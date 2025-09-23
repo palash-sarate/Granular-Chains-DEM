@@ -13,14 +13,15 @@ atom_style sphere
 boundary s s f
 newton on
 
-# 3. Geometry and Particle Creation
-# ==================================
 # Define the simulation box dimensions.
 # The box will be 1x1x1 meters.
 region box block 0 1 0 1 0 1 units box
 
-# Define the hard surface (the floor).
-# 'bottom_wall' is a name for the region.
-# 'plane' defines the shape, with its normal vector pointing upwards.
-region bottom_wall plane 0 0 -1 0 units box
-ERROR: Expected floating point parameter in input script or data file (../region_plane.cpp:66)
+# 2. Material Properties and Interaction Model
+# ==================================
+# Define particle material properties.
+# These values are for a steel ball and a steel floor.
+# Adjust these values based on the materials you want to simulate.
+# youngsModulus: E, poissonRatio: nu, restitutionCoeff: e, frictionCoeff: mu
+fix m1 all property/global youngsModulus 2.07e11 poissonRatio 0.3 restitutionCoeff 0.7 frictionCoeff 0.5
+ERROR: Fix command before simulation box is defined (../modify.cpp:776)
