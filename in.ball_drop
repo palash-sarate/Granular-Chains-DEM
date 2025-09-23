@@ -1,0 +1,73 @@
+# LIGGGHTS input script for a ball dropping on a hard surface
+# 1. Initialization
+# ==================================
+# Set up the simulation units (e.g., SI units) and atom style.
+# The 'sphere' atom style is required for granular simulations.
+units si
+atom_style sphere
+
+# Define the simulation boundary conditions.
+# 's s f' means the box is shrink-wrapped in x and y, and fixed in z.
+# This is a good choice for a simple ball drop with a fixed floor.
+boundary s s f
+newton on
+
+# 3. Geometry and Particle Creation
+# ==================================
+# Define the simulation box dimensions.
+# The box will be 1x1x1 meters.
+region box block 0 1 0 1 0 1 units box
+
+# Define the hard surface (the floor).
+# 'bottom_wall' is a name for the region.
+# 'plane' defines the shape, with its normal vector pointing upwards.
+region bottom_wall plane 0 0 -1 0 units box
+fix wall all mesh/surface/stress/gran file /tmp/empty.stl type 2
+
+# Create the single spherical particle (the ball).
+# ID 1, type 1, radius 0.05m, density 7850 kg/m^3 (steel).
+# The position is x=0.5m, y=0.5m, z=0.8m, which is above the floor.
+create_atoms 1 single 0.5 0.5 0.8 units box mass 0.001
+group ball type 1
+
+# 2. Material Properties and Interaction Model
+# ==================================
+# Define particle material properties.
+# These values are for a steel ball and a steel floor.
+# Adjust these values based on the materials you want to simulate.
+# youngsModulus: E, poissonRatio: nu, restitutionCoeff: e, frictionCoeff: mu
+fix m1 all property/global youngsModulus 2.07e11 poissonRatio 0.3 restitutionCoeff 0.7 frictionCoeff 0.5
+fix m2 all property/global youngsModulus 2.07e11 poissonRatio 0.3 restitutionCoeff 0.7 frictionCoeff 0.5
+
+# Define the interaction model between particles and with boundaries.
+pair_style gran/hertz/history
+pair_coeff * *
+
+# 4. Simulation Settings
+# ==================================
+# Set the timestep for the simulation. A small timestep is critical for stability.
+# The variable command allows us to use a descriptive name.
+variable dt equal 5.0e-6
+timestep ${dt}
+
+# Apply gravity in the negative z direction.
+fix grav all gravity 9.81 vector 0 0 -1
+
+# Apply the integration algorithm for particle motion.
+fix nve_ball ball nve/sphere
+
+# 5. Output and Running the Simulation
+# ==================================
+# Set up the frequency of outputting simulation data.
+# thermo outputs system-wide data to the console every 100 timesteps.
+thermo 100
+thermo_style custom step dt atoms ke pe etotal
+
+# dump outputs particle data to a file for visualization.
+# dump_all creates a file named 'sim.liggghts' every 100 timesteps.
+# The output includes particle ID, position (x, y, z), and velocity (vx, vy, vz).
+dump dump_all all custom 100 sim.liggghts id type x y z vx vy vz fx fy fz
+
+# Run the simulation for 10000 timesteps.
+# This duration is determined by the timestep and desired simulation time.
+run 10000

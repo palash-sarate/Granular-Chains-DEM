@@ -1,0 +1,26 @@
+LIGGGHTS (Version LIGGGHTS-PUBLIC 3.8.0, compiled 2025-09-22-20:50:23 by palash, git commit 3d5c00f20519e6bb6eb6756f51f1ad36564e649d)
+# LIGGGHTS input script for a ball dropping on a hard surface
+# 1. Initialization
+# ==================================
+# Set up the simulation units (e.g., SI units) and atom style.
+# The 'sphere' atom style is required for granular simulations.
+units si
+atom_style sphere
+
+# Define the simulation boundary conditions.
+# 's s f' means the box is shrink-wrapped in x and y, and fixed in z.
+# This is a good choice for a simple ball drop with a fixed floor.
+boundary s s f
+newton on
+
+# 3. Geometry and Particle Creation
+# ==================================
+# Define the simulation box dimensions.
+# The box will be 1x1x1 meters.
+region box block 0 1 0 1 0 1 units box
+
+# Define the hard surface (the floor).
+# 'bottom_wall' is a name for the region.
+# 'plane' defines the shape, with its normal vector pointing upwards.
+region bottom_wall plane 0 0 -1 0 units box
+ERROR: Expected floating point parameter in input script or data file (../region_plane.cpp:66)
