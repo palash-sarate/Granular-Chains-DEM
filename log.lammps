@@ -1,0 +1,28 @@
+LAMMPS (22 Jul 2025 - Update 1)
+  using 4 OpenMP thread(s) per MPI task
+Loaded 1 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
+# Flexible granular chain simulation in LAMMPS
+
+units       si
+atom_style hybrid sphere molecular
+WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (src/atom_vec_hybrid.cpp:132)
+# sphere
+# atom-ID atom-type diameter density x y z
+# bond
+# atom-ID molecule-ID atom-type x y z
+# hybrid sphere molecular
+# atom-ID atom-type x y z molecule-ID diameter density
+# atom_modify	map array
+boundary    p p p
+
+special_bonds fene
+
+# Read the atom and bond data from the data file.
+read_data test_format.data #chain.data
+Reading data file ...
+  orthogonal box = (0 0 0) to (1 1 1)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  2 atoms
+ERROR: Duplicate atom IDs exist (src/atom.cpp:930)
+Last input line: read_data test_format.data #chain.data

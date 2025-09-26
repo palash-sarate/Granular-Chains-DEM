@@ -1,0 +1,10 @@
+units si
+atom_style hybrid sphere molecular
+boundary p p p
+
+region box block 0 1 0 1 0 1
+create_box 1 box bond/types 0 angle/types 0
+create_atoms 1 single 0.5 0.5 0.5
+set type 1 diameter 0.001
+set type 1 density 1180.0
+write_data test_format.data
