@@ -3,10 +3,31 @@ atom_style hybrid sphere molecular
 boundary p p p
 
 region box block 0 1 0 1 0 1
-create_box 1 box bond/types 1 angle/types 0
-create_atoms 1 single 0.5 0.5 0.5
-set atom 1 molecule 1
+create_box 1 box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 1
+
+special_bonds fene
+bond_style fene
+bond_coeff 1 100000 0.001 0.001 0.001
+angle_style harmonic
+angle_coeff 1 100000 38.0
+
+pair_style zero 1.0
+pair_coeff * *
+neighbor 0.3 bin
+
+create_atoms 1 single 0.45 0.5 0.5
+create_atoms 1 single 0.50 0.5 0.5
+create_atoms 1 single 0.55 0.5 0.5
+
+set atom 1 mol 1
+set atom 2 mol 1
+set atom 3 mol 1
+
 set type 1 diameter 0.001
 set type 1 density 1180.0
-create_bonds single/bond 1 1 1 1
+
+create_bonds single/bond 1 1 2
+create_bonds single/bond 1 2 3
+create_bonds single/angle 1 1 2 3
+
 write_data sample.data

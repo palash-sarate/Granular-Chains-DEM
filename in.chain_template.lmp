@@ -9,69 +9,92 @@ atom_style hybrid sphere molecular
 # hybrid sphere molecular
 # atom-ID atom-type x y z molecule-ID diameter density
 # atom_modify	map array
-boundary    p p p
+boundary    f f f
 
 special_bonds fene
 
 # Read the atom and bond data from the data file.
-read_data test_format.data #chain.data
+read_data chain.data
 
 # Ensure spherical properties are consistent (overrides data if needed)
-set type 1 diameter 0.001
-set type 1 density 1180.0
+set type 1 diameter 0.002
+set type 1 density 8500.0
 velocity all set 0.0 0.0 0.0
 
-# Optional: ensure directory exists for output
-shell mkdir -p post
+# Optional: create a unique output directory per run (portable on Windows PowerShell)
+# shell powershell -NoProfile -Command "if (!(Test-Path 'post')) {New-Item -ItemType Directory -Path 'post' ^| Out-Null}; $counterPath = 'post/run_counter.txt'; if (!(Test-Path $counterPath)) {Set-Content -Path $counterPath -Value '0'}; $count = [int](Get-Content -Path $counterPath); $next = $count + 1; Set-Content -Path $counterPath -Value $next; $outdir = Join-Path 'post' ('run_{0:D4}' -f $next); New-Item -ItemType Directory -Path $outdir -Force ^| Out-Null; $forward = $outdir -replace '\\','/'; Set-Content -Path 'post/current_run.txt' -Value $forward; Set-Content -Path 'post/current_run.lmp' -Value ('variable outdir string ' + $forward);"
+# include post/current_run.lmp
+
+# Ensure a predictable output directory and set outdir
+shell if not exist post mkdir post
+shell if not exist post\current mkdir post\current
+variable outdir string post/current
 
 # Apply gravity
 fix grav all gravity 9.81 vector 0 0 -1
+# fix 3 all wall/gran granular hertz/material 1e5 1e3 0.3 &
+#     tangential mindlin NULL 1.0 0.5 zplane 0 NULL
+
+fix floor all wall/gran granular hertz/material 2.0e11 0.3 5e4 &
+    tangential linear_history 300.0 1.0 0.1 &
+    rolling sds 200.0 100.0 0.1 &
+    twisting marshall &
+    zplane 0.005 NULL
+    
+fix ceil all wall/gran granular hertz/material 2.0e11 0.3 5e4 &
+    tangential linear_history 300.0 1.0 0.1 &
+    rolling sds 200.0 100.0 0.1 &
+    twisting marshall &
+    zplane 0.08 NULL
+
+comm_modify    vel yes
 
 pair_style      granular
-# pair_coeff      1 * jkr 1000.0 50.0 0.3 10 tangential mindlin 800.0 1.0 0.5 rolling sds 500.0 200.0 0.5 twisting marshall
-pair_coeff      1 2 hertz 200.0 20.0 tangential linear_history 300.0 1.0 0.1 rolling sds 200.0 100.0 0.1 twisting marshall
+pair_coeff  1 1 hertz/material 2.0e11 0.30 5.0e4 &
+            tangential linear_history 8.0e10 5.0e3 0.40 &
+            rolling sds 1.0e4 5.0e3 0.30 &
+            twisting marshall
 
-fix prop1 all property/global youngsModulus peratomtype 5.0e6
-fix prop2 all property/global poissonsRatio peratomtype 0.45
-fix prop3 all property/global coefficientRestitution peratomtypepair 1 0.3
-fix prop4 all property/global coefficientFriction peratomtypepair 1 0.5
-# pair_coeff * *
+# pair_coeff 1 1 hertz/material 1 1 1
+# fix props all property/global youngsModulus peratomtype 1 2.0e11
+# fix props all property/global poissonsRatio peratomtype 1 0.30
+# fix props all property/global coefficientRestitution peratomtypepair 1 1 5.0e4
+# Set contact properties directly through pair coefficients (no property/global fixes available)
 
-# Define the bond style as Finite Extensible Nonlinear Elastic (FENE).
-# This provides a stiff restoring force that prevents the bond from stretching
-# beyond a defined maximum distance (R0). There is a repulsive force at
-# very close ranges, but no force in the middle, allowing beads to move freely
-# within the bond's range.
-# The parameters for bond_coeff are K (bond stiffness) and R0 (max bond length).
-# K = 100000 (very stiff, approximates an infinite well)
-# R0 = 0.001 (1mm, your required maximum separation)
-bond_style fene
-bond_coeff 1 100000 0.001 0.001 0.001 # type K R0 epsilon sigma
+# Connect beads with a custom tabulated bond: no force between 2 mm and 3 mm,
+# steep quadratic walls outside that window.
+bond_style table spline 200
+bond_coeff 1 bond_window.table WIN
 
 # Define the angle style as Harmonic. This will act as our angular infinite well.
 # The potential is given by E=K(θ−θ0)^2 where θ0 is the equilibrium angle.
 # We will set θ0 to your desired limit of 38 degrees.
-angle_style harmonic
-angle_coeff 1 100000 38.0 # type K_angle theta0
+angle_style table spline 2001      # use spline and match N_points in the file (2001 here)
+angle_coeff 1 bond_angle.table ANGLE_WELL
 
 # Use the standard NVE integrator for non-rigid bodies.
-fix integr all nve
+fix integr all nve/sphere
 
-# Set up neighbor list parameters
-neighbor 0.005 bin
-neigh_modify delay 0
+# Set up neighbor list parameters (wider skin and higher per-atom quota prevent overflow)
+neighbor 0.08 bin
+neigh_modify delay 0 every 1 check yes one 10000
 
-# Set a timestep for the simulation. A small timestep is required for this stiff bond.
-timestep 0.000001
+# Set a conservative timestep for the stiff bonded chain.
+timestep 2.5e-8
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 1000 timesteps.
 thermo 1000
-thermo_style custom step pe ke etotal temp press
+thermo_style custom step pe ke etotal press
 
 # Output a dump file of the atom coordinates for visualization (e.g., in ParaView)
-dump 1 all custom/vtk 100 post/chain_*.vtk id type x y z vx vy vz fx fy fz
+dump 1 all custom 10000 ${outdir}/chain_*.dump id type x y z vx vy vz diameter
 dump_modify 1 sort id
 
-# Run the simulation for 100000 timesteps.
-run 100000
+variable outdir delete
+# unfix floor
+# fix floor all wall/reflect zlo 0.005
+# run 4800000
+# unfix floor
+# Run the simulation for 100000 timesteps = 1.0 s.
+run 4800000
