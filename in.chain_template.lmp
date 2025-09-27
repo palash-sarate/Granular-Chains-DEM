@@ -27,12 +27,15 @@ shell mkdir -p post
 # Apply gravity
 fix grav all gravity 9.81 vector 0 0 -1
 
-pair_style gran model hertz tangential history
+pair_style      granular
+# pair_coeff      1 * jkr 1000.0 50.0 0.3 10 tangential mindlin 800.0 1.0 0.5 rolling sds 500.0 200.0 0.5 twisting marshall
+pair_coeff      1 2 hertz 200.0 20.0 tangential linear_history 300.0 1.0 0.1 rolling sds 200.0 100.0 0.1 twisting marshall
+
 fix prop1 all property/global youngsModulus peratomtype 5.0e6
 fix prop2 all property/global poissonsRatio peratomtype 0.45
 fix prop3 all property/global coefficientRestitution peratomtypepair 1 0.3
 fix prop4 all property/global coefficientFriction peratomtypepair 1 0.5
-pair_coeff * *
+# pair_coeff * *
 
 # Define the bond style as Finite Extensible Nonlinear Elastic (FENE).
 # This provides a stiff restoring force that prevents the bond from stretching
