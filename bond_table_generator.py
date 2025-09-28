@@ -21,9 +21,9 @@ class BondTableConfig:
     section: str = "WIN"
     r0: float = 2.5e-3             # nominal centre spacing (m)
     slack_half_width: float = 1.5e-4  # half-width of the near-zero-force window (m)
-    stiffness: float = 1.0e5       # N/m applied outside the slack window
+    stiffness: float = 1.0e8       # N/m applied outside the slack window
     r_min: float = 2.0e-3          # lower bound of the tabulated range (m)
-    r_max: float = 3.2e-3          # upper bound of the tabulated range (m)
+    r_max: float = 5.2e-3          # upper bound of the tabulated range (m)
     n_points: int = 401            # samples across the interval
     output_path: Path = Path("bond_window.table")
 
@@ -87,6 +87,36 @@ def _format_table(
 
     return "\n".join(header + body) + "\n"
 
+# plot the table for visual inspection
+def plot_table(cfg: BondTableConfig, rows: list[tuple[int, float, float, float]]) -> None:
+    import matplotlib.pyplot as plt
+
+    rs = [r * 1e3 for _, r, _, _ in rows]  # convert to mm
+    energies = [energy for _, _, energy, _ in rows]
+    forces = [force for _, _, _, force in rows]
+
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:blue'
+    ax1.set_xlabel('Distance (mm)')
+    ax1.set_ylabel('Energy (J)', color=color)
+    ax1.plot(rs, energies, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+    color = 'tab:red'
+    ax2.set_ylabel('Force (N)', color=color)  # we already handled the x-label with ax1
+    ax2.plot(rs, forces, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    plt.title('Bond Potential and Force Profile')
+    plt.show()
 
 if __name__ == "__main__":
     write_table(BondTableConfig())
+    # suggest time step as del t = 0.1 * sqrt(m/k)
+    del_t = 0.1 * (1.0e-6 / BondTableConfig().stiffness) ** 0.5
+    print (f"Suggested time step: {del_t:.3e} s")
+    plot_table(BondTableConfig(), generate_table(BondTableConfig()))

@@ -43,6 +43,33 @@ left_transition_end = allowed_lo + delta  # within this we'll smoothly go to zer
 right_transition_start = allowed_hi - delta
 right_transition_end = allowed_hi + delta
 
+def plot_table(cfg, rows):
+    import matplotlib.pyplot as plt
+
+    angles = [r[1] for r in rows]
+    energies = [r[2] for r in rows]
+    torques = [r[3] for r in rows]
+
+    fig, ax1 = plt.subplots()
+
+    color = "tab:blue"
+    ax1.set_xlabel("Angle (deg)")
+    ax1.set_ylabel("Energy", color=color)
+    ax1.plot(angles, energies, color=color)
+    ax1.tick_params(axis="y", labelcolor=color)
+
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+    color = "tab:red"
+    ax2.set_ylabel("Torque", color=color)  # we already handled the x-label with ax1
+    ax2.plot(angles, torques, color=color)
+    ax2.tick_params(axis="y", labelcolor=color)
+
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    plt.title("Angle well energy and torque")
+    plt.grid()
+    plt.show()
+
 # Helper: smoothstep for blending
 def smoothstep(x):
     # cubic smoothstep from 0->1 for x in [0,1]
@@ -106,6 +133,9 @@ with outfile.open("w", newline="\n") as fh:
     fh.write("\n")
     for idx, (th, u, t) in enumerate(zip(theta, U, torque), start=1):
         fh.write(f"{idx} {th:.6f} {u:.12e} {t:.12e}\n")
+
+# plot the table for visual inspection
+plot_table(None, [(i+1, th, u, t) for i, (th, u, t) in enumerate(zip(theta, U, torque))])
 
 # # Print first 40 lines for inspection
 # print("Wrote:", outfile)

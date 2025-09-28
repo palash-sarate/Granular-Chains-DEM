@@ -2,13 +2,6 @@
 
 units       si
 atom_style hybrid sphere molecular
-# sphere
-# atom-ID atom-type diameter density x y z
-# bond
-# atom-ID molecule-ID atom-type x y z
-# hybrid sphere molecular
-# atom-ID atom-type x y z molecule-ID diameter density
-# atom_modify	map array
 boundary    f f f
 
 special_bonds fene
@@ -17,21 +10,30 @@ special_bonds fene
 read_data chain.data
 
 # Ensure spherical properties are consistent (overrides data if needed)
+# mm
 set type 1 diameter 0.002
-set type 1 density 8500.0
+# kg/m3
+set type 1 density 708.47
 velocity all set 0.0 0.0 0.0
+
+# Pin the first three beads in space (anchor group) and integrate only the rest
+group anchors id 1 2 3
+group mobile subtract all anchors
+
+velocity anchors set 0.0 0.0 0.0
+set group anchors omega 0.0 0.0 0.0
 
 # Optional: create a unique output directory per run (portable on Windows PowerShell)
 # shell powershell -NoProfile -Command "if (!(Test-Path 'post')) {New-Item -ItemType Directory -Path 'post' ^| Out-Null}; $counterPath = 'post/run_counter.txt'; if (!(Test-Path $counterPath)) {Set-Content -Path $counterPath -Value '0'}; $count = [int](Get-Content -Path $counterPath); $next = $count + 1; Set-Content -Path $counterPath -Value $next; $outdir = Join-Path 'post' ('run_{0:D4}' -f $next); New-Item -ItemType Directory -Path $outdir -Force ^| Out-Null; $forward = $outdir -replace '\\','/'; Set-Content -Path 'post/current_run.txt' -Value $forward; Set-Content -Path 'post/current_run.lmp' -Value ('variable outdir string ' + $forward);"
 # include post/current_run.lmp
 
 # Ensure a predictable output directory and set outdir
-shell if not exist post mkdir post
-shell if not exist post\current mkdir post\current
-variable outdir string post/current
+shell if not exist post_chain_flop mkdir post_chain_flop
+shell if not exist post_chain_flop\current mkdir post_chain_flop\current
+variable outdir string post_chain_flop/current
 
-# Apply gravity
-fix grav all gravity 9.81 vector 0 0 -1
+# Apply gravity perpendicular to the chain (chain aligned with +z, gravity along +x)
+fix grav mobile gravity 9.81 vector 1 0 0
 # fix 3 all wall/gran granular hertz/material 1e5 1e3 0.3 &
 #     tangential mindlin NULL 1.0 0.5 zplane 0 NULL
 
@@ -56,12 +58,6 @@ pair_coeff  1 1 hertz/material 2.0e11 0.30 5.0e4 &
             rolling sds 1.0e4 5.0e3 0.30 &
             twisting marshall
 
-# pair_coeff 1 1 hertz/material 1 1 1
-# fix props all property/global youngsModulus peratomtype 1 2.0e11
-# fix props all property/global poissonsRatio peratomtype 1 0.30
-# fix props all property/global coefficientRestitution peratomtypepair 1 1 5.0e4
-# Set contact properties directly through pair coefficients (no property/global fixes available)
-
 # Connect beads with a custom tabulated bond: no force between 2 mm and 3 mm,
 # steep quadratic walls outside that window.
 bond_style table spline 200
@@ -73,8 +69,8 @@ bond_coeff 1 bond_window.table WIN
 angle_style table spline 2001      # use spline and match N_points in the file (2001 here)
 angle_coeff 1 bond_angle.table ANGLE_WELL
 
-# Use the standard NVE integrator for non-rigid bodies.
-fix integr all nve/sphere
+# Use the standard NVE integrator for the mobile beads only.
+fix integr mobile nve/sphere
 
 # Set up neighbor list parameters (wider skin and higher per-atom quota prevent overflow)
 neighbor 0.08 bin
