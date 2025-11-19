@@ -66,8 +66,11 @@ bond_coeff 1 bond_window.table WIN
 # Define the angle style as Harmonic. This will act as our angular infinite well.
 # The potential is given by E=K(θ−θ0)^2 where θ0 is the equilibrium angle.
 # We will set θ0 to your desired limit of 38 degrees.
-angle_style table spline 2001      # use spline and match N_points in the file (2001 here)
-angle_coeff 1 bond_angle.table ANGLE_WELL
+# angle_style table spline 2001      # use spline and match N_points in the file (2001 here)
+# angle_coeff 1 bond_angle.table ANGLE_WELL
+
+angle_style cosine
+angle_coeff 1 0
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -77,7 +80,7 @@ neighbor 0.08 bin
 neigh_modify delay 0 every 1 check yes one 10000
 
 # Set a conservative timestep for the stiff bonded chain.
-timestep 2.5e-8
+timestep 2.5e-7
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 1000 timesteps.
