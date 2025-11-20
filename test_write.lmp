@@ -1,5 +1,5 @@
 units si
-atom_style hybrid sphere molecular
+atom_style hybrid sphere angle
 boundary p p p
 
 region box block 0 1 0 1 0 1
@@ -30,4 +30,4 @@ create_bonds single/bond 1 1 2
 create_bonds single/bond 1 2 3
 create_bonds single/angle 1 1 2 3
 
-write_data sample.data
+write_data chain_datas/sample.data

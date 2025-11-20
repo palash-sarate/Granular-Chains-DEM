@@ -1,13 +1,15 @@
 # Flexible granular chain simulation in LAMMPS
 
 units       si
-atom_style hybrid sphere molecular
+atom_style hybrid sphere angle
 boundary    f f f
 
-special_bonds fene
+# special_bonds none
 
 # Read the atom and bond data from the data file.
-read_data chain.data
+# read_data chain_datas/chain.data
+read_data chain_datas/N4_chain.data
+# read_data chain_datas/N4_chain.data
 
 # Ensure spherical properties are consistent (overrides data if needed)
 # mm
@@ -17,7 +19,7 @@ set type 1 density 708.47
 velocity all set 0.0 0.0 0.0
 
 # Pin the first three beads in space (anchor group) and integrate only the rest
-group anchors id 1 2 3
+group anchors id 1 2
 group mobile subtract all anchors
 
 velocity anchors set 0.0 0.0 0.0
@@ -30,57 +32,77 @@ set group anchors omega 0.0 0.0 0.0
 # Ensure a predictable output directory and set outdir
 shell if not exist post_chain_flop mkdir post_chain_flop
 shell if not exist post_chain_flop\current mkdir post_chain_flop\current
+# clear dir if it exist
+shell del /Q post_chain_flop\current\*
 variable outdir string post_chain_flop/current
+
+variable r_max equal 0.003 #center to center
+# Theta limit in Radians (140 degrees * PI / 180)
+variable theta_lim equal 2.44346
+# Stiffnesses
+variable knt1 equal 1.0e3
+variable knt2   equal 1.0e8  # High stiffness for bond limit
+variable ktheta equal 1.0e8   # Stiffness for angle limit
 
 # Apply gravity perpendicular to the chain (chain aligned with +z, gravity along +x)
 fix grav mobile gravity 9.81 vector 1 0 0
-# fix 3 all wall/gran granular hertz/material 1e5 1e3 0.3 &
-#     tangential mindlin NULL 1.0 0.5 zplane 0 NULL
+# --- WALL DEFINITIONS ---
+# You must define X, Y, and Z walls separately.
 
-fix floor all wall/gran granular hertz/material 2.0e11 0.3 5e-4 &
+# 1. X-Walls (Left and Right: -0.02 to 0.02)
+fix xwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
     tangential linear_history 300.0 1.0 0.1 &
     rolling sds 200.0 100.0 0.1 &
     twisting marshall &
-    zplane NULL 0.013
+    xplane -0.02 0.02
 
-fix ceil all wall/gran granular hertz/material 2.0e11 0.3 5e-4 &
+# 2. Y-Walls (Front and Back: -0.01 to 0.01)
+fix ywalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
     tangential linear_history 300.0 1.0 0.1 &
     rolling sds 200.0 100.0 0.1 &
     twisting marshall &
-    zplane 0.08 NULL
+    yplane -0.01 0.01
 
-comm_modify    vel yes
+# 3. Z-Walls (Floor and Ceiling: 0.00 to 0.08)
+fix zwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
+    tangential linear_history 300.0 1.0 0.1 &
+    rolling sds 200.0 100.0 0.1 &
+    twisting marshall &
+    zplane 0.00 0.08
+
+comm_modify    vel yes cutoff 0.004
 
 # define particle - particle interactions
 pair_style      granular
-pair_coeff  1 1 hertz/material 2.0e11 0.30 5.0e4 &
+pair_coeff  1 1 hertz/material 1.0e8 0.30 5.0e4 &
             tangential linear_history 8.0e10 5.0e3 0.40 &
             rolling sds 1.0e4 5.0e3 0.30 &
             twisting marshall
 
-# Connect beads with a custom tabulated bond: no force between 2 mm and 3 mm,
-# steep quadratic walls outside that window.
-bond_style table spline 200
-bond_coeff 1 bond_window.table WIN
+# BOND: Lepton
+# If r > r_max (0.003): Apply harmonic penalty k/2 * (r - r_max)^2
+# If r <= r_max: Force is 0 (slack chain)
+# Note: Repulsion for r < 0.002 is handled by pair_style granular, not this bond.
+bond_style lepton
+bond_coeff 1 1.0 "0.5 * knt2 * (r - r_max)^2 * step(r - r_max); knt2=v_knt2; r_max=v_r_max"
 
-# Define the angle style as Harmonic. This will act as our angular infinite well.
-# The potential is given by E=K(θ−θ0)^2 where θ0 is the equilibrium angle.
-# We will set θ0 to your desired limit of 38 degrees.
-# angle_style table spline 2001      # use spline and match N_points in the file (2001 here)
-# angle_coeff 1 bond_angle.table ANGLE_WELL
+# ANGLE: Lepton
+# theta variable is in Radians.
+# If theta < theta_lim: Apply harmonic penalty k/2 * (theta - theta_lim)^2
+# If theta >= theta_lim: Force is 0 (free bending)
 
-angle_style cosine
-angle_coeff 1 0
+angle_style lepton
+angle_coeff 1 1.0 "0.5 * ktheta * (theta - t_lim)^2 * step(t_lim - theta); ktheta=v_ktheta; t_lim=v_theta_lim"
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
 
 # Set up neighbor list parameters (wider skin and higher per-atom quota prevent overflow)
-neighbor 0.08 bin
-neigh_modify delay 0 every 1 check yes one 10000
+neighbor 0.005 bin
+neigh_modify delay 0 every 1 check yes
 
 # Set a conservative timestep for the stiff bonded chain.
-timestep 2.5e-7
+timestep 1.0e-8
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 1000 timesteps.
@@ -88,13 +110,9 @@ thermo 1000
 thermo_style custom step pe ke etotal press
 
 # Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
-dump 1 all custom 10000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter
+dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter
 dump_modify 1 sort id
 
 variable outdir delete
-# unfix floor
-# fix floor all wall/reflect zlo 0.005
-# run 4800000
-# unfix floor
-# Run the simulation for 100000 timesteps = 1.0 s.
-run 4800000
+
+run 10000000
