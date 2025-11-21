@@ -1,6 +1,6 @@
 from analysis.data_manager import SimulationData
-from analysis.geometry import get_angle_series
-from analysis.plotting import plot_angle_evolution
+from analysis.geometry import get_angle_series, get_xyz_series
+from analysis.plotting import plot_angle_evolution, plot_xyz_evolution
 
 def main():
     # 1. Initialize Data Manager
@@ -17,13 +17,23 @@ def main():
     print(f"Loaded simulation with {len(df)} records.")
 
     # 3. Perform Analysis
-    # Example: Calculate angle between atoms 1, 2, and 3
-    print("Calculating angles...")
-    angle_series = get_angle_series(df, id1=1, id2=2, id3=3)
+    # # Example: Calculate angle between atoms 1, 2, and 3
+    # print("Calculating angles...")
+    # angle_series = get_angle_series(df, id1=1, id2=2, id3=3)
 
-    # 4. Visualize
-    print("Plotting...")
-    plot_angle_evolution(angle_series, title="Angle between Atoms 1-2-3")# filepath: d:\Chains_simulations\main_analysis.py
+    # # 4. Visualize
+    # print("Plotting...")
+    # plot_angle_evolution(angle_series, title="Angle between Atoms 1-2-3")# filepath: d:\Chains_simulations\main_analysis.py
 
+    # plot x, y, z over time of an atom
+    atom_id=4
+    xyz_data = get_xyz_series(df, atom_id=atom_id)
+    plot_xyz_evolution(xyz_data, title=f'Atom {atom_id} Position Evolution')
+    
+    # get distances between atom 1 and atom 2 over time
+    # distance_series = get_distance_series(df, id1=1, id2=2)
+    # plot_distance_evolution(distance_series, title="Distance between Atoms 1 and 
+    
+    
 if __name__ == "__main__":
     main()

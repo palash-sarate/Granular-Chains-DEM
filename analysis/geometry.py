@@ -1,5 +1,21 @@
 import numpy as np
 
+def get_xyz_series(df, atom_id):
+    """
+    Returns a list of (timestep, x, y, z) tuples for the whole simulation.
+    """
+    timesteps = df.index.get_level_values('timestep').unique()
+    results = []
+
+    for step in timesteps:
+        try:
+            pos = df.loc[(step, atom_id), ['x', 'y', 'z']].values
+            results.append((step, pos[0], pos[1], pos[2]))
+        except KeyError:
+            continue
+            
+    return results
+
 def calculate_angle_3d(pos_a, pos_b, pos_c):
     """
     Calculates angle ABC (at vertex B) in degrees.
