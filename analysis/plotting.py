@@ -34,7 +34,7 @@ def plot_distance_evolution(distance_data, title="Distance Evolution"):
     plt.figure(figsize=(10, 6))
     plt.plot(steps, values, label='Distance', color='r')
     plt.xlabel('Timestep')
-    plt.ylabel('Distance (units)')
+    plt.ylabel('Distance (m)')
     plt.title(title)
     plt.grid(True, alpha=0.3)
     plt.legend()

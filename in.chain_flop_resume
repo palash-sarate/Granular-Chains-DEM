@@ -18,6 +18,9 @@ read_data chain_datas/N4_chain.data
 # set type 1 density 708.47
 velocity all set 0.0 0.0 0.0
 
+# 1. Read the restart file instead of the data file
+read_restart post_chain_flop/current/restart.final.bin
+
 # Pin the first three beads in space (anchor group) and integrate only the rest
 group anchors id 1 2
 group mobile subtract all anchors
@@ -25,15 +28,7 @@ group mobile subtract all anchors
 velocity anchors set 0.0 0.0 0.0
 set group anchors omega 0.0 0.0 0.0
 
-# Optional: create a unique output directory per run (portable on Windows PowerShell)
-# shell powershell -NoProfile -Command "if (!(Test-Path 'post')) {New-Item -ItemType Directory -Path 'post' ^| Out-Null}; $counterPath = 'post/run_counter.txt'; if (!(Test-Path $counterPath)) {Set-Content -Path $counterPath -Value '0'}; $count = [int](Get-Content -Path $counterPath); $next = $count + 1; Set-Content -Path $counterPath -Value $next; $outdir = Join-Path 'post' ('run_{0:D4}' -f $next); New-Item -ItemType Directory -Path $outdir -Force ^| Out-Null; $forward = $outdir -replace '\\','/'; Set-Content -Path 'post/current_run.txt' -Value $forward; Set-Content -Path 'post/current_run.lmp' -Value ('variable outdir string ' + $forward);"
-# include post/current_run.lmp
-
 # Ensure a predictable output directory and set outdir
-shell if not exist post_chain_flop mkdir post_chain_flop
-shell if not exist post_chain_flop\current mkdir post_chain_flop\current
-# clear dir if it exist
-shell del /Q post_chain_flop\current\*
 variable outdir string post_chain_flop/current
 
 variable r_max equal 0.003 #center to center
@@ -108,8 +103,8 @@ neigh_modify delay 0 every 1 check yes
 timestep 1.0e-9
 
 # === 4. OUTPUTS & RUN ===
-# Output thermodynamic data every 10000 timesteps.
-thermo 10000
+# Output thermodynamic data every 1000 timesteps.
+thermo 1000
 thermo_style custom step pe ke etotal press
 
 # Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
@@ -118,9 +113,9 @@ dump_modify 1 sort id
 
 # Save a binary restart file every 1,000,000 steps
 # The '*' is replaced by the timestep number
-restart 100000 ${outdir}/restart.*.bin
+restart 1000000 ${outdir}/restart.*.bin
 
-run 100000000  # 100 million timesteps 10 ms
+run 10000000
 
 # Save the final state manually
 write_restart ${outdir}/restart.final.bin
