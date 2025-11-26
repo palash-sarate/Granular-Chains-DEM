@@ -4,6 +4,7 @@ units       si
 atom_style hybrid sphere angle
 boundary    f f f
 
+special_bonds lj/coul 1.0 1.0 1.0
 # special_bonds none
 
 # Read the atom and bond data from the data file.
@@ -36,15 +37,17 @@ shell if not exist post_chain_flop\current mkdir post_chain_flop\current
 shell del /Q post_chain_flop\current\*
 variable outdir string post_chain_flop/current
 
-variable r_max equal 0.003 #center to center
+# 
+variable r_max equal 0.0005 #pot center to center
 # Theta limit in Radians (140 degrees * PI / 180)
-variable theta_lim equal 2.44346
+variable theta_lim equal 2.4435
 # Stiffnesses
-variable knt2   equal 1.0e5  # High stiffness for bond limit
-variable ktheta equal 1.0e5   # Stiffness for angle limit
+variable knt2   equal 1.0e6  # High stiffness for bond limit
+variable ktheta equal 1.0e6   # Stiffness for angle limit
 # smoothing widths (tune as needed)
-variable w   equal 1.0e-5    # smoothing length (m)
-variable delta equal 0.05    # smoothing angle (rad) ~ 1.15 deg
+variable w   equal 1.0e-4    # smoothing length (m) 0.1 mm
+variable delta equal 1.0e-4    # smoothing angle (rad) ~ 1.15 deg
+
 # Granular pair style parameters
 # normal contact
 variable k_n equal 1e6 # Normal stiffness
@@ -112,6 +115,10 @@ angle_style lepton no_offset
 # angle_coeff 1 1.0 "0.5 * ktheta * (theta - t_lim)^2 * step(t_lim - theta); ktheta=v_ktheta; t_lim=v_theta_lim"
 angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - theta)/w_a)); ktheta=v_ktheta; t_lim=v_theta_lim; w_a=v_delta"
 
+# Replaces the missing internal link friction
+group chain_particles type 1
+fix 1 chain_particles viscous 0.3
+
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
 
@@ -119,17 +126,25 @@ fix integr mobile nve/sphere
 neighbor 0.004 bin # skin_width type
 neigh_modify delay 0 every 1 check yes
 
+# COMPUTE BOND AND ANGLE DATA
+# Calculate bond distance and energy
+compute 1 chain_particles bond/local dist engpot force 
+# Calculate angle theta and energy
+compute 2 chain_particles angle/local theta eng
+
 # Set a conservative timestep for the stiff bonded chain.
 timestep 1.0e-6
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 10000 timesteps.
-thermo 1000
+thermo 10000
 thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 
 # Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
-dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass 
+dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
+dump 2 all local 1000 ${outdir}/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump 3 all local 1000 ${outdir}/angle_*.dump index c_2[1] c_2[2]
 
 # Save a binary restart file every 1,000,000 steps
 # The '*' is replaced by the timestep number

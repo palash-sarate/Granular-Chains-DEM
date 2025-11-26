@@ -30,7 +30,7 @@ class SimulationData:
         if not os.path.exists(self.cache_file):
             return False
         
-        dump_files = glob.glob(os.path.join(self.data_dir, "*.dump"))
+        dump_files = glob.glob(os.path.join(self.data_dir, "chain_*.dump"))
         if not dump_files:
             return False
             
