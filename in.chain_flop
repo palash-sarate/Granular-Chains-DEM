@@ -33,6 +33,9 @@ set group anchors omega 0.0 0.0 0.0
 # Ensure a predictable output directory and set outdir
 shell if not exist post_chain_flop mkdir post_chain_flop
 shell if not exist post_chain_flop\current mkdir post_chain_flop\current
+shell if not exist post_chain_flop\current\bond mkdir post_chain_flop\current\bond
+shell if not exist post_chain_flop\current\angle mkdir post_chain_flop\current\angle
+shell if not exist post_chain_flop\current\restart mkdir post_chain_flop\current\restart
 # clear dir if it exist
 shell del /Q post_chain_flop\current\*
 variable outdir string post_chain_flop/current
@@ -117,7 +120,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 
 # Replaces the missing internal link friction
 group chain_particles type 1
-fix 1 chain_particles viscous 0.3
+fix 1 chain_particles viscous 0.1
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -143,16 +146,16 @@ thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 # Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
 dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
-dump 2 all local 1000 ${outdir}/bond_*.dump index c_1[1] c_1[2] c_1[3]
-dump 3 all local 1000 ${outdir}/angle_*.dump index c_2[1] c_2[2]
+dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
 
 # Save a binary restart file every 1,000,000 steps
 # The '*' is replaced by the timestep number
-restart 100000 ${outdir}/restart.*.bin
+restart 100000 ${outdir}/restart/restart.*.bin
 
 run 10000000  # 1e7 timesteps 1 second 
 
 # Save the final state manually
-write_restart ${outdir}/restart.final.bin
+write_restart ${outdir}/restart/restart.final.bin
 
 variable outdir delete
