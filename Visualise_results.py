@@ -47,7 +47,7 @@ def main():
     anim = Animator(df, output_file="chain_movement.mp4")
     
     # You can color by 'id', 'vx', 'vy', 'vz', or 'velocity_magnitude' if those columns exist
-    anim.create_animation(start_frame=1, end_frame=200, fps=24, color_by='id', point_size=100)
+    anim.create_animation(start_frame=1, end_frame=200, fps=24, color_by='id', point_size=100, view='front_rev')
 
     
 if __name__ == "__main__":

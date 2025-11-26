@@ -90,11 +90,13 @@ class Animator:
             if max_range == 0: max_range = 1.0
             
             # Approximate scaling: 10 inches * 72 points/inch * 0.7 (axis fraction)
-            axis_length_points = 10 * 72 * 0.7
+            axis_length_points = 100 * 72 * 0.7
             
             # Size in points = (Diameter / Data Range) * Axis Length in Points
             # Scatter 's' argument is area in points^2
             s_values = ((diameters / max_range) * axis_length_points) ** 2
+            # print(f"Frame {frame_idx}: Using diameter-based sizes.")
+            # print(f"s_values {s_values}")
         else:
             s_values = point_size
 
@@ -139,6 +141,8 @@ class Animator:
             elev, azim = 90, -90
         elif view in ['front', 'xz']:
             elev, azim = 0, -90
+        elif view in ['front_rev', '-xz']:
+            elev, azim = 0, 90
         elif view in ['side', 'yz']:
             elev, azim = 0, 0
         else: # isometric or default
