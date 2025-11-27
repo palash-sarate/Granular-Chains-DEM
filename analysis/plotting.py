@@ -2,7 +2,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-def plot_angle_evolution(angle_data_list, legend_labels=None, title="Angle Evolution"):
+def plot_angle_evolution(angle_data_list, legend_labels=None, title="Angle Evolution", save_path=None):
     """
     Plots multiple series of angle vs time.
     angle_data_list: list of lists, where each inner list contains tuples (timestep, angle)
@@ -31,9 +31,12 @@ def plot_angle_evolution(angle_data_list, legend_labels=None, title="Angle Evolu
     plt.title(title)
     plt.grid(True, alpha=0.3)
     plt.legend()
+    
+    if save_path:
+        plt.savefig(save_path)
     # plt.show()
     
-def plot_distance_evolution(distance_data_list, legend_labels=None, title="Distance Evolution"):
+def plot_distance_evolution(distance_data_list, legend_labels=None, title="Distance Evolution", save_path=None):
     """
     Plots multiple series of distance vs time.
     distance_data_list: list of lists, where each inner list contains tuples (timestep, distance)
@@ -62,9 +65,10 @@ def plot_distance_evolution(distance_data_list, legend_labels=None, title="Dista
     plt.title(title)
     plt.grid(True, alpha=0.3)
     plt.legend()
-    # plt.show()
+    if save_path:
+        plt.savefig(save_path)
     
-def plot_xyz_evolution(xyz_data_list, legend_labels=None, title="X, Y, Z Evolution"):
+def plot_xyz_evolution(xyz_data_list, legend_labels=None, title="X, Y, Z Evolution", save_path=None):
     """
     Plots multiple series of x, y, z coordinates vs time.
     xyz_data_list: list of lists, where each inner list contains tuples (timestep, x, y, z)
@@ -102,4 +106,5 @@ def plot_xyz_evolution(xyz_data_list, legend_labels=None, title="X, Y, Z Evoluti
     plt.title(title)
     plt.grid(True, alpha=0.3)
     plt.legend()
-    # plt.show()
+    if save_path:
+        plt.savefig(save_path)

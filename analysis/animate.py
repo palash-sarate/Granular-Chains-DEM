@@ -54,7 +54,11 @@ class Animator:
         Static method to render a single frame. 
         Must be static to be picklable for ProcessPoolExecutor.
         """
-        elev, azim = view_angles
+        if len(view_angles) == 3:
+            elev, azim, roll = view_angles
+        else:
+            elev, azim = view_angles
+            roll = 0
         
         # Extract data
         x = group_data['x'].values
@@ -89,8 +93,9 @@ class Animator:
             max_range = max(x_range, y_range, z_range)
             if max_range == 0: max_range = 1.0
             
-            # Approximate scaling: 10 inches * 72 points/inch * 0.7 (axis fraction)
-            axis_length_points = 100 * 72 * 0.7
+            # Approximate scaling: 10 inches * 72 points/inch * 0.4 (axis fraction)
+            # Reduced from 0.7 to 0.4 to prevent visual intersection of non-intersecting particles
+            axis_length_points = 10 * 72 * 0.4
             
             # Size in points = (Diameter / Data Range) * Axis Length in Points
             # Scatter 's' argument is area in points^2
@@ -105,7 +110,20 @@ class Animator:
         ax = fig.add_subplot(111, projection='3d')
         
         # Set view angle
-        ax.view_init(elev=elev, azim=azim)
+        try:
+            ax.view_init(elev=elev, azim=azim, roll=roll)
+        except TypeError:
+            # Fallback for older matplotlib versions that don't support roll
+            if roll != 0:
+                print(f"Warning: 'roll' parameter ignored. Matplotlib version may be too old.")
+            ax.view_init(elev=elev, azim=azim)
+            
+        # Ensure the aspect ratio is cubic so the fixed limits look correct
+        try:
+            ax.set_box_aspect((1, 1, 1))
+        except AttributeError:
+            # Older matplotlib versions might use pbaspect or not support this
+            pass
         
         # Scatter plot
         sc = ax.scatter(x, y, z, c=c_values, cmap=cmap, s=s_values)
@@ -126,17 +144,22 @@ class Animator:
         plt.close(fig)
         return temp_filename
 
-    def create_animation(self, fps=30, resolution_dpi=100, color_by='id', cmap='viridis', point_size=50, start_frame=0, end_frame=None, view='isometric'):
+    def create_animation(self, fps=30, resolution_dpi=100, color_by='id', cmap='viridis', point_size=50, start_frame=0, end_frame=None, view='isometric', axis_limits=None):
         """
         Main function to create the animation using the loaded DataFrame.
         
         :param start_frame: Index of the first frame to include (0-based).
         :param end_frame: Index of the last frame to include (exclusive). If None, includes all.
         :param view: Camera view. Can be a tuple (elev, azim) or string: 'isometric', 'top'/'xy', 'front'/'xz', 'side'/'yz'.
+        :param axis_limits: Optional. Can be a float (range size centered on data) or a list of tuples [(xmin, xmax), (ymin, ymax), (zmin, zmax)].
         """
         # Determine view angles
-        if isinstance(view, (tuple, list)) and len(view) == 2:
-            elev, azim = view
+        roll = 0
+        if isinstance(view, (tuple, list)):
+            if len(view) == 2:
+                elev, azim = view
+            elif len(view) == 3:
+                elev, azim, roll = view
         elif view in ['top', 'xy']:
             elev, azim = 90, -90
         elif view in ['front', 'xz']:
@@ -145,10 +168,12 @@ class Animator:
             elev, azim = 0, 90
         elif view in ['side', 'yz']:
             elev, azim = 0, 0
+        elif view == 'z_left_x_down':
+            elev, azim, roll = 0, 90, 90
         else: # isometric or default
             elev, azim = 30, -60
         
-        view_angles = (elev, azim)
+        view_angles = (elev, azim, roll)
 
         # Get all unique timesteps sorted
         all_timesteps = sorted(self.df['timestep'].unique())
@@ -181,7 +206,30 @@ class Animator:
         
         # Prepare arguments for parallel processing
         tasks = []
-        limits = (self.x_limits, self.y_limits, self.z_limits)
+        
+        # Determine limits
+        if axis_limits is not None:
+            if isinstance(axis_limits, (int, float)):
+                # Calculate center of the data
+                x_center = (self.x_limits[0] + self.x_limits[1]) / 2
+                y_center = (self.y_limits[0] + self.y_limits[1]) / 2
+                z_center = (self.z_limits[0] + self.z_limits[1]) / 2
+                
+                half_range = axis_limits / 2
+                limits = (
+                    (x_center - half_range, x_center + half_range),
+                    (y_center - half_range, y_center + half_range),
+                    (z_center - half_range, z_center + half_range)
+                )
+                print(f"Using fixed axis range of {axis_limits} centered at ({x_center:.4f}, {y_center:.4f}, {z_center:.4f})")
+            elif isinstance(axis_limits, (list, tuple)) and len(axis_limits) == 3:
+                limits = axis_limits
+                print(f"Using explicit axis limits: {limits}")
+            else:
+                print("Warning: Invalid axis_limits format. Using auto-calculated limits.")
+                limits = (self.x_limits, self.y_limits, self.z_limits)
+        else:
+            limits = (self.x_limits, self.y_limits, self.z_limits)
         
         for i, (timestep, group) in enumerate(grouped):
             tasks.append((i, timestep, group, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles))

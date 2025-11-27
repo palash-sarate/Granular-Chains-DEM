@@ -3,3 +3,4 @@
 *.dump
 /post_chain_flop
 log.lammps
+temp_frame*
