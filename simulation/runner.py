@@ -58,7 +58,7 @@ class SimulationRunner:
         """Creates the necessary output directories."""
         outdir = config.output_dir
         # Create main output dir and subdirectories
-        subdirs = ["bond", "angle", "restart"]
+        subdirs = ["bond", "angle", "restart", "chain"]
         
         # Create base dir
         os.makedirs(outdir, exist_ok=True)
@@ -68,7 +68,7 @@ class SimulationRunner:
             
         print(f"Prepared output directories in: {outdir}")
 
-    def run(self, config: SimulationConfig, template_path: Optional[str] = None, verbose: bool = True):
+    def run(self, config: SimulationConfig, verbose: bool = True):
         """
         Runs the simulation using the provided configuration.
         If template_path is provided, generates a new input script.
@@ -77,19 +77,22 @@ class SimulationRunner:
         # Prepare directories first
         self._prepare_directories(config)
         
-        script_to_run = config.input_script
-        
-        if template_path:
+        if config.input_script:
+            script_to_run = config.input_script        
+        elif config.template:
+            template_path = f"simulation_templates/{config.template}"
             # Generate a temporary or specific input script
-            script_to_run = f"generated_{os.path.basename(template_path)}"
-            self.generate_input_script(config, template_path, script_to_run)
+            script_to_run = f"{config.output_dir}/in.{config.simulation}"
+            self.generate_input_script(config, template_path, script_to_run)            
+        else:
+            raise ValueError("Either input_script or template must be provided in the config.")
         
         cmd = [self.lammps_exe, "-in", script_to_run]
         
-        # We still pass variables via command line as a backup or for variables not in the script
-        vars_dict = config.to_lammps_vars()
-        for key, value in vars_dict.items():
-            cmd.extend(["-var", key, value])
+        # We can still pass variables via command line as a backup or for variables not in the script
+        # vars_dict = config.to_lammps_vars()
+        # for key, value in vars_dict.items():
+        #     cmd.extend(["-var", key, value])
             
         self._execute(cmd, verbose)
 

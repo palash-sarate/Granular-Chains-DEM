@@ -1,6 +1,6 @@
 .venv
 .history
 *.dump
-/post_chain_flop
+/dumping_yard
 log.lammps
 temp_frame*

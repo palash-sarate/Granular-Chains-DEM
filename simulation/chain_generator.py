@@ -35,7 +35,7 @@ class ChainConfig:
 	orientation: str = "vert"
 	spacing: float = 0.0 # centre-to-centre spacing in metres
 	diameter: float = 2.0e-3  # metres
-	density: float = 8.5e3  # kg/m^3
+	density: float = 7084.7  # kg/m^3
 	output_dir: Path = Path("chain_datas")
 	
 	# New configuration fields
@@ -43,6 +43,7 @@ class ChainConfig:
 	direction: Tuple[float, float, float] = (0.0, 0.0, 1.0)
 	max_spacing: float = 0.0
 	loop_radius: float = 0.0
+	box: Tuple[float, float, float, float, float, float] | None = None
 
 	def validate(self) -> None:
 		if self.beads < 1:
@@ -133,12 +134,17 @@ def _generate_random(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 	positions = [(0.0, 0.0, 0.0)]
 	for _ in range(cfg.beads - 1):
 		prev = positions[-1]
-		# Random direction on sphere
-		theta = random.uniform(0, math.pi)
-		phi = random.uniform(0, 2 * math.pi)
-		dx = math.sin(theta) * math.cos(phi)
-		dy = math.sin(theta) * math.sin(phi)
-		dz = math.cos(theta)
+		
+		# Uniform random direction on sphere
+		# z is uniform in [-1, 1]
+		# phi is uniform in [0, 2pi]
+		z = random.uniform(-1.0, 1.0)
+		phi = random.uniform(0.0, 2.0 * math.pi)
+		
+		r_xy = math.sqrt(1.0 - z*z)
+		dx = r_xy * math.cos(phi)
+		dy = r_xy * math.sin(phi)
+		dz = z
 		
 		# Spacing
 		if cfg.max_spacing > 0:
@@ -152,8 +158,8 @@ def _generate_random(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 
 def _generate_loop(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 	# Parameters
-	# Default radius large enough to satisfy >140 deg constraint (R > 1.5s)
-	R = cfg.loop_radius if cfg.loop_radius > 0 else max(0.02, 10 * cfg.spacing)
+	# Default radius is 2 * diameter if not specified
+	R = cfg.loop_radius if cfg.loop_radius > 0 else 2.0 * cfg.diameter
 	pitch = 1.5 * cfg.diameter # Small pitch to avoid intersection
 	
 	# Calculate beads for one full loop (2pi)
@@ -259,7 +265,12 @@ def write_chain_data(cfg: ChainConfig) -> Path:
 
 	cfg.validate()
 	positions = generate_positions(cfg)
-	box = estimate_box(cfg, positions)
+	
+	if cfg.box:
+		box = cfg.box
+	else:
+		box = estimate_box(cfg, positions)
+		
 	mass = cfg.bead_mass
 
 	lines: List[str] = []
@@ -294,15 +305,14 @@ def write_chain_data(cfg: ChainConfig) -> Path:
 		lines.append(
 			" ".join(
 				[
-					str(atom_id),
-					"1",  # molecule-ID (single chain)
+					str(atom_id),					
 					"1",  # atom type
 					format_float(x),
 					format_float(y),
 					format_float(z),
 					format_float(cfg.diameter),
 					format_float(cfg.density),
-					"1.0",  # quaternion w
+					"1",  # molecule-ID (single chain)
 					"0.0",
 					"0.0",
 					"0.0",
@@ -406,7 +416,7 @@ Examples:
 		"--loop-radius",
 		type=float,
 		default=0.0,
-		help="[Loop] Radius of the loop section.",
+		help="[Loop] Radius of the loop section. Defaults to 2 * diameter.",
 	)
 
 	# Common options
@@ -416,13 +426,21 @@ Examples:
 		required=True,
 		help="Centre-to-centre spacing between beads (metres).",
 	)
-	parser.add_argument("--diameter", type=float, default=2.0e-3, help="Bead diameter (metres).")
-	parser.add_argument("--density", type=float, default=8.5e3, help="Bead material density (kg/m^3).")
+	parser.add_argument("--diameter", type=float, default=ChainConfig.diameter, help="Bead diameter (metres).")
+	parser.add_argument("--density", type=float, default=ChainConfig.density, help="Bead material density (kg/m^3).")
 	parser.add_argument(
 		"--output-dir",
 		type=Path,
 		default=Path("chain_datas"),
 		help="Directory where the data file will be written.",
+	)
+	
+	parser.add_argument(
+		"--box",
+		type=float,
+		nargs=6,
+		metavar=("XLO", "XHI", "YLO", "YHI", "ZLO", "ZHI"),
+		help="Override simulation box bounds (xlo xhi ylo yhi zlo zhi).",
 	)
 
 	args = parser.parse_args(argv)
@@ -438,6 +456,7 @@ Examples:
 		diameter=args.diameter,
 		density=args.density,
 		output_dir=args.output_dir,
+		box=tuple(args.box) if args.box else None,
 	)
 
 

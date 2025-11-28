@@ -1,13 +1,18 @@
 from analysis.data_manager import SimulationData
 from analysis.geometry import get_angle_series, get_xyz_series, get_distance_series
 from analysis.plotting import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from analysis.animate import Animator
 import os
-import uuid
+# import uuid
+from simulation import SimulationConfig, SimulationRunner
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
+    run_simulation()
+    # visualise_results()
+
+def visualise_results():
     # 1. Initialize Data Manager
     data_dir = "post_chain_flop/Viscocity_00027_dt_1e6"
     save_dir = "post_chain_flop/Visualisations/Viscocity_00027_dt_1e6"
@@ -55,8 +60,30 @@ def main():
     # You can color by 'id', 'vx', 'vy', 'vz', or 'velocity_magnitude' if those columns exist
     # Axis limits set to 15mm (0.015m) as requested
     anim.create_animation(start_frame=1, end_frame=None, fps=24, color_by='id', point_size=100, view='z_left_x_down', axis_limits=0.015)
-
     
+def run_simulation():
+    
+    # Create a config with a specific run name
+    config = SimulationConfig(
+        template = "in.chain_flop_template",
+        data_file = "N5_chain.data",
+        simulation = "Chain_flop",
+        run = "N4_Viscosity_03_dt_1e6",
+        run_steps = 10000
+    )
+
+    # Initialize runner
+    # Ensure 'lmp' is in your PATH or provide absolute path
+    runner = SimulationRunner(lammps_executable="lmp")
+
+    print(f"Running simulation: {config.simulation}=>{config.run}")
+    print(f"Output directory: {config.output_dir}")
+
+    # Run simulation
+    # This will create directories: post_chain_flop/Viscosity_03/{bond,angle,restart}
+    # and generate a temporary input script 'generated_in.chain_flop'
+    runner.run(config)
+
 if __name__ == "__main__":
     try:
         main()
