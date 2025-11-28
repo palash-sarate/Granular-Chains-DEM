@@ -36,8 +36,8 @@ Finding 1-2 1-3 1-4 neighbors ...
   special bond factors coul:  1        1        1       
      2 = max # of 1-2 neighbors
      2 = max # of special neighbors
-  special bonds CPU = 0.001 seconds
-  read_data CPU = 0.009 seconds
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.006 seconds
 # read_data chain_datas/N4_chain.data
 
 # Ensure spherical properties are consistent (overrides data if needed)
@@ -63,26 +63,26 @@ Setting atom values ...
 # include post/current_run.lmp
 
 # Ensure a predictable output directory and set outdir
-variable run_name string "Viscocity_0002_dt_1e6"
+variable run_name string "Viscocity_00027_dt_1e6"
 
 shell if not exist post_chain_flop mkdir post_chain_flop
 shell if not exist post_chain_flop\${run_name} mkdir post_chain_flop\${run_name}
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6 mkdir post_chain_flop\${run_name}
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6 mkdir post_chain_flop\Viscocity_0002_dt_1e6
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6 mkdir post_chain_flop\${run_name}
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6 mkdir post_chain_flop\Viscocity_00027_dt_1e6
 shell if not exist post_chain_flop\${run_name}\bond mkdir post_chain_flop\${run_name}\bond
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\bond mkdir post_chain_flop\${run_name}\bond
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\bond mkdir post_chain_flop\Viscocity_0002_dt_1e6\bond
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\bond mkdir post_chain_flop\${run_name}\bond
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\bond mkdir post_chain_flop\Viscocity_00027_dt_1e6\bond
 shell if not exist post_chain_flop\${run_name}\angle mkdir post_chain_flop\${run_name}\angle
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\angle mkdir post_chain_flop\${run_name}\angle
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\angle mkdir post_chain_flop\Viscocity_0002_dt_1e6\angle
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\angle mkdir post_chain_flop\${run_name}\angle
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\angle mkdir post_chain_flop\Viscocity_00027_dt_1e6\angle
 shell if not exist post_chain_flop\${run_name}\restart mkdir post_chain_flop\${run_name}\restart
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\restart mkdir post_chain_flop\${run_name}\restart
-shell if not exist post_chain_flop\Viscocity_0002_dt_1e6\restart mkdir post_chain_flop\Viscocity_0002_dt_1e6\restart
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\restart mkdir post_chain_flop\${run_name}\restart
+shell if not exist post_chain_flop\Viscocity_00027_dt_1e6\restart mkdir post_chain_flop\Viscocity_00027_dt_1e6\restart
 # clear dir if it exist
 shell del /Q post_chain_flop\${run_name}\*
-shell del /Q post_chain_flop\Viscocity_0002_dt_1e6\*
+shell del /Q post_chain_flop\Viscocity_00027_dt_1e6\*
 variable outdir string post_chain_flop/${run_name}
-variable outdir string post_chain_flop/Viscocity_0002_dt_1e6
+variable outdir string post_chain_flop/Viscocity_00027_dt_1e6
 
 #
 variable r_max equal 0.0005 #pot center to center
@@ -150,7 +150,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 # Replaces the missing internal link friction
 group chain_particles type 1
 4 atoms in group chain_particles
-fix 1 chain_particles viscous 0.002
+fix 1 chain_particles viscous 0.0027
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -162,4 +162,125 @@ neigh_modify delay 0 every 1 check yes
 # COMPUTE BOND AND ANGLE DATA
 # Calculate bond distance and energy
 compute 1 chain_particles bond/local dist engpot force
-# Cal
+# Calculate angle theta and energy
+compute 2 chain_particles angle/local theta eng
+
+# Set a conservative timestep for the stiff bonded chain.
+timestep 1.0e-6
+
+# === 4. OUTPUTS & RUN ===
+# Output thermodynamic data every 10000 timesteps.
+thermo 10000
+thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
+
+# Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
+dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+dump 1 all custom 1000 post_chain_flop/Viscocity_00027_dt_1e6/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+dump_modify 1 sort id
+dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump 2 all local 1000 post_chain_flop/Viscocity_00027_dt_1e6/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
+dump 3 all local 1000 post_chain_flop/Viscocity_00027_dt_1e6/angle/angle_*.dump index c_2[1] c_2[2]
+
+# Save a binary restart file every 1,000,000 steps
+# The '*' is replaced by the timestep number
+restart 100000 ${outdir}/restart/restart.*.bin
+restart 100000 post_chain_flop/Viscocity_00027_dt_1e6/restart/restart.*.bin
+
+run 400000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:743)
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 0.006
+  ghost atom cutoff = 0.006
+  binsize = 0.003, bins = 34 34 34
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair granular, perpetual
+      attributes: half, newton on, size, history
+      pair build: half/size/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:743)
+WARNING: Communication cutoff adjusted to 0.006 (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:752)
+Per MPI rank memory allocation (min/avg/max) = 72.58 | 72.58 | 72.58 Mbytes
+   Step         PotEng         KinEng         E_bond        E_angle         TotEng         E_coul         E_mol         E_dihed         E_pair         E_vdwl    
+         0   3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              0              0            
+     10000   3.3597872e-09  1.227145e-07   3.3597872e-09  0              1.2607429e-07  0              3.3597872e-09  0              0              0            
+     20000   2.164461e-08   2.2449942e-07  2.164461e-08   0              2.4614403e-07  0              2.164461e-08   0              0              0            
+     30000   4.1815997e-08  2.2681472e-07  4.1815997e-08  0              2.6863072e-07  0              4.1815997e-08  0              0              0            
+     40000   1.81253e-08    1.7054542e-07  1.81253e-08    0              1.8867072e-07  0              1.81253e-08    0              0              0            
+     50000   6.6440148e-08  1.220466e-07   6.6440148e-08  0              1.8848674e-07  0              6.6440148e-08  0              0              0            
+     60000   3.3753451e-08  6.4179513e-08  3.3753451e-08  0              9.7932964e-08  0              3.3753451e-08  0              0              0            
+     70000   4.8048053e-08  3.2592257e-08  4.7754808e-08  2.9324486e-10  8.064031e-08   0              4.8048053e-08  0              0              0            
+     80000   2.8787675e-08  5.8478514e-09  2.8787675e-08  0              3.4635526e-08  0              2.8787675e-08  0              0              0            
+     90000   4.4390374e-08  1.4619572e-09  4.4390374e-08  0              4.5852331e-08  0              4.4390374e-08  0              0              0            
+    100000   3.7850092e-08  1.9510224e-09  3.7850092e-08  0              3.9801114e-08  0              3.7850092e-08  0              0              0            
+    110000   3.7845225e-08  1.4844474e-10  3.7844044e-08  1.1817558e-12  3.799367e-08   0              3.7845225e-08  0              0              0            
+    120000   3.9339034e-08  6.2106006e-10  3.9278728e-08  6.0305782e-11  3.9960094e-08  0              3.9339034e-08  0              0              0            
+    130000   3.8802986e-08  3.0057582e-10  3.8755897e-08  4.7089168e-11  3.9103562e-08  0              3.8802986e-08  0              0              0            
+    140000   3.9041169e-08  6.4835347e-11  3.8943636e-08  9.7532937e-11  3.9106004e-08  0              3.9041169e-08  0              0              0            
+    150000   3.8194278e-08  5.8918151e-11  3.8107998e-08  8.6279844e-11  3.8253196e-08  0              3.8194278e-08  0              0              0            
+    160000   3.8717498e-08  7.4178837e-12  3.8648249e-08  6.9249575e-11  3.8724916e-08  0              3.8717498e-08  0              0              0            
+    170000   3.8363377e-08  4.4037601e-12  3.8301215e-08  6.2162169e-11  3.8367781e-08  0              3.8363377e-08  0              0              0            
+    180000   3.8718915e-08  1.3211229e-12  3.8612031e-08  1.0688406e-10  3.8720236e-08  0              3.8718915e-08  0              0              0            
+    190000   3.8550343e-08  8.0254145e-13  3.8479565e-08  7.0778242e-11  3.8551145e-08  0              3.8550343e-08  0              0              0            
+    200000   3.8660812e-08  1.4793591e-13  3.8574682e-08  8.6130108e-11  3.866096e-08   0              3.8660812e-08  0              0              0            
+    210000   3.8602694e-08  1.6784885e-13  3.8526351e-08  7.6342589e-11  3.8602861e-08  0              3.8602694e-08  0              0              0            
+    220000   3.861447e-08   1.3962397e-13  3.8534619e-08  7.9850299e-11  3.8614609e-08  0              3.861447e-08   0              0              0            
+    230000   3.8609846e-08  3.7507532e-14  3.8527872e-08  8.1973964e-11  3.8609883e-08  0              3.8609846e-08  0              0              0            
+    240000   3.8602272e-08  2.8146176e-15  3.8522967e-08  7.9304878e-11  3.8602275e-08  0              3.8602272e-08  0              0              0            
+    250000   3.8609702e-08  4.0201466e-15  3.8528933e-08  8.0768998e-11  3.8609707e-08  0              3.8609702e-08  0              0              0            
+    260000   3.8605575e-08  3.5052283e-15  3.8525535e-08  8.0040417e-11  3.8605579e-08  0              3.8605575e-08  0              0              0            
+    270000   3.8609614e-08  9.9209983e-16  3.8529769e-08  7.9844561e-11  3.8609615e-08  0              3.8609614e-08  0              0              0            
+    280000   3.8607853e-08  9.5859774e-17  3.8527563e-08  8.0289539e-11  3.8607853e-08  0              3.8607853e-08  0              0              0            
+    290000   3.8609121e-08  9.114597e-17   3.8529073e-08  8.0047781e-11  3.8609121e-08  0              3.8609121e-08  0              0              0            
+    300000   3.8608037e-08  8.3898849e-17  3.8527865e-08  8.0172681e-11  3.8608037e-08  0              3.8608037e-08  0              0              0            
+    310000   3.8608551e-08  2.7807371e-17  3.8528363e-08  8.0187451e-11  3.8608551e-08  0              3.8608551e-08  0              0              0            
+    320000   3.8608094e-08  3.948772e-18   3.8527978e-08  8.0115656e-11  3.8608094e-08  0              3.8608094e-08  0              0              0            
+    330000   3.8608309e-08  2.1711903e-18  3.8528154e-08  8.0155202e-11  3.8608309e-08  0              3.8608309e-08  0              0              0            
+    340000   3.8608258e-08  2.0383684e-18  3.8528123e-08  8.0134455e-11  3.8608258e-08  0              3.8608258e-08  0              0              0            
+    350000   3.8608279e-08  8.1351454e-19  3.8528144e-08  8.0134786e-11  3.8608279e-08  0              3.8608279e-08  0              0              0            
+    360000   3.8608319e-08  1.4206298e-19  3.8528173e-08  8.014613e-11   3.8608319e-08  0              3.8608319e-08  0              0              0            
+    370000   3.8608286e-08  4.617626e-20   3.8528147e-08  8.0139565e-11  3.8608286e-08  0              3.8608286e-08  0              0              0            
+    380000   3.8608307e-08  4.8232823e-20  3.8528165e-08  8.0142856e-11  3.8608307e-08  0              3.8608307e-08  0              0              0            
+    390000   3.8608288e-08  2.2783698e-20  3.8528146e-08  8.0142451e-11  3.8608288e-08  0              3.8608288e-08  0              0              0            
+    400000   3.8608296e-08  3.4638211e-21  3.8528155e-08  8.0140639e-11  3.8608296e-08  0              3.8608296e-08  0              0              0            
+Loop time of 626.027 on 4 procs for 400000 steps with 4 atoms
+
+93.9% CPU use with 1 MPI tasks x 4 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.3408     | 0.3408     | 0.3408     |   0.0 |  0.05
+Bond    | 620.46     | 620.46     | 620.46     |   0.0 | 99.11
+Neigh   | 0.0006991  | 0.0006991  | 0.0006991  |   0.0 |  0.00
+Comm    | 0.15577    | 0.15577    | 0.15577    |   0.0 |  0.02
+Output  | 2.9421     | 2.9421     | 2.9421     |   0.0 |  0.47
+Modify  | 1.0942     | 1.0942     | 1.0942     |   0.0 |  0.17
+Other   |            | 1.033      |            |       |  0.17
+
+Nlocal:              4 ave           4 max           4 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              5 ave           5 max           5 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 5
+Ave neighs/atom = 1.25
+Ave special neighs/atom = 1.5
+Neighbor list builds = 6
+Dangerous builds = 0
+
+# Save the final state manually
+write_restart ${outdir}/restart/restart.final.bin
+write_restart post_chain_flop/Viscocity_00027_dt_1e6/restart/restart.final.bin
+System init for write_restart ...
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:743)
+
+variable outdir delete
+Total wall time: 0:10:26

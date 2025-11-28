@@ -31,7 +31,7 @@ set group anchors omega 0.0 0.0 0.0
 # include post/current_run.lmp
 
 # Ensure a predictable output directory and set outdir
-variable run_name string "Viscocity_0002_dt_1e6"
+variable run_name string "Viscocity_00027_dt_1e6"
 
 shell if not exist post_chain_flop mkdir post_chain_flop
 shell if not exist post_chain_flop\${run_name} mkdir post_chain_flop\${run_name}
@@ -122,7 +122,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 
 # Replaces the missing internal link friction
 group chain_particles type 1
-fix 1 chain_particles viscous 0.002
+fix 1 chain_particles viscous 0.0027
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere

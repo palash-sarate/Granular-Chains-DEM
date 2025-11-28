@@ -1,24 +1,19 @@
 """Utilities for generating LAMMPS `chain.data` files.
 
-This module builds linear bead chains compatible with the existing
-`in.chain_flop.lmp` workflow.  You can import and re‑use the helper
-functions or execute the module directly from the command line.
+This module builds bead chains in various configurations (linear, directional,
+random, loop) compatible with the existing `in.chain_flop.lmp` workflow.
 
-Example
--------
+You can import and re‑use the helper functions or execute the module directly
+from the command line.
 
-Generate a vertical chain with 12 beads spaced 2.5 mm apart::
-
-	python chain_generator.py 12 --orientation vert --spacing 2.5e-3
-
-The output file will be written as ``chain_vert_12.data`` in the current
-working directory unless ``--output-dir`` is provided.
+Run with --help for detailed usage and examples.
 """
 
 from __future__ import annotations
 
 import argparse
 import math
+import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Sequence, Tuple
@@ -29,35 +24,53 @@ ORIENTATION_AXES = {
 	"horz": 0,  # x-axis
 }
 
+MODES = ["linear", "direction", "random", "loop"]
+
 
 @dataclass
 class ChainConfig:
 	"""Configuration parameters for a bead chain."""
 
 	beads: int
-	orientation: str
-	spacing: float  # centre-to-centre spacing in metres
+	orientation: str = "vert"
+	spacing: float = 0.0 # centre-to-centre spacing in metres
 	diameter: float = 2.0e-3  # metres
 	density: float = 8.5e3  # kg/m^3
-	output_dir: Path = Path(".")
+	output_dir: Path = Path("chain_datas")
+	
+	# New configuration fields
+	mode: str = "linear"
+	direction: Tuple[float, float, float] = (0.0, 0.0, 1.0)
+	max_spacing: float = 0.0
+	loop_radius: float = 0.0
 
 	def validate(self) -> None:
 		if self.beads < 1:
 			raise ValueError("The chain must contain at least one bead.")
 		if self.spacing <= 0:
-			raise ValueError("Spacing must be positive and > 2bd.")
+			raise ValueError("Spacing must be positive.")
 		if self.diameter <= 0:
 			raise ValueError("Diameter must be positive.")
 		if self.density <= 0:
 			raise ValueError("Density must be positive.")
-		if self.orientation not in ORIENTATION_AXES:
+		
+		if self.mode not in MODES:
+			raise ValueError(f"Unsupported mode '{self.mode}'. Use one of {MODES}.")
+			
+		if self.mode == "linear" and self.orientation not in ORIENTATION_AXES:
 			raise ValueError(
 				f"Unsupported orientation '{self.orientation}'. Use one of {tuple(ORIENTATION_AXES)}."
 			)
+			
+		if self.mode == "random" and self.max_spacing > 0 and self.max_spacing < self.diameter:
+			raise ValueError("Max spacing must be >= diameter.")
 
 	@property
 	def output_path(self) -> Path:
-		name = f"chain_{self.orientation}_{self.beads}.data"
+		if self.mode == "linear":
+			name = f"N{self.beads}_chain_{self.orientation}.data"
+		else:
+			name = f"N{self.beads}_chain_{self.mode}.data"
 		return self.output_dir / name
 
 	@property
@@ -70,9 +83,27 @@ class ChainConfig:
 		return volume * self.density
 
 
+def normalize(v: Tuple[float, float, float]) -> Tuple[float, float, float]:
+	norm = math.sqrt(sum(x*x for x in v))
+	if norm == 0: return (0.0, 0.0, 1.0)
+	return (v[0]/norm, v[1]/norm, v[2]/norm)
+
+
 def generate_positions(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 	"""Return the bead centre coordinates for the requested chain."""
+	if cfg.mode == "linear":
+		return _generate_linear(cfg)
+	elif cfg.mode == "direction":
+		return _generate_direction(cfg)
+	elif cfg.mode == "random":
+		return _generate_random(cfg)
+	elif cfg.mode == "loop":
+		return _generate_loop(cfg)
+	else:
+		raise ValueError(f"Unknown mode: {cfg.mode}")
 
+
+def _generate_linear(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 	axis = ORIENTATION_AXES[cfg.orientation]
 	span = cfg.spacing * (cfg.beads - 1)
 	start = -0.5 * span
@@ -84,6 +115,110 @@ def generate_positions(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 		positions.append(coord)
 
 	return [tuple(values) for values in positions]
+
+
+def _generate_direction(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
+	ux, uy, uz = normalize(cfg.direction)
+	span = cfg.spacing * (cfg.beads - 1)
+	start_dist = -0.5 * span
+	
+	positions = []
+	for i in range(cfg.beads):
+		d = start_dist + i * cfg.spacing
+		positions.append((d * ux, d * uy, d * uz))
+	return positions
+
+
+def _generate_random(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
+	positions = [(0.0, 0.0, 0.0)]
+	for _ in range(cfg.beads - 1):
+		prev = positions[-1]
+		# Random direction on sphere
+		theta = random.uniform(0, math.pi)
+		phi = random.uniform(0, 2 * math.pi)
+		dx = math.sin(theta) * math.cos(phi)
+		dy = math.sin(theta) * math.sin(phi)
+		dz = math.cos(theta)
+		
+		# Spacing
+		if cfg.max_spacing > 0:
+			dist = random.uniform(cfg.diameter, cfg.max_spacing)
+		else:
+			dist = cfg.spacing
+			
+		positions.append((prev[0] + dist * dx, prev[1] + dist * dy, prev[2] + dist * dz))
+	return positions
+
+
+def _generate_loop(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
+	# Parameters
+	# Default radius large enough to satisfy >140 deg constraint (R > 1.5s)
+	R = cfg.loop_radius if cfg.loop_radius > 0 else max(0.02, 10 * cfg.spacing)
+	pitch = 1.5 * cfg.diameter # Small pitch to avoid intersection
+	
+	# Calculate beads for one full loop (2pi)
+	loop_length = math.sqrt((2 * math.pi * R)**2 + pitch**2)
+	beads_per_loop = int(math.ceil(loop_length / cfg.spacing))
+	
+	n_loop = beads_per_loop
+	remaining = cfg.beads - n_loop
+	
+	if remaining < 0:
+		# If requested beads are fewer than a full loop, just make the loop part
+		n_loop = cfg.beads
+		n_start = 0
+		n_end = 0
+	else:
+		# Distribute remaining beads to start and end straight sections
+		n_start = remaining // 2
+		n_end = remaining - n_start
+		
+	positions = []
+	
+	# 1. Straight part (along Y axis, ending at origin)
+	# We align so that the straight part flows into the helix at (R, 0, 0)
+	# Helix starts at t=0 => (R, 0, 0). Tangent is (0, R, h/2pi) ~ +Y
+	# So straight part comes from -Y direction.
+	
+	y_start = - (n_start * cfg.spacing)
+	for i in range(n_start):
+		# x=R, z=0, y increasing
+		positions.append((R, y_start + i * cfg.spacing, 0.0))
+		
+	# 2. Loop part (Helix)
+	dt = cfg.spacing / math.sqrt(R**2 + (pitch / (2 * math.pi))**2)
+	current_t = 0.0
+	
+	# If we had straight part, the last point was (R, -spacing, 0).
+	# The first loop point at t=0 is (R, 0, 0). Distance is spacing. Perfect.
+	# If n_start=0, we start at (R, 0, 0).
+	
+	for i in range(n_loop):
+		x = R * math.cos(current_t)
+		y = R * math.sin(current_t)
+		z = (pitch / (2 * math.pi)) * current_t
+		positions.append((x, y, z))
+		current_t += dt
+		
+	# 3. Straight part end
+	# Continue along the tangent of the helix at the last point
+	last_t = current_t - dt
+	last_pos = positions[-1]
+	
+	# Tangent vector at last_t
+	tx = -R * math.sin(last_t)
+	ty = R * math.cos(last_t)
+	tz = pitch / (2 * math.pi)
+	norm = math.sqrt(tx*tx + ty*ty + tz*tz)
+	ux, uy, uz = tx/norm, ty/norm, tz/norm
+	
+	for i in range(n_end):
+		px = last_pos[0] + (i + 1) * cfg.spacing * ux
+		py = last_pos[1] + (i + 1) * cfg.spacing * uy
+		pz = last_pos[2] + (i + 1) * cfg.spacing * uz
+		positions.append((px, py, pz))
+		
+	return positions
 
 
 def estimate_box(cfg: ChainConfig, positions: Sequence[Tuple[float, float, float]]) -> Tuple[float, float, float, float, float, float]:
@@ -128,7 +263,7 @@ def write_chain_data(cfg: ChainConfig) -> Path:
 	mass = cfg.bead_mass
 
 	lines: List[str] = []
-	lines.append(f"LAMMPS data file for {cfg.orientation} chain of {cfg.beads} beads")
+	lines.append(f"LAMMPS data file for {cfg.mode} chain of {cfg.beads} beads")
 	lines.append("")
 	lines.append(f"{cfg.beads} atoms")
 	lines.append("1 atom types")
@@ -201,14 +336,80 @@ def write_chain_data(cfg: ChainConfig) -> Path:
 
 
 def parse_args(argv: Iterable[str] | None = None) -> ChainConfig:
-	parser = argparse.ArgumentParser(description="Generate linear bead-chain LAMMPS data files.")
+	description = """Generate bead-chain LAMMPS data files with various geometries.
+
+Modes:
+  linear    - Straight chain along a primary axis (vert/z or horz/x).
+  direction - Straight chain along an arbitrary 3D vector.
+  random    - 3D random walk (squiggle).
+  loop      - Straight section flowing into a helical loop and back out.
+"""
+	epilog = """
+Examples:
+  1. Linear vertical chain (default):
+     python chain_generator.py 50 --spacing 0.0025
+
+  2. Linear horizontal chain:
+     python chain_generator.py 50 --mode linear --orientation horz --spacing 0.0025
+
+  3. Chain along a specific direction vector (1, 1, 1):
+     python chain_generator.py 50 --mode direction --direction 1 1 1 --spacing 0.0025
+
+  4. Random walk chain with variable spacing (2mm to 4mm):
+     python chain_generator.py 100 --mode random --spacing 0.002 --max-spacing 0.004
+
+  5. Loop configuration:
+     python chain_generator.py 100 --mode loop --spacing 0.0025
+"""
+	parser = argparse.ArgumentParser(
+		description=description,
+		epilog=epilog,
+		formatter_class=argparse.RawDescriptionHelpFormatter
+	)
 	parser.add_argument("beads", type=int, help="Number of beads in the chain.")
+	
+	# Mode selection
+	parser.add_argument(
+		"--mode",
+		choices=MODES,
+		default="linear",
+		help="Generation mode: 'linear', 'direction', 'random', or 'loop'.",
+	)
+
+	# Linear mode options
 	parser.add_argument(
 		"--orientation",
 		choices=ORIENTATION_AXES.keys(),
 		default="vert",
-		help="Chain orientation: 'vert' aligns beads along z, 'horz' along x.",
+		help="[Linear] Chain orientation: 'vert' aligns beads along z, 'horz' along x.",
 	)
+	
+	# Direction mode options
+	parser.add_argument(
+		"--direction",
+		type=float,
+		nargs=3,
+		default=[0.0, 0.0, 1.0],
+		help="[Direction] Vector defining the chain direction (x y z).",
+	)
+	
+	# Random mode options
+	parser.add_argument(
+		"--max-spacing",
+		type=float,
+		default=0.0,
+		help="[Random] Maximum spacing for random walk. If 0, uses fixed spacing.",
+	)
+	
+	# Loop mode options
+	parser.add_argument(
+		"--loop-radius",
+		type=float,
+		default=0.0,
+		help="[Loop] Radius of the loop section.",
+	)
+
+	# Common options
 	parser.add_argument(
 		"--spacing",
 		type=float,
@@ -220,7 +421,7 @@ def parse_args(argv: Iterable[str] | None = None) -> ChainConfig:
 	parser.add_argument(
 		"--output-dir",
 		type=Path,
-		default=Path("."),
+		default=Path("chain_datas"),
 		help="Directory where the data file will be written.",
 	)
 
@@ -228,8 +429,12 @@ def parse_args(argv: Iterable[str] | None = None) -> ChainConfig:
 
 	return ChainConfig(
 		beads=args.beads,
+		mode=args.mode,
 		orientation=args.orientation,
+		direction=tuple(args.direction),
 		spacing=args.spacing,
+		max_spacing=args.max_spacing,
+		loop_radius=args.loop_radius,
 		diameter=args.diameter,
 		density=args.density,
 		output_dir=args.output_dir,

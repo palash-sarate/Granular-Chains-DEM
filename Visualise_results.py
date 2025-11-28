@@ -4,11 +4,13 @@ from analysis.plotting import plot_angle_evolution, plot_xyz_evolution, plot_dis
 import matplotlib.pyplot as plt
 from analysis.animate import Animator
 import os
+import uuid
 
 def main():
+    # session_id = str(uuid.uuid4())[:8]
     # 1. Initialize Data Manager
-    data_dir = "post_chain_flop/Viscocity_00005_dt_1e6"
-    save_dir = "post_chain_flop/Visualisations/Viscocity_00005_dt_1e6"
+    data_dir = "post_chain_flop/Viscocity_00027_dt_1e6"
+    save_dir = "post_chain_flop/Visualisations/Viscocity_00027_dt_1e6"
     
     # make save_dir if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
