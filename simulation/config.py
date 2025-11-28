@@ -14,7 +14,7 @@ class SimulationConfig:
     r_max: float = 0.0005
     theta_lim: float = 2.4435
     
-    # Stiffness and Damping
+    # Stiffness and pot. smoothing
     knt2: float = 1.0e6
     ktheta: float = 1.0e6
     w: float = 1.0e-4
@@ -31,10 +31,10 @@ class SimulationConfig:
     mu_s: float = 0.3
     
     # Input/Output
-    input_script: str = "in.chain_flop_template"
-    data_file: str = "chain_datas/N4_chain.data"
+    template: str = "in.chain_flop_template"
+    data_file_name: str = "N4_chain.data"
     run_name: str = "current"
-    base_output_dir: str = "post_chain_flop"
+    simulation_name: str = "post_chain_flop"
     
     # Additional LAMMPS variables
     extra_vars: Dict[str, Any] = field(default_factory=dict)
@@ -43,7 +43,17 @@ class SimulationConfig:
     def output_dir(self) -> str:
         """Constructs the output directory path from base_dir and run_name."""
         # Use forward slashes for LAMMPS compatibility even on Windows
-        return f"{self.base_output_dir}/{self.run_name}"
+        return f"dumping_yard/{self.simulation_name}/{self.run_name}"
+    @property
+    def data_file(self) -> str:
+        """Constructs the output directory path from base_dir and run_name."""
+        # Use forward slashes for LAMMPS compatibility even on Windows
+        return f"chain_datas/{self.data_file_name}"
+    @property
+    def input_script(self) -> str:
+        """Constructs the output directory path from base_dir and run_name."""
+        # Use forward slashes for LAMMPS compatibility even on Windows
+        return f"simulation_templates/{self.template}"
 
     def to_lammps_vars(self) -> Dict[str, str]:
         """Converts config to a dictionary of LAMMPS variable arguments."""
@@ -62,7 +72,9 @@ class SimulationConfig:
             "mu_s": str(self.mu_s),
             "r_max": str(self.r_max),
             "theta_lim": str(self.theta_lim),
-            "outdir": self.output_dir
+            "outdir": self.output_dir,
+            "data_file": self.data_file,
+            "input_script": self.input_script
         }
         # Add any extra variables
         for k, v in self.extra_vars.items():

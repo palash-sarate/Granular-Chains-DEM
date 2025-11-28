@@ -7,8 +7,9 @@ import os
 
 def main():
     # 1. Initialize Data Manager
-    data_dir = "post_chain_flop/Viscocity_0005_dt_1e7"
-    save_dir = "post_chain_flop/Visualisations/Viscocity_0005_dt_1e7"
+    data_dir = "post_chain_flop/Viscocity_00005_dt_1e6"
+    save_dir = "post_chain_flop/Visualisations/Viscocity_00005_dt_1e6"
+    
     # make save_dir if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
     
@@ -47,11 +48,11 @@ def main():
     plot_distance_evolution([distance_series_12,distance_series_23,distance_series_34], legend_labels=['1-2','2-3','3-4'], save_path=f"{save_dir}/Distance_evol.png")
     
     # print("Generating animation...")
-    # anim = Animator(df, output_file=f"{save_dir}/chain_motion.mp4")
+    anim = Animator(df, output_file=f"{save_dir}/chain_motion.mp4")
     
     # You can color by 'id', 'vx', 'vy', 'vz', or 'velocity_magnitude' if those columns exist
     # Axis limits set to 15mm (0.015m) as requested
-    # anim.create_animation(start_frame=1, end_frame=None, fps=24, color_by='id', point_size=100, view='z_left_x_down', axis_limits=0.015)
+    anim.create_animation(start_frame=1, end_frame=None, fps=24, color_by='id', point_size=100, view='z_left_x_down', axis_limits=0.015)
 
     
 if __name__ == "__main__":
