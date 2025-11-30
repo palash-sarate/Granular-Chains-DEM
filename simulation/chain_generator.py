@@ -36,7 +36,7 @@ class ChainConfig:
 	spacing: float = 0.0 # centre-to-centre spacing in metres
 	diameter: float = 2.0e-3  # metres
 	density: float = 7084.7  # kg/m^3
-	output_dir: Path = Path("chain_datas")
+	output_dir: Path = Path("chain_data/default")
 	
 	# New configuration fields
 	mode: str = "linear"
@@ -72,7 +72,7 @@ class ChainConfig:
 			name = f"N{self.beads}_chain_{self.orientation}.data"
 		else:
 			name = f"N{self.beads}_chain_{self.mode}.data"
-		return self.output_dir / name
+		return Path(f"{self.output_dir}/{name}")
 
 	@property
 	def radius(self) -> float:
@@ -313,9 +313,9 @@ def write_chain_data(cfg: ChainConfig) -> Path:
 					format_float(cfg.diameter),
 					format_float(cfg.density),
 					"1",  # molecule-ID (single chain)
-					"0.0",
-					"0.0",
-					"0.0",
+					"0",
+					"0",
+					"0",
 				]
 			)
 		)

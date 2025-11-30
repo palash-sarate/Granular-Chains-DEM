@@ -6,12 +6,61 @@ from analysis.animate import Animator
 import os
 # import uuid
 from simulation import SimulationConfig, SimulationRunner
+from simulation.chain_generator import ChainConfig, write_chain_data
+from pathlib import Path
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
-    run_simulation()
+    # run_flop_simulations()
     # visualise_results()
+    
+    # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
+    Ns = [4,6,8,10,12,14,16,24,48,100]
+    generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
+    
+def run_flop_simulations():
+    # Ns = [4,6,8,10,12,14,16,24,48,100]
+    Ns = [4,6]
+    for N in Ns:
+        print(f"Running flop simulation for N={N}...")
+        config = SimulationConfig(
+            template = "in.chain_flop_template",
+            data_file = f"chains_linear_x/N{N}_chain_horz.data",
+            simulation = "Chain_flop",
+            run = f"N{N}_Viscosity_03_dt_1e6",
+            extra_vars={
+                "viscosity": 0.03,
+                "run_steps": 10,
+                "dt": 1e-6
+            }
+        )
 
+        # Initialize runner
+        # Ensure 'lmp' is in your PATH or provide absolute path
+        runner = SimulationRunner(lammps_executable="lmp")
+
+        print(f"Running simulation: {config.simulation}=>{config.run}")
+        print(f"Output directory: {config.output_dir}")
+
+        # Run simulation
+        # This will create directories: post_chain_flop/Viscosity_03/{bond,angle,restart}
+        # and generate a temporary input script 'generated_in.chain_flop'
+        runner.run(config)
+    
+def generate_linear_chains(Ns: list[int], orientation: str, output_dir: str) -> None:
+    for N in Ns:
+        print(f"Generating linear chain with {N} beads, orientation={orientation}...")
+        linear_config = ChainConfig(
+            beads=N,
+            # center to center spacing
+            spacing=0.0045,
+            mode="linear",
+            orientation=orientation,
+            output_dir=Path(f"chain_data/{output_dir}"),
+        )
+        path = write_chain_data(linear_config)
+        print(f"Created: {path}")
+    
 def visualise_results():
     # 1. Initialize Data Manager
     data_dir = "post_chain_flop/Viscocity_00027_dt_1e6"
@@ -69,7 +118,11 @@ def run_simulation():
         data_file = "N5_chain.data",
         simulation = "Chain_flop",
         run = "N4_Viscosity_03_dt_1e6",
-        run_steps = 10000
+        extra_vars={
+            "viscosity": 0.03,
+            "run_steps": 10000,
+            "dt": 1e-6
+        }
     )
 
     # Initialize runner

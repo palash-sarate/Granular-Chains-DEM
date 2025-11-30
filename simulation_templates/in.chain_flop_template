@@ -9,7 +9,7 @@ special_bonds lj/coul 1.0 1.0 1.0
 
 # # Read the atom and bond data from the data file.
 ################################################
-read_data chain_datas/N4_chain.data
+read_data chain_datas/default_chain.data
 
 velocity all set 0.0 0.0 0.0
 
@@ -102,7 +102,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 
 # Replaces the missing internal link friction
 group chain_particles type 1
-fix 1 chain_particles viscous 0.1
+fix 1 chain_particles viscous 1
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere

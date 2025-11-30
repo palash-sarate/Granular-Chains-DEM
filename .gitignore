@@ -2,5 +2,8 @@
 .history
 *.dump
 /dumping_yard
+/chain_data
 log.lammps
 temp_frame*
+*.pyc
+*__pycache__/

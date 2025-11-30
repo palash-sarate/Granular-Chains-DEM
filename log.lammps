@@ -1,26 +1,24 @@
-LAMMPS (22 Jul 2025 - Update 1)
+LAMMPS (22 Jul 2025 - Update 2)
   using 4 OpenMP thread(s) per MPI task
-Loaded 1 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
-variable simulation string Chain_flop # Injected variable
-variable run string N4_Viscosity_03_dt_1e6 # Injected variable
-variable data_file string N5_chain.data # Injected variable
-variable template string in.chain_flop_template # Injected variable
+Open of file C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins\helloplugin.so failed: 
+Loaded 0 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
 # Flexible granular chain simulation in LAMMPS
 
 units       si
 atom_style hybrid sphere angle
-WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (src/atom_vec_hybrid.cpp:132)
+WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\atom_vec_hybrid.cpp:132)
 boundary    f f f
 
 special_bonds lj/coul 1.0 1.0 1.0
 # special_bonds none
 
-# Read the atom and bond data from the data file.
-read_data chain_datas/N4_chain.data
+# # Read the atom and bond data from the data file.
+################################################
+read_data chain_data/chains_linear_x/N4_chain_horz.data
 Reading data file ...
   orthogonal box = (-0.05 -0.05 0) to (0.05 0.05 0.1)
   1 by 1 by 1 MPI processor grid
-WARNING: Atom style in data file hybrid sphere angle differs from currently defined atom style hybrid (src/read_data.cpp:727)
+WARNING: Atom style in data file hybrid sphere molecular differs from currently defined atom style hybrid (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\read_data.cpp:727)
   reading atoms ...
   4 atoms
   scanning bonds ...
@@ -39,7 +37,7 @@ Finding 1-2 1-3 1-4 neighbors ...
      2 = max # of 1-2 neighbors
      2 = max # of special neighbors
   special bonds CPU = 0.000 seconds
-  read_data CPU = 0.011 seconds
+  read_data CPU = 0.005 seconds
 
 velocity all set 0.0 0.0 0.0
 
@@ -53,35 +51,37 @@ velocity anchors set 0.0 0.0 0.0
 set group anchors omega 0.0 0.0 0.0
 Setting atom values ...
   2 settings made for omega
-variable outdir string dumping_yard/Chain_flop/N4_Viscosity_03_dt_1e6 # Generated from config
 
-#
-variable r_max equal 0.0005 # Generated from config
+################################################
+variable outdir string dumping_yard/Chain_flop/N4_Viscosity_03_dt_1e6
+
+# ################################################
+variable r_max equal 0.0005 #pot center to center
 # Theta limit in Radians (140 degrees * PI / 180)
-variable theta_lim equal 2.4435 # Generated from config
+variable theta_lim equal 2.4435
 # Stiffnesses
-variable knt2 equal 1000000.0 # Generated from config
-variable ktheta equal 1000000.0 # Generated from config
+variable knt2   equal 1.0e6  # High stiffness for bond limit
+variable ktheta equal 1.0e6   # Stiffness for angle limit
 # smoothing widths (tune as needed)
-variable w equal 0.0001 # Generated from config
-variable delta equal 0.0001 # Generated from config
+variable w   equal 1.0e-4    # smoothing length (m) 0.1 mm
+variable delta equal 1.0e-4    # smoothing angle (rad) ~ 1.15 deg
 
 # Granular pair style parameters
 # normal contact
-variable k_n equal 1000000.0 # Generated from config
-variable nu_n0 equal 50.0 # Generated from config
+variable k_n equal 1e6 # Normal stiffness
+variable nu_n0 equal 50.0 # damping prefactor or a coefficient of restitution
 # rolling
-variable k_roll equal 1000000.0 # Generated from config
-variable gamma_roll equal 5000.0 # Generated from config
-variable mu_roll equal 0.3 # Generated from config
+variable k_roll equal 1.0e6   # Rolling Friction Stiffness
+variable gamma_roll equal 5000 # Rolling Friction Damping
+variable mu_roll equal 0.3 # Rolling Friction Coefficient
 # tangential
-variable k_t equal 1000000.0 # Generated from config
-variable x_gamma_t equal 1.0 # Generated from config
-variable mu_s equal 0.3 # Generated from config
+variable k_t equal 1.0e6   # Tangential stiffness coefficient.
+variable x_gamma_t equal 1.0 # dimensionless multiplier for the normal damping
+variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
+################################################
 
-
-# Apply gravity perpendicular to the chain (chain aligned with +z, gravity along +x)
-fix grav mobile gravity 9.81 vector 1 0 0
+# Apply gravity in the standard downward (−z) direction
+fix grav mobile gravity 9.81 vector 0 0 -1
 # --- WALL DEFINITIONS ---
 # You must define X, Y, and Z walls separately.
 
@@ -120,7 +120,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 # Replaces the missing internal link friction
 group chain_particles type 1
 4 atoms in group chain_particles
-fix 1 chain_particles viscous 0.1
+fix 1 chain_particles viscous 0.03
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -136,7 +136,7 @@ compute 1 chain_particles bond/local dist engpot force
 compute 2 chain_particles angle/local theta eng
 
 # Set a conservative timestep for the stiff bonded chain.
-timestep 1.0e-6
+timestep 1e-06
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 10000 timesteps.
@@ -156,10 +156,9 @@ dump 3 all local 1000 dumping_yard/Chain_flop/N4_Viscosity_03_dt_1e6/angle/angle
 # The '*' is replaced by the timestep number
 restart 100000 ${outdir}/restart/restart.*.bin
 restart 100000 dumping_yard/Chain_flop/N4_Viscosity_03_dt_1e6/restart/restart.*.bin
-
-run 10000000  # 1e7 timesteps 1 second
+run 10
 Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
-WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (src/comm.cpp:743)
+WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:743)
 Neighbor list info ...
   update: every = 1 steps, delay = 0 steps, check = yes
   max neighbors/atom: 2000, page size: 100000
@@ -172,8 +171,44 @@ Neighbor list info ...
       pair build: half/size/bin/newton
       stencil: half/bin/3d
       bin: standard
-WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (src/comm.cpp:743)
-WARNING: Communication cutoff adjusted to 0.006 (src/comm.cpp:752)
+WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:743)
+WARNING: Communication cutoff adjusted to 0.006 (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\comm.cpp:752)
 Per MPI rank memory allocation (min/avg/max) = 72.58 | 72.58 | 72.58 Mbytes
    Step         PotEng         KinEng         E_bond        E_angle         TotEng         E_coul         E_mol         E_dihed         E_pair         E_vdwl    
          0   3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              0              0            
+        10  -nan(ind)      -nan(ind)      -nan(ind)      -nan(ind)      -nan(ind)       0             -nan(ind)       0              0              0            
+Loop time of 0.0200119 on 4 procs for 10 steps with 4 atoms
+
+390.4% CPU use with 1 MPI tasks x 4 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.92e-05   | 1.92e-05   | 1.92e-05   |   0.0 |  0.10
+Bond    | 0.01964    | 0.01964    | 0.01964    |   0.0 | 98.14
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 8.8e-06    | 8.8e-06    | 8.8e-06    |   0.0 |  0.04
+Output  | 0.0001684  | 0.0001684  | 0.0001684  |   0.0 |  0.84
+Modify  | 0.0001076  | 0.0001076  | 0.0001076  |   0.0 |  0.54
+Other   |            | 6.76e-05   |            |       |  0.34
+
+Nlocal:              4 ave           4 max           4 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              5 ave           5 max           5 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 5
+Ave neighs/atom = 1.25
+Ave special neighs/atom = 1.5
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# Save the final state manually
+write_restart ${outdir}/restart/restart.final.bin
+write_restart dumping_yard/Chain_flop/N4_Viscosity_03_dt_1e6/restart/restart.final.bin
+System init for write_restart ...
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+ERROR on proc 0: Non-numeric atom coords - simulation unstable
+For more information see https://docs.lammps.org/err0006 (C:\Users\runneradmin\AppData\Local\Temp\tmp675km_ty\build\_deps\lammps-src\src\OPENMP\domain_omp.cpp:58)

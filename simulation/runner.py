@@ -4,6 +4,7 @@ import sys
 import re
 from typing import Optional, List
 from .config import SimulationConfig
+# from lammps import lammps
 
 class SimulationRunner:
     def __init__(self, lammps_executable: str = "lmp"):
@@ -14,42 +15,47 @@ class SimulationRunner:
         Generates a LAMMPS input script by replacing variables in a template 
         with values from the configuration.
         """
+        
         with open(template_path, 'r') as f:
             content = f.read()
-            
-        vars_dict = config.to_lammps_vars()
         
-        for key, value in vars_dict.items():
-            # Regex to find "variable key equal/index/string value"
-            # We replace the whole line with the new definition
-            # We use 'equal' for numbers to be safe, or string for strings.
-            
-            # Check if value is a number
-            try:
-                float(value)
-                var_type = "equal"
-            except ValueError:
-                var_type = "string"
-                
-            # Special case: outdir is a string
-            if key == "outdir":
-                var_type = "string"
+        pattern = re.compile(r'^\s*variable\s+outdir\s+string\s+.+$', re.MULTILINE)
+        replacement = f"variable outdir string {config.output_dir}"
+        content = pattern.sub(replacement, content)
+        
+        # if data_file is specified in config, replace the read_data line
+        if config.data_file:
+            pattern = re.compile(r'^\s*read_data\s+.*$', re.MULTILINE)
+            replacement = f"read_data chain_data/{config.data_file}"
+            content = pattern.sub(replacement, content)
+        
+        # if Viscosity is specified in extra_vars, replace the viscosity line
+        if 'viscosity' in config.extra_vars:
+            viscosity_value = config.extra_vars['viscosity']
+            pattern = re.compile(
+                r'^(?P<before>.*\bfix\b.*\bviscous\b.*?)(?P<number>-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)(?P<after>\s*(?:#.*)?)$',
+                re.MULTILINE,
+            )
 
-            pattern = re.compile(r'^\s*variable\s+' + re.escape(key) + r'\s+(equal|index|string)\s+.*$', re.MULTILINE)
-            replacement = f"variable {key} {var_type} {value} # Generated from config"
-            
-            if pattern.search(content):
-                content = pattern.sub(replacement, content)
-            else:
-                # If not found, append it to the beginning of the file (after comments?) or just top
-                # But LAMMPS reads sequentially. Variables must be defined before use.
-                # If it's not in the template, we assume it's needed.
-                # Let's prepend it after the first few lines or just at the top.
-                # However, if we prepend, it might be overridden later if we missed the regex.
-                # But if regex didn't match, it's not there.
-                # Safest is to prepend.
-                content = f"variable {key} {var_type} {value} # Injected variable\n" + content
-                
+            def _replace_viscous_value(match):
+                before = match.group('before').rstrip()
+                after = match.group('after') or ''
+                return f"{before} {viscosity_value}{after}"
+
+            content = pattern.sub(_replace_viscous_value, content)
+        
+        if 'dt' in config.extra_vars:
+            dt_value = config.extra_vars['dt']
+            pattern = re.compile(r'^\s*timestep\s+.*$', re.MULTILINE)
+            replacement = f"timestep {dt_value}"
+            content = pattern.sub(replacement, content)
+        
+        if 'run_steps' in config.extra_vars:
+            run_steps_value = config.extra_vars['run_steps']
+            pattern = re.compile(r'^\s*run\s+.*$', re.MULTILINE)
+            replacement = f"run {run_steps_value}"
+            content = pattern.sub(replacement, content)
+        
         with open(output_path, 'w') as f:
             f.write(content)
         print(f"Generated input script: {output_path}")
@@ -78,7 +84,12 @@ class SimulationRunner:
         self._prepare_directories(config)
         
         if config.input_script:
-            script_to_run = config.input_script        
+            script_to_run = config.input_script
+            # save the script to output dir for record-keeping
+            dest_script = os.path.join(config.output_dir, os.path.basename(script_to_run))
+            subprocess.run(["cp", script_to_run, dest_script], check=True)
+            script_to_run = dest_script
+
         elif config.template:
             template_path = f"simulation_templates/{config.template}"
             # Generate a temporary or specific input script
@@ -109,7 +120,7 @@ class SimulationRunner:
         
         with open(resume_template, 'r') as f:
             content = f.read()
-            
+        
         # Replace read_restart line
         # Look for 'read_restart ...'
         pattern = re.compile(r'^\s*read_restart\s+.*$', re.MULTILINE)

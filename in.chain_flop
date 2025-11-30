@@ -65,7 +65,8 @@ variable mu_roll equal 0.3 # Rolling Friction Coefficient
 variable k_t equal 1.0e6   # Tangential stiffness coefficient.
 variable x_gamma_t equal 1.0 # dimensionless multiplier for the normal damping
 variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
-
+# 
+variable viscosity equal 0.0027
 
 # Apply gravity perpendicular to the chain (chain aligned with +z, gravity along +x)
 fix grav mobile gravity 9.81 vector 1 0 0
