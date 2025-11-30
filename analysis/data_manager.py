@@ -7,6 +7,7 @@ import pickle
 class SimulationData:
     def __init__(self, data_dir, cache_file="sim_cache.pkl"):
         self.data_dir = data_dir
+        self.chain_dump_dir = os.path.join(data_dir, "chain")
         self.cache_file = os.path.join(data_dir, cache_file)
         self.df = None
 
@@ -29,8 +30,8 @@ class SimulationData:
         """Checks if cache exists and is newer than the latest dump file."""
         if not os.path.exists(self.cache_file):
             return False
-        
-        dump_files = glob.glob(os.path.join(self.data_dir, "chain_*.dump"))
+        print(f"Checking cache validity against dumps in: {self.chain_dump_dir}")
+        dump_files = glob.glob(os.path.join(self.chain_dump_dir, "*.dump"))
         if not dump_files:
             return False
             
@@ -51,14 +52,14 @@ class SimulationData:
                 meta['timestep'] = int(lines[i+1])
             elif "ITEM: ATOMS" in line:
                 columns = line.split()[2:]
-                df = pd.read_csv(filepath, skiprows=i+1, names=columns, sep='\s+', engine='python')
+                df = pd.read_csv(filepath, skiprows=i+1, names=columns, sep=r'\s+', engine='python')
                 df['timestep'] = meta['timestep']
                 return df
         return pd.DataFrame()
 
     def _parse_all_dumps(self):
         """Parses all dump files in directory and returns a MultiIndex DataFrame."""
-        dump_files = glob.glob(os.path.join(self.data_dir, "*.dump"))
+        dump_files = glob.glob(os.path.join(self.chain_dump_dir, "*.dump"))
         
         # Sort by timestep
         def get_step(filename):

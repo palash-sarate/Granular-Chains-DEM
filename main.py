@@ -11,8 +11,9 @@ from pathlib import Path
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
-    run_flop_simulations()
-    # visualise_results()
+    # run_flop_simulations()
+    visualise_results("Chain_flop", "N4_Viscosity_03_dt_1e6")
+    # visualise_results("Chain_flop", "N6_Viscosity_03_dt_1e6")
     
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
     # Ns = [4,6,8,10,12,14,16,24,48,100]
@@ -30,7 +31,7 @@ def run_flop_simulations():
             run = f"N{N}_Viscosity_03_dt_1e6",
             extra_vars={
                 "viscosity": 0.03,
-                "run_steps": 10,
+                "run_steps": 100000,
                 "dt": 1e-6
             }
         )
@@ -61,10 +62,10 @@ def generate_linear_chains(Ns: list[int], orientation: str, output_dir: str) -> 
         path = write_chain_data(linear_config)
         print(f"Created: {path}")
     
-def visualise_results():
+def visualise_results(simulation, run):
     # 1. Initialize Data Manager
-    data_dir = "post_chain_flop/Viscocity_00027_dt_1e6"
-    save_dir = "post_chain_flop/Visualisations/Viscocity_00027_dt_1e6"
+    data_dir = f"dumping_yard/{simulation}/{run}"
+    save_dir = f"dumping_yard/{simulation}/{run}"
     
     # make save_dir if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
@@ -79,18 +80,27 @@ def visualise_results():
         return
 
     print(f"Loaded simulation with {len(df)} records.")
-    # print df head
-    # print(df.head())
+
+    # get the number of atoms from the dataframe
+    num_atoms = df.index.get_level_values('id').nunique()
+    print(f"Number of unique atoms: {num_atoms}")
     
     # 3. Perform Analysis
     # # Example: Calculate angle between atoms 1, 2, and 3
     # print("Calculating angles...")
-    angle_123 = get_angle_series(df, id1=1, id2=2, id3=3)
-    angle_234 = get_angle_series(df, id1=2, id2=3, id3=4)
+    if num_atoms < 3:
+        print("Need at least three atoms to compute angles.")
+        return
 
-    # # 4. Visualize
-    plot_angle_evolution([angle_123, angle_234], legend_labels=["1-2-3","2-3-4"], save_path=f"{save_dir}/Angle_evol.png")
-    
+    angle_series_list = []
+    angle_labels = []
+
+    for start_id in range(1, num_atoms - 1):
+        id1, id2, id3 = start_id, start_id + 1, start_id + 2
+        angle_series_list.append(get_angle_series(df, id1=id1, id2=id2, id3=id3))
+        angle_labels.append(f"{id1}-{id2}-{id3}")
+
+    plot_angle_evolution(angle_series_list, legend_labels=angle_labels, save_path=f"{save_dir}/Angle_evol.png")
 
     # plot x, y, z over time of an atom
     # atom_id=4
