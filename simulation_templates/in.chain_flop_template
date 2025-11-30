@@ -53,27 +53,6 @@ fix grav mobile gravity 9.81 vector 0 0 -1
 # --- WALL DEFINITIONS ---
 # You must define X, Y, and Z walls separately.
 
-# 1. X-Walls (Left and Right: -0.02 to 0.02)
-fix xwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    xplane -0.02 0.02
-
-# 2. Y-Walls (Front and Back: -0.01 to 0.01)
-fix ywalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    yplane -0.01 0.01
-
-# 3. Z-Walls (Floor and Ceiling: 0.00 to 0.08)
-fix zwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    zplane 0.00 0.08
-
 comm_modify vel yes cutoff 0.004
 
 # define particle - particle interactions

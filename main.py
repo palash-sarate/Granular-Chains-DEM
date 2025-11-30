@@ -11,12 +11,12 @@ from pathlib import Path
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
-    # run_flop_simulations()
+    run_flop_simulations()
     # visualise_results()
     
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
-    Ns = [4,6,8,10,12,14,16,24,48,100]
-    generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
+    # Ns = [4,6,8,10,12,14,16,24,48,100]
+    # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
     
 def run_flop_simulations():
     # Ns = [4,6,8,10,12,14,16,24,48,100]
@@ -52,8 +52,8 @@ def generate_linear_chains(Ns: list[int], orientation: str, output_dir: str) -> 
         print(f"Generating linear chain with {N} beads, orientation={orientation}...")
         linear_config = ChainConfig(
             beads=N,
-            # center to center spacing
-            spacing=0.0045,
+            # center to center spacing 0 to 0.0025 max
+            spacing=0.0025,
             mode="linear",
             orientation=orientation,
             output_dir=Path(f"chain_data/{output_dir}"),
