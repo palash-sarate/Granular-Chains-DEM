@@ -237,7 +237,7 @@ def estimate_box(cfg: ChainConfig, positions: Sequence[Tuple[float, float, float
 	center_z = (min(zs) + max(zs)) / 2.0
 
 	# Create a generous cubic box: size = 2 * number of beads * 0.0025
-	box_size = 2.0 * cfg.beads * 0.0025
+	box_size = 2.0 * cfg.beads * 0.003
 	half_size = box_size / 2.0
 
 	xlo = center_x - half_size

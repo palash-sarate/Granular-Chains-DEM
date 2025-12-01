@@ -38,8 +38,9 @@ class Animator:
         self.x_limits = self._safe_limits(self.df['x'].min(), self.df['x'].max())
         self.y_limits = self._safe_limits(self.df['y'].min(), self.df['y'].max())
         self.z_limits = self._safe_limits(self.df['z'].min(), self.df['z'].max())
+        print(f"Global axis limits set to X:{self.x_limits}, Y:{self.y_limits}, Z:{self.z_limits}")
 
-    def _safe_limits(self, vmin, vmax, padding=0.5):
+    def _safe_limits(self, vmin, vmax, padding=0.0025):
         """
         Ensures limits are not identical. 
         If min == max, expands the range by +/- padding.
@@ -81,27 +82,7 @@ class Animator:
         # Determine marker sizes (render as spheres with diameter)
         if 'diameter' in group_data.columns:
             diameters = group_data['diameter'].values
-            
-            # Calculate scaling factor to map data units to point sizes
-            # Figure size is 10x10 inches. 3D axis typically takes ~70% of space.
-            # 1 inch = 72 points.
-            # Scale = (Figure Size in Points * Fraction) / Axis Data Range
-            
-            x_range = limits[0][1] - limits[0][0]
-            y_range = limits[1][1] - limits[1][0]
-            z_range = limits[2][1] - limits[2][0]
-            max_range = max(x_range, y_range, z_range)
-            if max_range == 0: max_range = 1.0
-            
-            # Approximate scaling: 10 inches * 72 points/inch * 0.4 (axis fraction)
-            # Reduced from 0.7 to 0.4 to prevent visual intersection of non-intersecting particles
-            axis_length_points = 10 * 72 * 0.4
-            
-            # Size in points = (Diameter / Data Range) * Axis Length in Points
-            # Scatter 's' argument is area in points^2
-            s_values = ((diameters / max_range) * axis_length_points) ** 2
-            # print(f"Frame {frame_idx}: Using diameter-based sizes.")
-            # print(f"s_values {s_values}")
+            s_values = diameters
         else:
             s_values = point_size
 
@@ -125,8 +106,29 @@ class Animator:
             # Older matplotlib versions might use pbaspect or not support this
             pass
         
-        # Scatter plot
-        sc = ax.scatter(x, y, z, c=c_values, cmap=cmap, s=s_values)
+        # Plot spheres with valid RGBA colors
+        if len(c_values):
+            c_array = np.asarray(c_values, dtype=float)
+            c_min, c_max = np.min(c_array), np.max(c_array)
+            if c_max - c_min == 0:
+                normed = np.zeros_like(c_array, dtype=float)
+            else:
+                normed = (c_array - c_min) / (c_max - c_min)
+            color_map = plt.get_cmap(cmap)
+            sphere_colors = color_map(normed)
+        else:
+            sphere_colors = []
+
+        for x_coord, y_coord, z_coord, d, sphere_color in zip(x, y, z, s_values, sphere_colors):
+            u = np.linspace(0, 2 * np.pi, 20)
+            v = np.linspace(0, np.pi, 20)
+            r = d / 2.0
+            
+            x_sphere = r * np.outer(np.cos(u), np.sin(v)) + x_coord
+            y_sphere = r * np.outer(np.sin(u), np.sin(v)) + y_coord
+            z_sphere = r * np.outer(np.ones(np.size(u)), np.cos(v)) + z_coord
+            
+            ax.plot_surface(x_sphere, y_sphere, z_sphere, color=sphere_color, alpha=0.6)
         
         # Set consistent limits
         ax.set_xlim(limits[0])
@@ -208,6 +210,7 @@ class Animator:
         tasks = []
         
         # Determine limits
+        limits = None
         if axis_limits is not None:
             if isinstance(axis_limits, (int, float)):
                 # Calculate center of the data
@@ -227,9 +230,26 @@ class Animator:
                 print(f"Using explicit axis limits: {limits}")
             else:
                 print("Warning: Invalid axis_limits format. Using auto-calculated limits.")
-                limits = (self.x_limits, self.y_limits, self.z_limits)
-        else:
-            limits = (self.x_limits, self.y_limits, self.z_limits)
+
+        if limits is None:
+            # Auto-calculate limits, but force them to be cubic (equal ranges) to prevent distortion
+            # when combined with ax.set_box_aspect((1, 1, 1))
+            x_range = self.x_limits[1] - self.x_limits[0]
+            y_range = self.y_limits[1] - self.y_limits[0]
+            z_range = self.z_limits[1] - self.z_limits[0]
+            
+            max_range = max(x_range, y_range, z_range)
+            
+            x_center = (self.x_limits[0] + self.x_limits[1]) / 2
+            y_center = (self.y_limits[0] + self.y_limits[1]) / 2
+            z_center = (self.z_limits[0] + self.z_limits[1]) / 2
+            
+            limits = (
+                (x_center - max_range/2, x_center + max_range/2),
+                (y_center - max_range/2, y_center + max_range/2),
+                (z_center - max_range/2, z_center + max_range/2)
+            )
+            print(f"Auto-calculated cubic limits with range {max_range:.4f} to prevent distortion.")
         
         for i, (timestep, group) in enumerate(grouped):
             tasks.append((i, timestep, group, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles))
