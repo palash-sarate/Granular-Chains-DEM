@@ -8,6 +8,7 @@ import os
 # import uuid
 from simulation import SimulationConfig, SimulationRunner
 from simulation.chain_generator import ChainConfig, write_chain_data
+from simulation.library_generator import LibraryGenerator
 from pathlib import Path
 import argparse
 import ast
@@ -15,10 +16,16 @@ import sys
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
-    run_flop_simulations()
+    # run_flop_simulations()
+    generate_relaxed_chain_states(n_beads=4, n_states=5)
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
     # Ns = [4,6,8,10,12,14,16,24,48,100]
     # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
+
+def generate_relaxed_chain_states(n_beads=4, n_states=10):
+    runner = SimulationRunner(lammps_executable="lmp")
+    lib_gen = LibraryGenerator(runner)
+    lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
 
 def run_flop_simulations(Ns = [4,6,8,10,12,14,16,24,48,100], 
                          run_steps = [100000, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000], 
@@ -27,10 +34,10 @@ def run_flop_simulations(Ns = [4,6,8,10,12,14,16,24,48,100],
         print(f"Running flop simulation for N={N}...")
         run_flop_simulation(N, run_step, viscosity, dt)
         
-    visualize_chain_flop_results(Ns)
+    visualize_chain_flop_results(Ns, viscosity, dt)
 
 def run_flop_simulation(N, run_step, viscosity, dt):
-    viscosity_token = f"{int(round(viscosity * 1e4)):05d}"
+    viscosity_token = get_viscosity_token(viscosity)
     dt_token = get_dt_token(dt)
 
     config = SimulationConfig(
@@ -154,6 +161,7 @@ if __name__ == "__main__":
         "generate_linear_chains": generate_linear_chains,
         "visualize_results": visualize_results,
         "visualize_chain_flop_results": visualize_chain_flop_results,
+        "generate_relaxed_chain_states": generate_relaxed_chain_states,
     }
 
     parser = argparse.ArgumentParser(description="Execute functions from main.py")

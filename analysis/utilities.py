@@ -12,7 +12,7 @@ def get_dt_token(dt: float) -> str:
     exponent = exponent.lstrip("+-")
     exponent = exponent.lstrip("0") or "0"
     dt_token = f"{mantissa}e{exponent}"
-    print(f"DT token: {dt_token}")
+    # print(f"DT token: {dt_token}")
     return dt_token
 
 def get_viscosity_token(viscosity: float) -> str:
@@ -24,7 +24,7 @@ def get_viscosity_token(viscosity: float) -> str:
     token_str = f"{token:09d}"
     # remove trailing zeros
     token_str = token_str.rstrip("0")
-    print(f"Viscosity token: {token_str}")
+    # print(f"Viscosity token: {token_str}")
     return token_str
 
 def main():
