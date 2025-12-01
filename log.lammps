@@ -13,32 +13,32 @@ special_bonds lj/coul 1.0 1.0 1.0
 
 # # Read the atom and bond data from the data file.
 ################################################
-read_data chain_data/chains_linear_x/N6_chain_horz.data
+read_data chain_data/chains_linear_x/N4_chain_horz.data
 Reading data file ...
-  orthogonal box = (-0.00975 -0.0035 -0.0035) to (0.00975 0.0035 0.0035)
+  orthogonal box = (-0.01 -0.01 -0.01) to (0.01 0.01 0.01)
   1 by 1 by 1 MPI processor grid
 WARNING: Atom style in data file hybrid sphere molecular differs from currently defined atom style hybrid (src/read_data.cpp:727)
   reading atoms ...
-  6 atoms
+  4 atoms
   reading velocities ...
-  6 velocities
+  4 velocities
   scanning bonds ...
   1 = max bonds/atom
   scanning angles ...
   1 = max angles/atom
-  orthogonal box = (-0.00975 -0.0035 -0.0035) to (0.00975 0.0035 0.0035)
+  orthogonal box = (-0.01 -0.01 -0.01) to (0.01 0.01 0.01)
   1 by 1 by 1 MPI processor grid
   reading bonds ...
-  5 bonds
+  3 bonds
   reading angles ...
-  4 angles
+  2 angles
 Finding 1-2 1-3 1-4 neighbors ...
   special bond factors lj:    1        1        1       
   special bond factors coul:  1        1        1       
      2 = max # of 1-2 neighbors
      2 = max # of special neighbors
-  special bonds CPU = 0.000 seconds
-  read_data CPU = 0.002 seconds
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.047 seconds
 
 velocity all set 0.0 0.0 0.0
 
@@ -46,7 +46,7 @@ velocity all set 0.0 0.0 0.0
 group anchors id 1 2
 2 atoms in group anchors
 group mobile subtract all anchors
-4 atoms in group mobile
+2 atoms in group mobile
 
 velocity anchors set 0.0 0.0 0.0
 set group anchors omega 0.0 0.0 0.0
@@ -54,7 +54,7 @@ Setting atom values ...
   2 settings made for omega
 
 ################################################
-variable outdir string dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6
+variable outdir string dumping_yard/Chain_flop/N4_Viscosity_003_dt_1e6
 
 # ################################################
 variable r_max equal 0.0005 #pot center to center
@@ -111,8 +111,8 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 
 # Replaces the missing internal link friction
 group chain_particles type 1
-6 atoms in group chain_particles
-fix 1 chain_particles viscous 0.03
+4 atoms in group chain_particles
+fix 1 chain_particles viscous 0.003
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -137,17 +137,17 @@ thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 
 # Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
 dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
-dump 1 all custom 1000 dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+dump 1 all custom 1000 dumping_yard/Chain_flop/N4_Viscosity_003_dt_1e6/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
 dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
-dump 2 all local 1000 dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump 2 all local 1000 dumping_yard/Chain_flop/N4_Viscosity_003_dt_1e6/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
 dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
-dump 3 all local 1000 dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6/angle/angle_*.dump index c_2[1] c_2[2]
+dump 3 all local 1000 dumping_yard/Chain_flop/N4_Viscosity_003_dt_1e6/angle/angle_*.dump index c_2[1] c_2[2]
 
 # Save a binary restart file every 1,000,000 steps
 # The '*' is replaced by the timestep number
 restart 100000 ${outdir}/restart/restart.*.bin
-restart 100000 dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6/restart/restart.*.bin
+restart 100000 dumping_yard/Chain_flop/N4_Viscosity_003_dt_1e6/restart/restart.*.bin
 run 100000
 Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
 WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (src/comm.cpp:743)
@@ -156,7 +156,7 @@ Neighbor list info ...
   max neighbors/atom: 2000, page size: 100000
   master list distance cutoff = 0.006
   ghost atom cutoff = 0.006
-  binsize = 0.003, bins = 7 3 3
+  binsize = 0.003, bins = 7 7 7
   1 neighbor lists, perpetual/occasional/extra = 1 0 0
   (1) pair granular, perpetual
       attributes: half, newton on, size, history
@@ -167,51 +167,9 @@ WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate
 WARNING: Communication cutoff adjusted to 0.006 (src/comm.cpp:752)
 Per MPI rank memory allocation (min/avg/max) = 68.99 | 68.99 | 68.99 Mbytes
    Step         PotEng         KinEng         E_bond        E_angle         TotEng         E_coul         E_mol         E_dihed         E_pair         E_vdwl    
-         0   5.1528841e-09  0              5.1528841e-09  0              5.1528841e-09  0              5.1528841e-09  0              0              0            
-     10000   5.0864024e-09  5.5880125e-09  5.0864024e-09  0              1.0674415e-08  0              5.0864024e-09  0              0              0            
-     20000   5.1005282e-09  5.5797686e-09  5.1005282e-09  0              1.0680297e-08  0              5.1005282e-09  0              0              0            
-     30000   5.2173914e-09  5.5690258e-09  5.2173914e-09  0              1.0786417e-08  0              5.2173914e-09  0              0              0            
-     40000   5.4605124e-09  5.5546873e-09  5.4605124e-09  0              1.10152e-08    0              5.4605124e-09  0              0              0            
-     50000   5.8649685e-09  5.5350012e-09  5.8649685e-09  0              1.139997e-08   0              5.8649685e-09  0              0              0            
-     60000   6.4738661e-09  5.5081414e-09  6.4738661e-09  0              1.1982007e-08  0              6.4738661e-09  0              0              0            
-     70000   7.3307779e-09  5.4725885e-09  7.3307779e-09  0              1.2803366e-08  0              7.3307779e-09  0              0              0            
-     80000   8.4693524e-09  5.4275596e-09  8.4693524e-09  0              1.3896912e-08  0              8.4693524e-09  0              0              0            
-     90000   9.9066821e-09  5.3731057e-09  9.9066821e-09  0              1.5279788e-08  0              9.9066821e-09  0              0              0            
-    100000   1.1645396e-08  5.3098683e-09  1.1645396e-08  0              1.6955265e-08  0              1.1645396e-08  0              0              0            
-Loop time of 106.38 on 4 procs for 100000 steps with 6 atoms
-
-92.5% CPU use with 1 MPI tasks x 4 OpenMP threads
-
-MPI task timing breakdown:
-Section |  min time  |  avg time  |  max time  |%varavg| %total
----------------------------------------------------------------
-Pair    | 0.072257   | 0.072257   | 0.072257   |   0.0 |  0.07
-Bond    | 105.23     | 105.23     | 105.23     |   0.0 | 98.92
-Neigh   | 7e-06      | 7e-06      | 7e-06      |   0.0 |  0.00
-Comm    | 0.026991   | 0.026991   | 0.026991   |   0.0 |  0.03
-Output  | 0.75712    | 0.75712    | 0.75712    |   0.0 |  0.71
-Modify  | 0.10293    | 0.10293    | 0.10293    |   0.0 |  0.10
-Other   |            | 0.1912     |            |       |  0.18
-
-Nlocal:              6 ave           6 max           6 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:              0 ave           0 max           0 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:              9 ave           9 max           9 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-
-Total # of neighbors = 9
-Ave neighs/atom = 1.5
-Ave special neighs/atom = 1.6666667
-Neighbor list builds = 1
-Dangerous builds = 0
-
-# Save the final state manually
-write_restart ${outdir}/restart/restart.final.bin
-write_restart dumping_yard/Chain_flop/N6_Viscosity_03_dt_1e6/restart/restart.final.bin
-System init for write_restart ...
-Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
-WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (src/comm.cpp:743)
-
-variable outdir delete
-Total wall time: 0:01:46
+         0   3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              3.0917305e-09  0              0              0            
+     10000   3.3269414e-09  1.127048e-07   3.3269414e-09  0              1.1603174e-07  0              3.3269414e-09  0              0              0            
+     20000   1.840146e-08   1.9630714e-07  1.840146e-08   0              2.147086e-07   0              1.840146e-08   0              0              0            
+     30000   4.6785112e-08  1.9854703e-07  4.6785112e-08  0              2.4533214e-07  0              4.6785112e-08  0              0              0            
+     40000   1.3306369e-08  1.4076808e-07  1.3306369e-08  0              1.5407445e-07  0              1.3306369e-08  0              0              0            
+     50000   6.7505989e-08  9.7839894e-08  6.750598

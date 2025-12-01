@@ -152,14 +152,9 @@ class SimulationRunner:
         print(f"Executing: {' '.join(cmd)}")
         
         if verbose:
-            # Stream output to stdout
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            if process.stdout:
-                for line in process.stdout:
-                    print(line, end='')
-            process.wait()
-            if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode, cmd)
-        else:
+            # Run directly to allow real-time output to terminal
             subprocess.run(cmd, check=True)
+        else:
+            # Suppress output
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print("Simulation completed.")

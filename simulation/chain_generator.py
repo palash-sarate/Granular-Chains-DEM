@@ -230,28 +230,22 @@ def _generate_loop(cfg: ChainConfig) -> List[Tuple[float, float, float]]:
 def estimate_box(cfg: ChainConfig, positions: Sequence[Tuple[float, float, float]]) -> Tuple[float, float, float, float, float, float]:
 	"""Compute a bounding box that comfortably encloses the chain."""
 
-	margin = max(cfg.spacing, cfg.diameter)
-	radius = cfg.radius
-
+	# Calculate geometric center
 	xs, ys, zs = zip(*positions)
+	center_x = (min(xs) + max(xs)) / 2.0
+	center_y = (min(ys) + max(ys)) / 2.0
+	center_z = (min(zs) + max(zs)) / 2.0
 
-	xlo = min(xs) - radius - margin
-	xhi = max(xs) + radius + margin
-	ylo = min(ys) - radius - margin
-	yhi = max(ys) + radius + margin
-	zlo = min(zs) - radius - margin
-	zhi = max(zs) + radius + margin
+	# Create a generous cubic box: size = 2 * number of beads * 0.0025
+	box_size = 2.0 * cfg.beads * 0.0025
+	half_size = box_size / 2.0
 
-	# Guarantee non-zero extents even for single-bead chains aligned to zero.
-	if math.isclose(xlo, xhi):
-		xlo -= margin
-		xhi += margin
-	if math.isclose(ylo, yhi):
-		ylo -= margin
-		yhi += margin
-	if math.isclose(zlo, zhi):
-		zlo -= margin
-		zhi += margin
+	xlo = center_x - half_size
+	xhi = center_x + half_size
+	ylo = center_y - half_size
+	yhi = center_y + half_size
+	zlo = center_z - half_size
+	zhi = center_z + half_size
 
 	return xlo, xhi, ylo, yhi, zlo, zhi
 

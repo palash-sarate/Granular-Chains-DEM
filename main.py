@@ -11,8 +11,8 @@ from pathlib import Path
 
 def main():
     # session_id = str(uuid.uuid4())[:8]
-    # run_flop_simulations()
-    visualise_results("Chain_flop", "N4_Viscosity_03_dt_1e6")
+    run_flop_simulations()
+    # visualise_results("Chain_flop", "N4_Viscosity_03_dt_1e6")
     # visualise_results("Chain_flop", "N6_Viscosity_03_dt_1e6")
     
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
@@ -28,9 +28,9 @@ def run_flop_simulations():
             template = "in.chain_flop_template",
             data_file = f"chains_linear_x/N{N}_chain_horz.data",
             simulation = "Chain_flop",
-            run = f"N{N}_Viscosity_03_dt_1e6",
+            run = f"N{N}_Viscosity_003_dt_1e6",
             extra_vars={
-                "viscosity": 0.03,
+                "viscosity": 0.003,
                 "run_steps": 100000,
                 "dt": 1e-6
             }
