@@ -4,6 +4,7 @@ class LammpsParser:
     def __init__(self, script_path):
         self.script_path = script_path
         self.regions = {}
+        self.variables = {}
         self.box_region_id = None
         self.boundary = ['p', 'p', 'p'] # Default
         self.parse()
@@ -26,6 +27,30 @@ class LammpsParser:
                 self._parse_create_box(parts)
             elif command == 'boundary':
                 self.boundary = parts[1:4]
+            elif command == 'variable':
+                self._parse_variable(parts)
+
+    def _parse_variable(self, parts):
+        # variable name style args...
+        # e.g. variable amp equal 0.005
+        # e.g. variable amp string 0.005
+        if len(parts) >= 4:
+            name = parts[1]
+            style = parts[2]
+            value = " ".join(parts[3:])
+            
+            # Try to convert to float if possible
+            try:
+                if style in ['equal', 'string']:
+                    # Remove quotes if present
+                    value = value.replace('"', '').replace("'", "")
+                    # Check if it's a number
+                    float_val = float(value)
+                    self.variables[name] = float_val
+                else:
+                    self.variables[name] = value
+            except ValueError:
+                self.variables[name] = value
 
     def _parse_region(self, parts):
         # region ID style args...
