@@ -24,10 +24,11 @@ def main():
     # Ns = [4,6,8,10,12,14,16,24,48,100]
     # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
 
-def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=100, freq=5.0, amp=0.005):
+def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=100, freq=5.0, 
+                        amp=0.005, dt = 1e-6, run_steps = 10000):
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
-    manager.run_hopper_flow(chain_source_dir, n_fill, freq, amp)
+    manager.run_hopper_flow(chain_source_dir, n_fill, freq, amp=amp, dt=dt, run_steps=run_steps)
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10):
     runner = SimulationRunner(lammps_executable="lmp")
@@ -153,7 +154,16 @@ def visualize_results(simulation, run):
             save_path=f"{save_dir}/Distance_evol.png",
         )
     # print("Generating animation...")
-    anim = Animator(df, output_file=f"{save_dir}/chain_motion.mp4")
+    
+    # Find LAMMPS script in data_dir
+    lammps_script = None
+    if os.path.exists(data_dir):
+        for file in os.listdir(data_dir):
+            if file.startswith("in."):
+                lammps_script = os.path.join(data_dir, file)
+                break
+    
+    anim = Animator(df, output_file=f"{save_dir}/chain_motion.mp4", lammps_script=lammps_script)
     
     # You can color by 'id', 'vx', 'vy', 'vz', or 'velocity_magnitude' if those columns exist
     # Axis limits set to 15mm (0.015m) as requested

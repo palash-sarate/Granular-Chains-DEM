@@ -7,17 +7,173 @@ import subprocess
 import pandas as pd
 import time
 import shutil
+from analysis.lammps_parser import LammpsParser
+
+# Helper functions for geometry rendering
+def render_block(ax, params, alpha=0.2, color='gray', wireframe=False):
+    xlo, xhi = params['xlo'], params['xhi']
+    ylo, yhi = params['ylo'], params['yhi']
+    zlo, zhi = params['zlo'], params['zhi']
+    
+    if wireframe:
+        # Draw edges
+        corners = [
+            [xlo, ylo, zlo], [xhi, ylo, zlo], [xhi, yhi, zlo], [xlo, yhi, zlo],
+            [xlo, ylo, zhi], [xhi, ylo, zhi], [xhi, yhi, zhi], [xlo, yhi, zhi]
+        ]
+        edges = [
+            (0,1), (1,2), (2,3), (3,0), # Bottom
+            (4,5), (5,6), (6,7), (7,4), # Top
+            (0,4), (1,5), (2,6), (3,7)  # Sides
+        ]
+        for start, end in edges:
+            ax.plot3D(
+                [corners[start][0], corners[end][0]],
+                [corners[start][1], corners[end][1]],
+                [corners[start][2], corners[end][2]],
+                color='black', linewidth=1
+            )
+    else:
+        # Draw surfaces (simplified as 6 planes)
+        # X faces
+        y = np.linspace(ylo, yhi, 2)
+        z = np.linspace(zlo, zhi, 2)
+        Y, Z = np.meshgrid(y, z)
+        ax.plot_surface(np.full_like(Y, xlo), Y, Z, alpha=alpha, color=color)
+        ax.plot_surface(np.full_like(Y, xhi), Y, Z, alpha=alpha, color=color)
+        
+        # Y faces
+        x = np.linspace(xlo, xhi, 2)
+        z = np.linspace(zlo, zhi, 2)
+        X, Z = np.meshgrid(x, z)
+        ax.plot_surface(X, np.full_like(X, ylo), Z, alpha=alpha, color=color)
+        ax.plot_surface(X, np.full_like(X, yhi), Z, alpha=alpha, color=color)
+        
+        # Z faces
+        x = np.linspace(xlo, xhi, 2)
+        y = np.linspace(ylo, yhi, 2)
+        X, Y = np.meshgrid(x, y)
+        ax.plot_surface(X, Y, np.full_like(X, zlo), alpha=alpha, color=color)
+        ax.plot_surface(X, Y, np.full_like(X, zhi), alpha=alpha, color=color)
+
+def render_cylinder(ax, params, alpha=0.2, color='gray'):
+    # dim c1 c2 radius lo hi
+    dim = params['dim']
+    c1, c2 = params['c1'], params['c2']
+    radius = params['radius']
+    lo, hi = params['lo'], params['hi']
+    
+    # Resolution
+    u = np.linspace(0, 2 * np.pi, 30)
+    v = np.linspace(lo, hi, 10)
+    U, V = np.meshgrid(u, v)
+    
+    if dim == 'x':
+        # axis is x. c1=y, c2=z
+        Y = c1 + radius * np.cos(U)
+        Z = c2 + radius * np.sin(U)
+        X = V
+    elif dim == 'y':
+        # axis is y. c1=x, c2=z
+        X = c1 + radius * np.cos(U)
+        Z = c2 + radius * np.sin(U)
+        Y = V
+    elif dim == 'z':
+        # axis is z. c1=x, c2=y
+        X = c1 + radius * np.cos(U)
+        Y = c2 + radius * np.sin(U)
+        Z = V
+        
+    ax.plot_surface(X, Y, Z, alpha=alpha, color=color)
+
+def render_cone(ax, params, alpha=0.2, color='gray'):
+    # dim c1 c2 radlo radhi lo hi
+    dim = params['dim']
+    c1, c2 = params['c1'], params['c2']
+    radlo, radhi = params['radlo'], params['radhi']
+    lo, hi = params['lo'], params['hi']
+    
+    u = np.linspace(0, 2 * np.pi, 30)
+    v = np.linspace(lo, hi, 10)
+    U, V = np.meshgrid(u, v)
+    
+    # Radius at position v
+    # Linear interpolation: r(v) = radlo + (radhi - radlo) * (v - lo) / (hi - lo)
+    R = radlo + (radhi - radlo) * (V - lo) / (hi - lo)
+    
+    if dim == 'x':
+        Y = c1 + R * np.cos(U)
+        Z = c2 + R * np.sin(U)
+        X = V
+    elif dim == 'y':
+        X = c1 + R * np.cos(U)
+        Z = c2 + R * np.sin(U)
+        Y = V
+    elif dim == 'z':
+        X = c1 + R * np.cos(U)
+        Y = c2 + R * np.sin(U)
+        Z = V
+        
+    ax.plot_surface(X, Y, Z, alpha=alpha, color=color)
+
+def render_plane(ax, params, limits, alpha=0.2, color='gray'):
+    # px py pz nx ny nz
+    # Plane equation: nx(x-px) + ny(y-py) + nz(z-pz) = 0
+    # nx*x + ny*y + nz*z = d, where d = nx*px + ny*py + nz*pz
+    px, py, pz = params['px'], params['py'], params['pz']
+    nx, ny, nz = params['nx'], params['ny'], params['nz']
+    
+    d = nx*px + ny*py + nz*pz
+    
+    # We need to plot this within limits
+    xlim, ylim, zlim = limits
+    
+    # Create a grid on the two axes with smallest normal component
+    # to avoid division by zero or instability
+    normal = np.array([nx, ny, nz])
+    abs_normal = np.abs(normal)
+    max_axis = np.argmax(abs_normal)
+    
+    if max_axis == 2: # Z is dominant
+        x = np.linspace(xlim[0], xlim[1], 2)
+        y = np.linspace(ylim[0], ylim[1], 2)
+        X, Y = np.meshgrid(x, y)
+        # z = (d - nx*x - ny*y) / nz
+        Z = (d - nx*X - ny*Y) / nz
+    elif max_axis == 1: # Y is dominant
+        x = np.linspace(xlim[0], xlim[1], 2)
+        z = np.linspace(zlim[0], zlim[1], 2)
+        X, Z = np.meshgrid(x, z)
+        Y = (d - nx*X - nz*Z) / ny
+    else: # X is dominant
+        y = np.linspace(ylim[0], ylim[1], 2)
+        z = np.linspace(zlim[0], zlim[1], 2)
+        Y, Z = np.meshgrid(y, z)
+        X = (d - ny*Y - nz*Z) / nx
+        
+    ax.plot_surface(X, Y, Z, alpha=alpha, color=color)
 
 class Animator:
-    def __init__(self, dataframe, output_file="simulation.mp4"):
+    def __init__(self, dataframe, output_file="simulation.mp4", lammps_script=None):
         """
         Initialize the Animator with a pandas DataFrame.
         
         :param dataframe: Pandas DataFrame containing simulation data.
         :param output_file: Name of the output video file.
+        :param lammps_script: Path to the LAMMPS input script to parse geometry from.
         """
         # Create a copy to avoid modifying the original data
         self.df = dataframe.copy()
+        
+        # Parse LAMMPS geometry if provided
+        self.geometry = None
+        if lammps_script and os.path.exists(lammps_script):
+            try:
+                parser = LammpsParser(lammps_script)
+                self.geometry = parser.get_geometry()
+                print(f"Loaded geometry from {lammps_script}: {list(self.geometry['regions'].keys())}")
+            except Exception as e:
+                print(f"Failed to parse LAMMPS script: {e}")
         
         # Check if we have a MultiIndex (likely timestep, id) and reset it to make them columns
         if isinstance(self.df.index, pd.MultiIndex):
@@ -50,7 +206,7 @@ class Animator:
         return (vmin, vmax)
     
     @staticmethod
-    def _render_single_frame(frame_idx, timestep, group_data, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles):
+    def _render_single_frame(frame_idx, timestep, group_data, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles, geometry=None):
         """
         Static method to render a single frame. 
         Must be static to be picklable for ProcessPoolExecutor.
@@ -84,7 +240,7 @@ class Animator:
             diameters = group_data['diameter'].values
             s_values = diameters
         else:
-            s_values = point_size
+            s_values = np.full_like(x, point_size)
 
         # Setup plot
         fig = plt.figure(figsize=(10, 10), dpi=resolution_dpi)
@@ -130,6 +286,39 @@ class Animator:
             
             ax.plot_surface(x_sphere, y_sphere, z_sphere, color=sphere_color, alpha=0.6)
         
+        # Render Geometry
+        if geometry:
+            regions = geometry.get('regions', {})
+            box_id = geometry.get('box_region')
+            
+            # Define a color cycle for regions
+            colors = ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta']
+            color_idx = 0
+            
+            for r_id, r_data in regions.items():
+                style = r_data['style']
+                params = r_data['params']
+                
+                is_box = (r_id == box_id)
+                
+                if style == 'union':
+                    continue
+                
+                if is_box:
+                    render_block(ax, params, wireframe=True)
+                else:
+                    color = colors[color_idx % len(colors)]
+                    color_idx += 1
+                    
+                    if style == 'block':
+                        render_block(ax, params, alpha=0.1, color=color)
+                    elif style == 'cylinder':
+                        render_cylinder(ax, params, alpha=0.1, color=color)
+                    elif style == 'cone':
+                        render_cone(ax, params, alpha=0.1, color=color)
+                    elif style == 'plane':
+                        render_plane(ax, params, limits, alpha=0.1, color=color)
+
         # Set consistent limits
         ax.set_xlim(limits[0])
         ax.set_ylim(limits[1])
@@ -252,7 +441,7 @@ class Animator:
             print(f"Auto-calculated cubic limits with range {max_range:.4f} to prevent distortion.")
         
         for i, (timestep, group) in enumerate(grouped):
-            tasks.append((i, timestep, group, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles))
+            tasks.append((i, timestep, group, limits, color_by, cmap, resolution_dpi, point_size, temp_dir, view_angles, self.geometry))
             
         temp_files = []
         

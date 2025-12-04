@@ -87,9 +87,12 @@ region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2 move v_x_osc v
 region hopper_union union 2 hopper_cone hopper_cyl
 
 # Define Wall
-fix wall all wall/gran/region hooke 1e5 1e5 50.0 1.0 0.3 1 region hopper_union
+# fix wall/gran/region does not support 'granular' style. Using hertz/history equivalent.
+# Args: Kn Kt gamma_n gamma_t xmu dampflag
+fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union
+
 region floor_plane plane 0 0 -0.45 0 0 1
-fix floor all wall/gran/region hooke 1e5 1e5 50.0 1.0 0.3 1 region floor_plane
+fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane
 
 # --- MOLECULES ---
 # Include the file that defines m1, m2, ... mN

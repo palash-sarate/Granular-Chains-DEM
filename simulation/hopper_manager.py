@@ -52,7 +52,10 @@ class HopperManager:
                         n_fill: int, 
                         freq: float = 5.0, 
                         amp: float = 0.005,
-                        run_name: str = "hopper_test"):
+                        run_name: str = "hopper_test",
+                        dt: float = 1e-6,
+                        run_steps: int = 10000,
+                        temperature: float = 1e12):
         
         # 1. Prepare Molecules
         # We'll store molecules in a subdir of the source or a temp dir
@@ -74,9 +77,9 @@ class HopperManager:
                 "freq": freq,
                 "amp": amp,
                 "seed": 12345,
-                "run_steps": 10000, # Post-fill run
-                "dt": 1e-6,
-                "temperature": 1e12 # Not used for creation but for thermostat if needed
+                "run_steps": run_steps, # Post-fill run
+                "dt": dt,
+                "temperature": temperature # Not used for creation but for thermostat if needed
             }
         )
         
