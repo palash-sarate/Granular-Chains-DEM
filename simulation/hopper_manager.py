@@ -50,6 +50,7 @@ class HopperManager:
     def run_hopper_flow(self, 
                         chain_source_dir: str, 
                         n_fill: int, 
+                        drop_steps: int = None,
                         freq: float = 5.0, 
                         amp: float = 0.005,
                         run_name: str = "hopper_test",
@@ -57,6 +58,10 @@ class HopperManager:
                         run_steps: int = 10000,
                         temperature: float = 1e12):
         
+        if drop_steps is None:
+            drop_steps = 5 * (1 / dt) * 1e-2
+            # print(f"Setting drop_steps to {drop_steps} based on dt={dt}")
+            
         # 1. Prepare Molecules
         # We'll store molecules in a subdir of the source or a temp dir
         mol_dir = "chain_data/molecules_temp"
@@ -79,11 +84,13 @@ class HopperManager:
                 "seed": 12345,
                 "run_steps": run_steps, # Post-fill run
                 "dt": dt,
-                "temperature": temperature # Not used for creation but for thermostat if needed
+                "temperature": temperature, # Not used for creation but for thermostat if needed
+                "drop_steps": int(drop_steps)
             }
         )
         
         # 3. Run
         print(f"Starting Hopper Flow simulation: {run_name}")
-        self.runner.run(sim_config, verbose=True)
+        # Enable directory cleaning to prevent mixing old and new data
+        self.runner.run(sim_config, verbose=True, clean_dir=True)
 

@@ -130,7 +130,7 @@ label loop_start
     create_atoms 0 single ${rx} ${ry} 0.2 mol ${mol_id} ${seed}
     
     # Run to let it fall
-    run 50000 
+    run ${drop_steps}
 
     next i
 jump SELF loop_start

@@ -6,6 +6,10 @@ from typing import Optional, List
 from .config import SimulationConfig
 # from lammps import lammps
 
+import shutil
+import json
+import datetime
+
 class SimulationRunner:
     def __init__(self, lammps_executable: str = "lmp"):
         self.lammps_exe = lammps_executable
@@ -56,9 +60,15 @@ class SimulationRunner:
             f.write(content)
         print(f"Generated input script: {output_path}")
 
-    def _prepare_directories(self, config: SimulationConfig):
+    def _prepare_directories(self, config: SimulationConfig, clean: bool = False):
         """Creates the necessary output directories."""
         outdir = config.output_dir
+        
+        # Clean directory if requested
+        if clean and os.path.exists(outdir):
+            print(f"Cleaning output directory: {outdir}")
+            shutil.rmtree(outdir)
+            
         # Create main output dir and subdirectories
         subdirs = ["bond", "angle", "restart", "chain"]
         
@@ -70,14 +80,14 @@ class SimulationRunner:
             
         print(f"Prepared output directories in: {outdir}")
 
-    def run(self, config: SimulationConfig, verbose: bool = True):
+    def run(self, config: SimulationConfig, verbose: bool = True, clean_dir: bool = True):
         """
         Runs the simulation using the provided configuration.
         If template_path is provided, generates a new input script.
         Otherwise, runs config.input_script directly (assuming it's ready).
         """
         # Prepare directories first
-        self._prepare_directories(config)
+        self._prepare_directories(config, clean=clean_dir)
         
         if config.input_script:
             script_to_run = config.input_script

@@ -24,11 +24,11 @@ def main():
     # Ns = [4,6,8,10,12,14,16,24,48,100]
     # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
 
-def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=100, freq=5.0, 
+def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=10, freq=5.0, 
                         amp=0.005, dt = 1e-6, run_steps = 10000):
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
-    manager.run_hopper_flow(chain_source_dir, n_fill, freq, amp=amp, dt=dt, run_steps=run_steps)
+    manager.run_hopper_flow(chain_source_dir, n_fill, freq=freq, amp=amp, dt=dt, run_steps=run_steps)
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10):
     runner = SimulationRunner(lammps_executable="lmp")
