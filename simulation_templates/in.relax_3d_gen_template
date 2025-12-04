@@ -25,6 +25,8 @@ variable ktheta equal 1.0e6
 variable w   equal 1.0e-4
 variable delta equal 1.0e-4
 
+comm_modify vel yes
+
 # Granular pair style
 pair_style  granular
 pair_coeff  1 1 hooke 1e6 50.0 & 

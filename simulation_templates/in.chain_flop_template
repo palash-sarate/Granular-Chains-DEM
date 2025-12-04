@@ -9,7 +9,7 @@ special_bonds lj/coul 1.0 1.0 1.0
 
 # # Read the atom and bond data from the data file.
 ################################################
-read_data chain_datas/default_chain.data
+read_data ${data_file}
 
 velocity all set 0.0 0.0 0.0
 
@@ -20,10 +20,6 @@ group mobile subtract all anchors
 velocity anchors set 0.0 0.0 0.0
 set group anchors omega 0.0 0.0 0.0
 
-################################################
-variable outdir string Default_sim/default_run
-
-# ################################################
 variable r_max equal 0.0005 #pot center to center
 # Theta limit in Radians (140 degrees * PI / 180)
 variable theta_lim equal 2.4435
@@ -81,7 +77,7 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 
 # Replaces the missing internal link friction
 group chain_particles type 1
-fix 1 chain_particles viscous 1
+fix 1 chain_particles viscous ${viscosity}
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -97,7 +93,7 @@ compute 1 chain_particles bond/local dist engpot force
 compute 2 chain_particles angle/local theta eng
 
 # Set a conservative timestep for the stiff bonded chain.
-timestep 1.0e-6
+timestep ${dt}
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 10000 timesteps.
@@ -114,7 +110,7 @@ dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
 # The '*' is replaced by the timestep number
 restart 100000 ${outdir}/restart/restart.*.bin
 
-run 10000000  # 1e7 timesteps 1 second 
+run ${run_steps}  # 1e7 timesteps 1 second 
 
 # Save the final state manually
 write_restart ${outdir}/restart/restart.final.bin

@@ -9,6 +9,7 @@ import os
 from simulation import SimulationConfig, SimulationRunner
 from simulation.chain_generator import ChainConfig, write_chain_data
 from simulation.library_generator import LibraryGenerator
+from simulation.hopper_manager import HopperManager
 from pathlib import Path
 import argparse
 import ast
@@ -17,10 +18,16 @@ import sys
 def main():
     # session_id = str(uuid.uuid4())[:8]
     # run_flop_simulations()
-    generate_relaxed_chain_states(n_beads=4, n_states=5)
+    # generate_relaxed_chain_states(n_beads=4, n_states=5)
+    run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=50)
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
     # Ns = [4,6,8,10,12,14,16,24,48,100]
     # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
+
+def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=100, freq=5.0, amp=0.005):
+    runner = SimulationRunner(lammps_executable="lmp")
+    manager = HopperManager(runner)
+    manager.run_hopper_flow(chain_source_dir, n_fill, freq, amp)
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10):
     runner = SimulationRunner(lammps_executable="lmp")
@@ -162,6 +169,7 @@ if __name__ == "__main__":
         "visualize_results": visualize_results,
         "visualize_chain_flop_results": visualize_chain_flop_results,
         "generate_relaxed_chain_states": generate_relaxed_chain_states,
+        "run_hopper_simulation": run_hopper_simulation,
     }
 
     parser = argparse.ArgumentParser(description="Execute functions from main.py")

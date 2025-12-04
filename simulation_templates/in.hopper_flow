@@ -1,23 +1,7 @@
-LAMMPS (22 Jul 2025 - Update 1)
-  using 4 OpenMP thread(s) per MPI task
-Loaded 1 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
-variable outdir string dumping_yard/Hopper_Flow/hopper_test
-variable mol_include_file string chain_data/molecules_temp/molecules.inc
-variable n_templates string 5
-variable n_fill string 10
-variable freq string 5.0
-variable amp string 0.005
-variable seed string 12345
-variable run_steps string 10000
-variable dt string 1e-06
-variable temperature string 1000000000000.0
-variable data_file string chain_data/default_chain.data
-
 # Hopper Flow Simulation with Dynamic Injection
 
 units       si
 atom_style hybrid sphere angle
-WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (src/atom_vec_hybrid.cpp:132)
 boundary    f f f
 
 comm_modify vel yes cutoff 0.004
@@ -40,8 +24,6 @@ special_bonds lj/coul 1.0 1.0 1.0
 # --- BOX CREATION ---
 region sim_box block -0.5 0.5 -0.5 0.5 -1.0 0.5
 create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 2
-Created orthogonal box = (-0.5 -0.5 -1) to (0.5 0.5 0.5)
-  1 by 1 by 1 MPI processor grid
 
 variable r_max equal 0.0005 #pot center to center
 # Theta limit in Radians (140 degrees * PI / 180)
@@ -68,7 +50,10 @@ variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
 ################################################
 
 pair_style  granular
-pair_coeff  * * hooke 1e6 50.0             tangential linear_history 1.0e6 1.0 0.3             rolling sds 1.0e6 5000 0.3             twisting marshall
+pair_coeff  * * hooke 1e6 50.0 & 
+            tangential linear_history 1.0e6 1.0 0.3 & 
+            rolling sds 1.0e6 5000 0.3 &
+            twisting marshall
 
 # BOND: Lepton
 # If r > r_max (0.003): Apply harmonic penalty k/2 * (r - r_max)^2
@@ -109,68 +94,11 @@ fix floor all wall/gran/region hooke 1e5 1e5 50.0 1.0 0.3 1 region floor_plane
 # --- MOLECULES ---
 # Include the file that defines m1, m2, ... mN
 include ${mol_include_file}
-include chain_data/molecules_temp/molecules.inc
-molecule m1 chain_data/molecules_temp/mol_1.mol
-Read molecule template m1:
-# Molecule file generated from relaxed chain
-  1 molecules
-  0 fragments
-  0 bodies
-  4 atoms with max type 1
-  3 bonds with max type 1
-  2 angles with max type 1
-  0 dihedrals with max type 0
-  0 impropers with max type 0
-molecule m2 chain_data/molecules_temp/mol_2.mol
-Read molecule template m2:
-# Molecule file generated from relaxed chain
-  1 molecules
-  0 fragments
-  0 bodies
-  4 atoms with max type 1
-  3 bonds with max type 1
-  2 angles with max type 1
-  0 dihedrals with max type 0
-  0 impropers with max type 0
-molecule m3 chain_data/molecules_temp/mol_3.mol
-Read molecule template m3:
-# Molecule file generated from relaxed chain
-  1 molecules
-  0 fragments
-  0 bodies
-  4 atoms with max type 1
-  3 bonds with max type 1
-  2 angles with max type 1
-  0 dihedrals with max type 0
-  0 impropers with max type 0
-molecule m4 chain_data/molecules_temp/mol_4.mol
-Read molecule template m4:
-# Molecule file generated from relaxed chain
-  1 molecules
-  0 fragments
-  0 bodies
-  4 atoms with max type 1
-  3 bonds with max type 1
-  2 angles with max type 1
-  0 dihedrals with max type 0
-  0 impropers with max type 0
-molecule m5 chain_data/molecules_temp/mol_5.mol
-Read molecule template m5:
-# Molecule file generated from relaxed chain
-  1 molecules
-  0 fragments
-  0 bodies
-  4 atoms with max type 1
-  3 bonds with max type 1
-  2 angles with max type 1
-  0 dihedrals with max type 0
-  0 impropers with max type 0
 
 # --- SETTINGS ---
 neighbor 0.004 bin
 neigh_modify delay 0 every 1 check yes
 timestep ${dt}
-timestep 1e-06
 
 fix 1 all nve/sphere
 fix 2 all gravity 9.81 vector 0 0 -1
@@ -180,40 +108,31 @@ thermo 1000
 thermo_style custom step atoms ke pe
 
 dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz diameter
-dump 1 all custom 1000 dumping_yard/Hopper_Flow/hopper_test/chain/chain_*.dump id type x y z vx vy vz diameter
 dump_modify 1 sort id
 
 # --- FILLING LOOP ---
 variable i loop ${n_fill}
-variable i loop 10
 label loop_start
 
     # Pick random template ID
     variable r equal floor(random(1,${n_templates}+1,${seed}))
-    variable r equal floor(random(1,5+1,${seed}))
-    variable r equal floor(random(1,5+1,12345))
     variable mol_id string m${r}
-    variable mol_id string m5
-
+    
     # Insert chain at top of hopper (z=0.2)
     # Randomize X, Y slightly within the top opening
     variable rx equal random(-0.02,0.02,${seed})
-    variable rx equal random(-0.02,0.02,12345)
     variable ry equal random(-0.02,0.02,${seed})
-    variable ry equal random(-0.02,0.02,12345)
-
+    
     # create_atoms type single x y z mol molID seed
     create_atoms 0 single ${rx} ${ry} 0.2 mol ${mol_id} ${seed}
-    create_atoms 0 single -0.0195829629898071 ${ry} 0.2 mol ${mol_id} ${seed}
-    create_atoms 0 single -0.0195829629898071 -0.0082572865486145 0.2 mol ${mol_id} ${seed}
-    create_atoms 0 single -0.0195829629898071 -0.0082572865486145 0.2 mol m5 ${seed}
-    create_atoms 0 single -0.0195829629898071 -0.0082572865486145 0.2 mol m5 12345
-Created 4 atoms
-  using lattice units in orthogonal box = (-0.5 -0.5 -1) to (0.5 0.5 0.5)
-  create_atoms CPU = 0.002 seconds
-
+    
     # Run to let it fall
-    run 50000
-Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
-WARNING: Communication cutoff 0.006 is shorter than a bond length based estimate of 0.0085. This may lead to errors. (src/comm.cpp:743)
-Neighbor list info .
+    run 50000 
+
+    next i
+jump SELF loop_start
+
+# --- POST-FILL RUN ---
+run ${run_steps}
+
+write_data ${outdir}/final_hopper.data

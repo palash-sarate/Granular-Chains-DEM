@@ -19,43 +19,39 @@ class SimulationRunner:
         with open(template_path, 'r') as f:
             content = f.read()
         
+        # Remove existing outdir variable definition if present to avoid conflicts
         pattern = re.compile(r'^\s*variable\s+outdir\s+string\s+.+$', re.MULTILINE)
-        replacement = f"variable outdir string {config.output_dir}"
-        content = pattern.sub(replacement, content)
+        content = pattern.sub("", content)
         
-        # if data_file is specified in config, replace the read_data line
+        # Inject ALL extra_vars as LAMMPS variables at the top of the script
+        header_vars = []
+        
+        # Always inject outdir
+        outdir_normalized = config.output_dir.replace("\\", "/")
+        header_vars.append(f"variable outdir string {outdir_normalized}")
+
+        for key, value in config.extra_vars.items():
+            header_vars.append(f"variable {key} string {value}")
+        
+        # Also inject data_file as a variable if present
         if config.data_file:
-            pattern = re.compile(r'^\s*read_data\s+.*$', re.MULTILINE)
-            replacement = f"read_data chain_data/{config.data_file}"
-            content = pattern.sub(replacement, content)
-        
-        # if Viscosity is specified in extra_vars, replace the viscosity line
-        if 'viscosity' in config.extra_vars:
-            viscosity_value = config.extra_vars['viscosity']
-            pattern = re.compile(
-                r'^(?P<before>.*\bfix\b.*\bviscous\b.*?)(?P<number>-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)(?P<after>\s*(?:#.*)?)$',
-                re.MULTILINE,
-            )
+            # Check if it's already a full path or needs prefix
+            if config.data_file.startswith("chain_data/") or config.data_file.startswith("chain_data\\"):
+                 data_path = config.data_file
+            elif "/" in config.data_file or "\\" in config.data_file:
+                 # Assume it's a relative path provided by user (like temp_lib_gen/...)
+                 data_path = f"chain_data/{config.data_file}"
+            else:
+                 # Default location
+                 data_path = f"chain_data/{config.data_file}"
+            
+            # Normalize slashes for LAMMPS
+            data_path = data_path.replace("\\", "/")
+            header_vars.append(f"variable data_file string {data_path}")
 
-            def _replace_viscous_value(match):
-                before = match.group('before').rstrip()
-                after = match.group('after') or ''
-                return f"{before} {viscosity_value}{after}"
+        if header_vars:
+            content = "\n".join(header_vars) + "\n\n" + content
 
-            content = pattern.sub(_replace_viscous_value, content)
-        
-        if 'dt' in config.extra_vars:
-            dt_value = config.extra_vars['dt']
-            pattern = re.compile(r'^\s*timestep\s+.*$', re.MULTILINE)
-            replacement = f"timestep {dt_value}"
-            content = pattern.sub(replacement, content)
-        
-        if 'run_steps' in config.extra_vars:
-            run_steps_value = config.extra_vars['run_steps']
-            pattern = re.compile(r'^\s*run\s+.*$', re.MULTILINE)
-            replacement = f"run {run_steps_value}"
-            content = pattern.sub(replacement, content)
-        
         with open(output_path, 'w') as f:
             f.write(content)
         print(f"Generated input script: {output_path}")

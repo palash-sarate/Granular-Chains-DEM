@@ -51,7 +51,7 @@ class LibraryGenerator:
             
             # Config for relaxation
             sim_config = SimulationConfig(
-                template="in.relax_3d",
+                template="in.relax_3d_gen_template",
                 data_file=str(rel_data_path).replace("\\", "/"), # Ensure forward slashes for LAMMPS
                 simulation="Relax_3d_Library_Gen",
                 run=run_name,
