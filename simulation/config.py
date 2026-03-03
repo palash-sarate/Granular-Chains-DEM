@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
+import json
 
 @dataclass
 class SimulationConfig:    
@@ -12,6 +13,11 @@ class SimulationConfig:
     
     # Additional LAMMPS variables
     extra_vars: Dict[str, Any] = field(default_factory=dict)
+
+    # New optional fields for raw LAMMPS lines from JSON
+    regions: Optional[List[str]] = None        # each entry: a 'region ...' line or multiline chunk
+    wall_blocks: Optional[List[str]] = None    # each entry: a 'fix ...' wall block (string / multiline)
+    walls: Optional[Dict[str, Any]] = None     # keep-compatible: structured walls (converted by runner if present)
 
     @property
     def output_dir(self) -> str:
@@ -33,3 +39,9 @@ class SimulationConfig:
             vars_dict[k] = str(v)
             
         return vars_dict
+
+    @classmethod
+    def from_json(cls, path: str) -> "SimulationConfig":
+        with open(path, "r") as f:
+            data = json.load(f)
+        return cls(**data)

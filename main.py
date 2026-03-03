@@ -38,10 +38,14 @@ def generate_relaxed_chain_states(n_beads=4, n_states=10):
 
 def run_flop_simulations(Ns = [4,6,8,10,12,14,16,24,48,100], 
                          run_steps = [100000, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000], 
-                         viscosity = 0.003, dt = 1e-6):
+                         viscosity = 0.0001, dt = 1e-6):
     for N, run_step in zip(Ns, run_steps):
         print(f"Running flop simulation for N={N}...")
-        run_flop_simulation(N, run_step, viscosity, dt)
+        try:
+            run_flop_simulation(N, run_step, viscosity, dt)
+        except Exception as e:
+            print(f"Error processing N={N}: {e}")
+            print("Continuing with the generated files...")
         
     visualize_chain_flop_results(Ns, viscosity, dt)
 
@@ -49,17 +53,28 @@ def run_flop_simulation(N, run_step, viscosity, dt):
     viscosity_token = get_viscosity_token(viscosity)
     dt_token = get_dt_token(dt)
 
-    config = SimulationConfig(
-            template="in.chain_flop_template",
-            data_file=f"chains_linear_x/N{N}_chain_horz.data",
-            simulation="Chain_flop",
-            run=f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
-            extra_vars={
+    config = SimulationConfig({
+            "template": "in.chain_flop_template",
+            "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+            "simulation": "Chain_flop",
+            "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+            "extra_vars":{
                 "viscosity": viscosity,
                 "run_steps": run_step,
                 "dt": dt
-            }
-        )
+            },
+            "regions": [
+                "region hopper_cone cone z 0.0 0.0 0.01 0.05 0.05 0.15 open 1 open 2 move v_x_osc v_zero v_zero",
+                "region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2 move v_x_osc v_zero v_zero",
+                "region hopper_union union 2 hopper_cone hopper_cyl",
+                "region floor_plane plane 0 0 -0.45 0 0 1"
+            ],
+            "wall_blocks": [
+                "fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union",
+                "fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane"
+            ]
+        })
+    
     run_simulation(config)
 
 def run_simulation(config: SimulationConfig):
