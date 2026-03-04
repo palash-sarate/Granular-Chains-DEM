@@ -44,13 +44,6 @@ variable x_gamma_t equal 1.0 # dimensionless multiplier for the normal damping
 variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
 ################################################
 
-# Apply gravity in the standard downward (−z) direction
-fix grav mobile gravity 9.81 vector 0 0 -1
-# --- WALL DEFINITIONS ---
-# You must define X, Y, and Z walls separately.
-
-comm_modify vel yes cutoff 0.004
-
 # define particle - particle interactions
 pair_style  granular
 # k_n, nu_n0 # k_t, x_(gamma,t), mu_s # k_roll, gamma_roll, mu_roll
@@ -75,9 +68,13 @@ angle_style lepton no_offset
 # angle_coeff 1 1.0 "0.5 * ktheta * (theta - t_lim)^2 * step(t_lim - theta); ktheta=v_ktheta; t_lim=v_theta_lim"
 angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - theta)/w_a)); ktheta=v_ktheta; t_lim=v_theta_lim; w_a=v_delta"
 
-# Replaces the missing internal link friction
+# Apply gravity in the standard downward (−z) direction
+fix grav mobile gravity 9.81 vector 0 0 -1
+
 group chain_particles type 1
 fix 1 chain_particles viscous ${viscosity}
+
+comm_modify vel yes cutoff 0.004
 
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
@@ -86,14 +83,14 @@ fix integr mobile nve/sphere
 neighbor 0.004 bin # skin_width type
 neigh_modify delay 0 every 1 check yes
 
+# Set a conservative timestep for the stiff bonded chain.
+timestep ${dt}
+
 # COMPUTE BOND AND ANGLE DATA
 # Calculate bond distance and energy
 compute 1 chain_particles bond/local dist engpot force 
 # Calculate angle theta and energy
 compute 2 chain_particles angle/local theta eng
-
-# Set a conservative timestep for the stiff bonded chain.
-timestep ${dt}
 
 # === 4. OUTPUTS & RUN ===
 # Output thermodynamic data every 10000 timesteps.

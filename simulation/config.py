@@ -7,6 +7,7 @@ class SimulationConfig:
     # Input/Output
     input_script: Optional[str] = None
     template: str = "in.default_chain_template"
+    resume_file: Optional[str] = None  # New field for resume file path
     data_file: str = "default_chain.data"
     run: str = "default_run"
     simulation: str = "default_simulation"

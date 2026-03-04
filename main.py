@@ -53,7 +53,7 @@ def run_flop_simulation(N, run_step, viscosity, dt):
     viscosity_token = get_viscosity_token(viscosity)
     dt_token = get_dt_token(dt)
 
-    config = SimulationConfig({
+    config = SimulationConfig(**{
             "template": "in.chain_flop_template",
             "data_file": f"chains_linear_x/N{N}_chain_horz.data",
             "simulation": "Chain_flop",
@@ -63,19 +63,53 @@ def run_flop_simulation(N, run_step, viscosity, dt):
                 "run_steps": run_step,
                 "dt": dt
             },
-            "regions": [
-                "region hopper_cone cone z 0.0 0.0 0.01 0.05 0.05 0.15 open 1 open 2 move v_x_osc v_zero v_zero",
-                "region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2 move v_x_osc v_zero v_zero",
-                "region hopper_union union 2 hopper_cone hopper_cyl",
-                "region floor_plane plane 0 0 -0.45 0 0 1"
-            ],
-            "wall_blocks": [
-                "fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union",
-                "fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane"
-            ]
+            # "regions": [
+            #     "region hopper_cone cone z 0.0 0.0 0.01 0.05 0.05 0.15 open 1 open 2 move v_x_osc v_zero v_zero",
+            #     "region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2 move v_x_osc v_zero v_zero",
+            #     "region hopper_union union 2 hopper_cone hopper_cyl",
+            #     "region floor_plane plane 0 0 -0.45 0 0 1"
+            # ],
+            # "wall_blocks": [
+            #     "fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union",
+            #     "fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane"
+            # ]
         })
     
     run_simulation(config)
+
+def resume_flop_simulation(N, run_step, viscosity, dt, resume_token):
+    viscosity_token = get_viscosity_token(viscosity)
+    dt_token = get_dt_token(dt)
+
+    config = SimulationConfig(**{
+            "template": "in.chain_flop_resume",
+            "resume_file": f"./dumping_yard/Chain_flop/N{N}_Viscosity_{viscosity_token}_dt_{dt_token}/restart/restart.{resume_token}.bin",
+            "simulation": "Chain_flop",
+            "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+            "extra_vars":{
+                "viscosity": viscosity,
+                "run_steps": run_step,
+                "dt": dt
+            },
+            # regions and walls should be the same as the original template, so no need to redefine them here
+        })
+    
+    try:
+        resume_simulation(config)
+    except Exception as e:
+        print(f"Error Resuming sim N={N}: {e}")
+        
+    visualize_results("Chain_flop", f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}")
+
+def resume_simulation(config: SimulationConfig):
+    # Initialize runner
+    # Ensure 'lmp' is in your PATH or provide absolute path
+    runner = SimulationRunner(lammps_executable="lmp")
+    
+    print(f"Resuming simulation: {config.simulation}=>{config.run}")
+    print(f"Output directory: {config.output_dir}")
+        
+    runner.resume(config)
 
 def run_simulation(config: SimulationConfig):
     # Initialize runner
@@ -219,6 +253,7 @@ if __name__ == "__main__":
         "main": main,
         "run_flop_simulations": run_flop_simulations,
         "run_flop_simulation": run_flop_simulation,
+        "resume_flop_simulation": resume_flop_simulation,
         "run_simulation": run_simulation,
         "generate_linear_chains": generate_linear_chains,
         "visualize_results": visualize_results,

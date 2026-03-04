@@ -50,6 +50,12 @@ class SimulationRunner:
             data_path = data_path.replace("\\", "/")
             header_vars.append(f"variable data_file string {data_path}")
 
+        # Resume functionality: inject resume specific variables
+        # resume_file
+        if config.resume_file:
+            resume_path = config.resume_file.replace("\\", "/")
+            header_vars.append(f"variable resume_file string {resume_path}")
+            
         if header_vars:
             content = "\n".join(header_vars) + "\n\n" + content
 
@@ -161,45 +167,26 @@ class SimulationRunner:
             
         self._execute(cmd, verbose)
 
-    def resume(self, config: SimulationConfig, restart_file: str, resume_template: str = "in.chain_flop_resume", verbose: bool = True):
+    def resume(self, config: SimulationConfig, verbose: bool = True):
         """
         Resumes the simulation from a restart file.
         """
-        # Generate resume script
-        script_to_run = f"generated_{os.path.basename(resume_template)}"
-        
-        # We need to inject the restart file path into the script
-        # The current resume script has 'read_restart post_chain_flop/current/restart.final.bin'
-        # We should replace that line.
-        
-        with open(resume_template, 'r') as f:
-            content = f.read()
-        
-        # Replace read_restart line
-        # Look for 'read_restart ...'
-        pattern = re.compile(r'^\s*read_restart\s+.*$', re.MULTILINE)
-        replacement = f"read_restart {restart_file}"
-        content = pattern.sub(replacement, content)
-        
-        # Also apply config variables
-        vars_dict = config.to_lammps_vars()
-        for key, value in vars_dict.items():
-            try:
-                float(value)
-                var_type = "equal"
-            except ValueError:
-                var_type = "string"
-            if key == "outdir": var_type = "string"
 
-            var_pattern = re.compile(r'^\s*variable\s+' + re.escape(key) + r'\s+(equal|index|string)\s+.*$', re.MULTILINE)
-            var_replacement = f"variable {key} {var_type} {value} # Generated from config"
-            if var_pattern.search(content):
-                content = var_pattern.sub(var_replacement, content)
-                
-        with open(script_to_run, 'w') as f:
-            f.write(content)
-            
+        if config.template:
+            template_path = f"simulation_templates/{config.template}"
+            # Generate a temporary or specific input script
+            script_to_run = f"{config.output_dir}/in.{config.simulation}.resume"
+            self.generate_input_script(config, template_path, script_to_run)            
+        else:
+            raise ValueError("Resume template must be provided in the config.")
+        
         cmd = [self.lammps_exe, "-in", script_to_run]
+        
+        # We can still pass variables via command line as a backup or for variables not in the script
+        # vars_dict = config.to_lammps_vars()
+        # for key, value in vars_dict.items():
+        #     cmd.extend(["-var", key, value])
+            
         self._execute(cmd, verbose)
 
     def _execute(self, cmd: List[str], verbose: bool):

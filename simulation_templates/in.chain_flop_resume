@@ -1,20 +1,27 @@
+# Flexible granular chain simulation in LAMMPS
+
 units       si
 atom_style hybrid sphere angle
 boundary    f f f
 
 # 1. READ RESTART
 # Point this to the specific file you want to resume from
-read_restart post_chain_flop/current/restart.final.bin
+read_restart ${resume_file}
+
+# 3. RE-DEFINE GROUPS (Groups are usually saved, but good practice to ensure)
+group anchors id 1 2
+group mobile subtract all anchors
 
 # 2. RE-DEFINE VARIABLES (Crucial: Variables are not saved in restart files)
-variable r_max equal 0.0005 
+variable r_max equal 0.0005 #pot center to center
+# Theta limit in Radians (140 degrees * PI / 180)
 variable theta_lim equal 2.4435
 # Stiffnesses
-variable knt2   equal 1.0e6  
-variable ktheta equal 1.0e6   
-# smoothing widths
-variable w   equal 1.0e-4    
-variable delta equal 1.0e-4    
+variable knt2   equal 1.0e6  # High stiffness for bond limit
+variable ktheta equal 1.0e6   # Stiffness for angle limit
+# smoothing widths (tune as needed)
+variable w   equal 1.0e-4    # smoothing length (m) 0.1 mm
+variable delta equal 1.0e-4    # smoothing angle (rad) ~ 1.15 deg
 
 # Granular parameters
 variable k_n equal 1e6 
@@ -25,10 +32,6 @@ variable mu_roll equal 0.3
 variable k_t equal 1.0e6   
 variable x_gamma_t equal 1.0 
 variable mu_s equal 0.3 
-
-# 3. RE-DEFINE GROUPS (Groups are usually saved, but good practice to ensure)
-group anchors id 1 2
-group mobile subtract all anchors
 
 # 4. RE-DEFINE FORCE FIELD (Coeffs are saved, but Lepton needs variables)
 pair_style  granular
@@ -46,35 +49,20 @@ angle_coeff 1 0 "0.5 * ktheta * (theta - t_lim)^2 * 0.5 * (1 + tanh((t_lim - the
 # 5. RE-DEFINE FIXES (Not saved in restart)
 fix grav mobile gravity 9.81 vector 1 0 0
 
-fix xwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    xplane -0.02 0.02
+group chain_particles type 1
+fix 1 chain_particles viscous ${viscosity}
 
-fix ywalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    yplane -0.01 0.01
+comm_modify vel yes cutoff 0.004
 
-fix zwalls all wall/gran granular hertz/material 1.0e8 0.3 5e-4 &
-    tangential linear_history 300.0 1.0 0.1 &
-    rolling sds 200.0 100.0 0.1 &
-    twisting marshall &
-    zplane 0.00 0.08
-
-fix 1 mobile viscous 0.3
+# Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
 
 # 6. SETTINGS
-comm_modify vel yes cutoff 0.004
 neighbor 0.004 bin
 neigh_modify delay 0 every 1 check yes
-timestep 1.0e-6
 
-# 7. OUTPUTS
-variable outdir string post_chain_flop/current
+# Set a conservative timestep for the stiff bonded chain.
+timestep ${dt}
 
 # Re-define computes
 compute 1 chain_particles bond/local dist engpot force 
@@ -85,14 +73,25 @@ thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 
 # Dumps (Note: 'append yes' is not strictly needed if filenames have step numbers, 
 # but good if you use single filenames)
-dump 1 all custom 1000 ${outdir}/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
-dump 2 all local 1000 ${outdir}/bond_*.dump index c_1[1] c_1[2] c_1[3]
-dump 3 all local 1000 ${outdir}/angle_*.dump index c_2[1] c_2[2]
+dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+dump_modify 2 colname 2 dist
+dump_modify 2 colname 3 energy
+dump_modify 2 colname 4 force
+
+dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
+dump_modify 3 colname 2 theta 
+dump_modify 3 colname 3 energy
 
 # Restart settings
-restart 100000 ${outdir}/restart.*.bin
+restart 100000 ${outdir}/restart/restart.*.bin
 
 # 8. RUN
 # Run for another 10 million steps
-run 10000000
+run ${run_steps} 
+
+# Save the final state manually
+write_restart ${outdir}/restart/restart.final.bin
+
+variable outdir delete
