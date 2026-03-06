@@ -157,8 +157,8 @@ class SimulationRunner:
             self.generate_input_script(config, template_path, script_to_run)            
         else:
             raise ValueError("Either input_script or template must be provided in the config.")
-        
-        cmd = [self.lammps_exe, "-in", script_to_run]
+  
+        cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps.log"]
         
         # We can still pass variables via command line as a backup or for variables not in the script
         # vars_dict = config.to_lammps_vars()
@@ -180,7 +180,7 @@ class SimulationRunner:
         else:
             raise ValueError("Resume template must be provided in the config.")
         
-        cmd = [self.lammps_exe, "-in", script_to_run]
+        cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps_resume.log"]
         
         # We can still pass variables via command line as a backup or for variables not in the script
         # vars_dict = config.to_lammps_vars()
@@ -190,12 +190,14 @@ class SimulationRunner:
         self._execute(cmd, verbose)
 
     def _execute(self, cmd: List[str], verbose: bool):
-        print(f"Executing: {' '.join(cmd)}")
-        
+        # If a log_file is provided, write both stdout and stderr to it.
+        # When verbose is True and no log_file is provided, stream to terminal.
+        cmd_str = ' '.join(cmd)
+
         if verbose:
-            # Run directly to allow real-time output to terminal
+            print(f"Executing: {cmd_str}")
             subprocess.run(cmd, check=True)
         else:
-            # Suppress output
+            # Discard output
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print("Simulation completed.")

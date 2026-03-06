@@ -1,6 +1,8 @@
 import sys
 import argparse
 import ast
+import time
+from typing import Optional
     
 def get_dt_token(dt: float) -> str:
     """
@@ -26,6 +28,92 @@ def get_viscosity_token(viscosity: float) -> str:
     token_str = token_str.rstrip("0")
     # print(f"Viscosity token: {token_str}")
     return token_str
+
+
+class ETAEstimator:
+    """Estimate remaining time for a looped job using exponential smoothing.
+
+    Usage:
+        eta = ETAEstimator(total=100)
+        eta.start()
+        for i in range(100):
+            # do work
+            eta.update(i+1)
+            print(eta)
+    """
+
+    def __init__(self, total: Optional[int] = None, smoothing: float = 0.2):
+        self.total = total
+        self.smoothing = float(smoothing)
+        self.start_time: Optional[float] = None
+        self.last_time: Optional[float] = None
+        self.last_count = 0
+        self.ema_per_item: Optional[float] = None
+
+    def start(self) -> None:
+        self.start_time = time.monotonic()
+        self.last_time = self.start_time
+        self.last_count = 0
+        self.ema_per_item = None
+
+    def update(self, completed: int) -> None:
+        """Call after completing `completed` items (1-based count).
+
+        Estimates the per-item time using the delta since last update and
+        updates an exponential moving average. Must call `start()` first.
+        """
+        now = time.monotonic()
+        if self.start_time is None:
+            self.start()
+            now = time.monotonic()
+
+        delta_count = completed - self.last_count
+        delta_time = max(1e-9, now - (self.last_time or self.start_time))
+        if delta_count > 0:
+            per_item = delta_time / delta_count
+            if self.ema_per_item is None:
+                self.ema_per_item = per_item
+            else:
+                alpha = self.smoothing
+                self.ema_per_item = alpha * per_item + (1 - alpha) * self.ema_per_item
+
+        self.last_time = now
+        self.last_count = completed
+
+    def elapsed(self) -> float:
+        if self.start_time is None:
+            return 0.0
+        return time.monotonic() - self.start_time
+
+    def eta_seconds(self) -> Optional[float]:
+        if self.ema_per_item is None or self.total is None:
+            return None
+        remaining = max(0, int(self.total) - int(self.last_count))
+        return remaining * self.ema_per_item
+
+    def progress_fraction(self) -> Optional[float]:
+        if self.total is None:
+            return None
+        return min(1.0, float(self.last_count) / float(self.total))
+
+    def format_seconds(self, s: Optional[float]) -> str:
+        if s is None:
+            return "--:--:--"
+        s = int(round(s))
+        h = s // 3600
+        m = (s % 3600) // 60
+        sec = s % 60
+        return f"{h:02d}:{m:02d}:{sec:02d}"
+
+    def __str__(self) -> str:
+        elapsed = self.elapsed()
+        eta = self.eta_seconds()
+        frac = self.progress_fraction()
+        parts = [f"elapsed={self.format_seconds(elapsed)}"]
+        if frac is not None:
+            parts.append(f"{int(100*frac):3d}%")
+        parts.append(f"ETA={self.format_seconds(eta)}")
+        return " ".join(parts)
 
 def main():
     available_functions = {

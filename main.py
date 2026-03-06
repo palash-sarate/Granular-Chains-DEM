@@ -1,7 +1,7 @@
 from analysis.data_manager import SimulationData
 from analysis.geometry import get_angle_series, get_xyz_series, get_distance_series
 from analysis.plotting import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
-from analysis.utilities import get_dt_token, get_viscosity_token
+from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
 # import matplotlib.pyplot as plt
 from analysis.animate import Animator
 from analysis.vtk_exporter import VTKExporter
@@ -36,19 +36,63 @@ def generate_relaxed_chain_states(n_beads=4, n_states=10):
     lib_gen = LibraryGenerator(runner)
     lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
 
-def run_flop_simulations(Ns = [4,6,8,10,12,14,16,24,48,100], 
-                         run_steps = [100000, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000], 
-                         viscosity = 0.0001, dt = 1e-6):
-    for N, run_step in zip(Ns, run_steps):
-        print(f"Running flop simulation for N={N}...")
-        try:
-            run_flop_simulation(N, run_step, viscosity, dt)
-        except Exception as e:
-            print(f"Error processing N={N}: {e}")
-            print("Continuing with the generated files...")
-        
-    visualize_chain_flop_results(Ns, viscosity, dt)
+def run_flop_simulations(Ns = [6], 
+                         run_steps = [50000],
+                         viscosities = [i/100000 for i in range(60, 101, 5)], dt = 1e-6):
+    # Provide an on-the-fly ETA estimator for the nested loop
+    total = len(Ns) * len(run_steps) * len(viscosities)
+    eta = ETAEstimator(total=total)
+    eta.start()
+    completed = 0
 
+    for N in Ns:
+        for run_step in run_steps:
+            for viscosity in viscosities:
+                completed += 1
+                try:
+                    # Build config here so we can determine output dir and logfile
+                    viscosity_token = get_viscosity_token(viscosity)
+                    dt_token = get_dt_token(dt)
+                    config = SimulationConfig(**{
+                        "template": "in.chain_flop_template",
+                        "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+                        "simulation": "Chain_flop",
+                        "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+                        "extra_vars":{
+                            "viscosity": viscosity,
+                            "run_steps": run_step,
+                            "dt": dt
+                        },
+                    })
+
+                    # Ensure log directory exists and create per-simulation logfile
+                    log_path = f"{config.output_dir}/lammps.log"
+                    # Print concise progress line with overall ETA and current simulation name
+                    overall_line = f"[{completed}/{total}] {int(100*eta.progress_fraction() if eta.progress_fraction() is not None else 0):3d}% | {eta}"
+                    current_line = f"Running: {config.simulation} => {config.run} | log: {log_path}"
+                    # Overwrite two terminal lines
+                    sys.stdout.write('\r' + ' ' * 120 + '\r')
+                    sys.stdout.write(overall_line + '\n' + current_line + '\n')
+                    sys.stdout.flush()
+
+                    # Run simulation with output sent to logfile (no verbose terminal output)
+                    runner = SimulationRunner(lammps_executable="lmp")
+                    runner.run(config, verbose=False, clean_dir=True)
+                except Exception as e:
+                    # Log the exception to the simulation log if possible, otherwise print
+                    try:
+                        with open(log_path, 'a') as fh:
+                            fh.write(f"\nERROR: {e}\n")
+                    except Exception:
+                        print(f"Error processing N={N}: {e}")
+                    print("Continuing with the generated files...")
+                finally:
+                    eta.update(completed)
+                    # move cursor up to keep only latest two lines visible
+                    sys.stdout.write('\x1b[2A')
+                    sys.stdout.flush()
+                    visualize_results("Chain_flop", f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}")
+                
 def run_flop_simulation(N, run_step, viscosity, dt):
     viscosity_token = get_viscosity_token(viscosity)
     dt_token = get_dt_token(dt)
@@ -75,7 +119,12 @@ def run_flop_simulation(N, run_step, viscosity, dt):
             # ]
         })
     
-    run_simulation(config)
+    try:
+        run_simulation(config)
+    except Exception as e:
+        print(f"Error running sim N={N}: {e}")
+    
+    visualize_results("Chain_flop", f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}")
 
 def resume_flop_simulation(N, run_step, viscosity, dt, resume_token):
     viscosity_token = get_viscosity_token(viscosity)
