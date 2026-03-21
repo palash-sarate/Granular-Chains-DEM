@@ -1,4 +1,5 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
@@ -8,6 +9,17 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from data_manager import SimulationData
+
+# Optional drag-and-drop support via tkinterdnd2. If not available,
+# the UI will show an instruction and Open buttons remain functional.
+try:
+    from tkinterdnd2 import DND_FILES, TkinterDnD
+    BaseTk = TkinterDnD.Tk
+    DND_CONST = DND_FILES
+    DND_AVAILABLE = True
+except Exception:
+    BaseTk = tk.Tk
+    DND_AVAILABLE = False
 
 
 def parse_simple_data_file(path: str) -> pd.DataFrame:
@@ -31,19 +43,30 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     if start is None:
         return pd.DataFrame()
 
-    # Skip possible blank or header line(s)
-    # Read numeric lines until next blank or section
+    # Advance past any blank/comment lines after the 'Atoms' header
+    idx = start
+    while idx < len(lines) and (lines[idx].strip() == '' or lines[idx].strip().startswith('#')):
+        idx += 1
+
+    # Read numeric lines until next blank or a new section header (e.g., Velocities, Bonds, Angles, Bonds, Masses)
+    SECTION_HEADERS = set(['Velocities', 'Bonds', 'Angles', 'Masses', 'PairIJ', 'Velocities', 'Bonds', 'Angles'])
     data_lines = []
-    for line in lines[start:]:
-        if line.strip() == '' or line.strip().endswith(':'):
+    for line in lines[idx:]:
+        s = line.strip()
+        if s == '':
+            break
+        # Stop if line looks like a section header (word with no numbers)
+        first_tok = s.split()[0]
+        if first_tok in SECTION_HEADERS:
             break
         # skip comments
-        if line.strip().startswith('#'):
+        if s.startswith('#'):
             continue
         parts = line.split()
         # require at least id and x y z (3 coords + id -> 4)
         if len(parts) < 4:
-            continue
+            # if a short non-data line appears, stop parsing atoms
+            break
         data_lines.append(parts)
 
     if not data_lines:
@@ -97,11 +120,13 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     return df
 
 
-class ViewerApp(tk.Tk):
+class ViewerApp(BaseTk):
     def __init__(self):
         super().__init__()
         self.title('Chains Simulation Viewer')
         self.geometry('1000x700')
+        # Ensure clean shutdown when window is closed
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
 
         # Left controls
         ctrl = tk.Frame(self)
@@ -110,6 +135,18 @@ class ViewerApp(tk.Tk):
         tk.Button(ctrl, text='Open Dump Folder', command=self.open_dump_folder).pack(fill=tk.X)
         tk.Button(ctrl, text='Open Dump Files...', command=self.open_dump_files).pack(fill=tk.X, pady=(4,0))
         tk.Button(ctrl, text='Open Data File...', command=self.open_data_file).pack(fill=tk.X, pady=(4,0))
+
+        # Drag-and-drop area
+        drop_text = 'Drop dump/.data files here' if DND_AVAILABLE else 'Drag-and-drop disabled (install tkinterdnd2)'
+        self.drop_label = tk.Label(ctrl, text=drop_text, relief='ridge', width=30, height=4)
+        self.drop_label.pack(fill=tk.X, pady=(8,4))
+        if DND_AVAILABLE:
+            try:
+                self.drop_label.drop_target_register(DND_CONST)
+                self.drop_label.dnd_bind('<<Drop>>', self.on_drop)
+            except Exception:
+                # if registration fails, keep graceful fallback
+                self.drop_label.config(text='Drag-and-drop not available on this platform')
 
         tk.Label(ctrl, text='Timesteps:').pack(anchor='w', pady=(8,0))
         self.ts_listbox = tk.Listbox(ctrl, width=30, height=20)
@@ -179,6 +216,62 @@ class ViewerApp(tk.Tk):
 
         if not frames:
             messagebox.showerror('Error', 'No valid dump frames parsed')
+            return
+        full = pd.concat(frames)
+        full.set_index(['timestep','id'], inplace=True)
+        full = full.reset_index()
+        self.load_dataframe(full)
+
+    def on_drop(self, event):
+        # event.data may be a list-like string; use tk splitlist for safety
+        try:
+            files = list(self.tk.splitlist(event.data))
+        except Exception:
+            # Fallback parsing
+            raw = event.data.strip()
+            files = [p.strip('{}') for p in raw.split()]
+
+        # Normalize paths
+        files = [f.replace('\\', '/') for f in files]
+        self.handle_dropped_files(files)
+
+    def handle_dropped_files(self, files):
+        if not files:
+            return
+        # If single .data file -> open as data file
+        if len(files) == 1 and files[0].lower().endswith('.data'):
+            try:
+                df = parse_simple_data_file(files[0])
+                if df.empty:
+                    messagebox.showerror('Parse failed', 'Could not parse the dropped data file')
+                    return
+                df = df.reset_index()
+                self.load_dataframe(df)
+            except Exception as e:
+                messagebox.showerror('Error', f'Failed to load data file: {e}')
+            return
+
+        # Otherwise treat as dump files (one or many)
+        frames = []
+        for f in files:
+            try:
+                with open(f, 'r') as fh:
+                    lines = fh.readlines()
+                timestep = 0
+                for i, line in enumerate(lines):
+                    if 'ITEM: TIMESTEP' in line:
+                        timestep = int(lines[i+1])
+                    if 'ITEM: ATOMS' in line:
+                        cols = line.split()[2:]
+                        df = pd.read_csv(f, skiprows=i+1, names=cols, sep=r'\s+', engine='python')
+                        df['timestep'] = timestep
+                        frames.append(df)
+                        break
+            except Exception as e:
+                print(f'Failed to parse dropped file {f}: {e}')
+
+        if not frames:
+            messagebox.showerror('Error', 'No valid dump frames parsed from dropped files')
             return
         full = pd.concat(frames)
         full.set_index(['timestep','id'], inplace=True)
@@ -281,10 +374,35 @@ class ViewerApp(tk.Tk):
 
         self.canvas.draw()
 
+    def _cleanup(self):
+        """Cleanup resources before exiting."""
+        try:
+            plt.close('all')
+        except Exception:
+            pass
+
+    def _on_close(self):
+        # Called when window is closed via window manager
+        self._cleanup()
+        try:
+            self.destroy()
+        except Exception:
+            pass
+        # Force exit to ensure background threads (if any) don't block terminal
+        sys.exit(0)
+
 
 def run():
     app = ViewerApp()
-    app.mainloop()
+    try:
+        app.mainloop()
+    finally:
+        # In case mainloop returns, ensure cleanup and exit
+        try:
+            app._cleanup()
+        except Exception:
+            pass
+        sys.exit(0)
 
 
 if __name__ == '__main__':
