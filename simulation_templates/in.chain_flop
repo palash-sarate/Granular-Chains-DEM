@@ -4,18 +4,25 @@ units       si
 atom_style hybrid sphere angle
 boundary    f f f
 
-# 1. READ RESTART
-# Point this to the specific file you want to resume from
-read_restart ${resume_file}
+special_bonds lj/coul 1.0 1.0 1.0
+# special_bonds none
 
-# 3. RE-DEFINE GROUPS (Groups are usually saved, but good practice to ensure)
+# # Read the atom and bond data from the data file.
+################################################
+read_data ${data_file}
+
+velocity all set 0.0 0.0 0.0
+
+# Pin the first three beads in space (anchor group) and integrate only the rest
 group anchors id 1 2
 group mobile subtract all anchors
 
-include ${lepton_inc}
+velocity anchors set 0.0 0.0 0.0
+set group anchors omega 0.0 0.0 0.0
 
-# 5. RE-DEFINE FIXES (Not saved in restart)
-fix grav mobile gravity 9.81 vector 1 0 0
+include ${lepton_inc}
+# Apply gravity in the standard downward (−z) direction
+fix grav mobile gravity 9.81 vector 0 0 -1
 
 group chain_particles type 1
 fix 1 chain_particles viscous ${viscosity}
@@ -25,22 +32,25 @@ comm_modify vel yes cutoff 0.004
 # Use the standard NVE integrator for the mobile beads only.
 fix integr mobile nve/sphere
 
-# 6. SETTINGS
-neighbor 0.004 bin
+# Set up neighbor list parameters (wider skin and higher per-atom quota prevent overflow)
+neighbor 0.004 bin # skin_width type
 neigh_modify delay 0 every 1 check yes
 
 # Set a conservative timestep for the stiff bonded chain.
 timestep ${dt}
 
-# Re-define computes
+# COMPUTE BOND AND ANGLE DATA
+# Calculate bond distance and energy
 compute 1 chain_particles bond/local dist engpot force 
+# Calculate angle theta and energy
 compute 2 chain_particles angle/local theta eng
 
+# === 4. OUTPUTS & RUN ===
+# Output thermodynamic data every 10000 timesteps.
 thermo 10000
 thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 
-# Dumps (Note: 'append yes' is not strictly needed if filenames have step numbers, 
-# but good if you use single filenames)
+# Output a dump file of the sphere coordinates for visualization (e.g., in ParaView)
 dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
 dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
@@ -52,12 +62,11 @@ dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
 dump_modify 3 colname 2 theta 
 dump_modify 3 colname 3 energy
 
-# Restart settings
+# Save a binary restart file every 1,000,000 steps
+# The '*' is replaced by the timestep number
 restart 100000 ${outdir}/restart/restart.*.bin
 
-# 8. RUN
-# Run for another 10 million steps
-run ${run_steps} 
+run ${run_steps}  # 1e7 timesteps 1 second 
 
 # Save the final state manually
 write_restart ${outdir}/restart/restart.final.bin

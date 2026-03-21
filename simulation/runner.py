@@ -50,6 +50,10 @@ class SimulationRunner:
             data_path = data_path.replace("\\", "/")
             header_vars.append(f"variable data_file string {data_path}")
 
+        if config.lepton_file:
+            lepton_path = config.lepton_file.replace("\\", "/")
+            header_vars.append(f"variable lepton_inc string {lepton_path}")
+
         # Resume functionality: inject resume specific variables
         # resume_file
         if config.resume_file:
@@ -134,14 +138,15 @@ class SimulationRunner:
             
         print(f"Prepared output directories in: {outdir}")
 
-    def run(self, config: SimulationConfig, verbose: bool = True, clean_dir: bool = True):
+    def run(self, config: SimulationConfig, verbose: bool = True, clean_dir: bool = True, prep_dirs: bool = True):
         """
         Runs the simulation using the provided configuration.
         If template_path is provided, generates a new input script.
         Otherwise, runs config.input_script directly (assuming it's ready).
         """
         # Prepare directories first
-        self._prepare_directories(config, clean=clean_dir)
+        if prep_dirs:
+            self._prepare_directories(config, clean=clean_dir)
         
         if config.input_script:
             script_to_run = config.input_script

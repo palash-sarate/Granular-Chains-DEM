@@ -27,7 +27,7 @@ class LibraryGenerator:
 
         # 2. Generate Base Linear Chain (Temporary)
         # We place it in chain_data/temp_lib_gen so runner.py can find it easily
-        temp_chain_dir = Path("chain_data/temp_lib_gen")
+        temp_chain_dir = Path("chain_data/lib_gen_temp")
         temp_chain_dir.mkdir(parents=True, exist_ok=True)
         
         chain_cfg = ChainConfig(
@@ -70,7 +70,7 @@ class LibraryGenerator:
                 # 4. Move and Rename Output
                 # The output will be in dumping_yard/Library_Gen/relax_N.../relaxed_chain.data
                 generated_file = Path(f"dumping_yard/Relax_3d_Library_Gen/{run_name}/relaxed_chain.data")
-                
+                # copy the chain data to the target directory with a standardized name
                 if generated_file.exists():
                     final_dest = target_dir / f"state_{i}.data"
                     shutil.copy(generated_file, final_dest)

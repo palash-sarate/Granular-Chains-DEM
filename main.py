@@ -56,6 +56,7 @@ def run_flop_simulations(Ns = [6],
                     config = SimulationConfig(**{
                         "template": "in.chain_flop_template",
                         "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+                        "lepton_file": "simulation_templates/lepton.inc",
                         "simulation": "Chain_flop",
                         "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
                         "extra_vars":{
@@ -100,6 +101,7 @@ def run_flop_simulation(N, run_step, viscosity, dt):
     config = SimulationConfig(**{
             "template": "in.chain_flop_template",
             "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+            "lepton_file": "simulation_templates/lepton.inc",
             "simulation": "Chain_flop",
             "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
             "extra_vars":{

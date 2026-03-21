@@ -1,0 +1,55 @@
+# Fill-only hopper template: fill, relax, save (no oscillation)
+# Expects variables: outdir, mol_include_file, n_templates, n_fill, drop_steps,
+# relax_steps, dt, seed, lepton_inc
+
+units       si
+atom_style hybrid sphere angle
+boundary    f f f
+
+comm_modify vel yes cutoff 0.004
+special_bonds lj/coul 1.0 1.0 1.0
+
+# Box and topology
+region sim_box block -0.5 0.5 -0.5 0.5 -1.0 0.5
+create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 2
+
+include ${lepton_inc}
+
+# Static hopper bodies (no move for filling)
+region hopper_cone cone z 0.0 0.0 0.01 0.05 0.05 0.15 open 1 open 2
+region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2
+region hopper_union union 2 hopper_cone hopper_cyl
+fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union
+
+region floor_plane plane 0 0 -0.45 0 0 1
+fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane
+
+# Molecules
+include ${mol_include_file}
+
+# Settings
+neighbor 0.004 bin
+neigh_modify delay 0 every 1 check yes
+timestep ${dt}
+
+fix 1 all nve/sphere
+fix 2 all gravity 9.81 vector 0 0 -1
+
+# Fill loop
+variable i loop ${n_fill}
+label loop_start
+    variable r equal floor(random(1,${n_templates}+1,${seed}))
+    variable mol_id string m${r}
+    variable rx equal random(-0.02,0.02,${seed})
+    variable ry equal random(-0.02,0.02,${seed})
+    create_atoms 0 single ${rx} ${ry} 0.2 mol ${mol_id} ${seed}
+    run ${drop_steps}
+    next i
+jump SELF loop_start
+
+# Relax the filled hopper
+run ${relax_steps}
+
+# Save state
+write_data ${outdir}/final_hopper.data
+write_restart ${outdir}/restart/restart.fill.bin
