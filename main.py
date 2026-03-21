@@ -152,6 +152,11 @@ def resume_flop_simulation(N, run_step, viscosity, dt, resume_token):
         
     visualize_results("Chain_flop", f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}")
 
+def create_hopper_filled_state(chain_source_dir, n_fill, relax_steps, dt, run_name):
+    runner = SimulationRunner(lammps_executable="lmp")
+    manager = HopperManager(runner)
+    return manager.generate_filled_state(chain_source_dir, n_fill, relax_steps, dt=dt, run_name=run_name)
+
 def resume_simulation(config: SimulationConfig):
     # Initialize runner
     # Ensure 'lmp' is in your PATH or provide absolute path

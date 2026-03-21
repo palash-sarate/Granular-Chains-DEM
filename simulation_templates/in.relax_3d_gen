@@ -4,6 +4,7 @@ units       si
 atom_style hybrid sphere angle
 boundary    f f f
 
+comm_modify vel yes cutoff 0.004
 special_bonds lj/coul 1.0 1.0 1.0
 
 # Variables passed from runner:

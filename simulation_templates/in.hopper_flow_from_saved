@@ -10,9 +10,12 @@ special_bonds lj/coul 1.0 1.0 1.0
 
 # Read saved state: prefer restart_file if provided
 if "${restart_file}" != "" then "read_restart ${restart_file}"
-if "${restart_file}" == "" then "read_data ${data_file}"
+if "${restart_file}" == "" then "read_data ${data_file}" 
 
 include ${lepton_inc}
+
+group chain_particles type 1
+fix 1 chain_particles viscous ${viscosity}
 
 # Oscillation variables
 variable x_osc equal "v_amp * sin(2*PI*v_freq*time)"
