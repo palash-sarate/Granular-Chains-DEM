@@ -3,6 +3,7 @@ import argparse
 import ast
 import time
 from typing import Optional
+import numpy as np
     
 def get_dt_token(dt: float) -> str:
     """
@@ -29,6 +30,27 @@ def get_viscosity_token(viscosity: float) -> str:
     # print(f"Viscosity token: {token_str}")
     return token_str
 
+def validate_chain_spacing(chain_data, min_spacing=0.0, max_spacing=0.0025):
+    """
+    Validates spacing between consecutive atoms in the chain.
+    Returns (is_valid, messages)
+    """
+    if not chain_data or len(chain_data) < 2:
+        return True, []
+
+    messages = []
+    is_valid = True
+    
+    # Extract just x,y,z
+    coords = [np.array(p[:3]) for p in chain_data]
+    
+    for i in range(len(coords) - 1):
+        dist = np.linalg.norm(coords[i+1] - coords[i])
+        if dist < min_spacing or dist > max_spacing:
+            is_valid = False
+            messages.append(f"Gap {i+1}-{i+2}: {dist:.6f} m (Expected {min_spacing}-{max_spacing})")
+            
+    return is_valid, messages
 
 class ETAEstimator:
     """Estimate remaining time for a looped job using exponential smoothing.

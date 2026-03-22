@@ -53,9 +53,13 @@ class SimulationRunner:
         if config.lepton_file:
             lepton_path = config.lepton_file.replace("\\", "/")
             header_vars.append(f"variable lepton_inc string {lepton_path}")
+        
+        # include dump file variable if provided
+        if config.dump_file:
+            dump_path = config.dump_file.replace("\\", "/")
+            header_vars.append(f"variable dump_inc string {dump_path}")
 
         # Resume functionality: inject resume specific variables
-        # resume_file
         if config.resume_file:
             resume_path = config.resume_file.replace("\\", "/")
             header_vars.append(f"variable resume_file string {resume_path}")

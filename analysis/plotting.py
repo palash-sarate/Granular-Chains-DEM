@@ -3,30 +3,8 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import argparse
 
-def validate_chain_spacing(chain_data, min_spacing=0.0, max_spacing=0.0025):
-    """
-    Validates spacing between consecutive atoms in the chain.
-    Returns (is_valid, messages)
-    """
-    if not chain_data or len(chain_data) < 2:
-        return True, []
-
-    messages = []
-    is_valid = True
-    
-    # Extract just x,y,z
-    coords = [np.array(p[:3]) for p in chain_data]
-    
-    for i in range(len(coords) - 1):
-        dist = np.linalg.norm(coords[i+1] - coords[i])
-        if dist < min_spacing or dist > max_spacing:
-            is_valid = False
-            messages.append(f"Gap {i+1}-{i+2}: {dist:.6f} m (Expected {min_spacing}-{max_spacing})")
-            
-    return is_valid, messages
-
 # function to visualize chain.data
-def plot_chain_data(chain_data_source, title=None, save_path=None):
+def plot_chain_data(chain_data_source, title=None, save_path=None, fig = None, ax = None):
     """
     Plots the 3D coordinates of the chain data.
     chain_data_source: list of tuples/lists with (x, y, z) coordinates OR path to LAMMPS data file
@@ -110,8 +88,8 @@ def plot_chain_data(chain_data_source, title=None, save_path=None):
         xs, ys, zs = zip(*chain_data)
         ds = [0.002] * len(xs)
 
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
+    # fig = plt.figure(figsize=(10, 8))
+    # ax = fig.add_subplot(111, projection='3d')
     
     # Plot spheres
     for x, y, z, d in zip(xs, ys, zs, ds):

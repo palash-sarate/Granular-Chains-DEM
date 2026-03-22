@@ -4,9 +4,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
 import numpy as np
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from vedo import Plotter, Spheres, Lines, Axes
+from utilities import validate_chain_spacing
 
 from data_manager import SimulationData
 
@@ -20,7 +19,6 @@ try:
 except Exception:
     BaseTk = tk.Tk
     DND_AVAILABLE = False
-
 
 def parse_simple_data_file(path: str) -> pd.DataFrame:
     """Attempt a best-effort parse of a LAMMPS data file to extract atom positions.
@@ -88,7 +86,8 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
             x = arr[:,2]
             y = arr[:,3]
             z = arr[:,4]
-            df = pd.DataFrame({'id': ids, 'type': types, 'x': x, 'y': y, 'z': z})
+            dia = arr[:,5]
+            df = pd.DataFrame({'id': ids, 'type': types, 'x': x, 'y': y, 'z': z, 'diameter': dia})
     except Exception:
         # fallback: attempt to parse as mixed tokens
         rows = []
@@ -100,11 +99,12 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
                     x = float(parts[-3])
                     y = float(parts[-2])
                     z = float(parts[-1])
-                    rows.append((idv, x, y, z))
+                    dia = float(parts[4]) if len(parts) > 5 else 0.0
+                    rows.append((idv, x, y, z, dia))
             except Exception:
                 continue
         if rows:
-            df = pd.DataFrame(rows, columns=['id','x','y','z'])
+            df = pd.DataFrame(rows, columns=['id','x','y','z','diameter'])
 
     if df is None:
         return pd.DataFrame()
@@ -124,7 +124,7 @@ class ViewerApp(BaseTk):
     def __init__(self):
         super().__init__()
         self.title('Chains Simulation Viewer')
-        self.geometry('1000x700')
+        self.geometry('300x700')
         # Ensure clean shutdown when window is closed
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
@@ -158,18 +158,36 @@ class ViewerApp(BaseTk):
         self.frame_slider.pack(fill=tk.X)
 
         tk.Button(ctrl, text='Fit View', command=self.fit_view).pack(fill=tk.X, pady=(8,0))
+        # Option to draw chain lines between consecutive particles
+        self.draw_chains_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(ctrl, text='Draw Chains', variable=self.draw_chains_var, command=self._on_draw_toggle).pack(fill=tk.X, pady=(4,0))
+        tk.Button(ctrl, text='Reset View', command=self.reset_view).pack(fill=tk.X, pady=(4,0))
         tk.Button(ctrl, text='Close', command=self.destroy).pack(fill=tk.X, pady=(20,0))
 
-        # Right: Matplotlib canvas
-        self.fig = plt.figure(figsize=(7,6))
-        self.ax = self.fig.add_subplot(111, projection='3d')
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+        self.plotter = Plotter(
+            bg='white',
+            interactive=True
+        )
 
         # Data holders
         self.df = None
         self.timesteps = []
         self.current_timestep = None
+        # Store initial axis limits and default view angles
+        self._init_limits = None
+        self._default_view = (30, -60)
+        try:
+            self.ax.view_init(elev=self._default_view[0], azim=self._default_view[1])
+        except Exception:
+            pass
+
+    def _on_draw_toggle(self):
+        # refresh current timestep view to show/hide chains
+        if self.current_timestep is not None:
+            try:
+                self.show_timestep(self.current_timestep)
+            except Exception:
+                pass
 
     def open_dump_folder(self):
         folder = filedialog.askdirectory(title='Select data directory (contains chain/ subfolder)')
@@ -297,16 +315,21 @@ class ViewerApp(BaseTk):
             if c not in self.df.columns:
                 messagebox.showerror('Invalid data', f'Missing column: {c}')
                 return
+            
+        # compute and store initial/global axis limits for reset
+        x_min, x_max = self.df['x'].min(), self.df['x'].max()
+        y_min, y_max = self.df['y'].min(), self.df['y'].max()
+        z_min, z_max = self.df['z'].min(), self.df['z'].max()
+        self._init_limits = ((x_min, x_max), (y_min, y_max), (z_min, z_max))
 
         self.timesteps = sorted(self.df['timestep'].unique())
         self.ts_listbox.delete(0, tk.END)
         for t in self.timesteps:
             self.ts_listbox.insert(tk.END, str(t))
 
-        # setup slider
+        self.frame_slider.config(from_=0, to=max(0, len(self.timesteps)-1))
+        self.frame_slider.set(0)
         if self.timesteps:
-            self.frame_slider.config(from_=0, to=max(0, len(self.timesteps)-1))
-            self.frame_slider.set(0)
             self.show_timestep(self.timesteps[0])
 
     def on_ts_select(self, event):
@@ -330,50 +353,125 @@ class ViewerApp(BaseTk):
         self.show_timestep(t)
 
     def fit_view(self):
-        # recompute limits based on current dataframe
-        if self.df is None:
+        if self.plotter:
+            self.plotter.reset_camera()
+            self.plotter.render()
+
+    def reset_view(self):
+        if self.plotter:
+            self.plotter.reset_camera()
+            self.plotter.render()
+        
+    def _draw_chains_on_subset(self, subset: pd.DataFrame):
+        """Draw lines connecting consecutive particles.
+
+        Grouping strategy:
+        - If a column named 'mol' or 'molecule' or 'chain' exists, group by that.
+        - Otherwise, treat the whole subset as a single chain sorted by 'id'.
+        """
+        if subset.empty:
             return
-        x_min, x_max = self.df['x'].min(), self.df['x'].max()
-        y_min, y_max = self.df['y'].min(), self.df['y'].max()
-        z_min, z_max = self.df['z'].min(), self.df['z'].max()
-        self.ax.set_xlim(x_min, x_max)
-        self.ax.set_ylim(y_min, y_max)
-        self.ax.set_zlim(z_min, z_max)
-        self.canvas.draw()
+
+        # Determine possible grouping column
+        group_col = None
+        for c in ('mol', 'molecule', 'chain', 'chain_id'):
+            if c in subset.columns:
+                group_col = c
+                break
+
+        if group_col is None:
+            # single chain: sort by id
+            pts = subset.sort_values('id')
+            xs = pts['x'].values
+            ys = pts['y'].values
+            zs = pts['z'].values
+            if xs.size > 1:
+                self.ax.plot(xs, ys, zs, color='k', linewidth=0.8, alpha=0.8)
+            return
+
+        # multiple chains/groups
+        for key, grp in subset.groupby(group_col):
+            pts = grp.sort_values('id')
+            xs = pts['x'].values
+            ys = pts['y'].values
+            zs = pts['z'].values
+            if xs.size > 1:
+                self.ax.plot(xs, ys, zs, linewidth=0.8, alpha=0.8)
 
     def show_timestep(self, timestep):
         if self.df is None:
             return
+
         subset = self.df[self.df['timestep'] == timestep]
-        if subset.empty:
-            return
+        self.current_timestep = timestep
 
-        self.ax.cla()
-        x = subset['x'].values
-        y = subset['y'].values
-        z = subset['z'].values
+        self.plotter.clear()
 
-        # size
-        if 'diameter' in subset.columns:
-            sizes = (subset['diameter'].values / subset['diameter'].max()) * 100
-        else:
-            sizes = np.full_like(x, 30)
+        actors = self.plot_chain_data(subset)
 
-        self.ax.scatter(x, y, z, s=sizes, c='C0', depthshade=True)
+        # ---- Compute equal bounding box ----
+        xs = subset['x'].values
+        ys = subset['y'].values
+        zs = subset['z'].values
 
-        self.ax.set_xlabel('X')
-        self.ax.set_ylabel('Y')
-        self.ax.set_zlabel('Z')
-        self.ax.set_title(f'Timestep: {timestep}  (particles: {len(subset)})')
+        xmin, xmax = xs.min(), xs.max()
+        ymin, ymax = ys.min(), ys.max()
+        zmin, zmax = zs.min(), zs.max()
 
-        # set equal aspect (best-effort)
-        try:
-            self.ax.set_box_aspect((1,1,1))
-        except Exception:
-            pass
+        # center
+        cx = 0.5 * (xmin + xmax)
+        cy = 0.5 * (ymin + ymax)
+        cz = 0.5 * (zmin + zmax)
 
-        self.canvas.draw()
+        # max range → enforce cube
+        max_range = max(xmax - xmin, ymax - ymin, zmax - zmin) / 2.0
 
+        bounds = [
+            cx - max_range, cx + max_range,
+            cy - max_range, cy + max_range,
+            cz - max_range, cz + max_range
+        ]
+
+        axes = Axes(
+            xrange=(bounds[0], bounds[1]),
+            yrange=(bounds[2], bounds[3]),
+            zrange=(bounds[4], bounds[5]),
+            xtitle='X',
+            ytitle='Y',
+            ztitle='Z',
+            c='black'
+        )
+
+        # ---- Add everything ----
+        self.plotter.add(*actors)
+        self.plotter.add(axes)
+
+        # ---- Force camera to respect bounds ----
+        self.plotter.reset_camera()
+
+        self.plotter.render()
+
+    def plot_chain_data(self, chain_data):
+        if chain_data.empty:
+            return []
+
+        pts = chain_data[['x','y','z']].values
+        print(pts)
+        r = (chain_data['diameter'].values / 2.0)
+
+        # Create spheres (GPU instanced → fast)
+        spheres = Spheres(pts, r=r, c='blue', alpha=0.6)
+
+        actors = [spheres]
+
+        # Optional: draw chains
+        if getattr(self, 'draw_chains_var', None) and self.draw_chains_var.get():
+            if len(pts) > 1:
+                lines = Lines(pts, c='black', lw=1)
+                actors.append(lines)
+
+        return actors
+    
     def _cleanup(self):
         """Cleanup resources before exiting."""
         try:

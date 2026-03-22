@@ -35,6 +35,7 @@ class SimulationConfig:
     resume_file: Optional[str] = None  # New field for resume file path
     data_file: str = "default_chain.data"
     lepton_file: str = "simulation_templates/lepton.inc"
+    dump_file: str = "simulation_templates/default_dump.inc"
     run: str = "default_run"
     simulation: str = "default_simulation"
     

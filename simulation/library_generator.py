@@ -10,7 +10,9 @@ class LibraryGenerator:
     def __init__(self, runner: SimulationRunner):
         self.runner = runner
 
-    def generate_library(self, n_beads: int, n_states: int, output_dir: str = "chain_data/relaxed"):
+    def generate_library(self, n_beads: int, n_states: int,
+                         output_dir: str = "chain_data/relaxed",
+                         config: SimulationConfig = None):
         """
         Generates a library of relaxed chain states.
         
@@ -53,12 +55,14 @@ class LibraryGenerator:
             sim_config = SimulationConfig(
                 template="in.relax_3d_gen",
                 data_file=str(rel_data_path).replace("\\", "/"), # Ensure forward slashes for LAMMPS
+                dump_file= "simulation_templates/default_dump.inc", # Assuming this is a standard include for dumping
                 simulation="Relax_3d_Library_Gen",
                 run=run_name,
                 extra_vars={
                     "seed": seed,
                     "run_steps": 50000, # 0.05s of relaxation
                     "dt": 1e-6,
+                    # "viscosity": 0.0005,
                     "temperature": 1e12
                 }
             )

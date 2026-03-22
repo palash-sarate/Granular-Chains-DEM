@@ -20,9 +20,6 @@ velocity all create ${temperature} ${seed} dist gaussian
 
 # --- FORCE FIELD (Same as chain_flop) ---
 include ${lepton_inc}
-# --- INTEGRATION ---
-# NVE integration for movement
-fix 1 all nve/sphere
 
 # Langevin thermostat for randomization (Brownian motion)
 # temp start, temp stop, damp parameter (time units)
@@ -33,10 +30,13 @@ fix 2 all langevin ${temperature} ${temperature} ${damp} ${seed} omega yes
 neighbor 0.004 bin
 neigh_modify delay 0 every 1 check yes
 
+group chain_particles type 1
+# fix 1 chain_particles viscous ${viscosity}
+fix 1 chain_particles nve/sphere
+
 timestep ${dt}
 
-thermo 1000
-thermo_style custom step pe ke etotal temp
+include ${dump_inc}
 
 run ${run_steps}
 
