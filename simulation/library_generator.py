@@ -7,8 +7,10 @@ from .config import SimulationConfig
 from .chain_generator import ChainConfig, write_chain_data
 
 class LibraryGenerator:
-    def __init__(self, runner: SimulationRunner):
+    def __init__(self, runner: SimulationRunner, forced: bool = True):
         self.runner = runner
+        # If False, skip generation if final relaxed state already exists in target directory
+        self.forced = forced
 
     def generate_library(self, n_beads: int, n_states: int,
                          output_dir: str = "chain_data/relaxed",
@@ -51,6 +53,13 @@ class LibraryGenerator:
             seed = random.randint(1, 999999)
             run_name = f"relax_N{n_beads}_state_{i}"
             
+            # if forced is True, we skip generation if the final relaxed chain data 
+            # already exists in chain_data/relaxed/N{n_beads}/state_i.data
+            final_dest = target_dir / f"state_{i}.data"
+            if not self.forced and final_dest.exists():
+                print(f"  [State {i+1}/{n_states}] Skipping (already exists): {final_dest}")
+                continue
+            
             # Config for relaxation
             sim_config = SimulationConfig(
                 template="in.relax_3d_gen",
@@ -60,10 +69,12 @@ class LibraryGenerator:
                 run=run_name,
                 extra_vars={
                     "seed": seed,
-                    "run_steps": 50000, # 0.05s of relaxation
+                    "motion_steps": 500000, # 1s of relaxation
+                    "explore_steps": 200000, # 1s of relaxation
+                    "viscous_relax_steps": 300000, # 1s of relaxation
                     "dt": 1e-6,
                     # "viscosity": 0.0005,
-                    "temperature": 1e12
+                    "temperature": 1e15
                 }
             )
             

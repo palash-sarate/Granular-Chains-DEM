@@ -31,9 +31,9 @@ def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=10, f
     manager = HopperManager(runner)
     manager.run_hopper_flow(chain_source_dir, n_fill, freq=freq, amp=amp, dt=dt, run_steps=run_steps)
 
-def generate_relaxed_chain_states(n_beads=4, n_states=10):
+def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
     runner = SimulationRunner(lammps_executable="lmp")
-    lib_gen = LibraryGenerator(runner)
+    lib_gen = LibraryGenerator(runner, forced)
     lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
 
 def run_flop_simulations(Ns = [6], 

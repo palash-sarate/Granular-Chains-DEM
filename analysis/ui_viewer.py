@@ -456,7 +456,7 @@ class ViewerApp(BaseTk):
             return []
 
         pts = chain_data[['x','y','z']].values
-        print(pts)
+    
         r = (chain_data['diameter'].values / 2.0)
 
         # Create spheres (GPU instanced → fast)

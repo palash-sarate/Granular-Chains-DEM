@@ -57,15 +57,16 @@ class SimulationData:
                 return df
         return pd.DataFrame()
 
+    def _get_step(self, filename):
+        match = re.search(r'_(\d+)\.dump', filename)
+        return int(match.group(1)) if match else 0
+    
     def _parse_all_dumps(self):
         """Parses all dump files in directory and returns a MultiIndex DataFrame."""
         dump_files = glob.glob(os.path.join(self.chain_dump_dir, "*.dump"))
-        
+        print(f"Found {len(dump_files)} dump files to parse in {self.chain_dump_dir}")
         # Sort by timestep
-        def get_step(filename):
-            match = re.search(r'_(\d+)\.dump', filename)
-            return int(match.group(1)) if match else 0
-        dump_files.sort(key=get_step)
+        dump_files.sort(key=self._get_step)
 
         all_frames = [self._parse_single_dump(f) for f in dump_files]
         
