@@ -7,7 +7,7 @@ import subprocess
 import pandas as pd
 import time
 import shutil
-from analysis.lammps_parser import LammpsParser
+from analysis.data_manager import parse_lammps_geometry_script
 
 # Helper functions for geometry rendering
 def render_block(ax, params, alpha=0.2, color='gray', wireframe=False):
@@ -154,26 +154,28 @@ def render_plane(ax, params, limits, alpha=0.2, color='gray'):
     ax.plot_surface(X, Y, Z, alpha=alpha, color=color)
 
 class Animator:
-    def __init__(self, dataframe, output_file="simulation.mp4", lammps_script=None):
+    def __init__(self, dataframe, output_file="simulation.mp4", lammps_script=None, geometry=None):
         """
         Initialize the Animator with a pandas DataFrame.
         
         :param dataframe: Pandas DataFrame containing simulation data.
         :param output_file: Name of the output video file.
-        :param lammps_script: Path to the LAMMPS input script to parse geometry from.
+        :param lammps_script: Optional path to LAMMPS input script (legacy convenience path).
+        :param geometry: Optional pre-parsed geometry dictionary.
         """
         # Create a copy to avoid modifying the original data
         self.df = dataframe.copy()
         
-        # Parse LAMMPS geometry if provided
-        self.geometry = None
-        if lammps_script and os.path.exists(lammps_script):
+        # Geometry is data-layer responsibility; allow injection and keep
+        # lammps_script as a backward-compatible convenience.
+        self.geometry = geometry
+        if self.geometry is None and lammps_script and os.path.exists(lammps_script):
             try:
-                parser = LammpsParser(lammps_script)
-                self.geometry = parser.get_geometry()
-                print(f"Loaded geometry from {lammps_script}: {list(self.geometry['regions'].keys())}")
+                self.geometry = parse_lammps_geometry_script(lammps_script)
+                if self.geometry:
+                    print(f"Loaded geometry from {lammps_script}: {list(self.geometry.get('regions', {}).keys())}")
             except Exception as e:
-                print(f"Failed to parse LAMMPS script: {e}")
+                print(f"Failed to load geometry from {lammps_script}: {e}")
         
         # Check if we have a MultiIndex (likely timestep, id) and reset it to make them columns
         if isinstance(self.df.index, pd.MultiIndex):

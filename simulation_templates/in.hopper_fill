@@ -17,11 +17,11 @@ fix 2 all gravity 9.81 vector 0 0 -1
 
 include ${lepton_inc}
 
-group chain_particles type 1
-fix 1 chain_particles viscous ${viscosity}
+group chain_particles dynamic all region sim_box
+fix 1 all viscous ${viscosity}
 
 # Use the standard NVE integrator for the mobile beads only.
-fix integr chain_particles nve/sphere
+fix integr all nve/sphere
 
 include ${setup_inc}
 

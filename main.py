@@ -1,6 +1,6 @@
 from analysis.data_manager import SimulationData
 from analysis.utilities import get_angle_series, get_xyz_series, get_distance_series
-from analysis.plotting import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
+from analysis.utilities import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
 from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
 # import matplotlib.pyplot as plt
 from analysis.animate import Animator
@@ -29,7 +29,7 @@ def run_hopper_simulation():
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
     manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
-                                n_fill=10, dt = 1e-6, relax_steps=10000,
+                                n_fill=10, dt = 1e-6, relax_steps=100000,
                                 run_name="hopper_test_2",
                                 seed = 12345,
                                 mol_dir = "chain_data/molecules_temp", 
