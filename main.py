@@ -1,5 +1,5 @@
 from analysis.data_manager import SimulationData
-from analysis.geometry import get_angle_series, get_xyz_series, get_distance_series
+from analysis.utilities import get_angle_series, get_xyz_series, get_distance_series
 from analysis.plotting import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
 from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
 # import matplotlib.pyplot as plt
@@ -19,17 +19,21 @@ import sys
 def main():
     # session_id = str(uuid.uuid4())[:8]
     # run_flop_simulations()
+    run_hopper_simulation()
     # generate_relaxed_chain_states(n_beads=4, n_states=5)
-    run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=50)
     # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
     # Ns = [4,6,8,10,12,14,16,24,48,100]
     # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
 
-def run_hopper_simulation(chain_source_dir="chain_data/relaxed/N4", n_fill=10, freq=5.0, 
-                        amp=0.005, dt = 1e-6, run_steps = 10000):
+def run_hopper_simulation():
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
-    manager.run_hopper_flow(chain_source_dir, n_fill, freq=freq, amp=amp, dt=dt, run_steps=run_steps)
+    manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
+                                n_fill=10, dt = 1e-6, relax_steps=10000,
+                                run_name="hopper_test_2",
+                                seed = 12345,
+                                mol_dir = "chain_data/molecules_temp", 
+                                setup_inc = "simulation_geometries/2D_hopper_flow_setup.inc")
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
     runner = SimulationRunner(lammps_executable="lmp")

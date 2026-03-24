@@ -56,7 +56,8 @@ class HopperManager:
                         run_name: str = "hopper_test",
                         dt: float = 1e-6,
                         run_steps: int = 10000,
-                        temperature: float = 1e12):
+                        setup_inc: str = "simulation_geometries/2D_hopper_flow_setup.inc"
+                        ):
         
         if drop_steps is None:
             drop_steps = 5 * (1 / dt) * 1e-2
@@ -76,6 +77,7 @@ class HopperManager:
             simulation="Hopper_Flow",
             run=run_name,
             extra_vars={
+                "setup_inc": setup_inc,
                 "mol_include_file": inc_file,
                 "n_templates": n_templates,
                 "n_fill": n_fill,
@@ -84,7 +86,6 @@ class HopperManager:
                 "seed": 12345,
                 "run_steps": run_steps, # Post-fill run
                 "dt": dt,
-                "temperature": temperature, # Not used for creation but for thermostat if needed
                 "drop_steps": int(drop_steps)
             }
         )
@@ -96,7 +97,8 @@ class HopperManager:
 
     def generate_filled_state(self, source_dir: str, n_fill: int, relax_steps: int,
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
-                              mol_dir: str = "chain_data/molecules_temp") -> str:
+                              mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "") -> str:
+        
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
         """
@@ -116,6 +118,8 @@ class HopperManager:
             run=run_name,
             data_file=None,
             extra_vars={
+                "viscosity": 0.001,
+                "setup_inc": setup_inc,
                 "mol_include_file": inc_file,
                 "n_templates": n_templates,
                 "n_fill": n_fill,

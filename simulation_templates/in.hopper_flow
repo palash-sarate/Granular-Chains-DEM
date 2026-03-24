@@ -21,13 +21,7 @@ fix 1 chain_particles viscous ${viscosity}
 variable x_osc equal "v_amp * sin(2*PI*v_freq*time)"
 variable zero equal 0.0
 
-region hopper_cone cone z 0.0 0.0 0.01 0.05 0.05 0.15 open 1 open 2 move v_x_osc v_zero v_zero
-region hopper_cyl cylinder z 0.0 0.0 0.01 0.02 0.05 open 1 open 2 move v_x_osc v_zero v_zero
-region hopper_union union 2 hopper_cone hopper_cyl
-fix wall all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_union
-
-region floor_plane plane 0 0 -0.45 0 0 1
-fix floor all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region floor_plane
+include ${setup_inc}
 
 neighbor 0.004 bin
 neigh_modify delay 0 every 1 check yes
