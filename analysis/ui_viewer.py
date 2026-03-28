@@ -6,8 +6,8 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 from vedo import Plotter, Spheres, Lines, Axes, Box, Cylinder, Cone, Plane
-from utilities import validate_chain_spacing
-from data_manager import SimulationData, parse_simple_data_file, load_lammps_geometry
+from analysis.utilities import validate_chain_spacing
+from analysis.data_manager import SimulationData, parse_simple_data_file, load_lammps_geometry
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.

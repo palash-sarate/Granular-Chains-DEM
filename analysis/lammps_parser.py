@@ -1,4 +1,6 @@
+import os
 import re
+from typing import Optional, Set
 
 class LammpsParser:
     def __init__(self, script_path):
@@ -10,14 +12,33 @@ class LammpsParser:
         self.parse()
 
     def parse(self):
-        with open(self.script_path, 'r') as f:
+        visited: Set[str] = set()
+        self._parse_file(self.script_path, visited)
+
+    def _parse_file(self, script_path: str, visited: Set[str]) -> None:
+        if not script_path:
+            return
+
+        # Use absolute paths for cycle protection.
+        abs_path = os.path.abspath(script_path)
+        if abs_path in visited:
+            return
+        visited.add(abs_path)
+
+        if not os.path.isfile(abs_path):
+            print(f"LammpsParser: include target not found: {script_path}")
+            return
+
+        including_dir = os.path.dirname(abs_path)
+
+        with open(abs_path, 'r') as f:
             lines = f.readlines()
 
         for line in lines:
-            line = line.split('#')[0].strip() # Remove comments
+            line = line.split('#')[0].strip()  # Remove comments
             if not line:
                 continue
-            
+
             parts = line.split()
             command = parts[0]
 
@@ -27,8 +48,68 @@ class LammpsParser:
                 self._parse_create_box(parts)
             elif command == 'boundary':
                 self.boundary = parts[1:4]
-            elif command == 'variable':
-                self._parse_variable(parts)
+            # elif command == 'variable':
+            #     self._parse_variable(parts)
+            # elif command == 'include':
+            #     include_target = self._resolve_include_target(parts[1:], including_dir)
+            #     if include_target:
+            #         self._parse_file(include_target, visited)
+
+    def _resolve_include_target(self, include_tokens, including_dir: str) -> Optional[str]:
+        """Resolve `include` path tokens to a concrete file path.
+
+        Supports:
+        - `include ${var}` where `var` is defined via `variable ... string|equal ...`
+        - relative paths (try relative to including file dir, then CWD)
+        - quoted paths (single/double)
+        """
+        if not include_tokens:
+            return None
+
+        raw_target = " ".join(include_tokens).strip()
+        if len(raw_target) >= 2 and raw_target[0] == raw_target[-1] and raw_target[0] in ("'", '"'):
+            raw_target = raw_target[1:-1]
+
+        # Expand ${var} references using current known variables.
+        # If a variable is unknown, we skip this include rather than guessing.
+        pattern = re.compile(r"\$\{([^}]+)\}")
+        unresolved: Set[str] = set()
+
+        def repl(match: re.Match) -> str:
+            name = match.group(1)
+            if name not in self.variables:
+                unresolved.add(name)
+                return ""
+            return str(self.variables[name])
+
+        resolved = pattern.sub(repl, raw_target)
+        if unresolved:
+            print(f"LammpsParser: unresolved include variable(s) {sorted(unresolved)} in: {raw_target}")
+            return None
+
+        # If still empty, skip.
+        resolved = resolved.strip()
+        if not resolved:
+            return None
+
+        # If absolute and exists, use it.
+        if os.path.isabs(resolved):
+            if os.path.isfile(resolved):
+                return resolved
+            return None
+
+        # Relative: first try relative to including file directory.
+        candidate = os.path.abspath(os.path.join(including_dir, resolved))
+        if os.path.isfile(candidate):
+            return candidate
+
+        # Fallback: relative to current working directory.
+        candidate_cwd = os.path.abspath(os.path.join(os.getcwd(), resolved))
+        if os.path.isfile(candidate_cwd):
+            return candidate_cwd
+
+        # Nothing found.
+        return None
 
     def _parse_variable(self, parts):
         # variable name style args...

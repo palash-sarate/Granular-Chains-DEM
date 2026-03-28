@@ -7,3 +7,4 @@ log.lammps
 temp_frame*
 *.pyc
 *__pycache__/
+/out_mesh

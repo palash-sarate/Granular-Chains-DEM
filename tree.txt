@@ -1,0 +1,39 @@
+.                                                                                                                            
+├── -p
+├── README.md
+├── analysis
+│   ├── __init__.py
+│   ├── animate.py
+│   ├── data_manager.py
+│   ├── lammps_parser.py
+│   ├── ui_viewer.py
+│   ├── utilities.py
+│   ├── visualizer.py
+│   └── vtk_exporter.py
+├── log.lammps
+├── main.py
+├── requirements.txt
+├── simulation
+│   ├── __init__.py
+│   ├── chain_generator.py
+│   ├── config.py
+│   ├── hopper_manager.py
+│   ├── library_generator.py
+│   ├── molecule_converter.py
+│   └── runner.py
+├── simulation_geometries
+│   ├── 2D_hopper.inc
+│   ├── 2D_hopper_flow_setup.inc
+│   ├── 2D_hopper_stubs_array.inc
+│   ├── 3D_hopper.inc
+│   ├── 3D_hopper_flow_setup.inc
+│   └── collection_box.inc
+├── simulation_templates
+│   ├── default_dump.inc
+│   ├── in.chain_flop
+│   ├── in.chain_flop_resume
+│   ├── in.hopper_fill
+│   ├── in.hopper_fill_resume
+│   ├── in.hopper_flow
+│   ├── in.relax_3d_gen
+│   └── lepton.inc

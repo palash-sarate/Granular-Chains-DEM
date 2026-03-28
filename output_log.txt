@@ -1,0 +1,31 @@
+LAMMPS (22 Jul 2025 - Update 1)
+  using 4 OpenMP thread(s) per MPI task
+Loaded 1 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
+Created orthogonal box = (-0.01 -0.2 0) to (0.01 0.2 0.5)
+  1 by 1 by 1 MPI processor grid
+Created 600000 atoms
+  using lattice units in orthogonal box = (-0.01 -0.2 0) to (0.01 0.2 0.5)
+  create_atoms CPU = 3.210 seconds
+WARNING: Calling write_dump before a full system init (src/write_dump.cpp:89)
+Total wall time: 0:00:04
+LAMMPS (22 Jul 2025 - Update 1)
+  using 4 OpenMP thread(s) per MPI task
+Loaded 1 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
+Created orthogonal box = (-0.01 -0.2 0) to (0.01 0.2 0.5)
+  1 by 1 by 1 MPI processor grid
+ERROR: Create_atoms region funnel does not exist (src/create_atoms.cpp:158)
+Last input line: create_atoms 1 random 600000 12345 funnel 
+                                                    ^^^^^^
+[funnel_bottom] Running LAMMPS...
+[funnel_bottom] Loading dump into OVITO...
+[funnel_bottom] Constructing surface...
+[funnel_bottom] Exporting mesh to out_mesh\funnel_bottom_mesh.vtk...
+[funnel] Running LAMMPS...
+Traceback (most recent call last):
+  File "D:\Chains_simulations\analysis\geometry_extractor.py", line 140, in <module>
+    main()
+  File "D:\Chains_simulations\analysis\geometry_extractor.py", line 99, in main
+    subprocess.run([args.lammps_cmd, "-in", str(input_file)], check=True)
+  File "D:\Users\Palash\Downloads\DS_Ascendum\.conda\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['lmp', '-in', 'out_mesh\\in.generate_funnel']' returned non-zero exit status 1.

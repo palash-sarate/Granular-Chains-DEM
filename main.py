@@ -29,7 +29,7 @@ def run_hopper_simulation():
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
     manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
-                                n_fill=10, dt = 1e-6, relax_steps=100000,
+                                n_fill=100, dt = 1e-6, relax_steps=100000,
                                 run_name="hopper_test_2",
                                 seed = 12345,
                                 mol_dir = "chain_data/molecules_temp", 

@@ -6,7 +6,7 @@ import pickle
 import numpy as np
 from typing import Optional, Tuple
 
-from lammps_parser import LammpsParser
+from analysis.lammps_parser import LammpsParser
 
 
 def detect_lammps_input_script(sim_dir: str) -> Optional[str]:
