@@ -30,7 +30,7 @@ def run_hopper_simulation():
     manager = HopperManager(runner)
     manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
                                 n_fill=100, dt = 1e-6, relax_steps=100000,
-                                run_name="hopper_test_2",
+                                run_name="hopper_fill_N4",
                                 seed = 12345,
                                 mol_dir = "chain_data/molecules_temp", 
                                 setup_inc = "simulation_geometries/2D_hopper_flow_setup.inc")

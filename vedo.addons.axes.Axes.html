@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: function Axes</title>
+</head><body>
+<dl><dt><a name="-vedo.addons.axes.Axes"><strong>vedo.addons.axes.Axes</strong></a> = Axes(obj=None, xtitle='x', ytitle='y', ztitle='z', xrange=None, yrange=None, zrange=None, c=None, number_of_divisions=None, digits=None, limit_ratio=0.04, title_depth=0, title_font='', text_scale=1.0, x_values_and_labels=None, y_values_and_labels=None, z_values_and_labels=None, htitle='', htitle_size=0.03, htitle_font=None, htitle_italic=False, htitle_color=None, htitle_backface_color=None, htitle_justify='bottom-left', htitle_rotation=0, htitle_offset=(0, 0.01, 0), xtitle_position=0.95, ytitle_position=0.95, ztitle_position=0.95, xtitle_offset=0.025, ytitle_offset=0.0275, ztitle_offset=0.02, xtitle_justify=None, ytitle_justify=None, ztitle_justify=None, xtitle_rotation=0, ytitle_rotation=0, ztitle_rotation=0, xtitle_box=False, ytitle_box=False, xtitle_size=0.025, ytitle_size=0.025, ztitle_size=0.025, xtitle_color=None, ytitle_color=None, ztitle_color=None, xtitle_backface_color=None, ytitle_backface_color=None, ztitle_backface_color=None, xtitle_italic=0, ytitle_italic=0, ztitle_italic=0, grid_linewidth=1, xygrid=True, yzgrid=False, zxgrid=False, xygrid2=False, yzgrid2=False, zxgrid2=False, xygrid_transparent=False, yzgrid_transparent=False, zxgrid_transparent=False, xygrid2_transparent=False, yzgrid2_transparent=False, zxgrid2_transparent=False, xyplane_color=None, yzplane_color=None, zxplane_color=None, xygrid_color=None, yzgrid_color=None, zxgrid_color=None, xyalpha=0.075, yzalpha=0.075, zxalpha=0.075, xyframe_line=None, yzframe_line=None, zxframe_line=None, xyframe_color=None, yzframe_color=None, zxframe_color=None, axes_linewidth=1, xline_color=None, yline_color=None, zline_color=None, xhighlight_zero=False, yhighlight_zero=False, zhighlight_zero=False, xhighlight_zero_color='red4', yhighlight_zero_color='green4', zhighlight_zero_color='blue4', show_ticks=True, xtick_length=0.015, ytick_length=0.015, ztick_length=0.015, xtick_thickness=0.0025, ytick_thickness=0.0025, ztick_thickness=0.0025, xminor_ticks=1, yminor_ticks=1, zminor_ticks=1, tip_size=None, label_font='', xlabel_color=None, ylabel_color=None, zlabel_color=None, xlabel_backface_color=None, ylabel_backface_color=None, zlabel_backface_color=None, xlabel_size=0.016, ylabel_size=0.016, zlabel_size=0.016, xlabel_offset=0.8, ylabel_offset=0.8, zlabel_offset=0.8, xlabel_justify=None, ylabel_justify=None, zlabel_justify=None, xlabel_rotation=0, ylabel_rotation=0, zlabel_rotation=0, xaxis_rotation=0, yaxis_rotation=0, zaxis_rotation=0, xyshift=0, yzshift=0, zxshift=0, xshift_along_y=0, xshift_along_z=0, yshift_along_x=0, yshift_along_z=0, zshift_along_x=0, zshift_along_y=0, x_use_bounds=True, y_use_bounds=True, z_use_bounds=False, x_inverted=False, y_inverted=False, z_inverted=False, use_global=False, tol=0.001) -&gt; 'Assembly | None'</dt><dd><span class="code">Draw&nbsp;axes&nbsp;for&nbsp;the&nbsp;input&nbsp;object.<br>
+Check&nbsp;[available&nbsp;fonts&nbsp;here](<a href="https://vedo.embl.es/fonts">https://vedo.embl.es/fonts</a>).<br>
+&nbsp;<br>
+Returns&nbsp;an&nbsp;`vedo.Assembly`&nbsp;object.<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+&nbsp;<br>
+-&nbsp;`xtitle`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['x'],&nbsp;x-axis&nbsp;title&nbsp;text<br>
+-&nbsp;`xrange`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;x-axis&nbsp;range&nbsp;in&nbsp;format&nbsp;(xmin,&nbsp;ymin),&nbsp;default&nbsp;is&nbsp;automatic.<br>
+-&nbsp;`number_of_divisions`,&nbsp;&nbsp;&nbsp;[None],&nbsp;approximate&nbsp;number&nbsp;of&nbsp;divisions&nbsp;on&nbsp;the&nbsp;longest&nbsp;axis<br>
+-&nbsp;`axes_linewidth`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1],&nbsp;width&nbsp;of&nbsp;the&nbsp;axes&nbsp;lines<br>
+-&nbsp;`grid_linewidth`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1],&nbsp;width&nbsp;of&nbsp;the&nbsp;grid&nbsp;lines<br>
+-&nbsp;`title_depth`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0],&nbsp;extrusion&nbsp;fractional&nbsp;depth&nbsp;of&nbsp;title&nbsp;text<br>
+-&nbsp;`x_values_and_labels`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[],&nbsp;assign&nbsp;custom&nbsp;tick&nbsp;positions&nbsp;and&nbsp;labels&nbsp;[(pos1,&nbsp;label1),&nbsp;...]<br>
+-&nbsp;`xygrid`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;show&nbsp;a&nbsp;gridded&nbsp;wall&nbsp;on&nbsp;plane&nbsp;xy<br>
+-&nbsp;`yzgrid`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;show&nbsp;a&nbsp;gridded&nbsp;wall&nbsp;on&nbsp;plane&nbsp;yz<br>
+-&nbsp;`zxgrid`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;show&nbsp;a&nbsp;gridded&nbsp;wall&nbsp;on&nbsp;plane&nbsp;zx<br>
+-&nbsp;`yzgrid2`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;show&nbsp;yz&nbsp;plane&nbsp;on&nbsp;opposite&nbsp;side&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box<br>
+-&nbsp;`zxgrid2`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;show&nbsp;zx&nbsp;plane&nbsp;on&nbsp;opposite&nbsp;side&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box<br>
+-&nbsp;`xygrid_transparent`&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;make&nbsp;grid&nbsp;plane&nbsp;completely&nbsp;transparent<br>
+-&nbsp;`xygrid2_transparent`&nbsp;&nbsp;&nbsp;[False],&nbsp;make&nbsp;grid&nbsp;plane&nbsp;completely&nbsp;transparent&nbsp;on&nbsp;opposite&nbsp;side&nbsp;box<br>
+-&nbsp;`xyplane_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['None'],&nbsp;color&nbsp;of&nbsp;the&nbsp;plane<br>
+-&nbsp;`xygrid_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['None'],&nbsp;grid&nbsp;line&nbsp;color<br>
+-&nbsp;`xyalpha`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.15],&nbsp;grid&nbsp;plane&nbsp;opacity<br>
+-&nbsp;`xyframe_line`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0],&nbsp;add&nbsp;a&nbsp;frame&nbsp;for&nbsp;the&nbsp;plane,&nbsp;use&nbsp;value&nbsp;as&nbsp;the&nbsp;thickness<br>
+-&nbsp;`xyframe_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;color&nbsp;for&nbsp;the&nbsp;frame&nbsp;of&nbsp;the&nbsp;plane<br>
+-&nbsp;`show_ticks`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;show&nbsp;major&nbsp;ticks<br>
+-&nbsp;`digits`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;use&nbsp;this&nbsp;number&nbsp;of&nbsp;significant&nbsp;digits&nbsp;in&nbsp;scientific&nbsp;notation<br>
+-&nbsp;`title_font`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[''],&nbsp;font&nbsp;for&nbsp;axes&nbsp;titles<br>
+-&nbsp;`label_font`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[''],&nbsp;font&nbsp;for&nbsp;numeric&nbsp;labels<br>
+-&nbsp;`text_scale`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1.0],&nbsp;global&nbsp;scaling&nbsp;factor&nbsp;for&nbsp;all&nbsp;text&nbsp;elements&nbsp;(titles,&nbsp;labels)<br>
+-&nbsp;`htitle`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[''],&nbsp;header&nbsp;title<br>
+-&nbsp;`htitle_size`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.03],&nbsp;header&nbsp;title&nbsp;size<br>
+-&nbsp;`htitle_font`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;header&nbsp;font&nbsp;(defaults&nbsp;to&nbsp;`title_font`)<br>
+-&nbsp;`htitle_italic`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;header&nbsp;font&nbsp;is&nbsp;italic<br>
+-&nbsp;`htitle_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;header&nbsp;title&nbsp;color&nbsp;(defaults&nbsp;to&nbsp;`xtitle_color`)<br>
+-&nbsp;`htitle_backface_color`,&nbsp;[None],&nbsp;header&nbsp;title&nbsp;color&nbsp;on&nbsp;its&nbsp;backface<br>
+-&nbsp;`htitle_justify`,&nbsp;['bottom-center'],&nbsp;origin&nbsp;of&nbsp;the&nbsp;title&nbsp;justification<br>
+-&nbsp;`htitle_offset`,&nbsp;&nbsp;&nbsp;[(0,0.01,0)],&nbsp;control&nbsp;offsets&nbsp;of&nbsp;header&nbsp;title&nbsp;in&nbsp;x,&nbsp;y&nbsp;and&nbsp;z<br>
+-&nbsp;`xtitle_position`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.32],&nbsp;title&nbsp;fractional&nbsp;positions&nbsp;along&nbsp;axis<br>
+-&nbsp;`xtitle_offset`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.05],&nbsp;title&nbsp;fractional&nbsp;offset&nbsp;distance&nbsp;from&nbsp;axis&nbsp;line,&nbsp;can&nbsp;be&nbsp;a&nbsp;list<br>
+-&nbsp;`xtitle_justify`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;choose&nbsp;the&nbsp;origin&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box&nbsp;of&nbsp;title<br>
+-&nbsp;`xtitle_rotation`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0],&nbsp;add&nbsp;a&nbsp;rotation&nbsp;of&nbsp;the&nbsp;axis&nbsp;title,&nbsp;can&nbsp;be&nbsp;a&nbsp;list&nbsp;(rx,ry,rz)<br>
+-&nbsp;`xtitle_box`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;add&nbsp;a&nbsp;box&nbsp;around&nbsp;title&nbsp;text<br>
+-&nbsp;`xline_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[automatic],&nbsp;color&nbsp;of&nbsp;the&nbsp;x-axis<br>
+-&nbsp;`xtitle_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[automatic],&nbsp;color&nbsp;of&nbsp;the&nbsp;axis&nbsp;title<br>
+-&nbsp;`xtitle_backface_color`,&nbsp;[None],&nbsp;color&nbsp;of&nbsp;axis&nbsp;title&nbsp;on&nbsp;its&nbsp;backface<br>
+-&nbsp;`xtitle_size`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.025],&nbsp;size&nbsp;of&nbsp;the&nbsp;axis&nbsp;title<br>
+-&nbsp;`xtitle_italic`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0],&nbsp;a&nbsp;bool&nbsp;or&nbsp;float&nbsp;to&nbsp;make&nbsp;the&nbsp;font&nbsp;italic<br>
+-&nbsp;`xhighlight_zero`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;draw&nbsp;a&nbsp;line&nbsp;highlighting&nbsp;zero&nbsp;position&nbsp;if&nbsp;in&nbsp;range<br>
+-&nbsp;`xhighlight_zero_color`,&nbsp;[auto],&nbsp;color&nbsp;of&nbsp;the&nbsp;line&nbsp;highlighting&nbsp;the&nbsp;zero&nbsp;position<br>
+-&nbsp;`xtick_length`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.005],&nbsp;radius&nbsp;of&nbsp;the&nbsp;major&nbsp;ticks<br>
+-&nbsp;`xtick_thickness`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.0025],&nbsp;thickness&nbsp;of&nbsp;the&nbsp;major&nbsp;ticks&nbsp;along&nbsp;their&nbsp;axis<br>
+-&nbsp;`xminor_ticks`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1],&nbsp;number&nbsp;of&nbsp;minor&nbsp;ticks&nbsp;between&nbsp;two&nbsp;major&nbsp;ticks<br>
+-&nbsp;`xlabel_color`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[automatic],&nbsp;color&nbsp;of&nbsp;numeric&nbsp;labels&nbsp;and&nbsp;ticks<br>
+-&nbsp;`xlabel_backface_color`,&nbsp;[auto],&nbsp;back&nbsp;face&nbsp;color&nbsp;of&nbsp;numeric&nbsp;labels&nbsp;and&nbsp;ticks<br>
+-&nbsp;`xlabel_size`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.015],&nbsp;size&nbsp;of&nbsp;the&nbsp;numeric&nbsp;labels&nbsp;along&nbsp;axis<br>
+-&nbsp;`xlabel_rotation`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,list],&nbsp;numeric&nbsp;labels&nbsp;rotation&nbsp;(can&nbsp;be&nbsp;a&nbsp;list&nbsp;of&nbsp;3&nbsp;rotations)<br>
+-&nbsp;`xlabel_offset`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.8,list],&nbsp;offset&nbsp;of&nbsp;the&nbsp;numeric&nbsp;labels&nbsp;(can&nbsp;be&nbsp;a&nbsp;list&nbsp;of&nbsp;3&nbsp;offsets)<br>
+-&nbsp;`xlabel_justify`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[None],&nbsp;choose&nbsp;the&nbsp;origin&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box&nbsp;of&nbsp;labels<br>
+-&nbsp;`xaxis_rotation`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0],&nbsp;rotate&nbsp;the&nbsp;X&nbsp;axis&nbsp;elements&nbsp;(ticks&nbsp;and&nbsp;labels)&nbsp;around&nbsp;this&nbsp;same&nbsp;axis<br>
+-&nbsp;`xyshift`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.0],&nbsp;slide&nbsp;the&nbsp;xy-plane&nbsp;along&nbsp;z&nbsp;(the&nbsp;range&nbsp;is&nbsp;[0,1])<br>
+-&nbsp;`xshift_along_y`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.0],&nbsp;slide&nbsp;x-axis&nbsp;along&nbsp;the&nbsp;y-axis&nbsp;(the&nbsp;range&nbsp;is&nbsp;[0,1])<br>
+-&nbsp;`tip_size`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.01],&nbsp;size&nbsp;of&nbsp;the&nbsp;arrow&nbsp;tip&nbsp;as&nbsp;a&nbsp;fraction&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box&nbsp;diagonal<br>
+-&nbsp;`limit_ratio`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.04],&nbsp;below&nbsp;this&nbsp;ratio&nbsp;don't&nbsp;plot&nbsp;smaller&nbsp;axis<br>
+-&nbsp;`x_use_bounds`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[True],&nbsp;keep&nbsp;into&nbsp;account&nbsp;space&nbsp;occupied&nbsp;by&nbsp;labels&nbsp;when&nbsp;setting&nbsp;camera<br>
+-&nbsp;`x_inverted`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;invert&nbsp;labels&nbsp;order&nbsp;and&nbsp;direction&nbsp;(only&nbsp;visually!)<br>
+-&nbsp;`use_global`,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[False],&nbsp;try&nbsp;to&nbsp;compute&nbsp;the&nbsp;global&nbsp;bounding&nbsp;box&nbsp;of&nbsp;visible&nbsp;actors<br>
+&nbsp;<br>
+Example:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;```python<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;vedo&nbsp;import&nbsp;Axes,&nbsp;Box,&nbsp;show<br>
+&nbsp;&nbsp;&nbsp;&nbsp;box&nbsp;=&nbsp;Box(pos=(1,2,3),&nbsp;size=(8,9,7)).alpha(0.1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;axs&nbsp;=&nbsp;Axes(box,&nbsp;c='k')&nbsp;&nbsp;#&nbsp;returns&nbsp;an&nbsp;Assembly&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;a&nbsp;in&nbsp;axs.unpack():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(a.name)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show(box,&nbsp;axs).close()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;```<br>
+&nbsp;&nbsp;&nbsp;&nbsp;![](<a href="https://vedo.embl.es/images/feats/axes1.png">https://vedo.embl.es/images/feats/axes1.png</a>)<br>
+&nbsp;<br>
+Examples:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[custom_axes1.py](<a href="https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes1.py">https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes1.py</a>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[custom_axes2.py](<a href="https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes2.py">https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes2.py</a>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[custom_axes3.py](<a href="https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes3.py">https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes3.py</a>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[custom_axes4.py](<a href="https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes4.py">https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes4.py</a>)<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;![](<a href="https://vedo.embl.es/images/pyplot/customAxes3.png">https://vedo.embl.es/images/pyplot/customAxes3.png</a>)</span></dd></dl>
+
+</body></html>

@@ -57,7 +57,7 @@ def main():
 
     parser.add_argument("--regions", nargs="+", default=["simbox"], help="List of LAMMPS region names to fill with particles")
     parser.add_argument("--bounds", nargs=6, type=float,
-                        default=[-0.01, 0.01, -0.2, 0.2, 0.0, 0.5],
+                        default=[-1, 1, -1, 1, -0.02, 1],
                         help="Sampling box bounds: xlo xhi ylo yhi zlo zhi")
 
     parser.add_argument("--var", action="append",
@@ -66,7 +66,7 @@ def main():
     args = parser.parse_args()
 
     inc_file = Path(args.inc).resolve()
-    outdir = Path(args.outdir)
+    outdir = Path(args.outdir) / inc_file.stem
     outdir.mkdir(parents=True, exist_ok=True)
 
     # Parse extra variables
@@ -105,7 +105,7 @@ def main():
         pipeline.modifiers.append(
             ConstructSurfaceModifier(
                 radius=args.radius,
-                smoothing_level=3
+                smoothing_level=10
             )
         )
 

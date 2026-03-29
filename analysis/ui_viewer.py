@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox
 from typing import Optional
 import pandas as pd
 import numpy as np
-from vedo import Plotter, Spheres, Lines, Axes, Box, Cylinder, Cone, Plane
+from vedo import Plotter, Spheres, Lines, Axes, Box, Cylinder, Cone, Plane, Mesh
 from analysis.utilities import validate_chain_spacing
 from analysis.data_manager import SimulationData, parse_simple_data_file, load_lammps_geometry
 
@@ -36,6 +36,7 @@ class ViewerApp(BaseTk):
         tk.Button(ctrl, text='Open Dump Folder', command=self.open_dump_folder).pack(fill=tk.X)
         tk.Button(ctrl, text='Open Dump Files...', command=self.open_dump_files).pack(fill=tk.X, pady=(4,0))
         tk.Button(ctrl, text='Open Data File...', command=self.open_data_file).pack(fill=tk.X, pady=(4,0))
+        tk.Button(ctrl, text='Open VTK Files...', command=self.open_vtk_files).pack(fill=tk.X, pady=(4,0))
         self.refresh_button = tk.Button(ctrl, text='Refresh', command=self.refresh_current_source, state=tk.DISABLED)
         self.refresh_button.pack(fill=tk.X, pady=(8,0))
 
@@ -52,7 +53,7 @@ class ViewerApp(BaseTk):
                 self.drop_label.config(text='Drag-and-drop not available on this platform')
 
         tk.Label(ctrl, text='Timesteps:').pack(anchor='w', pady=(8,0))
-        self.ts_listbox = tk.Listbox(ctrl, width=30, height=20)
+        self.ts_listbox = tk.Listbox(ctrl, width=30, height=5)
         self.ts_listbox.pack(fill=tk.Y)
         self.ts_listbox.bind('<<ListboxSelect>>', self.on_ts_select)
 
@@ -67,7 +68,22 @@ class ViewerApp(BaseTk):
         self.show_geometry_var = tk.BooleanVar(value=False)
         tk.Checkbutton(ctrl, text='Show Geometry', variable=self.show_geometry_var, command=self._on_draw_toggle).pack(fill=tk.X, pady=(4,0))
         tk.Button(ctrl, text='Reset View', command=self.reset_view).pack(fill=tk.X, pady=(4,0))
-        tk.Button(ctrl, text='Close', command=self.destroy).pack(fill=tk.X, pady=(20,0))
+        
+        # VTK Management
+        tk.Label(ctrl, text='Loaded VTKs:').pack(anchor='w', pady=(8,0))
+        vtk_frame = tk.Frame(ctrl)
+        vtk_frame.pack(fill=tk.X)
+        self.vtk_listbox = tk.Listbox(vtk_frame, height=5, selectmode=tk.MULTIPLE)
+        self.vtk_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.vtk_listbox.bind('<<ListboxSelect>>', self.on_vtk_select)
+        vtk_scroll = tk.Scrollbar(vtk_frame, orient=tk.VERTICAL)
+        vtk_scroll.config(command=self.vtk_listbox.yview)
+        vtk_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.vtk_listbox.config(yscrollcommand=vtk_scroll.set)
+        
+        tk.Button(ctrl, text='Delete Selected VTKs', command=self.delete_selected_vtks).pack(fill=tk.X, pady=(2,0))
+
+        # tk.Button(ctrl, text='Close', command=self.destroy).pack(fill=tk.X, pady=(20,0))
 
         self.plotter = Plotter(
             bg='white',
@@ -79,6 +95,9 @@ class ViewerApp(BaseTk):
 
         # Data holders
         self.df = None
+        self._dynamic_actors = []
+        self.vtk_meshes = {}
+        self.vtk_color_idx = 0
         self.timesteps = []
         self.current_timestep = None
         self.current_sim_folder = None
@@ -128,6 +147,10 @@ class ViewerApp(BaseTk):
 
     def _load_simulation_folder(self, folder: str) -> None:
         """Load a simulation folder using SimulationData (expects folder/chain/*.dump)."""
+        if self.current_sim_folder is not None:
+            if os.path.normpath(self.current_sim_folder) != os.path.normpath(folder):
+                self.clear_vtk_meshes()
+        
         prev_ts = self.current_timestep
         try:
             sim = SimulationData(folder)
@@ -204,6 +227,8 @@ class ViewerApp(BaseTk):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files','*.dump'),('All','*.*')])
         if not files:
             return
+        self.clear_vtk_meshes()
+        self.current_sim_folder = None
         # Create a temporary in-memory concatenated DataFrame
         frames = []
         for f in files:
@@ -264,10 +289,21 @@ class ViewerApp(BaseTk):
         if os.path.isdir(p):
             sim_root = self._resolve_sim_root_from_drop_dir(p)
             if sim_root is None:
+                vtk_files = []
+                for root, _, fs in os.walk(p):
+                    for f in fs:
+                        if f.lower().endswith('.vtk'):
+                            vtk_files.append(os.path.join(root, f))
+                if vtk_files:
+                    for f in vtk_files:
+                        self._add_vtk_mesh(f)
+                    if self.current_timestep is not None:
+                        self.show_timestep(self.current_timestep)
+                    return
                 messagebox.showerror(
                     'Invalid folder',
                     'Dropped folder must be the simulation run folder containing a chain/ subfolder, '
-                    'or the chain/ subfolder itself.'
+                    'or contain .vtk files.'
                 )
                 return
             self._load_simulation_folder(sim_root)
@@ -287,6 +323,20 @@ class ViewerApp(BaseTk):
             except Exception as e:
                 messagebox.showerror('Error', f'Failed to load data file: {e}')
             return
+
+        vtk_files = [f for f in files if f.lower().endswith('.vtk')]
+        if vtk_files:
+            for f in vtk_files:
+                self._add_vtk_mesh(f)
+            files = [f for f in files if not f.lower().endswith('.vtk')]
+            if len(files) == 0:
+                if self.current_timestep is not None:
+                    self.show_timestep(self.current_timestep)
+                return
+        else:
+            # If we are loading only fresh dumps, clear VTK context manually to mimic opening files
+            self.clear_vtk_meshes()
+            self.current_sim_folder = None
 
         # Otherwise treat as dump files (one or many)
         frames = []
@@ -321,6 +371,8 @@ class ViewerApp(BaseTk):
         path = filedialog.askopenfilename(title='Select LAMMPS data file', filetypes=[('Data files','*.data'),('All','*.*')])
         if not path:
             return
+        self.clear_vtk_meshes()
+        self.current_sim_folder = None
         df = parse_simple_data_file(path)
         if df.empty:
             messagebox.showerror('Parse failed', 'Could not parse the selected data file')
@@ -330,6 +382,74 @@ class ViewerApp(BaseTk):
         self.load_dataframe(df)
         self.geometry_data = None
         self.geometry_script_path = None
+
+    def clear_vtk_meshes(self):
+        # Remove them from the plotter first
+        if hasattr(self, 'vtk_meshes'):
+            for mesh_data in self.vtk_meshes.values():
+                if mesh_data['actor'] in self.plotter.actors:
+                    self.plotter.remove(mesh_data['actor'])
+        self.vtk_meshes.clear()
+        if hasattr(self, 'vtk_listbox'):
+            self.vtk_listbox.delete(0, tk.END)
+        self.vtk_color_idx = 0
+
+    def open_vtk_files(self):
+        files = filedialog.askopenfilenames(title='Select VTK files', filetypes=[('VTK files', '*.vtk'), ('All', '*.*')])
+        if not files:
+            return
+        for f in files:
+            self._add_vtk_mesh(f)
+        if self.current_timestep is not None:
+            self.show_timestep(self.current_timestep)
+
+    def _add_vtk_mesh(self, path):
+        name = os.path.basename(path)
+        if name in self.vtk_meshes:
+            return  # already loaded
+        try:
+            import vedo
+            obj = vedo.load(path)
+            mesh = obj.tomesh() if hasattr(obj, "tomesh") else obj
+            
+            colors = ['red', 'green', 'blue', 'gold', 'cyan', 'magenta', 'orange', 'purple', 'lime', 'pink']
+            color = colors[self.vtk_color_idx % len(colors)]
+            self.vtk_color_idx += 1
+            mesh.c(color).alpha(0.8)
+            self.vtk_meshes[name] = {
+                'path': path,
+                'actor': mesh,
+                'visible': True,
+                'color': color
+            }
+            if hasattr(self, 'vtk_listbox'):
+                self.vtk_listbox.insert(tk.END, name)
+                idx = self.vtk_listbox.size() - 1
+                self.vtk_listbox.selection_set(idx)
+        except Exception as e:
+            print(f"Failed to load VTK {path}: {e}")
+
+    def on_vtk_select(self, event):
+        if not hasattr(self, 'vtk_listbox'): return
+        selected_indices = self.vtk_listbox.curselection()
+        for i in range(self.vtk_listbox.size()):
+            name = self.vtk_listbox.get(i)
+            if name in self.vtk_meshes:
+                self.vtk_meshes[name]['visible'] = (i in selected_indices)
+        if self.current_timestep is not None:
+            self.show_timestep(self.current_timestep)
+
+    def delete_selected_vtks(self):
+        if not hasattr(self, 'vtk_listbox'): return
+        selected_indices = self.vtk_listbox.curselection()
+        if not selected_indices: return
+        for i in reversed(selected_indices):
+            name = self.vtk_listbox.get(i)
+            if name in self.vtk_meshes:
+                del self.vtk_meshes[name]
+            self.vtk_listbox.delete(i)
+        if self.current_timestep is not None:
+            self.show_timestep(self.current_timestep)
 
     def load_dataframe(self, df: pd.DataFrame):
         self.df = df.copy()
@@ -428,18 +548,40 @@ class ViewerApp(BaseTk):
         subset = self.df[self.df['timestep'] == timestep]
         self.current_timestep = timestep
 
-        self.plotter.clear()
+        if getattr(self, '_dynamic_actors', None) is not None:
+            for act in self._dynamic_actors:
+                self.plotter.remove(act)
+        self._dynamic_actors = []
 
         actors = self.plot_chain_data(subset)
 
         # ---- Compute equal bounding box ----
-        xs = subset['x'].values
-        ys = subset['y'].values
-        zs = subset['z'].values
+        # Use globally computed particle limits instead of per-frame subsets to freeze axes over time
+        if self._init_limits is not None:
+            xmin, xmax = self._init_limits[0]
+            ymin, ymax = self._init_limits[1]
+            zmin, zmax = self._init_limits[2]
+        else:
+            xmin, xmax, ymin, ymax, zmin, zmax = float('inf'), float('-inf'), float('inf'), float('-inf'), float('inf'), float('-inf')
 
-        xmin, xmax = xs.min(), xs.max()
-        ymin, ymax = ys.min(), ys.max()
-        zmin, zmax = zs.min(), zs.max()
+        # Widen global box to comfortably fit all visible VTK geometries
+        if hasattr(self, 'vtk_meshes'):
+            for mesh_data in self.vtk_meshes.values():
+                if mesh_data['visible']:
+                    try:
+                        bnds = mesh_data['actor'].bounds()
+                        if len(bnds) == 6:
+                            xmin = min(xmin, bnds[0])
+                            xmax = max(xmax, bnds[1])
+                            ymin = min(ymin, bnds[2])
+                            ymax = max(ymax, bnds[3])
+                            zmin = min(zmin, bnds[4])
+                            zmax = max(zmax, bnds[5])
+                    except Exception:
+                        pass
+
+        if xmin == float('inf'):  # Fallback if entirely empty
+            xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
 
         # center
         cx = 0.5 * (xmin + xmax)
@@ -466,10 +608,24 @@ class ViewerApp(BaseTk):
         )
 
         # ---- Add everything ----
-        self.plotter.add(*actors)
+        self._dynamic_actors.extend(actors)
+        self._dynamic_actors.append(axes)
+
         if getattr(self, 'show_geometry_var', None) and self.show_geometry_var.get():
-            self.plotter.add(*self._build_geometry_actors(bounds))
-        self.plotter.add(axes)
+            geom_actors = self._build_geometry_actors(bounds)
+            self._dynamic_actors.extend(geom_actors)
+
+        self.plotter.add(*self._dynamic_actors)
+
+        if hasattr(self, 'vtk_meshes'):
+            for mesh_data in self.vtk_meshes.values():
+                act = mesh_data['actor']
+                if mesh_data['visible']:
+                    if act not in self.plotter.actors:
+                        self.plotter.add(act)
+                else:
+                    if act in self.plotter.actors:
+                        self.plotter.remove(act)
 
         # ---- Force camera to respect bounds ----
         self.plotter.reset_camera()

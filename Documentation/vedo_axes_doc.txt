@@ -1,0 +1,90 @@
+
+    Draw axes for the input object.
+    Check [available fonts here](https://vedo.embl.es/fonts).
+
+    Returns an `vedo.Assembly` object.
+
+    Parameters
+    ----------
+
+    - `xtitle`,                 ['x'], x-axis title text
+    - `xrange`,                [None], x-axis range in format (xmin, ymin), default is automatic.
+    - `number_of_divisions`,   [None], approximate number of divisions on the longest axis
+    - `axes_linewidth`,           [1], width of the axes lines
+    - `grid_linewidth`,           [1], width of the grid lines
+    - `title_depth`,              [0], extrusion fractional depth of title text
+    - `x_values_and_labels`        [], assign custom tick positions and labels [(pos1, label1), ...]
+    - `xygrid`,                [True], show a gridded wall on plane xy
+    - `yzgrid`,                [True], show a gridded wall on plane yz
+    - `zxgrid`,                [True], show a gridded wall on plane zx
+    - `yzgrid2`,              [False], show yz plane on opposite side of the bounding box
+    - `zxgrid2`,              [False], show zx plane on opposite side of the bounding box
+    - `xygrid_transparent`    [False], make grid plane completely transparent
+    - `xygrid2_transparent`   [False], make grid plane completely transparent on opposite side box
+    - `xyplane_color`,       ['None'], color of the plane
+    - `xygrid_color`,        ['None'], grid line color
+    - `xyalpha`,               [0.15], grid plane opacity
+    - `xyframe_line`,             [0], add a frame for the plane, use value as the thickness
+    - `xyframe_color`,         [None], color for the frame of the plane
+    - `show_ticks`,            [True], show major ticks
+    - `digits`,                [None], use this number of significant digits in scientific notation
+    - `title_font`,              [''], font for axes titles
+    - `label_font`,              [''], font for numeric labels
+    - `text_scale`,             [1.0], global scaling factor for all text elements (titles, labels)
+    - `htitle`,                  [''], header title
+    - `htitle_size`,           [0.03], header title size
+    - `htitle_font`,           [None], header font (defaults to `title_font`)
+    - `htitle_italic`,         [True], header font is italic
+    - `htitle_color`,          [None], header title color (defaults to `xtitle_color`)
+    - `htitle_backface_color`, [None], header title color on its backface
+    - `htitle_justify`, ['bottom-center'], origin of the title justification
+    - `htitle_offset`,   [(0,0.01,0)], control offsets of header title in x, y and z
+    - `xtitle_position`,       [0.32], title fractional positions along axis
+    - `xtitle_offset`,         [0.05], title fractional offset distance from axis line, can be a list
+    - `xtitle_justify`,        [None], choose the origin of the bounding box of title
+    - `xtitle_rotation`,          [0], add a rotation of the axis title, can be a list (rx,ry,rz)
+    - `xtitle_box`,           [False], add a box around title text
+    - `xline_color`,      [automatic], color of the x-axis
+    - `xtitle_color`,     [automatic], color of the axis title
+    - `xtitle_backface_color`, [None], color of axis title on its backface
+    - `xtitle_size`,          [0.025], size of the axis title
+    - `xtitle_italic`,            [0], a bool or float to make the font italic
+    - `xhighlight_zero`,       [True], draw a line highlighting zero position if in range
+    - `xhighlight_zero_color`, [auto], color of the line highlighting the zero position
+    - `xtick_length`,         [0.005], radius of the major ticks
+    - `xtick_thickness`,     [0.0025], thickness of the major ticks along their axis
+    - `xminor_ticks`,             [1], number of minor ticks between two major ticks
+    - `xlabel_color`,     [automatic], color of numeric labels and ticks
+    - `xlabel_backface_color`, [auto], back face color of numeric labels and ticks
+    - `xlabel_size`,          [0.015], size of the numeric labels along axis
+    - `xlabel_rotation`,     [0,list], numeric labels rotation (can be a list of 3 rotations)
+    - `xlabel_offset`,     [0.8,list], offset of the numeric labels (can be a list of 3 offsets)
+    - `xlabel_justify`,        [None], choose the origin of the bounding box of labels
+    - `xaxis_rotation`,           [0], rotate the X axis elements (ticks and labels) around this same axis
+    - `xyshift`                 [0.0], slide the xy-plane along z (the range is [0,1])
+    - `xshift_along_y`          [0.0], slide x-axis along the y-axis (the range is [0,1])
+    - `tip_size`,              [0.01], size of the arrow tip as a fraction of the bounding box diagonal
+    - `limit_ratio`,           [0.04], below this ratio don't plot smaller axis
+    - `x_use_bounds`,          [True], keep into account space occupied by labels when setting camera
+    - `x_inverted`,           [False], invert labels order and direction (only visually!)
+    - `use_global`,           [False], try to compute the global bounding box of visible actors
+
+    Example:
+        ```python
+        from vedo import Axes, Box, show
+        box = Box(pos=(1,2,3), size=(8,9,7)).alpha(0.1)
+        axs = Axes(box, c='k')  # returns an Assembly object
+        for a in axs.unpack():
+            print(a.name)
+        show(box, axs).close()
+        ```
+        ![](https://vedo.embl.es/images/feats/axes1.png)
+
+    Examples:
+        - [custom_axes1.py](https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes1.py)
+        - [custom_axes2.py](https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes2.py)
+        - [custom_axes3.py](https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes3.py)
+        - [custom_axes4.py](https://github.com/marcomusy/vedo/tree/master/examples/pyplot/custom_axes4.py)
+
+        ![](https://vedo.embl.es/images/pyplot/customAxes3.png)
+    
