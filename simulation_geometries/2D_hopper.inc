@@ -12,6 +12,7 @@ variable sin_c       equal sin(${hopper_ang}*${pi}/180.0)
 variable cos_c       equal cos(${hopper_ang}*${pi}/180.0)
 variable converging_sec_ht equal tan(${hopper_ang}*${pi}/180.0)*(${y_half} - ${orifice_half})
 variable eps equal 0.01
+variable funnel_top equal 0.5 # funnel extent in z direction
 variable f_x_half equal 0.1 # funnel extent in x direction
 variable h_y_half equal ${y_half}+${eps} # hopper extent in y direction
 variable h_x_half equal ${x_half}+${eps} # hopper extent in y direction
@@ -19,12 +20,16 @@ variable h_x_half equal ${x_half}+${eps} # hopper extent in y direction
 # Entry funnel (Top) - Funneling in the X-direction
 region entry_f_neg plane -${x_half} 0 ${z_bin_top} -${sin_f} 0  -${cos_f}
 region entry_f_pos plane  ${x_half} 0 ${z_bin_top}  ${sin_f} 0  -${cos_f}
-region funnel_bounds block -${f_x_half} ${f_x_half} -${y_half} ${y_half} ${z_bin_top} 0.5 side in
+region funnel_bounds block -${f_x_half} ${f_x_half} -${y_half} ${y_half} ${z_bin_top} ${funnel_top} side in
 region funnel_neg intersect 2 entry_f_neg funnel_bounds
 region funnel_pos intersect 2 entry_f_pos funnel_bounds
 fix wall_funnel_neg all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_neg
 fix wall_funnel_pos all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_pos
-
+# Funnel side walls
+region funnel_left block -${f_x_half} ${f_x_half} ${y_half} ${h_y_half} ${z_bin_top} ${funnel_top}
+region funnel_right block -${f_x_half} ${f_x_half} -${h_y_half} -${y_half} ${z_bin_top} ${funnel_top}
+fix wall_funnel_left all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_left
+fix wall_funnel_right all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_right
 # Converging section
 region exit_v_neg plane 0 -${orifice_half} 0 0 -${sin_c} -${cos_c}
 region exit_v_pos plane 0  ${orifice_half} 0 0  ${sin_c} -${cos_c}
