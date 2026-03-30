@@ -88,7 +88,8 @@ class ViewerApp(BaseTk):
         tk.Label(col2, text='Loaded VTKs:', anchor='w').pack(fill=tk.X, pady=(0, 2))
         vtk_frame = tk.Frame(col2)
         vtk_frame.pack(fill=tk.X)
-        self.vtk_listbox = tk.Listbox(vtk_frame, width=22, height=5, selectmode=tk.MULTIPLE)
+        self.vtk_listbox = tk.Listbox(vtk_frame, width=22, height=5, selectmode=tk.MULTIPLE,
+                                      exportselection=False)
         self.vtk_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.vtk_listbox.bind('<<ListboxSelect>>', self.on_vtk_select)
         vtk_scroll = tk.Scrollbar(vtk_frame, orient=tk.VERTICAL)
@@ -504,7 +505,7 @@ class ViewerApp(BaseTk):
             import vedo
             obj = vedo.load(path)
             mesh = obj.tomesh() if hasattr(obj, "tomesh") else obj
-            
+
             colors = ['red', 'green', 'blue', 'gold', 'cyan', 'magenta', 'orange', 'purple', 'lime', 'pink']
             color = colors[self.vtk_color_idx % len(colors)]
             self.vtk_color_idx += 1
@@ -515,6 +516,10 @@ class ViewerApp(BaseTk):
                 'visible': True,
                 'color': color
             }
+            # Add actor to the plotter once at load time.
+            # Visibility is toggled thereafter via on()/off() — never add/remove again.
+            self.plotter.add(mesh)
+            mesh.on()
             if hasattr(self, 'vtk_listbox'):
                 self.vtk_listbox.insert(tk.END, name)
                 idx = self.vtk_listbox.size() - 1
@@ -531,8 +536,12 @@ class ViewerApp(BaseTk):
             if name in self.vtk_meshes:
                 self.vtk_meshes[name]['visible'] = (i in selected_indices)
         self._recompute_scene_bounds()
+        self._sync_vtk_visibility()
         if self.current_timestep is not None:
+            # Rebuild axes to reflect updated bounds, but preserve camera position
             self.show_timestep(self.current_timestep)
+        else:
+            self.plotter.render()
 
     def delete_selected_vtks(self):
         if not hasattr(self, 'vtk_listbox'): return
@@ -541,11 +550,21 @@ class ViewerApp(BaseTk):
         for i in reversed(selected_indices):
             name = self.vtk_listbox.get(i)
             if name in self.vtk_meshes:
+                # Explicitly remove from plotter BEFORE deleting from dict —
+                # show_timestep only iterates vtk_meshes so it would never
+                # clean up an already-deleted entry.
+                act = self.vtk_meshes[name]['actor']
+                try:
+                    self.plotter.remove(act)
+                except Exception:
+                    pass
                 del self.vtk_meshes[name]
             self.vtk_listbox.delete(i)
         self._recompute_scene_bounds()
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
+        else:
+            self.plotter.render()
 
     def load_dataframe(self, df: pd.DataFrame):
         self.df = df.copy()
@@ -679,19 +698,29 @@ class ViewerApp(BaseTk):
 
         self.plotter.add(*self._dynamic_actors)
 
-        # ---- Sync VTK mesh visibility (these are persistent actors, not dynamic) ----
-        if hasattr(self, 'vtk_meshes'):
-            for mesh_data in self.vtk_meshes.values():
-                act = mesh_data['actor']
-                if mesh_data['visible']:
-                    if act not in self.plotter.actors:
-                        self.plotter.add(act)
-                else:
-                    if act in self.plotter.actors:
-                        self.plotter.remove(act)
+        # ---- Sync VTK mesh visibility (actors are permanently in the plotter;
+        #      on()/off() toggles VTK-level visibility reliably) ----
+        self._sync_vtk_visibility()
 
         # Re-overlay any active highlights at the new timestep positions
         self._render_highlights()
+
+    def _sync_vtk_visibility(self):
+        """Toggle each VTK actor's VTK-level visibility flag (on/off).
+
+        Actors live permanently in the plotter renderer once added at load time.
+        Using on()/off() is more reliable than plotter.add/remove because the
+        membership check (``act in plotter.actors``) can silently mis-compare
+        VTK object identities across different vedo versions.
+        """
+        if not hasattr(self, 'vtk_meshes'):
+            return
+        for mesh_data in self.vtk_meshes.values():
+            act = mesh_data['actor']
+            if mesh_data['visible']:
+                act.on()
+            else:
+                act.off()
 
     def _build_geometry_actors(self, bounds):
         if not self.geometry_data:
