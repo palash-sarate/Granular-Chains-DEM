@@ -33,7 +33,7 @@ def run_hopper_simulation():
                                 run_name="hopper_fill_N4",
                                 seed = 12345,
                                 mol_dir = "chain_data/molecules_temp", 
-                                setup_inc = "simulation_geometries/2D_hopper_flow_setup.inc")
+                                setup_inc = "simulation_geometries/2D_hopper_2.inc")
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
     runner = SimulationRunner(lammps_executable="lmp")

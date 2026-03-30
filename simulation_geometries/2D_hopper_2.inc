@@ -10,19 +10,20 @@ variable cos_f       equal cos(${funnel_ang}*${pi}/180.0)
 variable hopper_ang  equal 60.0         # Entry funnel angle to horizontal
 variable sin_c       equal sin(${hopper_ang}*${pi}/180.0)
 variable cos_c       equal cos(${hopper_ang}*${pi}/180.0)
-# variable converging_sec_ht equal tan(${hopper_ang}*${pi}/180.0)*(${y_half} - ${orifice_half})
-# variable x_cover equal 4*${x_half}
-variable f_x_half equal 0.1 # funnel extent in x direction
+variable eps equal 0.01
+variable funnel_thickness equal ${x_half}+${eps}
+variable funnel_ht equal ${z_bin_top}+0.1
 
 # 1. Entry Funnel (Top) - Funneling in the X-direction
 # These planes converge from a wide X-opening down to the 2.5mm gap at z_bin_top
-region entry_f_neg plane -${x_half} 0 ${z_bin_top} -${sin_f} 0  -${cos_f}
-region entry_f_pos plane  ${x_half} 0 ${z_bin_top}  ${sin_f} 0  -${cos_f}
-# This ensures particles don't escape the funnel
-region funnel_bounds block -${f_x_half} ${f_x_half} -${y_half} ${y_half} ${z_bin_top} 0.5 side in
-# Combine the entry planes with side limits
-region funnel_neg intersect 2 entry_f_neg funnel_bounds
-region funnel_pos intersect 2 entry_f_pos funnel_bounds
+
+region entry_f_neg prism ${x_half} ${funnel_thickness} -${y_half} ${y_half} ${z_bin_top} ${funnel_ht} 0 0.1 0 side out
+region entry_f_pos prism -${funnel_thickness} -${x_half} -${y_half} ${y_half} ${z_bin_top} ${funnel_ht} 0 -0.1 0 side out
+
+fix wall_f_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_neg
+fix wall_f_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_pos
+# fix wall_f_neg all wall/gran/region granular hertz/material 1e5 1e3 0.3 tangential mindlin NULL 1.0 0.5 region entry_f_neg
+# fix wall_f_pos all wall/gran/region granular hertz/material 1e5 1e3 0.3 tangential mindlin NULL 1.0 0.5 region entry_f_pos
 
 # 2. Hopper
 # Inclined in the Y-direction as per your previous setup
@@ -33,15 +34,10 @@ region planes_h intersect 2 exit_v_neg exit_v_pos
 region hopper_bounds block -${x_half} ${x_half} -${y_half} ${y_half} 0.0 ${z_bin_top}
 region hopper intersect 2 planes_h hopper_bounds
 
-# Final Union of all parts
-# region complete_hopper union 2 funnel hopper
-
 # 6. Apply Granular Wall Fix
-fix wall_funnel_neg all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_neg
-fix wall_funnel_pos all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_pos
-fix wall_hopper all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper
+fix wall_all all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region hopper
 
 # 5 Orifice cover
 # This stops the particles from leaving hopper when filling
-# region orifice_cover plane 0 0 0 0 0 1
-# fix lid all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region orifice_cover
+region orifice_cover plane 0 0 0 0 0 1
+fix lid all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region orifice_cover

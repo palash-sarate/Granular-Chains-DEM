@@ -13,7 +13,7 @@ special_bonds lj/coul 1.0 1.0 1.0
 region sim_box block -0.5 0.5 -0.25 0.25 -0.1 0.6
 create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 2
 
-fix 2 all gravity 9.81 vector 0 0 -1
+fix 1 all gravity 9.81 vector 0 0 -1
 
 include ${lepton_inc}
 
@@ -28,12 +28,24 @@ neigh_modify delay 0 every 1 check yes
 timestep ${dt}
 
 group chain_particles dynamic all region sim_box
-fix 1 all viscous ${viscosity}
+fix 2 all viscous ${viscosity}
 
 # Use the standard NVE integrator for the mobile beads only.
-fix integr all nve/sphere
+fix 3 all nve/sphere
 
 include ${dump_inc}
+
+# --- Pre-fill: drop single spheres to seed the hopper floor ---
+# variable n_singles equal 20          # number of single beads to drop first
+# variable js loop ${n_singles}
+# label single_loop_start
+#     variable rxs equal random(-0.08, 0.08,  ${seed})
+#     variable rys equal random(-0.155, 0.155, ${seed})
+#     create_atoms 1 single ${rxs} ${rys} 0.48
+#     set atom $(count(all)) diameter 0.002 mass 2.96763e-05
+#     run ${drop_steps}
+#     next js
+# jump SELF single_loop_start
 
 # Fill loop
 variable i loop ${n_fill}

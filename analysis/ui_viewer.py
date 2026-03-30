@@ -33,57 +33,105 @@ class ViewerApp(BaseTk):
         ctrl = tk.Frame(self)
         ctrl.pack(side=tk.LEFT, fill=tk.Y, padx=6, pady=6)
 
-        tk.Button(ctrl, text='Open Dump Folder', command=self.open_dump_folder).pack(fill=tk.X)
-        tk.Button(ctrl, text='Open Dump Files...', command=self.open_dump_files).pack(fill=tk.X, pady=(4,0))
-        tk.Button(ctrl, text='Open Data File...', command=self.open_data_file).pack(fill=tk.X, pady=(4,0))
-        tk.Button(ctrl, text='Open VTK Files...', command=self.open_vtk_files).pack(fill=tk.X, pady=(4,0))
-        self.refresh_button = tk.Button(ctrl, text='Refresh', command=self.refresh_current_source, state=tk.DISABLED)
-        self.refresh_button.pack(fill=tk.X, pady=(8,0))
+        # Two side-by-side columns inside ctrl
+        col1 = tk.Frame(ctrl)
+        col1.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+
+        try:
+            import tkinter.ttk as ttk
+            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
+        except Exception:
+            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
+
+        col2 = tk.Frame(ctrl)
+        col2.pack(side=tk.LEFT, fill=tk.Y)
+
+        # ── Column 1 : File loading & navigation ─────────────────
+        tk.Button(col1, text='Open Dump Folder', command=self.open_dump_folder).pack(fill=tk.X)
+        tk.Button(col1, text='Open Dump Files...', command=self.open_dump_files).pack(fill=tk.X, pady=(4, 0))
+        tk.Button(col1, text='Open Data File...', command=self.open_data_file).pack(fill=tk.X, pady=(4, 0))
+        tk.Button(col1, text='Open VTK Files...', command=self.open_vtk_files).pack(fill=tk.X, pady=(4, 0))
+        self.refresh_button = tk.Button(col1, text='Refresh', command=self.refresh_current_source, state=tk.DISABLED)
+        self.refresh_button.pack(fill=tk.X, pady=(8, 0))
 
         # Drag-and-drop area
-        drop_text = 'Drop dump/.data files here' if DND_AVAILABLE else 'Drag-and-drop disabled (install tkinterdnd2)'
-        self.drop_label = tk.Label(ctrl, text=drop_text, relief='ridge', width=30, height=4)
-        self.drop_label.pack(fill=tk.X, pady=(8,4))
+        drop_text = ('Drop dump/.data files here' if DND_AVAILABLE
+                     else 'Drag-and-drop disabled\n(install tkinterdnd2)')
+        self.drop_label = tk.Label(col1, text=drop_text, relief='ridge', width=22, height=4)
+        self.drop_label.pack(fill=tk.X, pady=(8, 4))
         if DND_AVAILABLE:
             try:
                 self.drop_label.drop_target_register(DND_CONST)
                 self.drop_label.dnd_bind('<<Drop>>', self.on_drop)
             except Exception:
-                # if registration fails, keep graceful fallback
                 self.drop_label.config(text='Drag-and-drop not available on this platform')
 
-        tk.Label(ctrl, text='Timesteps:').pack(anchor='w', pady=(8,0))
-        self.ts_listbox = tk.Listbox(ctrl, width=30, height=5)
+        tk.Label(col1, text='Timesteps:').pack(anchor='w', pady=(8, 0))
+        self.ts_listbox = tk.Listbox(col1, width=22, height=6)
         self.ts_listbox.pack(fill=tk.Y)
         self.ts_listbox.bind('<<ListboxSelect>>', self.on_ts_select)
 
-        tk.Label(ctrl, text='Frame').pack(anchor='w', pady=(8,0))
-        self.frame_slider = tk.Scale(ctrl, from_=0, to=0, orient=tk.HORIZONTAL, command=self.on_slider)
+        tk.Label(col1, text='Frame').pack(anchor='w', pady=(8, 0))
+        self.frame_slider = tk.Scale(col1, from_=0, to=0, orient=tk.HORIZONTAL, command=self.on_slider)
         self.frame_slider.pack(fill=tk.X)
 
-        tk.Button(ctrl, text='Fit View', command=self.fit_view).pack(fill=tk.X, pady=(8,0))
-        # Option to draw chain lines between consecutive particles
+        tk.Button(col1, text='Fit View', command=self.fit_view).pack(fill=tk.X, pady=(8, 0))
+        tk.Button(col1, text='Reset View', command=self.reset_view).pack(fill=tk.X, pady=(4, 0))
         self.draw_chains_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(ctrl, text='Draw Chains', variable=self.draw_chains_var, command=self._on_draw_toggle).pack(fill=tk.X, pady=(4,0))
+        tk.Checkbutton(col1, text='Draw Chains', variable=self.draw_chains_var,
+                       command=self._on_draw_toggle).pack(fill=tk.X, pady=(4, 0))
         self.show_geometry_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(ctrl, text='Show Geometry', variable=self.show_geometry_var, command=self._on_draw_toggle).pack(fill=tk.X, pady=(4,0))
-        tk.Button(ctrl, text='Reset View', command=self.reset_view).pack(fill=tk.X, pady=(4,0))
-        
-        # VTK Management
-        tk.Label(ctrl, text='Loaded VTKs:').pack(anchor='w', pady=(8,0))
-        vtk_frame = tk.Frame(ctrl)
+        tk.Checkbutton(col1, text='Show Geometry', variable=self.show_geometry_var,
+                       command=self._on_draw_toggle).pack(fill=tk.X, pady=(4, 0))
+
+        # ── Column 2 : VTK management & Highlight ────────────────
+        tk.Label(col2, text='Loaded VTKs:', anchor='w').pack(fill=tk.X, pady=(0, 2))
+        vtk_frame = tk.Frame(col2)
         vtk_frame.pack(fill=tk.X)
-        self.vtk_listbox = tk.Listbox(vtk_frame, height=5, selectmode=tk.MULTIPLE)
+        self.vtk_listbox = tk.Listbox(vtk_frame, width=22, height=5, selectmode=tk.MULTIPLE)
         self.vtk_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.vtk_listbox.bind('<<ListboxSelect>>', self.on_vtk_select)
         vtk_scroll = tk.Scrollbar(vtk_frame, orient=tk.VERTICAL)
         vtk_scroll.config(command=self.vtk_listbox.yview)
         vtk_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.vtk_listbox.config(yscrollcommand=vtk_scroll.set)
-        
-        tk.Button(ctrl, text='Delete Selected VTKs', command=self.delete_selected_vtks).pack(fill=tk.X, pady=(2,0))
+        tk.Button(col2, text='Delete Selected VTKs',
+                  command=self.delete_selected_vtks).pack(fill=tk.X, pady=(2, 0))
 
-        # tk.Button(ctrl, text='Close', command=self.destroy).pack(fill=tk.X, pady=(20,0))
+        # Highlight sub-section
+        tk.Label(col2, text='──── Highlight ────', fg='gray').pack(fill=tk.X, pady=(12, 2))
+
+        hl_mode_frame = tk.Frame(col2)
+        hl_mode_frame.pack(fill=tk.X)
+        self.highlight_mode_var = tk.StringVar(value='atom')
+        for _mode, _lbl in [('atom', 'Atom'), ('bond', 'Bond'),
+                             ('angle', 'Angle'), ('chain', 'Chain')]:
+            tk.Radiobutton(hl_mode_frame, text=_lbl,
+                           variable=self.highlight_mode_var,
+                           value=_mode).pack(side=tk.LEFT)
+
+        hl_id_frame = tk.Frame(col2)
+        hl_id_frame.pack(fill=tk.X, pady=(4, 0))
+        tk.Label(hl_id_frame, text='ID:').pack(side=tk.LEFT)
+        self.highlight_id_var = tk.StringVar()
+        _hl_entry = tk.Entry(hl_id_frame, textvariable=self.highlight_id_var, width=7)
+        _hl_entry.pack(side=tk.LEFT, padx=(4, 0))
+        _hl_entry.bind('<Return>', lambda e: self._apply_highlight())
+        tk.Button(hl_id_frame, text='Apply',
+                  command=self._apply_highlight).pack(side=tk.LEFT, padx=(4, 0))
+
+        hl_cs_frame = tk.Frame(col2)
+        hl_cs_frame.pack(fill=tk.X, pady=(2, 0))
+        tk.Label(hl_cs_frame, text='Chain size:').pack(side=tk.LEFT)
+        self.chain_size_var = tk.StringVar(value='4')
+        tk.Entry(hl_cs_frame, textvariable=self.chain_size_var,
+                 width=4).pack(side=tk.LEFT, padx=(4, 0))
+
+        tk.Button(col2, text='Clear Highlight',
+                  command=self._clear_highlight).pack(fill=tk.X, pady=(6, 0))
+        self.highlight_status = tk.Label(col2, text='—', fg='gray',
+                                         wraplength=160, justify='left')
+        self.highlight_status.pack(anchor='w', pady=(4, 0))
 
         self.plotter = Plotter(
             bg='white',
@@ -98,6 +146,7 @@ class ViewerApp(BaseTk):
         self._dynamic_actors = []
         self.vtk_meshes = {}
         self.vtk_color_idx = 0
+        self._scene_bounds = None  # persistent bounds: particles + vtk geometries
         self.timesteps = []
         self.current_timestep = None
         self.current_sim_folder = None
@@ -110,6 +159,11 @@ class ViewerApp(BaseTk):
             self.ax.view_init(elev=self._default_view[0], azim=self._default_view[1])
         except Exception:
             pass
+
+        # Highlight state (populated by _apply_highlight)
+        self._highlighted_ids: set = set()
+        self._highlight_color: str = 'yellow'
+        self._highlight_actors: list = []
 
     def _autosize_and_center(self) -> None:
         # Ensure geometry requests are computed
@@ -383,6 +437,42 @@ class ViewerApp(BaseTk):
         self.geometry_data = None
         self.geometry_script_path = None
 
+    def _recompute_scene_bounds(self):
+        """Recompute and cache the stable scene bounding box (particles + visible VTKs)."""
+        if self._init_limits is not None:
+            xmin, xmax = self._init_limits[0]
+            ymin, ymax = self._init_limits[1]
+            zmin, zmax = self._init_limits[2]
+        else:
+            xmin, xmax = float('inf'), float('-inf')
+            ymin, ymax = float('inf'), float('-inf')
+            zmin, zmax = float('inf'), float('-inf')
+
+        for mesh_data in self.vtk_meshes.values():
+            if mesh_data['visible']:
+                try:
+                    bnds = mesh_data['actor'].bounds()
+                    if len(bnds) == 6:
+                        xmin = min(xmin, bnds[0]); xmax = max(xmax, bnds[1])
+                        ymin = min(ymin, bnds[2]); ymax = max(ymax, bnds[3])
+                        zmin = min(zmin, bnds[4]); zmax = max(zmax, bnds[5])
+                except Exception:
+                    pass
+
+        if xmin == float('inf'):
+            xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
+
+        cx = 0.5 * (xmin + xmax)
+        cy = 0.5 * (ymin + ymax)
+        cz = 0.5 * (zmin + zmax)
+        max_range = max(xmax - xmin, ymax - ymin, zmax - zmin, 1e-6) / 2.0
+
+        self._scene_bounds = [
+            cx - max_range, cx + max_range,
+            cy - max_range, cy + max_range,
+            cz - max_range, cz + max_range
+        ]
+
     def clear_vtk_meshes(self):
         # Remove them from the plotter first
         if hasattr(self, 'vtk_meshes'):
@@ -393,6 +483,7 @@ class ViewerApp(BaseTk):
         if hasattr(self, 'vtk_listbox'):
             self.vtk_listbox.delete(0, tk.END)
         self.vtk_color_idx = 0
+        self._recompute_scene_bounds()
 
     def open_vtk_files(self):
         files = filedialog.askopenfilenames(title='Select VTK files', filetypes=[('VTK files', '*.vtk'), ('All', '*.*')])
@@ -402,6 +493,8 @@ class ViewerApp(BaseTk):
             self._add_vtk_mesh(f)
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
+            self.plotter.reset_camera()
+            self.plotter.render()
 
     def _add_vtk_mesh(self, path):
         name = os.path.basename(path)
@@ -426,6 +519,7 @@ class ViewerApp(BaseTk):
                 self.vtk_listbox.insert(tk.END, name)
                 idx = self.vtk_listbox.size() - 1
                 self.vtk_listbox.selection_set(idx)
+            self._recompute_scene_bounds()
         except Exception as e:
             print(f"Failed to load VTK {path}: {e}")
 
@@ -436,6 +530,7 @@ class ViewerApp(BaseTk):
             name = self.vtk_listbox.get(i)
             if name in self.vtk_meshes:
                 self.vtk_meshes[name]['visible'] = (i in selected_indices)
+        self._recompute_scene_bounds()
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
 
@@ -448,6 +543,7 @@ class ViewerApp(BaseTk):
             if name in self.vtk_meshes:
                 del self.vtk_meshes[name]
             self.vtk_listbox.delete(i)
+        self._recompute_scene_bounds()
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
 
@@ -459,11 +555,12 @@ class ViewerApp(BaseTk):
                 messagebox.showerror('Invalid data', f'Missing column: {c}')
                 return
             
-        # compute and store initial/global axis limits for reset
+        # compute and store initial/global axis limits (across all timesteps)
         x_min, x_max = self.df['x'].min(), self.df['x'].max()
         y_min, y_max = self.df['y'].min(), self.df['y'].max()
         z_min, z_max = self.df['z'].min(), self.df['z'].max()
         self._init_limits = ((x_min, x_max), (y_min, y_max), (z_min, z_max))
+        self._recompute_scene_bounds()
 
         self.timesteps = sorted(self.df['timestep'].unique())
         self.ts_listbox.delete(0, tk.END)
@@ -474,6 +571,10 @@ class ViewerApp(BaseTk):
         self.frame_slider.set(0)
         if self.timesteps:
             self.show_timestep(self.timesteps[0])
+            # Reset camera once on load/refresh to frame the full scene bounds.
+            # (NOT called on slider/listbox changes so the view stays locked.)
+            self.plotter.reset_camera()
+            self.plotter.render()
 
     def on_ts_select(self, event):
         sel = self.ts_listbox.curselection()
@@ -555,47 +656,8 @@ class ViewerApp(BaseTk):
 
         actors = self.plot_chain_data(subset)
 
-        # ---- Compute equal bounding box ----
-        # Use globally computed particle limits instead of per-frame subsets to freeze axes over time
-        if self._init_limits is not None:
-            xmin, xmax = self._init_limits[0]
-            ymin, ymax = self._init_limits[1]
-            zmin, zmax = self._init_limits[2]
-        else:
-            xmin, xmax, ymin, ymax, zmin, zmax = float('inf'), float('-inf'), float('inf'), float('-inf'), float('inf'), float('-inf')
-
-        # Widen global box to comfortably fit all visible VTK geometries
-        if hasattr(self, 'vtk_meshes'):
-            for mesh_data in self.vtk_meshes.values():
-                if mesh_data['visible']:
-                    try:
-                        bnds = mesh_data['actor'].bounds()
-                        if len(bnds) == 6:
-                            xmin = min(xmin, bnds[0])
-                            xmax = max(xmax, bnds[1])
-                            ymin = min(ymin, bnds[2])
-                            ymax = max(ymax, bnds[3])
-                            zmin = min(zmin, bnds[4])
-                            zmax = max(zmax, bnds[5])
-                    except Exception:
-                        pass
-
-        if xmin == float('inf'):  # Fallback if entirely empty
-            xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
-
-        # center
-        cx = 0.5 * (xmin + xmax)
-        cy = 0.5 * (ymin + ymax)
-        cz = 0.5 * (zmin + zmax)
-
-        # max range → enforce cube
-        max_range = max(xmax - xmin, ymax - ymin, zmax - zmin) / 2.0
-
-        bounds = [
-            cx - max_range, cx + max_range,
-            cy - max_range, cy + max_range,
-            cz - max_range, cz + max_range
-        ]
+        # ---- Use stable cached scene bounds (particles + VTKs, all timesteps) ----
+        bounds = self._scene_bounds if self._scene_bounds is not None else [-1, 1, -1, 1, -1, 1]
 
         axes = Axes(
             xrange=(bounds[0], bounds[1]),
@@ -607,7 +669,7 @@ class ViewerApp(BaseTk):
             c='black'
         )
 
-        # ---- Add everything ----
+        # ---- Add dynamic actors (particles, axes, optional geometry) ----
         self._dynamic_actors.extend(actors)
         self._dynamic_actors.append(axes)
 
@@ -617,6 +679,7 @@ class ViewerApp(BaseTk):
 
         self.plotter.add(*self._dynamic_actors)
 
+        # ---- Sync VTK mesh visibility (these are persistent actors, not dynamic) ----
         if hasattr(self, 'vtk_meshes'):
             for mesh_data in self.vtk_meshes.values():
                 act = mesh_data['actor']
@@ -627,10 +690,8 @@ class ViewerApp(BaseTk):
                     if act in self.plotter.actors:
                         self.plotter.remove(act)
 
-        # ---- Force camera to respect bounds ----
-        self.plotter.reset_camera()
-
-        self.plotter.render()
+        # Re-overlay any active highlights at the new timestep positions
+        self._render_highlights()
 
     def _build_geometry_actors(self, bounds):
         if not self.geometry_data:
@@ -727,6 +788,153 @@ class ViewerApp(BaseTk):
 
         return actors
     
+    # ──────────────────────────────────────────────────────────────
+    # Highlight helpers
+    # ──────────────────────────────────────────────────────────────
+
+    # Colour scheme: one distinct colour per highlight mode
+    _HL_COLORS = {
+        'atom':  'yellow',
+        'bond':  'orange',
+        'angle': 'violet',
+        'chain': 'lime',
+    }
+
+    def _apply_highlight(self):
+        """Read mode + ID from the UI, compute the atom-ID set, render."""
+        if self.df is None or self.current_timestep is None:
+            self.highlight_status.config(text='Load a simulation first.', fg='red')
+            return
+
+        mode   = self.highlight_mode_var.get()
+        id_str = self.highlight_id_var.get().strip()
+        if not id_str:
+            return
+        try:
+            n = int(id_str)
+        except ValueError:
+            self.highlight_status.config(text='Enter an integer ID.', fg='red')
+            return
+
+        subset = self.df[self.df['timestep'] == self.current_timestep]
+
+        if mode == 'atom':
+            ids   = {n}
+            label = f'Atom {n}'
+
+        elif mode == 'bond':
+            try:
+                cs = int(self.chain_size_var.get())
+            except Exception:
+                cs = 4
+            n_bonds = cs - 1          # bonds per chain
+            if n_bonds <= 0:
+                self.highlight_status.config(
+                    text='Chain size must be ≥ 2 to have bonds.', fg='red')
+                return
+            chain_idx     = (n - 1) // n_bonds          # 0-based chain index
+            bond_in_chain = (n - 1) %  n_bonds          # 0-based position within chain
+            chain_first   = chain_idx * cs + 1          # first atom ID of that chain
+            a1 = chain_first + bond_in_chain
+            a2 = chain_first + bond_in_chain + 1
+            ids   = {a1, a2}
+            label = (f'Bond {n}  →  chain {chain_idx + 1}, '
+                     f'atoms {a1} & {a2}')
+
+        elif mode == 'angle':
+            try:
+                cs = int(self.chain_size_var.get())
+            except Exception:
+                cs = 4
+            n_angles = cs - 2         # angles per chain
+            if n_angles <= 0:
+                self.highlight_status.config(
+                    text='Chain size must be ≥ 3 to have angles.', fg='red')
+                return
+            chain_idx      = (n - 1) // n_angles        # 0-based chain index
+            angle_in_chain = (n - 1) %  n_angles        # 0-based position within chain
+            chain_first    = chain_idx * cs + 1         # first atom ID of that chain
+            a1 = chain_first + angle_in_chain
+            a2 = chain_first + angle_in_chain + 1
+            a3 = chain_first + angle_in_chain + 2
+            ids   = {a1, a2, a3}
+            label = (f'Angle {n}  →  chain {chain_idx + 1}, '
+                     f'atoms {a1}, {a2}, {a3}')
+
+        elif mode == 'chain':
+            if 'mol' in subset.columns:
+                ids = set(subset[subset['mol'] == n]['id'].values.tolist())
+            else:
+                try:
+                    cs = int(self.chain_size_var.get())
+                except Exception:
+                    cs = 4
+                start = (n - 1) * cs + 1
+                ids   = set(range(start, start + cs))
+            label = f'Chain {n}  ({len(ids)} atoms)'
+
+        else:
+            return
+
+        self._highlighted_ids  = ids
+        self._highlight_color  = self._HL_COLORS.get(mode, 'yellow')
+
+        found = ids & set(subset['id'].values)
+        if not found:
+            self.highlight_status.config(
+                text=f'{label}  —  no atoms found in this frame', fg='red')
+        else:
+            self.highlight_status.config(text=label, fg='black')
+
+        self._render_highlights()
+
+    def _clear_highlight(self):
+        """Remove all highlights and reset state."""
+        self._highlighted_ids = set()
+        self._highlight_color = 'yellow'
+        for act in self._highlight_actors:
+            try:
+                self.plotter.remove(act)
+            except Exception:
+                pass
+        self._highlight_actors = []
+        self.highlight_status.config(text='—', fg='gray')
+        self.plotter.render()
+
+    def _render_highlights(self):
+        """(Re-)draw highlighted atoms as oversized spheres, then render.
+
+        Called from show_timestep() on every frame change so positions
+        update automatically as you scrub through timesteps.
+        """
+        # Remove previous highlight actors
+        for act in self._highlight_actors:
+            try:
+                self.plotter.remove(act)
+            except Exception:
+                pass
+        self._highlight_actors = []
+
+        if not self._highlighted_ids or self.df is None or self.current_timestep is None:
+            self.plotter.render()
+            return
+
+        subset = self.df[self.df['timestep'] == self.current_timestep]
+        hi = subset[subset['id'].isin(self._highlighted_ids)]
+
+        if hi.empty:
+            self.plotter.render()
+            return
+
+        pts = hi[['x', 'y', 'z']].values
+        # 30 % larger radius so highlights visually overlay the base spheres
+        r   = (hi['diameter'].values / 2.0) * 1.30
+
+        actor = Spheres(pts, r=r, c=self._highlight_color, alpha=0.95)
+        self._highlight_actors = [actor]
+        self.plotter.add(*self._highlight_actors)
+        self.plotter.render()
+
     def _cleanup(self):
         """Cleanup resources before exiting."""
         try:
