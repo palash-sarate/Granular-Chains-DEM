@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 from vedo import Plotter, Spheres, Lines, Axes, Box, Cylinder, Cone, Plane, Mesh
 from analysis.utilities import validate_chain_spacing
+from analysis.ts_windows import (BondPlotWindow, AnglePlotWindow, AtomPlotWindow,
+                                   parse_range_spec)
 from analysis.data_manager import SimulationData, parse_simple_data_file, load_lammps_geometry
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
@@ -19,6 +21,296 @@ try:
 except Exception:
     BaseTk = tk.Tk
     DND_AVAILABLE = False
+
+class SimDataController:
+    """Manages loading, parsing, and caching of simulation data."""
+    def __init__(self):
+        self.df: Optional[pd.DataFrame] = None
+        self.df_mi: Optional[pd.DataFrame] = None
+        self.current_sim_folder: Optional[str] = None
+        self.geometry_data: Optional[dict] = None
+        self.geometry_script_path: Optional[str] = None
+        self.timesteps: list = []
+        self._init_limits: Optional[tuple] = None
+        self.on_data_loaded_cb = None
+
+    def load_folder(self, folder: str, force_reload: bool = False):
+        try:
+            sim = SimulationData(folder)
+            df = sim.load_data(force_reload=force_reload)
+            if df.empty:
+                return False, "No dump files found or parsing failed."
+            
+            if isinstance(df.index, pd.MultiIndex):
+                df = df.reset_index()
+            
+            self.current_sim_folder = folder
+            self.geometry_data, self.geometry_script_path = load_lammps_geometry(folder)
+            self.load_dataframe(df)
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
+    def load_dump_files(self, files: list):
+        frames = []
+        for f in files:
+            try:
+                frame = self._parse_single_dump(f)
+                if frame is not None:
+                    frames.append(frame)
+            except Exception as e:
+                print(f"Failed to parse {f}: {e}")
+        
+        if not frames:
+            return False, "No valid dump frames parsed."
+        
+        full = pd.concat(frames).reset_index()
+        self.current_sim_folder = None
+        self.geometry_data = None
+        self.geometry_script_path = None
+        self.load_dataframe(full)
+        return True, None
+
+    def load_data_file(self, path: str):
+        try:
+            df = parse_simple_data_file(path)
+            if df.empty:
+                return False, "Could not parse the selected data file"
+            df = df.reset_index()
+            self.current_sim_folder = None
+            self.geometry_data = None
+            self.geometry_script_path = None
+            self.load_dataframe(df)
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
+    def load_dataframe(self, df: pd.DataFrame):
+        self.df = df.copy()
+        for c in ['x', 'y', 'z', 'id', 'timestep']:
+            if c not in self.df.columns:
+                raise ValueError(f"Missing column: {c}")
+
+        x_min, x_max = self.df['x'].min(), self.df['x'].max()
+        y_min, y_max = self.df['y'].min(), self.df['y'].max()
+        z_min, z_max = self.df['z'].min(), self.df['z'].max()
+        self._init_limits = ((x_min, x_max), (y_min, y_max), (z_min, z_max))
+
+        try:
+            self.df_mi = self.df.set_index(['timestep', 'id']).sort_index()
+        except Exception:
+            self.df_mi = None
+
+        self.timesteps = sorted(self.df['timestep'].unique())
+        if self.on_data_loaded_cb:
+            self.on_data_loaded_cb()
+
+    def _parse_single_dump(self, f: str):
+        try:
+            with open(f, 'r') as fh:
+                lines = fh.readlines()
+            timestep = 0
+            for i, line in enumerate(lines):
+                if 'ITEM: TIMESTEP' in line:
+                    timestep = int(lines[i+1])
+                if 'ITEM: ATOMS' in line:
+                    cols = line.split()[2:]
+                    df = pd.read_csv(f, skiprows=i+1, names=cols, sep=r'\s+', engine='python')
+                    df['timestep'] = timestep
+                    return df.set_index(['timestep', 'id'])
+        except Exception:
+            return None
+        return None
+
+    def _normalize_dropped_path(self, p: str) -> str:
+        p = (p or "").strip()
+        if p.startswith("{") and p.endswith("}"):
+            p = p[1:-1]
+        try:
+            return os.path.normpath(p)
+        except Exception:
+            return p
+
+    def _resolve_sim_root(self, dropped_dir: str) -> Optional[str]:
+        d = self._normalize_dropped_path(dropped_dir)
+        if not d or not os.path.isdir(d):
+            return None
+        if os.path.isdir(os.path.join(d, "chain")):
+            return d
+        if os.path.basename(d).lower() == "chain":
+            parent = os.path.dirname(d)
+            if parent and os.path.isdir(os.path.join(parent, "chain")):
+                return parent
+        return None
+
+
+class VtkOverlayController:
+    """Manages VTK mesh loading, visibility, and scene bounds."""
+    def __init__(self, plotter):
+        self.plotter = plotter
+        self.vtk_meshes: dict = {}
+        self.vtk_color_idx: int = 0
+        self._scene_bounds: Optional[list] = None
+
+    def add_mesh(self, path: str):
+        name = os.path.basename(path)
+        if name in self.vtk_meshes:
+            return False, "Already loaded"
+        try:
+            import vedo
+            obj = vedo.load(path)
+            mesh = obj.tomesh() if hasattr(obj, "tomesh") else obj
+            colors = ['red', 'green', 'blue', 'gold', 'cyan', 'magenta', 'orange', 'purple', 'lime', 'pink']
+            color = colors[self.vtk_color_idx % len(colors)]
+            self.vtk_color_idx += 1
+            mesh.c(color).alpha(0.8)
+            self.vtk_meshes[name] = {
+                'path': path, 'actor': mesh, 'visible': True, 'color': color
+            }
+            self.plotter.add(mesh)
+            mesh.on()
+            return True, name
+        except Exception as e:
+            return False, str(e)
+
+    def set_visibility(self, name: str, visible: bool):
+        if name in self.vtk_meshes:
+            self.vtk_meshes[name]['visible'] = visible
+            self.sync_visibility()
+
+    def sync_visibility(self):
+        for mesh_data in self.vtk_meshes.values():
+            act = mesh_data['actor']
+            if mesh_data['visible']:
+                act.on()
+            else:
+                act.off()
+
+    def remove_meshes(self, names: list):
+        for name in names:
+            if name in self.vtk_meshes:
+                act = self.vtk_meshes[name]['actor']
+                try:
+                    self.plotter.remove(act)
+                except Exception: pass
+                del self.vtk_meshes[name]
+
+    def clear(self):
+        for mesh_data in self.vtk_meshes.values():
+            if mesh_data['actor'] in self.plotter.actors:
+                self.plotter.remove(mesh_data['actor'])
+        self.vtk_meshes.clear()
+        self.vtk_color_idx = 0
+        self._scene_bounds = None
+
+    def recompute_bounds(self, init_limits: Optional[tuple]):
+        if init_limits is not None:
+            xmin, xmax = init_limits[0]
+            ymin, ymax = init_limits[1]
+            zmin, zmax = init_limits[2]
+        else:
+            xmin, xmax = float('inf'), float('-inf')
+            ymin, ymax = float('inf'), float('-inf')
+            zmin, zmax = float('inf'), float('-inf')
+
+        for mesh_data in self.vtk_meshes.values():
+            if mesh_data['visible']:
+                try:
+                    bnds = mesh_data['actor'].bounds()
+                    if len(bnds) == 6:
+                        xmin = min(xmin, bnds[0]); xmax = max(xmax, bnds[1])
+                        ymin = min(ymin, bnds[2]); ymax = max(ymax, bnds[3])
+                        zmin = min(zmin, bnds[4]); zmax = max(zmax, bnds[5])
+                except Exception: pass
+
+        if xmin == float('inf'):
+            xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
+
+        cx, cy, cz = 0.5*(xmin+xmax), 0.5*(ymin+ymax), 0.5*(zmin+zmax)
+        max_range = max(xmax-xmin, ymax-ymin, zmax-zmin, 1e-6) / 2.0
+        self._scene_bounds = [cx-max_range, cx+max_range, cy-max_range, cy+max_range, cz-max_range, cz+max_range]
+        return self._scene_bounds
+
+
+class HighlightController:
+    """Manages highlight state and rendering of highlighted atoms."""
+    _HL_COLORS = {'atom': 'yellow', 'bond': 'orange', 'angle': 'violet', 'chain': 'lime'}
+    
+    def __init__(self, plotter, get_data_cb, get_cs_cb):
+        self.plotter = plotter
+        self.get_data_cb = get_data_cb
+        self.get_cs_cb = get_cs_cb
+        self._highlighted_ids: set = set()
+        self._highlight_color: str = 'yellow'
+        self._highlight_actors: list = []
+
+    def clear(self):
+        self._highlighted_ids = set()
+        for act in self._highlight_actors:
+            try: self.plotter.remove(act)
+            except Exception: pass
+        self._highlight_actors = []
+
+    def apply(self, mode: str, n: int):
+        df, ts = self.get_data_cb()
+        if df is None or ts is None:
+            return False, "Data not available"
+        
+        subset = df[df['timestep'] == ts]
+        cs = self.get_cs_cb()
+        
+        if mode == 'atom':
+            ids, label = {n}, f'Atom {n}'
+        elif mode == 'bond':
+            nb = cs - 1
+            if nb <= 0: return False, "Chain size must be ≥ 2"
+            ci, binc = (n-1)//nb, (n-1)%nb
+            cf = ci * cs + 1
+            a1, a2 = cf + binc, cf + binc + 1
+            ids, label = {a1, a2}, f'Bond {n} (atoms {a1}, {a2})'
+        elif mode == 'angle':
+            na = cs - 2
+            if na <= 0: return False, "Chain size must be ≥ 3"
+            ci, ainc = (n-1)//na, (n-1)%na
+            cf = ci * cs + 1
+            a1, a2, a3 = cf + ainc, cf + ainc + 1, cf + ainc + 2
+            ids, label = {a1, a2, a3}, f'Angle {n} (atoms {a1}, {a2}, {a3})'
+        elif mode == 'chain':
+            if 'mol' in subset.columns:
+                ids = set(subset[subset['mol'] == n]['id'].values.tolist())
+            else:
+                start = (n-1)*cs + 1
+                ids = set(range(start, start + cs))
+            label = f'Chain {n} ({len(ids)} atoms)'
+        else: return False, "Unknown mode"
+
+        self._highlighted_ids = ids
+        self._highlight_color = self._HL_COLORS.get(mode, 'yellow')
+        found = ids & set(subset['id'].values)
+        if not found:
+            return False, f'{label} - no atoms in frame'
+        
+        self.render(df, ts)
+        return True, label
+
+    def render(self, df, ts):
+        for act in self._highlight_actors:
+            try: self.plotter.remove(act)
+            except Exception: pass
+        self._highlight_actors = []
+
+        if not self._highlighted_ids or df is None or ts is None:
+            return
+        
+        subset = df[df['timestep'] == ts]
+        hi = subset[subset['id'].isin(self._highlighted_ids)]
+        if hi.empty: return
+
+        pts = hi[['x', 'y', 'z']].values
+        r = (hi['diameter'].values / 2.0) * 1.30
+        actor = Spheres(pts, r=r, c=self._highlight_color, alpha=0.95)
+        self._highlight_actors = [actor]
+        self.plotter.add(actor)
 
 class ViewerApp(BaseTk):
     def __init__(self):
@@ -134,38 +426,75 @@ class ViewerApp(BaseTk):
                                          wraplength=160, justify='left')
         self.highlight_status.pack(anchor='w', pady=(4, 0))
 
+        # ── Time Series section ───────────────────────────────────
+        tk.Label(col2, text='──── Time Series ────', fg='gray').pack(fill=tk.X, pady=(12, 2))
+        tk.Button(col2, text='Bond Distances…',
+                  command=self._open_bond_win).pack(fill=tk.X)
+        tk.Button(col2, text='Angle Values…',
+                  command=self._open_angle_win).pack(fill=tk.X, pady=(4, 0))
+        tk.Button(col2, text='Atom Properties…',
+                  command=self._open_atom_win).pack(fill=tk.X, pady=(4, 0))
+
         self.plotter = Plotter(
             bg='white',
             interactive=True
         )
 
+        # Controllers
+        self.data_ctrl = SimDataController()
+        self.data_ctrl.on_data_loaded_cb = self._on_data_loaded
+        self.vtk_ctrl = VtkOverlayController(self.plotter)
+        self.hl_ctrl = HighlightController(self.plotter, self._get_current_rendering_data, self._get_chain_size)
+
         # Size-to-content and center on screen after widgets are laid out
         self._autosize_and_center()
 
         # Data holders
-        self.df = None
         self._dynamic_actors = []
-        self.vtk_meshes = {}
-        self.vtk_color_idx = 0
-        self._scene_bounds = None  # persistent bounds: particles + vtk geometries
-        self.timesteps = []
         self.current_timestep = None
-        self.current_sim_folder = None
-        self.geometry_data = None
-        self.geometry_script_path = None
         # Store initial axis limits and default view angles
-        self._init_limits = None
         self._default_view = (30, -60)
         try:
             self.ax.view_init(elev=self._default_view[0], azim=self._default_view[1])
         except Exception:
             pass
 
-        # Highlight state (populated by _apply_highlight)
-        self._highlighted_ids: set = set()
-        self._highlight_color: str = 'yellow'
-        self._highlight_actors: list = []
+        # Time-series window references (None when closed)
+        self._bond_win  = None
+        self._angle_win = None
+        self._atom_win  = None
+        # Saved range strings — restored when windows are reopened
+        self._bond_range_spec  = ''
+        self._angle_range_spec = ''
+        self._atom_range_spec  = ''
 
+    def _get_current_rendering_data(self):
+        return self.data_ctrl.df, self.current_timestep
+
+    def _get_chain_size(self):
+        try: return int(self.chain_size_var.get())
+        except: return 4
+
+    def _on_data_loaded(self):
+        # Notify any open time-series windows of new data
+        for _attr in ('_bond_win', '_angle_win', '_atom_win'):
+            _w = getattr(self, _attr, None)
+            if _w is not None:
+                try:
+                    if _w.winfo_exists():
+                        _w.refresh_df(self.data_ctrl.df_mi)
+                except Exception: pass
+
+        self.ts_listbox.delete(0, tk.END)
+        for t in self.data_ctrl.timesteps:
+            self.ts_listbox.insert(tk.END, str(t))
+
+        self.frame_slider.config(from_=0, to=max(0, len(self.data_ctrl.timesteps)-1))
+        self.frame_slider.set(0)
+        if self.data_ctrl.timesteps:
+            self.show_timestep(self.data_ctrl.timesteps[0])
+            self.plotter.reset_camera()
+            self.plotter.render()
     def _autosize_and_center(self) -> None:
         # Ensure geometry requests are computed
         try:
@@ -200,121 +529,45 @@ class ViewerApp(BaseTk):
             return
         self._load_simulation_folder(folder)
 
-    def _load_simulation_folder(self, folder: str) -> None:
-        """Load a simulation folder using SimulationData (expects folder/chain/*.dump)."""
-        if self.current_sim_folder is not None:
-            if os.path.normpath(self.current_sim_folder) != os.path.normpath(folder):
+    def _load_simulation_folder(self, folder: str, force_reload: bool = False) -> None:
+        """Load a simulation folder."""
+        if self.data_ctrl.current_sim_folder is not None:
+            if os.path.normpath(self.data_ctrl.current_sim_folder) != os.path.normpath(folder):
                 self.clear_vtk_meshes()
         
         prev_ts = self.current_timestep
-        try:
-            sim = SimulationData(folder)
-            df = sim.load_data(force_reload=True)
-            if df.empty:
-                messagebox.showerror('No data', 'No dump files found or parsing failed in selected folder')
-                return
-            # convert MultiIndex to columns for easier handling
-            if isinstance(df.index, pd.MultiIndex):
-                df = df.reset_index()
-            self.load_dataframe(df)
-            self.current_sim_folder = folder
-            self.geometry_data, self.geometry_script_path = load_lammps_geometry(folder)
-            try:
-                self.refresh_button.config(state=tk.NORMAL)
-            except Exception:
-                pass
+        ok, err = self.data_ctrl.load_folder(folder, force_reload=force_reload)
+        if not ok:
+            messagebox.showerror('Error', f'Failed to load dumps: {err}')
+            return
 
-            # Try to keep the same timestep selected after refresh/reload
-            if prev_ts is not None and prev_ts in self.timesteps:
-                try:
-                    idx = self.timesteps.index(prev_ts)
-                    self.frame_slider.set(idx)
-                    self.ts_listbox.selection_clear(0, tk.END)
-                    self.ts_listbox.selection_set(idx)
-                    self.ts_listbox.activate(idx)
-                    self.show_timestep(prev_ts)
-                except Exception:
-                    pass
-        except Exception as e:
-            messagebox.showerror('Error', f'Failed to load dumps: {e}')
+        try: self.refresh_button.config(state=tk.NORMAL)
+        except: pass
+
+        if prev_ts is not None and prev_ts in self.data_ctrl.timesteps:
+            try:
+                idx = self.data_ctrl.timesteps.index(prev_ts)
+                self.frame_slider.set(idx)
+                self.ts_listbox.selection_clear(0, tk.END)
+                self.ts_listbox.selection_set(idx)
+                self.ts_listbox.activate(idx)
+                self.show_timestep(prev_ts)
+            except Exception: pass
 
     def refresh_current_source(self) -> None:
         """Reload the last opened/dropped simulation folder from disk."""
-        if not self.current_sim_folder:
-            messagebox.showinfo('Refresh', 'No simulation folder loaded yet. Use Open Dump Folder or drop a folder first.')
+        if not self.data_ctrl.current_sim_folder:
+            messagebox.showinfo('Refresh', 'No simulation folder loaded yet.')
             return
-        self._load_simulation_folder(self.current_sim_folder)
+        self._load_simulation_folder(self.data_ctrl.current_sim_folder, force_reload=True)
 
-    def _normalize_dropped_path(self, p: str) -> str:
-        p = (p or "").strip()
-        if p.startswith("{") and p.endswith("}"):
-            p = p[1:-1]
-        # Keep OS-native separators for filesystem checks
-        try:
-            return os.path.normpath(p)
-        except Exception:
-            return p
-
-    def _resolve_sim_root_from_drop_dir(self, dropped_dir: str) -> Optional[str]:
-        """Given a dropped directory, resolve the simulation root directory.
-
-        Accepts either:
-        - the simulation root (contains chain/)
-        - the chain/ directory itself (parent is the simulation root)
-        """
-        d = self._normalize_dropped_path(dropped_dir)
-        if not d or not os.path.isdir(d):
-            return None
-
-        chain_dir = os.path.join(d, "chain")
-        if os.path.isdir(chain_dir):
-            return d
-
-        base = os.path.basename(d).lower()
-        if base == "chain":
-            parent = os.path.dirname(d)
-            if parent and os.path.isdir(os.path.join(parent, "chain")):
-                return parent
-
-        return None
 
     def open_dump_files(self):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files','*.dump'),('All','*.*')])
-        if not files:
-            return
+        if not files: return
         self.clear_vtk_meshes()
-        self.current_sim_folder = None
-        # Create a temporary in-memory concatenated DataFrame
-        frames = []
-        for f in files:
-            try:
-                # Use SimulationData parsing helper by emulating a chain folder
-                # Here we reuse the private parser by instantiating SimulationData pointing to a temp dir is complex,
-                # so parse single dump by reading ITEM: TIMESTEP and ATOMS sections
-                with open(f, 'r') as fh:
-                    lines = fh.readlines()
-                timestep = 0
-                for i, line in enumerate(lines):
-                    if 'ITEM: TIMESTEP' in line:
-                        timestep = int(lines[i+1])
-                    if 'ITEM: ATOMS' in line:
-                        cols = line.split()[2:]
-                        df = pd.read_csv(f, skiprows=i+1, names=cols, sep=r'\s+', engine='python')
-                        df['timestep'] = timestep
-                        frames.append(df)
-                        break
-            except Exception as e:
-                print(f'Failed to parse {f}: {e}')
-
-        if not frames:
-            messagebox.showerror('Error', 'No valid dump frames parsed')
-            return
-        full = pd.concat(frames)
-        full.set_index(['timestep','id'], inplace=True)
-        full = full.reset_index()
-        self.load_dataframe(full)
-        self.geometry_data = None
-        self.geometry_script_path = None
+        ok, err = self.data_ctrl.load_dump_files(files)
+        if not ok: messagebox.showerror('Error', err)
 
     def on_drop(self, event):
         # event.data may be a list-like string; use tk splitlist for safety
@@ -326,7 +579,7 @@ class ViewerApp(BaseTk):
             files = [p.strip('{}') for p in raw.split()]
 
         # Normalize paths
-        files = [self._normalize_dropped_path(f) for f in files]
+        files = [self.data_ctrl._normalize_dropped_path(f) for f in files]
         self.handle_dropped_files(files)
 
     def handle_dropped_files(self, files):
@@ -340,9 +593,8 @@ class ViewerApp(BaseTk):
 
         p = files[0]
 
-        # Dropped directory: treat as simulation folder (root or chain/)
         if os.path.isdir(p):
-            sim_root = self._resolve_sim_root_from_drop_dir(p)
+            sim_root = self.data_ctrl._resolve_sim_root(p)
             if sim_root is None:
                 vtk_files = []
                 for root, _, fs in os.walk(p):
@@ -350,266 +602,94 @@ class ViewerApp(BaseTk):
                         if f.lower().endswith('.vtk'):
                             vtk_files.append(os.path.join(root, f))
                 if vtk_files:
-                    for f in vtk_files:
-                        self._add_vtk_mesh(f)
-                    if self.current_timestep is not None:
-                        self.show_timestep(self.current_timestep)
+                    for f in vtk_files: self._add_vtk_mesh(f)
+                    if self.current_timestep is not None: self.show_timestep(self.current_timestep)
                     return
-                messagebox.showerror(
-                    'Invalid folder',
-                    'Dropped folder must be the simulation run folder containing a chain/ subfolder, '
-                    'or contain .vtk files.'
-                )
+                messagebox.showerror('Invalid folder','Dropped folder must contain a chain/ subfolder or .vtk files.')
                 return
             self._load_simulation_folder(sim_root)
             return
 
-        # If single .data file -> open as data file
         if p.lower().endswith('.data'):
-            try:
-                df = parse_simple_data_file(p)
-                if df.empty:
-                    messagebox.showerror('Parse failed', 'Could not parse the dropped data file')
-                    return
-                df = df.reset_index()
-                self.load_dataframe(df)
-                self.geometry_data = None
-                self.geometry_script_path = None
-            except Exception as e:
-                messagebox.showerror('Error', f'Failed to load data file: {e}')
+            ok, err = self.data_ctrl.load_data_file(p)
+            if not ok: messagebox.showerror('Error', err)
+            return
             return
 
         vtk_files = [f for f in files if f.lower().endswith('.vtk')]
         if vtk_files:
-            for f in vtk_files:
-                self._add_vtk_mesh(f)
+            for f in vtk_files: self._add_vtk_mesh(f)
             files = [f for f in files if not f.lower().endswith('.vtk')]
             if len(files) == 0:
-                if self.current_timestep is not None:
-                    self.show_timestep(self.current_timestep)
+                if self.current_timestep is not None: self.show_timestep(self.current_timestep)
                 return
         else:
-            # If we are loading only fresh dumps, clear VTK context manually to mimic opening files
             self.clear_vtk_meshes()
-            self.current_sim_folder = None
 
-        # Otherwise treat as dump files (one or many)
-        frames = []
-        for f in files:
-            try:
-                with open(f, 'r') as fh:
-                    lines = fh.readlines()
-                timestep = 0
-                for i, line in enumerate(lines):
-                    if 'ITEM: TIMESTEP' in line:
-                        timestep = int(lines[i+1])
-                    if 'ITEM: ATOMS' in line:
-                        cols = line.split()[2:]
-                        df = pd.read_csv(f, skiprows=i+1, names=cols, sep=r'\s+', engine='python')
-                        df['timestep'] = timestep
-                        frames.append(df)
-                        break
-            except Exception as e:
-                print(f'Failed to parse dropped file {f}: {e}')
-
-        if not frames:
-            messagebox.showerror('Error', 'No valid dump frames parsed from dropped files')
-            return
-        full = pd.concat(frames)
-        full.set_index(['timestep','id'], inplace=True)
-        full = full.reset_index()
-        self.load_dataframe(full)
-        self.geometry_data = None
-        self.geometry_script_path = None
+        if files:
+            ok, err = self.data_ctrl.load_dump_files(files)
+            if not ok: messagebox.showerror('Error', err)
 
     def open_data_file(self):
         path = filedialog.askopenfilename(title='Select LAMMPS data file', filetypes=[('Data files','*.data'),('All','*.*')])
-        if not path:
-            return
+        if not path: return
         self.clear_vtk_meshes()
-        self.current_sim_folder = None
-        df = parse_simple_data_file(path)
-        if df.empty:
-            messagebox.showerror('Parse failed', 'Could not parse the selected data file')
-            return
-        # reset index to columns
-        df = df.reset_index()
-        self.load_dataframe(df)
-        self.geometry_data = None
-        self.geometry_script_path = None
+        ok, err = self.data_ctrl.load_data_file(path)
+        if not ok: messagebox.showerror('Error', err)
 
-    def _recompute_scene_bounds(self):
-        """Recompute and cache the stable scene bounding box (particles + visible VTKs)."""
-        if self._init_limits is not None:
-            xmin, xmax = self._init_limits[0]
-            ymin, ymax = self._init_limits[1]
-            zmin, zmax = self._init_limits[2]
-        else:
-            xmin, xmax = float('inf'), float('-inf')
-            ymin, ymax = float('inf'), float('-inf')
-            zmin, zmax = float('inf'), float('-inf')
-
-        for mesh_data in self.vtk_meshes.values():
-            if mesh_data['visible']:
-                try:
-                    bnds = mesh_data['actor'].bounds()
-                    if len(bnds) == 6:
-                        xmin = min(xmin, bnds[0]); xmax = max(xmax, bnds[1])
-                        ymin = min(ymin, bnds[2]); ymax = max(ymax, bnds[3])
-                        zmin = min(zmin, bnds[4]); zmax = max(zmax, bnds[5])
-                except Exception:
-                    pass
-
-        if xmin == float('inf'):
-            xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
-
-        cx = 0.5 * (xmin + xmax)
-        cy = 0.5 * (ymin + ymax)
-        cz = 0.5 * (zmin + zmax)
-        max_range = max(xmax - xmin, ymax - ymin, zmax - zmin, 1e-6) / 2.0
-
-        self._scene_bounds = [
-            cx - max_range, cx + max_range,
-            cy - max_range, cy + max_range,
-            cz - max_range, cz + max_range
-        ]
 
     def clear_vtk_meshes(self):
-        # Remove them from the plotter first
-        if hasattr(self, 'vtk_meshes'):
-            for mesh_data in self.vtk_meshes.values():
-                if mesh_data['actor'] in self.plotter.actors:
-                    self.plotter.remove(mesh_data['actor'])
-        self.vtk_meshes.clear()
+        self.vtk_ctrl.clear()
         if hasattr(self, 'vtk_listbox'):
             self.vtk_listbox.delete(0, tk.END)
-        self.vtk_color_idx = 0
-        self._recompute_scene_bounds()
 
     def open_vtk_files(self):
         files = filedialog.askopenfilenames(title='Select VTK files', filetypes=[('VTK files', '*.vtk'), ('All', '*.*')])
-        if not files:
-            return
-        for f in files:
-            self._add_vtk_mesh(f)
+        if not files: return
+        for f in files: self._add_vtk_mesh(f)
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
             self.plotter.reset_camera()
             self.plotter.render()
 
     def _add_vtk_mesh(self, path):
-        name = os.path.basename(path)
-        if name in self.vtk_meshes:
-            return  # already loaded
-        try:
-            import vedo
-            obj = vedo.load(path)
-            mesh = obj.tomesh() if hasattr(obj, "tomesh") else obj
-
-            colors = ['red', 'green', 'blue', 'gold', 'cyan', 'magenta', 'orange', 'purple', 'lime', 'pink']
-            color = colors[self.vtk_color_idx % len(colors)]
-            self.vtk_color_idx += 1
-            mesh.c(color).alpha(0.8)
-            self.vtk_meshes[name] = {
-                'path': path,
-                'actor': mesh,
-                'visible': True,
-                'color': color
-            }
-            # Add actor to the plotter once at load time.
-            # Visibility is toggled thereafter via on()/off() — never add/remove again.
-            self.plotter.add(mesh)
-            mesh.on()
-            if hasattr(self, 'vtk_listbox'):
-                self.vtk_listbox.insert(tk.END, name)
-                idx = self.vtk_listbox.size() - 1
-                self.vtk_listbox.selection_set(idx)
-            self._recompute_scene_bounds()
-        except Exception as e:
-            print(f"Failed to load VTK {path}: {e}")
+        ok, res = self.vtk_ctrl.add_mesh(path)
+        if ok and hasattr(self, 'vtk_listbox'):
+            self.vtk_listbox.insert(tk.END, res)
+            self.vtk_listbox.selection_set(self.vtk_listbox.size() - 1)
+        elif not ok: print(f"Failed to load VTK {path}: {res}")
 
     def on_vtk_select(self, event):
         if not hasattr(self, 'vtk_listbox'): return
-        selected_indices = self.vtk_listbox.curselection()
+        sel = self.vtk_listbox.curselection()
         for i in range(self.vtk_listbox.size()):
-            name = self.vtk_listbox.get(i)
-            if name in self.vtk_meshes:
-                self.vtk_meshes[name]['visible'] = (i in selected_indices)
-        self._recompute_scene_bounds()
-        self._sync_vtk_visibility()
-        if self.current_timestep is not None:
-            # Rebuild axes to reflect updated bounds, but preserve camera position
-            self.show_timestep(self.current_timestep)
-        else:
-            self.plotter.render()
+            self.vtk_ctrl.set_visibility(self.vtk_listbox.get(i), i in sel)
+        if self.current_timestep is not None: self.show_timestep(self.current_timestep)
+        else: self.plotter.render()
 
     def delete_selected_vtks(self):
         if not hasattr(self, 'vtk_listbox'): return
-        selected_indices = self.vtk_listbox.curselection()
-        if not selected_indices: return
-        for i in reversed(selected_indices):
-            name = self.vtk_listbox.get(i)
-            if name in self.vtk_meshes:
-                # Explicitly remove from plotter BEFORE deleting from dict —
-                # show_timestep only iterates vtk_meshes so it would never
-                # clean up an already-deleted entry.
-                act = self.vtk_meshes[name]['actor']
-                try:
-                    self.plotter.remove(act)
-                except Exception:
-                    pass
-                del self.vtk_meshes[name]
-            self.vtk_listbox.delete(i)
-        self._recompute_scene_bounds()
-        if self.current_timestep is not None:
-            self.show_timestep(self.current_timestep)
-        else:
-            self.plotter.render()
+        sel = self.vtk_listbox.curselection()
+        if not sel: return
+        names = [self.vtk_listbox.get(i) for i in sel]
+        self.vtk_ctrl.remove_meshes(names)
+        for i in reversed(sel): self.vtk_listbox.delete(i)
+        if self.current_timestep is not None: self.show_timestep(self.current_timestep)
+        else: self.plotter.render()
 
-    def load_dataframe(self, df: pd.DataFrame):
-        self.df = df.copy()
-        # ensure columns present
-        for c in ['x','y','z','id','timestep']:
-            if c not in self.df.columns:
-                messagebox.showerror('Invalid data', f'Missing column: {c}')
-                return
-            
-        # compute and store initial/global axis limits (across all timesteps)
-        x_min, x_max = self.df['x'].min(), self.df['x'].max()
-        y_min, y_max = self.df['y'].min(), self.df['y'].max()
-        z_min, z_max = self.df['z'].min(), self.df['z'].max()
-        self._init_limits = ((x_min, x_max), (y_min, y_max), (z_min, z_max))
-        self._recompute_scene_bounds()
-
-        self.timesteps = sorted(self.df['timestep'].unique())
-        self.ts_listbox.delete(0, tk.END)
-        for t in self.timesteps:
-            self.ts_listbox.insert(tk.END, str(t))
-
-        self.frame_slider.config(from_=0, to=max(0, len(self.timesteps)-1))
-        self.frame_slider.set(0)
-        if self.timesteps:
-            self.show_timestep(self.timesteps[0])
-            # Reset camera once on load/refresh to frame the full scene bounds.
-            # (NOT called on slider/listbox changes so the view stays locked.)
-            self.plotter.reset_camera()
-            self.plotter.render()
 
     def on_ts_select(self, event):
         sel = self.ts_listbox.curselection()
-        if not sel:
-            return
+        if not sel: return
         idx = sel[0]
-        t = self.timesteps[idx]
+        t = self.data_ctrl.timesteps[idx]
         self.frame_slider.set(idx)
         self.show_timestep(t)
 
     def on_slider(self, val):
         idx = int(float(val))
-        if idx < 0 or idx >= len(self.timesteps):
-            return
-        t = self.timesteps[idx]
-        # update listbox selection without triggering event
+        if idx < 0 or idx >= len(self.data_ctrl.timesteps): return
+        t = self.data_ctrl.timesteps[idx]
         self.ts_listbox.selection_clear(0, tk.END)
         self.ts_listbox.selection_set(idx)
         self.ts_listbox.activate(idx)
@@ -655,79 +735,34 @@ class ViewerApp(BaseTk):
         # multiple chains/groups
         for key, grp in subset.groupby(group_col):
             pts = grp.sort_values('id')
-            xs = pts['x'].values
-            ys = pts['y'].values
-            zs = pts['z'].values
-            if xs.size > 1:
-                self.ax.plot(xs, ys, zs, linewidth=0.8, alpha=0.8)
-
     def show_timestep(self, timestep):
-        if self.df is None:
-            return
-
-        subset = self.df[self.df['timestep'] == timestep]
+        if self.data_ctrl.df is None: return
+        subset = self.data_ctrl.df[self.data_ctrl.df['timestep'] == timestep]
         self.current_timestep = timestep
 
-        if getattr(self, '_dynamic_actors', None) is not None:
-            for act in self._dynamic_actors:
-                self.plotter.remove(act)
+        for act in self._dynamic_actors: self.plotter.remove(act)
         self._dynamic_actors = []
 
         actors = self.plot_chain_data(subset)
+        bounds = self.vtk_ctrl.recompute_bounds(self.data_ctrl._init_limits)
+        axes = Axes(xrange=(bounds[0], bounds[1]), yrange=(bounds[2], bounds[3]), zrange=(bounds[4], bounds[5]),
+                    xtitle='X', ytitle='Y', ztitle='Z', c='black')
 
-        # ---- Use stable cached scene bounds (particles + VTKs, all timesteps) ----
-        bounds = self._scene_bounds if self._scene_bounds is not None else [-1, 1, -1, 1, -1, 1]
-
-        axes = Axes(
-            xrange=(bounds[0], bounds[1]),
-            yrange=(bounds[2], bounds[3]),
-            zrange=(bounds[4], bounds[5]),
-            xtitle='X',
-            ytitle='Y',
-            ztitle='Z',
-            c='black'
-        )
-
-        # ---- Add dynamic actors (particles, axes, optional geometry) ----
         self._dynamic_actors.extend(actors)
         self._dynamic_actors.append(axes)
 
-        if getattr(self, 'show_geometry_var', None) and self.show_geometry_var.get():
-            geom_actors = self._build_geometry_actors(bounds)
-            self._dynamic_actors.extend(geom_actors)
+        if self.show_geometry_var.get():
+            self._dynamic_actors.extend(self._build_geometry_actors(bounds))
 
         self.plotter.add(*self._dynamic_actors)
+        self.vtk_ctrl.sync_visibility()
+        self.hl_ctrl.render(self.data_ctrl.df, self.current_timestep)
 
-        # ---- Sync VTK mesh visibility (actors are permanently in the plotter;
-        #      on()/off() toggles VTK-level visibility reliably) ----
-        self._sync_vtk_visibility()
-
-        # Re-overlay any active highlights at the new timestep positions
-        self._render_highlights()
-
-    def _sync_vtk_visibility(self):
-        """Toggle each VTK actor's VTK-level visibility flag (on/off).
-
-        Actors live permanently in the plotter renderer once added at load time.
-        Using on()/off() is more reliable than plotter.add/remove because the
-        membership check (``act in plotter.actors``) can silently mis-compare
-        VTK object identities across different vedo versions.
-        """
-        if not hasattr(self, 'vtk_meshes'):
-            return
-        for mesh_data in self.vtk_meshes.values():
-            act = mesh_data['actor']
-            if mesh_data['visible']:
-                act.on()
-            else:
-                act.off()
 
     def _build_geometry_actors(self, bounds):
-        if not self.geometry_data:
-            return []
-
-        regions = self.geometry_data.get('regions', {})
-        box_id = self.geometry_data.get('box_region')
+        if not self.data_ctrl.geometry_data: return []
+        regions = self.data_ctrl.geometry_data.get('regions', {})
+        box_id = self.data_ctrl.geometry_data.get('box_region')
         actors = []
         colors = ['red', 'green', 'blue', 'gold', 'cyan', 'magenta']
         color_idx = 0
@@ -817,157 +852,65 @@ class ViewerApp(BaseTk):
 
         return actors
     
-    # ──────────────────────────────────────────────────────────────
-    # Highlight helpers
-    # ──────────────────────────────────────────────────────────────
 
-    # Colour scheme: one distinct colour per highlight mode
-    _HL_COLORS = {
-        'atom':  'yellow',
-        'bond':  'orange',
-        'angle': 'violet',
-        'chain': 'lime',
-    }
 
     def _apply_highlight(self):
-        """Read mode + ID from the UI, compute the atom-ID set, render."""
-        if self.df is None or self.current_timestep is None:
-            self.highlight_status.config(text='Load a simulation first.', fg='red')
-            return
-
-        mode   = self.highlight_mode_var.get()
+        mode = self.highlight_mode_var.get()
         id_str = self.highlight_id_var.get().strip()
-        if not id_str:
-            return
-        try:
-            n = int(id_str)
+        if not id_str: return
+        try: n = int(id_str)
         except ValueError:
             self.highlight_status.config(text='Enter an integer ID.', fg='red')
             return
-
-        subset = self.df[self.df['timestep'] == self.current_timestep]
-
-        if mode == 'atom':
-            ids   = {n}
-            label = f'Atom {n}'
-
-        elif mode == 'bond':
-            try:
-                cs = int(self.chain_size_var.get())
-            except Exception:
-                cs = 4
-            n_bonds = cs - 1          # bonds per chain
-            if n_bonds <= 0:
-                self.highlight_status.config(
-                    text='Chain size must be ≥ 2 to have bonds.', fg='red')
-                return
-            chain_idx     = (n - 1) // n_bonds          # 0-based chain index
-            bond_in_chain = (n - 1) %  n_bonds          # 0-based position within chain
-            chain_first   = chain_idx * cs + 1          # first atom ID of that chain
-            a1 = chain_first + bond_in_chain
-            a2 = chain_first + bond_in_chain + 1
-            ids   = {a1, a2}
-            label = (f'Bond {n}  →  chain {chain_idx + 1}, '
-                     f'atoms {a1} & {a2}')
-
-        elif mode == 'angle':
-            try:
-                cs = int(self.chain_size_var.get())
-            except Exception:
-                cs = 4
-            n_angles = cs - 2         # angles per chain
-            if n_angles <= 0:
-                self.highlight_status.config(
-                    text='Chain size must be ≥ 3 to have angles.', fg='red')
-                return
-            chain_idx      = (n - 1) // n_angles        # 0-based chain index
-            angle_in_chain = (n - 1) %  n_angles        # 0-based position within chain
-            chain_first    = chain_idx * cs + 1         # first atom ID of that chain
-            a1 = chain_first + angle_in_chain
-            a2 = chain_first + angle_in_chain + 1
-            a3 = chain_first + angle_in_chain + 2
-            ids   = {a1, a2, a3}
-            label = (f'Angle {n}  →  chain {chain_idx + 1}, '
-                     f'atoms {a1}, {a2}, {a3}')
-
-        elif mode == 'chain':
-            if 'mol' in subset.columns:
-                ids = set(subset[subset['mol'] == n]['id'].values.tolist())
-            else:
-                try:
-                    cs = int(self.chain_size_var.get())
-                except Exception:
-                    cs = 4
-                start = (n - 1) * cs + 1
-                ids   = set(range(start, start + cs))
-            label = f'Chain {n}  ({len(ids)} atoms)'
-
-        else:
-            return
-
-        self._highlighted_ids  = ids
-        self._highlight_color  = self._HL_COLORS.get(mode, 'yellow')
-
-        found = ids & set(subset['id'].values)
-        if not found:
-            self.highlight_status.config(
-                text=f'{label}  —  no atoms found in this frame', fg='red')
-        else:
-            self.highlight_status.config(text=label, fg='black')
-
-        self._render_highlights()
+        ok, res = self.hl_ctrl.apply(mode, n)
+        self.highlight_status.config(text=res, fg='black' if ok else 'red')
 
     def _clear_highlight(self):
-        """Remove all highlights and reset state."""
-        self._highlighted_ids = set()
-        self._highlight_color = 'yellow'
-        for act in self._highlight_actors:
-            try:
-                self.plotter.remove(act)
-            except Exception:
-                pass
-        self._highlight_actors = []
+        self.hl_ctrl.clear()
         self.highlight_status.config(text='—', fg='gray')
         self.plotter.render()
 
-    def _render_highlights(self):
-        """(Re-)draw highlighted atoms as oversized spheres, then render.
 
-        Called from show_timestep() on every frame change so positions
-        update automatically as you scrub through timesteps.
-        """
-        # Remove previous highlight actors
-        for act in self._highlight_actors:
-            try:
-                self.plotter.remove(act)
-            except Exception:
-                pass
-        self._highlight_actors = []
+    # ── Time-series window openers ────────────────────────────────
 
-        if not self._highlighted_ids or self.df is None or self.current_timestep is None:
-            self.plotter.render()
+    def _open_bond_win(self):
+        if self.data_ctrl.df_mi is None:
+            from tkinter import messagebox as _mb
+            _mb.showinfo('No data', 'Load a simulation first.')
             return
+        if self._bond_win is None or not self._bond_win.winfo_exists():
+            self._bond_win = BondPlotWindow(
+                self, self.data_ctrl.df_mi, self.chain_size_var, self._bond_range_spec)
+        else:
+            self._bond_win.lift()
 
-        subset = self.df[self.df['timestep'] == self.current_timestep]
-        hi = subset[subset['id'].isin(self._highlighted_ids)]
-
-        if hi.empty:
-            self.plotter.render()
+    def _open_angle_win(self):
+        if self.data_ctrl.df_mi is None:
+            from tkinter import messagebox as _mb
+            _mb.showinfo('No data', 'Load a simulation first.')
             return
+        if self._angle_win is None or not self._angle_win.winfo_exists():
+            self._angle_win = AnglePlotWindow(
+                self, self.data_ctrl.df_mi, self.chain_size_var, self._angle_range_spec)
+        else:
+            self._angle_win.lift()
 
-        pts = hi[['x', 'y', 'z']].values
-        # 30 % larger radius so highlights visually overlay the base spheres
-        r   = (hi['diameter'].values / 2.0) * 1.30
-
-        actor = Spheres(pts, r=r, c=self._highlight_color, alpha=0.95)
-        self._highlight_actors = [actor]
-        self.plotter.add(*self._highlight_actors)
-        self.plotter.render()
+    def _open_atom_win(self):
+        if self.data_ctrl.df_mi is None:
+            from tkinter import messagebox as _mb
+            _mb.showinfo('No data', 'Load a simulation first.')
+            return
+        if self._atom_win is None or not self._atom_win.winfo_exists():
+            self._atom_win = AtomPlotWindow(
+                self, self.data_ctrl.df_mi, self.chain_size_var, self._atom_range_spec)
+        else:
+            self._atom_win.lift()
 
     def _cleanup(self):
         """Cleanup resources before exiting."""
         try:
-            plt.close('all')
+            import matplotlib.pyplot as _plt
+            _plt.close('all')
         except Exception:
             pass
 
