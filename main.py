@@ -4,7 +4,7 @@ from analysis.utilities import plot_angle_evolution, plot_xyz_evolution, plot_di
 from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
 # import matplotlib.pyplot as plt
 from analysis.animate import Animator
-from analysis.vtk_exporter import VTKExporter
+# from analysis.vtk_exporter import VTKExporter
 import os
 # import uuid
 from simulation import SimulationConfig, SimulationRunner
@@ -279,34 +279,6 @@ def visualize_results(simulation, run):
     # Axis limits set to 15mm (0.015m) as requested
     anim.create_animation(start_frame=1, end_frame=None, fps=24, color_by='id', point_size=100, view='z_left_x_down', axis_limits=None)
 
-def export_vtk(simulation, run):
-    """
-    Export simulation data to VTK format for ParaView.
-    """
-    data_dir = f"dumping_yard/{simulation}/{run}"
-    save_dir = f"dumping_yard/{simulation}/{run}/vtk_output"
-    
-    print(f"Exporting VTK for {simulation}/{run}...")
-    
-    # Load Data
-    sim = SimulationData(data_dir)
-    df = sim.load_data(force_reload=False)
-    
-    if df.empty:
-        print("No data found!")
-        return
-
-    # Find LAMMPS script
-    lammps_script = None
-    if os.path.exists(data_dir):
-        for file in os.listdir(data_dir):
-            if file.startswith("in."):
-                lammps_script = os.path.join(data_dir, file)
-                break
-    
-    exporter = VTKExporter(df, save_dir, lammps_script)
-    exporter.export_series()
-    print(f"Export complete. Files saved to {save_dir}")
 
 if __name__ == "__main__":
     available_functions = {
@@ -319,8 +291,7 @@ if __name__ == "__main__":
         "visualize_results": visualize_results,
         "visualize_chain_flop_results": visualize_chain_flop_results,
         "generate_relaxed_chain_states": generate_relaxed_chain_states,
-        "run_hopper_simulation": run_hopper_simulation,
-        "export_vtk": export_vtk,
+        "run_hopper_simulation": run_hopper_simulation
     }
 
     parser = argparse.ArgumentParser(description="Execute functions from main.py")

@@ -97,7 +97,8 @@ class HopperManager:
 
     def generate_filled_state(self, source_dir: str, n_fill: int, relax_steps: int,
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
-                              mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "") -> str:
+                              mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
+                              dump_inc: str = "simulation_templates/default_dump.inc") -> str:
         
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
@@ -120,6 +121,7 @@ class HopperManager:
             extra_vars={
                 "viscosity": 0.001,
                 "setup_inc": setup_inc,
+                "dump_inc": dump_inc,
                 "mol_include_file": inc_file,
                 "n_templates": n_templates,
                 "n_fill": n_fill,

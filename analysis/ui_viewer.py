@@ -182,9 +182,14 @@ class VtkOverlayController:
         for mesh_data in self.vtk_meshes.values():
             act = mesh_data['actor']
             if mesh_data['visible']:
+                if act not in self.plotter.actors:
+                    self.plotter.add(act)
                 act.on()
             else:
+                if act in self.plotter.actors:
+                    self.plotter.remove(act)
                 act.off()
+        self.plotter.render()
 
     def remove_meshes(self, names: list):
         for name in names:
@@ -203,7 +208,7 @@ class VtkOverlayController:
         self.vtk_color_idx = 0
         self._scene_bounds = None
 
-    def recompute_bounds(self, init_limits: Optional[tuple]):
+    def recompute_bounds(self, init_limits: Optional[tuple], only_visible=True):
         if init_limits is not None:
             xmin, xmax = init_limits[0]
             ymin, ymax = init_limits[1]
@@ -214,7 +219,7 @@ class VtkOverlayController:
             zmin, zmax = float('inf'), float('-inf')
 
         for mesh_data in self.vtk_meshes.values():
-            if mesh_data['visible']:
+            if not only_visible or mesh_data['visible']:
                 try:
                     bnds = mesh_data['actor'].bounds()
                     if len(bnds) == 6:
@@ -226,9 +231,15 @@ class VtkOverlayController:
         if xmin == float('inf'):
             xmin, xmax, ymin, ymax, zmin, zmax = -1, 1, -1, 1, -1, 1
 
-        cx, cy, cz = 0.5*(xmin+xmax), 0.5*(ymin+ymax), 0.5*(zmin+zmax)
-        max_range = max(xmax-xmin, ymax-ymin, zmax-zmin, 1e-6) / 2.0
-        self._scene_bounds = [cx-max_range, cx+max_range, cy-max_range, cy+max_range, cz-max_range, cz+max_range]
+        x_pad = (xmax - xmin) * 0.05 if xmax > xmin else 0.1
+        y_pad = (ymax - ymin) * 0.05 if ymax > ymin else 0.1
+        z_pad = (zmax - zmin) * 0.05 if zmax > zmin else 0.1
+        
+        self._scene_bounds = [
+            xmin - x_pad, xmax + x_pad,
+            ymin - y_pad, ymax + y_pad,
+            zmin - z_pad, zmax + z_pad
+        ]
         return self._scene_bounds
 
 
@@ -312,6 +323,110 @@ class HighlightController:
         self._highlight_actors = [actor]
         self.plotter.add(actor)
 
+class PlaybackController:
+    """Manages playback state, timer, and transport controls."""
+    def __init__(self, root, get_timesteps_cb, on_frame_change_cb):
+        self.root = root
+        self.get_timesteps_cb = get_timesteps_cb
+        self.on_frame_change_cb = on_frame_change_cb
+        
+        self.playing = False
+        self.job = None
+        
+        # UI References
+        self.frame_slider = None
+        self.fps_slider = None
+        self.play_btn = None
+        self.frame_label = None
+        self.loop_var = None
+
+    def link_widgets(self, frame_slider, fps_slider, play_btn, frame_label, loop_var):
+        self.frame_slider = frame_slider
+        self.fps_slider = fps_slider
+        self.play_btn = play_btn
+        self.frame_label = frame_label
+        self.loop_var = loop_var
+
+    def update_status(self, idx: int):
+        if not self.frame_label: return
+        timesteps = self.get_timesteps_cb()
+        total = len(timesteps)
+        if total == 0:
+            self.frame_label.config(text="No frames loaded")
+            return
+        ts = timesteps[idx]
+        self.frame_label.config(text=f"Frame: {idx+1} / {total} (TS: {ts})")
+
+    def jump_start(self):
+        self.pause()
+        if self.frame_slider and self.get_timesteps_cb():
+            self.frame_slider.set(0)
+
+    def jump_end(self):
+        self.pause()
+        ts = self.get_timesteps_cb()
+        if self.frame_slider and ts:
+            self.frame_slider.set(len(ts) - 1)
+
+    def step_next(self):
+        self.pause()
+        if not self.frame_slider: return
+        curr = int(self.frame_slider.get())
+        ts = self.get_timesteps_cb()
+        if curr < len(ts) - 1:
+            self.frame_slider.set(curr + 1)
+        elif self.loop_var and self.loop_var.get():
+            self.frame_slider.set(0)
+
+    def step_prev(self):
+        self.pause()
+        if not self.frame_slider: return
+        curr = int(self.frame_slider.get())
+        ts = self.get_timesteps_cb()
+        if curr > 0:
+            self.frame_slider.set(curr - 1)
+        elif self.loop_var and self.loop_var.get():
+            self.frame_slider.set(len(ts)-1)
+
+    def pause(self):
+        self.playing = False
+        if self.job:
+            self.root.after_cancel(self.job)
+            self.job = None
+        if self.play_btn:
+            self.play_btn.config(text="▶ Play")
+
+    def toggle_play(self):
+        if self.playing:
+            self.pause()
+        else:
+            if not self.get_timesteps_cb(): return
+            self.playing = True
+            if self.play_btn:
+                self.play_btn.config(text="⏸ Pause")
+            self._tick()
+
+    def _tick(self):
+        if not self.playing or not self.frame_slider: return
+        
+        curr = int(self.frame_slider.get())
+        ts = self.get_timesteps_cb()
+        total = len(ts)
+        
+        next_idx = curr + 1
+        if next_idx >= total:
+            if self.loop_var and self.loop_var.get():
+                next_idx = 0
+            else:
+                self.pause()
+                return
+
+        self.frame_slider.set(next_idx)
+        
+        fps = self.fps_slider.get() if self.fps_slider else 10
+        delay = int(1000 / max(fps, 1))
+        self.job = self.root.after(delay, self._tick)
+
 class ViewerApp(BaseTk):
     def __init__(self):
         super().__init__()
@@ -320,6 +435,11 @@ class ViewerApp(BaseTk):
         # (Avoid a fixed width that leaves empty space to the right.)
         # Ensure clean shutdown when window is closed
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+        # Controllers (Pre-initialize logic controllers for UI binding)
+        self.data_ctrl = SimDataController()
+        self.data_ctrl.on_data_loaded_cb = self._on_data_loaded
+        self.playback_ctrl = PlaybackController(self, lambda: self.data_ctrl.timesteps, self.show_timestep)
 
         # Left controls
         ctrl = tk.Frame(self)
@@ -363,11 +483,42 @@ class ViewerApp(BaseTk):
         self.ts_listbox.pack(fill=tk.Y)
         self.ts_listbox.bind('<<ListboxSelect>>', self.on_ts_select)
 
-        tk.Label(col1, text='Frame').pack(anchor='w', pady=(8, 0))
-        self.frame_slider = tk.Scale(col1, from_=0, to=0, orient=tk.HORIZONTAL, command=self.on_slider)
-        self.frame_slider.pack(fill=tk.X)
+        tk.Label(col1, text='Frame Navigation:').pack(anchor='w', pady=(8, 0))
+        
+        # New Playback Control Frame
+        playback_frame = tk.Frame(col1)
+        playback_frame.pack(fill=tk.X, pady=(2, 0))
 
-        tk.Button(col1, text='Fit View', command=self.fit_view).pack(fill=tk.X, pady=(8, 0))
+        btn_row = tk.Frame(playback_frame)
+        btn_row.pack(fill=tk.X)
+        
+        tk.Button(btn_row, text='|◀', width=3, command=self.playback_ctrl.jump_start).pack(side=tk.LEFT)
+        tk.Button(btn_row, text='◀', width=3, command=self.playback_ctrl.step_prev).pack(side=tk.LEFT, padx=2)
+        self.play_btn = tk.Button(btn_row, text='▶ Play', width=8, command=self.playback_ctrl.toggle_play)
+        self.play_btn.pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_row, text='▶', width=3, command=self.playback_ctrl.step_next).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_row, text='▶|', width=3, command=self.playback_ctrl.jump_end).pack(side=tk.LEFT)
+
+        self.frame_slider = tk.Scale(playback_frame, from_=0, to=0, orient=tk.HORIZONTAL, command=self.on_slider)
+        self.frame_slider.pack(fill=tk.X, pady=(4, 0))
+
+        self.frame_label = tk.Label(playback_frame, text='Frame: 0 / 0', fg='gray')
+        self.frame_label.pack(fill=tk.X)
+
+        speed_frame = tk.Frame(playback_frame)
+        speed_frame.pack(fill=tk.X, pady=(4, 0))
+        tk.Label(speed_frame, text='FPS:').pack(side=tk.LEFT)
+        self.fps_slider = tk.Scale(speed_frame, from_=1, to=60, orient=tk.HORIZONTAL)
+        self.fps_slider.set(10)
+        self.fps_slider.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+        
+        self.loop_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(playback_frame, text='Loop Playback', variable=self.loop_var).pack(anchor='w')
+
+        # Link Playback Controller to its widgets
+        self.playback_ctrl.link_widgets(self.frame_slider, self.fps_slider, self.play_btn, self.frame_label, self.loop_var)
+
+        tk.Button(col1, text='Fit View', command=self.fit_view).pack(fill=tk.X, pady=(12, 0))
         tk.Button(col1, text='Reset View', command=self.reset_view).pack(fill=tk.X, pady=(4, 0))
         self.draw_chains_var = tk.BooleanVar(value=False)
         tk.Checkbutton(col1, text='Draw Chains', variable=self.draw_chains_var,
@@ -441,10 +592,11 @@ class ViewerApp(BaseTk):
         )
 
         # Controllers
-        self.data_ctrl = SimDataController()
-        self.data_ctrl.on_data_loaded_cb = self._on_data_loaded
         self.vtk_ctrl = VtkOverlayController(self.plotter)
         self.hl_ctrl = HighlightController(self.plotter, self._get_current_rendering_data, self._get_chain_size)
+
+        # Persistent View Bounds: Stores the max extents of all loaded objects to keep axes fixed
+        self._persistent_view_bounds = None
 
         # Size-to-content and center on screen after widgets are laid out
         self._autosize_and_center()
@@ -467,6 +619,11 @@ class ViewerApp(BaseTk):
         self._bond_range_spec  = ''
         self._angle_range_spec = ''
         self._atom_range_spec  = ''
+
+        # Global Keyboard Bindings
+        self.bind('<space>', lambda e: self.playback_ctrl.toggle_play())
+        self.bind('<Left>', lambda e: self.playback_ctrl.step_prev())
+        self.bind('<Right>', lambda e: self.playback_ctrl.step_next())
 
     def _get_current_rendering_data(self):
         return self.data_ctrl.df, self.current_timestep
@@ -491,6 +648,8 @@ class ViewerApp(BaseTk):
 
         self.frame_slider.config(from_=0, to=max(0, len(self.data_ctrl.timesteps)-1))
         self.frame_slider.set(0)
+        self.playback_ctrl.update_status(0)
+        self._update_persistent_bounds()
         if self.data_ctrl.timesteps:
             self.show_timestep(self.data_ctrl.timesteps[0])
             self.plotter.reset_camera()
@@ -531,6 +690,7 @@ class ViewerApp(BaseTk):
 
     def _load_simulation_folder(self, folder: str, force_reload: bool = False) -> None:
         """Load a simulation folder."""
+        self.playback_ctrl.pause()
         if self.data_ctrl.current_sim_folder is not None:
             if os.path.normpath(self.data_ctrl.current_sim_folder) != os.path.normpath(folder):
                 self.clear_vtk_meshes()
@@ -565,6 +725,7 @@ class ViewerApp(BaseTk):
     def open_dump_files(self):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files','*.dump'),('All','*.*')])
         if not files: return
+        self.playback_ctrl.pause()
         self.clear_vtk_meshes()
         ok, err = self.data_ctrl.load_dump_files(files)
         if not ok: messagebox.showerror('Error', err)
@@ -633,6 +794,7 @@ class ViewerApp(BaseTk):
     def open_data_file(self):
         path = filedialog.askopenfilename(title='Select LAMMPS data file', filetypes=[('Data files','*.data'),('All','*.*')])
         if not path: return
+        self.playback_ctrl.pause()
         self.clear_vtk_meshes()
         ok, err = self.data_ctrl.load_data_file(path)
         if not ok: messagebox.showerror('Error', err)
@@ -649,14 +811,18 @@ class ViewerApp(BaseTk):
         for f in files: self._add_vtk_mesh(f)
         if self.current_timestep is not None:
             self.show_timestep(self.current_timestep)
-            self.plotter.reset_camera()
-            self.plotter.render()
+        self.plotter.render()
+
+    def _update_persistent_bounds(self):
+        """Update the max extents of the axes to include particles and all loaded VTKs, then keep them fixed."""
+        self._persistent_view_bounds = self.vtk_ctrl.recompute_bounds(self.data_ctrl._init_limits, only_visible=False)
 
     def _add_vtk_mesh(self, path):
         ok, res = self.vtk_ctrl.add_mesh(path)
         if ok and hasattr(self, 'vtk_listbox'):
             self.vtk_listbox.insert(tk.END, res)
             self.vtk_listbox.selection_set(self.vtk_listbox.size() - 1)
+            self._update_persistent_bounds()
         elif not ok: print(f"Failed to load VTK {path}: {res}")
 
     def on_vtk_select(self, event):
@@ -693,6 +859,7 @@ class ViewerApp(BaseTk):
         self.ts_listbox.selection_clear(0, tk.END)
         self.ts_listbox.selection_set(idx)
         self.ts_listbox.activate(idx)
+        self.playback_ctrl.update_status(idx)
         self.show_timestep(t)
 
     def fit_view(self):
@@ -744,19 +911,25 @@ class ViewerApp(BaseTk):
         self._dynamic_actors = []
 
         actors = self.plot_chain_data(subset)
-        bounds = self.vtk_ctrl.recompute_bounds(self.data_ctrl._init_limits)
-        axes = Axes(xrange=(bounds[0], bounds[1]), yrange=(bounds[2], bounds[3]), zrange=(bounds[4], bounds[5]),
+        
+        # Use persistent bounds so the axes stay fixed regardless of particle motion or visibility toggles
+        if self._persistent_view_bounds is None:
+            self._update_persistent_bounds()
+        
+        b = self._persistent_view_bounds
+        axes = Axes(xrange=(b[0], b[1]), yrange=(b[2], b[3]), zrange=(b[4], b[5]),
                     xtitle='X', ytitle='Y', ztitle='Z', c='black')
 
         self._dynamic_actors.extend(actors)
         self._dynamic_actors.append(axes)
 
         if self.show_geometry_var.get():
-            self._dynamic_actors.extend(self._build_geometry_actors(bounds))
+            self._dynamic_actors.extend(self._build_geometry_actors(b))
 
         self.plotter.add(*self._dynamic_actors)
         self.vtk_ctrl.sync_visibility()
         self.hl_ctrl.render(self.data_ctrl.df, self.current_timestep)
+        self.plotter.render()
 
 
     def _build_geometry_actors(self, bounds):
@@ -864,6 +1037,7 @@ class ViewerApp(BaseTk):
             return
         ok, res = self.hl_ctrl.apply(mode, n)
         self.highlight_status.config(text=res, fg='black' if ok else 'red')
+        self.plotter.render()
 
     def _clear_highlight(self):
         self.hl_ctrl.clear()
@@ -908,6 +1082,8 @@ class ViewerApp(BaseTk):
 
     def _cleanup(self):
         """Cleanup resources before exiting."""
+        if hasattr(self, 'playback_ctrl'):
+            self.playback_ctrl.pause()
         try:
             import matplotlib.pyplot as _plt
             _plt.close('all')

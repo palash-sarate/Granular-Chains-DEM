@@ -53,11 +53,6 @@ class SimulationRunner:
         if config.lepton_file:
             lepton_path = config.lepton_file.replace("\\", "/")
             header_vars.append(f"variable lepton_inc string {lepton_path}")
-        
-        # include dump file variable if provided
-        if config.dump_file:
-            dump_path = config.dump_file.replace("\\", "/")
-            header_vars.append(f"variable dump_inc string {dump_path}")
 
         # Resume functionality: inject resume specific variables
         if config.resume_file:
@@ -66,57 +61,6 @@ class SimulationRunner:
             
         if header_vars:
             content = "\n".join(header_vars) + "\n\n" + content
-
-        # --- INSERT REGIONS/WALLS FROM CONFIG ---
-        # placeholder to look for in templates
-        placeholder = "# <REGIONS_WALLS>"
-
-        blocks: List[str] = []
-        # raw region lines (user-provided)
-        if config.regions:
-            blocks.extend(config.regions)
-        # raw wall/fix blocks (user-provided)
-        if config.wall_blocks:
-            blocks.extend(config.wall_blocks)
-
-        # also support structured `walls` dict (backwards compatible)
-        if config.walls:
-            # format structured walls into fix lines (x/y/z if present)
-            def _format_wall(axis: str, walls: dict) -> str:
-                mat = walls.get("material", {})
-                tang = walls.get("tangential", {})
-                roll = walls.get("rolling", {})
-                twist = walls.get("twisting", "marshall")
-                bounds = walls.get(axis, {})
-                lo = bounds.get("min", 0.0)
-                hi = bounds.get("max", 0.0)
-                return (
-                    f"fix {axis}walls all wall/gran granular "
-                    f"hertz/material {mat.get('kn',1.0e8)} {mat.get('nu',0.3)} {mat.get('rest',5e-4)} &\n"
-                    f"    tangential {tang.get('style','linear_history')} {tang.get('kt',300.0)} {tang.get('gamma',1.0)} {tang.get('mu',0.1)} &\n"
-                    f"    rolling {roll.get('style','sds')} {roll.get('kr',200.0)} {roll.get('gamma',100.0)} {roll.get('mu',0.1)} &\n"
-                    f"    twisting {twist} &\n"
-                    f"    {axis}plane {lo} {hi}\n\n"
-                )
-            for ax in ("x", "y", "z"):
-                if ax in config.walls:
-                    blocks.append(_format_wall(ax, config.walls))
-
-        if blocks:
-            block_text = "\n".join(blocks) + "\n\n"
-            if placeholder in content:
-                content = content.replace(placeholder, block_text)
-            else:
-                # place under the WALL DEFINITIONS section if it exists
-                marker = "# --- WALL DEFINITIONS ---"
-                if marker in content:
-                    content = content.replace(marker, marker + "\n" + block_text)
-                else:
-                    # fallback: append at end
-                    content += "\n# --- GENERATED REGIONS/WALLS ---\n" + block_text
-        else:
-            # remove placeholder if present
-            content = content.replace(placeholder, "")
 
         with open(output_path, 'w') as f:
             f.write(content)
