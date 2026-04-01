@@ -23,7 +23,7 @@ include ${setup_inc}
 include ${mol_include_file}
 
 # Settings
-neighbor 0.01 bin
+neighbor 0.004 bin
 neigh_modify delay 0 every 1 check yes
 timestep ${dt}
 
@@ -34,13 +34,6 @@ fix 2 all viscous ${viscosity}
 fix 3 all nve/sphere
 
 include ${dump_inc}
-
-# --- Trigger logic variables ---
-# variable z_target_min equal ${z_bin_top}-0.01
-# variable z_target_max equal ${z_bin_top}+0.01
-# variable in_target_zone atom "z > v_z_target_min && z < v_z_target_max"
-# compute check_zone all reduce max v_in_target_zone
-# variable any_in_zone equal c_check_zone
 
 # --- Pre-fill: drop single spheres to seed the hopper floor ---
 # variable n_singles equal 20          # number of single beads to drop first
@@ -63,35 +56,17 @@ label loop_start
     variable ry equal random(-0.155, 0.155, ${seed})
     create_atoms 0 single ${rx} ${ry} 0.5 mol ${mol_id} ${seed}
 
-    # Check if any atom is in the high-resolution zone
-    # run 0
-    # if "${any_in_zone} > 0" then &
-    #     "undump 1" &
-    #     "undump 2" &
-    #     "undump 3" &
-    #     "dump 1 all custom 10 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass" &
-    #     "dump_modify 1 sort id" &
-    #     "dump 2 all local 10 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]" &
-    #     "dump_modify 2 colname 2 dist" &
-    #     "dump_modify 2 colname 3 energy" &
-    #     "dump_modify 2 colname 4 force" &
-    #     "dump 3 all local 10 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]" &
-    #     "dump_modify 3 colname 2 theta" &
-    #     "dump_modify 3 colname 3 energy" &
-    #     "run ${relax_steps}" &
-    # else &
-    #     "undump 1" &
-    #     "undump 2" &
-    #     "undump 3" &
-    #     "dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass" &
-    #     "dump_modify 1 sort id" &
-    #     "dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]" &
-    #     "dump_modify 2 colname 2 dist" &
-    #     "dump_modify 2 colname 3 energy" &
-    #     "dump_modify 2 colname 4 force" &
-    #     "dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]" &
-    #     "dump_modify 3 colname 2 theta" &
-    #     "dump_modify 3 colname 3 energy"
+    if i == 4 then
+        run ${relax_steps}dump 1 all custom 1 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+        dump_modify 1 sort id
+        dump 2 all local 1 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
+        dump_modify 2 colname 2 dist
+        dump_modify 2 colname 3 energy
+        dump_modify 2 colname 4 force
+
+        dump 3 all local 1 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]
+        dump_modify 3 colname 2 theta 
+        dump_modify 3 colname 3 energy
 
     run ${drop_steps}
     next i

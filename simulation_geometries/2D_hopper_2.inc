@@ -16,14 +16,10 @@ variable funnel_ht equal ${z_bin_top}+0.1
 
 # 1. Entry Funnel (Top) - Funneling in the X-direction
 # These planes converge from a wide X-opening down to the 2.5mm gap at z_bin_top
-
 region entry_f_neg prism ${x_half} ${funnel_thickness} -${y_half} ${y_half} ${z_bin_top} ${funnel_ht} 0 0.1 0 side out
 region entry_f_pos prism -${funnel_thickness} -${x_half} -${y_half} ${y_half} ${z_bin_top} ${funnel_ht} 0 -0.1 0 side out
-
-fix wall_f_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_neg
-fix wall_f_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_pos
-# fix wall_f_neg all wall/gran/region granular hertz/material 1e5 1e3 0.3 tangential mindlin NULL 1.0 0.5 region entry_f_neg
-# fix wall_f_pos all wall/gran/region granular hertz/material 1e5 1e3 0.3 tangential mindlin NULL 1.0 0.5 region entry_f_pos
+fix wall_funnel_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_neg
+fix wall_funnel_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region entry_f_pos
 
 # 2. Hopper
 # Inclined in the Y-direction as per your previous setup

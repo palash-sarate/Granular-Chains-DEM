@@ -10,20 +10,24 @@ Three independently closable Toplevel windows:
 import tkinter as tk
 import pandas as pd
 
-from analysis.utilities import get_distance_series, get_angle_series, get_xyz_series
-
 
 # ── Palette & channel constants ────────────────────────────────────────────────
 
 _COLORS = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
            '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-ATOM_CHANNELS = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'fx', 'fy', 'fz']
+ATOM_CHANNELS  = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'fx', 'fy', 'fz']
+BOND_CHANNELS  = ['dist', 'energy', 'force']
+ANGLE_CHANNELS = ['theta', 'energy']
 
 _CH_LS = {
     'x': '-',  'y': '--',  'z': ':',
     'vx': '-', 'vy': '--', 'vz': ':',
     'fx': '-', 'fy': '--', 'fz': ':',
+    # Bonds
+    'dist': '-', 'energy': '--', 'force': ':',
+    # Angles
+    'theta': '-', 'energy': '--'
 }
 
 
@@ -201,35 +205,62 @@ class _TsWin(tk.Toplevel):
 
 class BondPlotWindow(_TsWin):
     SAVE_ATTR = '_bond_range_spec'
-    TITLE     = 'Bond Distances'
-    YLABEL    = 'Distance (m)'
+    TITLE     = 'Bond Properties'
+    YLABEL    = 'Value'
 
-    def _resolve(self, n: int):
-        """Map bond number n → (a1, a2, label) using chain-size convention."""
-        cs = max(2, int(self.cs_var.get()))
-        nb = cs - 1
-        ci = (n - 1) // nb
-        bi = (n - 1) % nb
-        cf = ci * cs + 1
-        a1 = cf + bi
-        a2 = a1 + 1
-        return a1, a2, f'Bond {n}  (a{a1}\u2013a{a2})'
+    def __init__(self, parent, df_mi, cs_var, initial=''):
+        self._ch_vars: dict = {ch: tk.BooleanVar(value=(ch == 'dist')) for ch in BOND_CHANNELS}
+        self._lines: dict   = {} # {bond_id: {channel: Line2D}}
+        super().__init__(parent, df_mi, cs_var, initial)
+
+    def _top_controls(self, fr):
+        super()._top_controls(fr)
+        tk.Label(fr, text='  Channels:').pack(side=tk.LEFT)
+        for ch in BOND_CHANNELS:
+            tk.Checkbutton(fr, text=ch, variable=self._ch_vars[ch],
+                           command=self._sync_vis).pack(side=tk.LEFT, padx=2)
+
+    def _sync_vis(self):
+        for bond_lines in self._lines.values():
+            for ch, ln in bond_lines.items():
+                ln.set_visible(self._ch_vars[ch].get())
+        self.canvas.draw_idle()
 
     def _plot_series(self, ids):
+        self._lines = {}
+        if self.df_mi is None or self.df_mi.empty:
+            return [], ids
+            
+        avail = [ch for ch in BOND_CHANNELS if ch in self.df_mi.columns]
         ok, skip = [], []
-        for i, n in enumerate(ids):
+        
+        for i, bid in enumerate(ids):
             try:
-                a1, a2, lbl = self._resolve(n)
-                data = get_distance_series(self.df_mi, a1, a2)
-                if not data:
-                    skip.append(n)
-                    continue
-                ts, vs = zip(*data)
-                self.ax.plot(ts, vs, label=lbl, color=self._col(i))
-                self.lb.insert(tk.END, lbl)
-                ok.append(n)
-            except Exception:
-                skip.append(n)
+                rows = self.df_mi.xs(bid, level='id')
+            except KeyError:
+                skip.append(bid)
+                continue
+            
+            if rows.empty:
+                skip.append(bid)
+                continue
+                
+            ts = rows.index.values
+            col = self._col(i)
+            self._lines[bid] = {}
+            
+            for ch in avail:
+                vis = self._ch_vars[ch].get()
+                ln, = self.ax.plot(ts, rows[ch].values,
+                                   label=f'Bond {bid} {ch}',
+                                   color=col,
+                                   linestyle=_CH_LS.get(ch, '-'),
+                                   visible=vis)
+                self._lines[bid][ch] = ln
+            
+            self.lb.insert(tk.END, f'Bond {bid} ({len(avail)} channels)')
+            ok.append(bid)
+            
         return ok, skip
 
 
@@ -237,36 +268,62 @@ class BondPlotWindow(_TsWin):
 
 class AnglePlotWindow(_TsWin):
     SAVE_ATTR = '_angle_range_spec'
-    TITLE     = 'Angle Values'
-    YLABEL    = 'Angle (\u00b0)'
+    TITLE     = 'Angle Properties'
+    YLABEL    = 'Value'
 
-    def _resolve(self, n: int):
-        """Map angle number n → (a1, a2, a3, label) using chain-size convention."""
-        cs = max(3, int(self.cs_var.get()))
-        na = cs - 2
-        ci = (n - 1) // na
-        ai = (n - 1) % na
-        cf = ci * cs + 1
-        a1 = cf + ai
-        a2 = a1 + 1
-        a3 = a1 + 2
-        return a1, a2, a3, f'Angle {n}  (a{a1}\u2013a{a2}\u2013a{a3})'
+    def __init__(self, parent, df_mi, cs_var, initial=''):
+        self._ch_vars: dict = {ch: tk.BooleanVar(value=(ch == 'theta')) for ch in ANGLE_CHANNELS}
+        self._lines: dict   = {} # {angle_id: {channel: Line2D}}
+        super().__init__(parent, df_mi, cs_var, initial)
+
+    def _top_controls(self, fr):
+        super()._top_controls(fr)
+        tk.Label(fr, text='  Channels:').pack(side=tk.LEFT)
+        for ch in ANGLE_CHANNELS:
+            tk.Checkbutton(fr, text=ch, variable=self._ch_vars[ch],
+                           command=self._sync_vis).pack(side=tk.LEFT, padx=2)
+
+    def _sync_vis(self):
+        for angle_lines in self._lines.values():
+            for ch, ln in angle_lines.items():
+                ln.set_visible(self._ch_vars[ch].get())
+        self.canvas.draw_idle()
 
     def _plot_series(self, ids):
+        self._lines = {}
+        if self.df_mi is None or self.df_mi.empty:
+            return [], ids
+            
+        avail = [ch for ch in ANGLE_CHANNELS if ch in self.df_mi.columns]
         ok, skip = [], []
-        for i, n in enumerate(ids):
+        
+        for i, aid in enumerate(ids):
             try:
-                a1, a2, a3, lbl = self._resolve(n)
-                data = get_angle_series(self.df_mi, a1, a2, a3)
-                if not data:
-                    skip.append(n)
-                    continue
-                ts, vs = zip(*data)
-                self.ax.plot(ts, vs, label=lbl, color=self._col(i))
-                self.lb.insert(tk.END, lbl)
-                ok.append(n)
-            except Exception:
-                skip.append(n)
+                rows = self.df_mi.xs(aid, level='id')
+            except KeyError:
+                skip.append(aid)
+                continue
+            
+            if rows.empty:
+                skip.append(aid)
+                continue
+                
+            ts = rows.index.values
+            col = self._col(i)
+            self._lines[aid] = {}
+            
+            for ch in avail:
+                vis = self._ch_vars[ch].get()
+                ln, = self.ax.plot(ts, rows[ch].values,
+                                   label=f'Angle {aid} {ch}',
+                                   color=col,
+                                   linestyle=_CH_LS.get(ch, '-'),
+                                   visible=vis)
+                self._lines[aid][ch] = ln
+            
+            self.lb.insert(tk.END, f'Angle {aid} ({len(avail)} channels)')
+            ok.append(aid)
+            
         return ok, skip
 
 
@@ -285,7 +342,8 @@ class AtomPlotWindow(_TsWin):
         super().__init__(parent, df_mi, cs_var, initial)
 
     def _top_controls(self, fr):
-        tk.Label(fr, text='Channels:').pack(side=tk.LEFT)
+        super()._top_controls(fr)
+        tk.Label(fr, text='  Channels:').pack(side=tk.LEFT)
         for ch in ATOM_CHANNELS:
             tk.Checkbutton(fr, text=ch, variable=self._ch_vars[ch],
                            command=self._sync_vis).pack(side=tk.LEFT, padx=2)

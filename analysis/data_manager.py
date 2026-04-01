@@ -159,73 +159,161 @@ class SimulationData:
     def __init__(self, data_dir, cache_file="sim_cache.pkl"):
         self.data_dir = data_dir
         self.chain_dump_dir = os.path.join(data_dir, "chain")
+        self.bond_dump_dir = os.path.join(data_dir, "bond")
+        self.angle_dump_dir = os.path.join(data_dir, "angle")
         self.cache_file = os.path.join(data_dir, cache_file)
-        self.df = None
+        self.df_atoms = None
+        self.df_bonds = None
+        self.df_angles = None
 
     def load_data(self, force_reload=False):
         """
         Loads data from cache if available and fresh; otherwise parses dump files.
+        Returns a dict of DataFrames: {'atoms': df, 'bonds': df, 'angles': df}
         """
         if not force_reload and self._is_cache_valid():
-            print("Loading from cache...")
-            self.df = pd.read_pickle(self.cache_file)
-        else:
-            print("Parsing dump files (this may take a moment)...")
-            self.df = self._parse_all_dumps()
-            print("Saving to cache...")
-            self.df.to_pickle(self.cache_file)
+            try:
+                print(f"Loading from cache: {self.cache_file}")
+                with open(self.cache_file, 'rb') as f:
+                    data = pickle.load(f)
+                
+                # Robust check for new dictionary format
+                if isinstance(data, dict) and 'atoms' in data:
+                    self.df_atoms = data.get('atoms')
+                    self.df_bonds = data.get('bonds')
+                    self.df_angles = data.get('angles')
+                    return data
+                else:
+                    print("Cache format outdated, re-parsing...")
+            except Exception as e:
+                print(f"Cache loading failed ({e}), re-parsing...")
         
-        return self.df
+        print("Parsing dump files (this may take a moment)...")
+        self.df_atoms = self._parse_all_dumps(self.chain_dump_dir)
+        self.df_bonds = self._parse_all_dumps(self.bond_dump_dir)
+        self.df_angles = self._parse_all_dumps(self.angle_dump_dir)
+        
+        print("Saving to cache...")
+        data = {
+            'atoms': self.df_atoms,
+            'bonds': self.df_bonds,
+            'angles': self.df_angles
+        }
+        with open(self.cache_file, 'wb') as f:
+            pickle.dump(data, f)
+        
+        return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
 
     def _is_cache_valid(self):
-        """Checks if cache exists and is newer than the latest dump file."""
+        """Checks if cache exists and is newer than the latest dump file in any directory."""
         if not os.path.exists(self.cache_file):
             return False
-        print(f"Checking cache validity against dumps in: {self.chain_dump_dir}")
-        dump_files = glob.glob(os.path.join(self.chain_dump_dir, "*.dump"))
-        if not dump_files:
+        
+        # Check atoms, bonds, and angles for updates
+        dirs = [self.chain_dump_dir, self.bond_dump_dir, self.angle_dump_dir]
+        latest_dump_mtime = 0
+        found_any = False
+        
+        for d in dirs:
+            if not os.path.isdir(d):
+                continue
+            dump_files = glob.glob(os.path.join(d, "*.dump"))
+            if dump_files:
+                found_any = True
+                latest_dump_mtime = max(latest_dump_mtime, max(os.path.getmtime(f) for f in dump_files))
+        
+        if not found_any:
             return False
             
-        latest_dump_mtime = max(os.path.getmtime(f) for f in dump_files)
         cache_mtime = os.path.getmtime(self.cache_file)
-        
         return cache_mtime > latest_dump_mtime
 
     def _parse_single_dump(self, filepath):
-        """Parses a single LAMMPS dump file."""
-        # (Your existing parsing logic, optimized slightly)
+        """Parses a single LAMMPS dump file (atoms, bonds, or angles)."""
         meta = {'timestep': 0}
-        with open(filepath, 'r') as f:
-            lines = f.readlines()
-            
-        for i, line in enumerate(lines):
-            if "ITEM: TIMESTEP" in line:
-                meta['timestep'] = int(lines[i+1])
-            elif "ITEM: ATOMS" in line:
-                columns = line.split()[2:]
-                df = pd.read_csv(filepath, skiprows=i+1, names=columns, sep=r'\s+', engine='python')
-                df['timestep'] = meta['timestep']
-                return df
+        count = 0
+        try:
+            with open(filepath, 'r') as f:
+                curr_line_idx = -1
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    curr_line_idx += 1
+                    
+                    if "ITEM: TIMESTEP" in line:
+                        step_line = f.readline()
+                        curr_line_idx += 1
+                        if step_line:
+                            try:
+                                meta['timestep'] = int(step_line.strip())
+                            except ValueError:
+                                pass
+                    elif "ITEM: NUMBER OF" in line:
+                        count_line = f.readline()
+                        curr_line_idx += 1
+                        if count_line:
+                            try:
+                                count = int(count_line.strip())
+                            except ValueError:
+                                count = 0
+                    elif "ITEM: ATOMS" in line or "ITEM: ENTRIES" in line:
+                        columns = line.split()[2:]
+                        # SKIP the headers we already read + the ITEM: ATOMS/ENTRIES header itself
+                        df = pd.read_csv(filepath, skiprows=curr_line_idx + 1,
+                                         names=columns, 
+                                         nrows=count if count > 0 else None,
+                                         sep=r'\s+', engine='python')
+                        
+                        # Defensive: drop any rows that failed to parse
+                        for col in df.columns:
+                            df[col] = pd.to_numeric(df[col], errors='coerce')
+                        df.dropna(subset=df.columns.intersection(['x','y','z','id','index','dist','theta']), 
+                                  inplace=True)
+                        
+                        df['timestep'] = meta['timestep']
+                        return df
+        except Exception as e:
+            print(f"Error parsing {filepath}: {e}")
         return pd.DataFrame()
 
     def _get_step(self, filename):
         match = re.search(r'_(\d+)\.dump', filename)
         return int(match.group(1)) if match else 0
     
-    def _parse_all_dumps(self):
+    def _parse_all_dumps(self, dump_dir):
         """Parses all dump files in directory and returns a MultiIndex DataFrame."""
-        dump_files = glob.glob(os.path.join(self.chain_dump_dir, "*.dump"))
-        print(f"Found {len(dump_files)} dump files to parse in {self.chain_dump_dir}")
+        if not os.path.isdir(dump_dir):
+            return pd.DataFrame()
+            
+        dump_files = glob.glob(os.path.join(dump_dir, "*.dump"))
+        if not dump_files:
+            return pd.DataFrame()
+            
+        print(f"Found {len(dump_files)} dump files to parse in {dump_dir}")
         # Sort by timestep
         dump_files.sort(key=self._get_step)
 
         all_frames = [self._parse_single_dump(f) for f in dump_files]
+        all_frames = [f for f in all_frames if not f.empty]
         
         if not all_frames:
             return pd.DataFrame()
 
-        full_df = pd.concat(all_frames)
-        # Create MultiIndex (Timestep, Atom ID)
-        full_df.set_index(['timestep', 'id'], inplace=True)
-        full_df.sort_index(inplace=True)
+        try:
+            full_df = pd.concat(all_frames)
+            # Create MultiIndex (Timestep, ID). 
+            # For atoms it is 'id', for bonds/angles it is 'index'.
+            id_col = 'id' if 'id' in full_df.columns else 'index'
+            if id_col not in full_df.columns:
+                print(f"Warning: Neither 'id' nor 'index' found in {dump_dir} dumps.")
+                return pd.DataFrame()
+                
+            full_df.set_index(['timestep', id_col], inplace=True)
+            full_df.index.names = ['timestep', 'id']  # Unified index names
+            full_df.sort_index(inplace=True)
+            return full_df
+        except Exception as e:
+            print(f"Failed to assemble DataFrames for {dump_dir}: {e}")
+            return pd.DataFrame()
         return full_df

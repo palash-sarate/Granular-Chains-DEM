@@ -1,12 +1,7 @@
 from analysis.data_manager import SimulationData
-from analysis.utilities import get_angle_series, get_xyz_series, get_distance_series
-from analysis.utilities import plot_angle_evolution, plot_xyz_evolution, plot_distance_evolution
 from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
-# import matplotlib.pyplot as plt
 from analysis.animate import Animator
-# from analysis.vtk_exporter import VTKExporter
 import os
-# import uuid
 from simulation import SimulationConfig, SimulationRunner
 from simulation.chain_generator import ChainConfig, write_chain_data
 from simulation.library_generator import LibraryGenerator
@@ -33,7 +28,8 @@ def run_hopper_simulation():
                                 run_name="hopper_fill_N4",
                                 seed = 12345,
                                 mol_dir = "chain_data/molecules_temp", 
-                                setup_inc = "simulation_geometries/2D_hopper_2.inc")
+                                setup_inc = "simulation_geometries/2D_hopper.inc",
+                                dump_inc = "simulation_templates/default_dump.inc")
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
     runner = SimulationRunner(lammps_executable="lmp")
@@ -198,88 +194,6 @@ def generate_linear_chains(Ns: list[int], orientation: str, output_dir: str) -> 
         path = write_chain_data(linear_config)
         print(f"Created: {path}")
   
-def visualize_chain_flop_results(Ns, viscosity, dt):
-    viscosity_token = get_viscosity_token(viscosity)
-    dt_token = get_dt_token(dt)
-    for N in Ns:
-        visualize_results("Chain_flop", f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}")
-   
-def visualize_results(simulation, run):
-    # 1. Initialize Data Manager
-    data_dir = f"dumping_yard/{simulation}/{run}"
-    save_dir = f"dumping_yard/{simulation}/{run}"
-    
-    # make save_dir if it doesn't exist
-    os.makedirs(save_dir, exist_ok=True)
-    
-    sim = SimulationData(data_dir)
-    
-    # 2. Load Data (Auto-caches)
-    df = sim.load_data(force_reload=True)
-    
-    if df.empty:
-        print("No data found!")
-        return
-
-    print(f"Loaded simulation with {len(df)} records.")
-
-    # get the number of atoms from the dataframe
-    num_atoms = df.index.get_level_values('id').nunique()
-    print(f"Number of unique atoms: {num_atoms}")
-    
-    # 3. Perform Analysis
-    # # Example: Calculate angle between atoms 1, 2, and 3
-    # print("Calculating angles...")
-    if num_atoms < 3:
-        print("Need at least three atoms to compute angles.")
-        return
-
-    angle_series_list = []
-    angle_labels = []
-
-    for start_id in range(1, num_atoms - 1):
-        id1, id2, id3 = start_id, start_id + 1, start_id + 2
-        angle_series_list.append(get_angle_series(df, id1=id1, id2=id2, id3=id3))
-        angle_labels.append(f"{id1}-{id2}-{id3}")
-
-    plot_angle_evolution(angle_series_list, legend_labels=angle_labels, save_path=f"{save_dir}/Angle_evol.png")
-
-    # plot x, y, z over time of an atom
-    # atom_id=4
-    # xyz_data = get_xyz_series(df, atom_id=atom_id)
-    # plot_xyz_evolution(xyz_data, title=f'Atom {atom_id} Position Evolution')
-    
-    if num_atoms < 2:
-        print("Need at least two atoms to compute distances.")
-    else:
-        distance_series_list = []
-        distance_labels = []
-        for atom_id in range(1, num_atoms):
-            id1, id2 = atom_id, atom_id + 1
-            distance_series_list.append(get_distance_series(df, id1=id1, id2=id2))
-            distance_labels.append(f"{id1}-{id2}")
-        plot_distance_evolution(
-            distance_series_list,
-            legend_labels=distance_labels,
-            save_path=f"{save_dir}/Distance_evol.png",
-        )
-    # print("Generating animation...")
-    
-    # Find LAMMPS script in data_dir
-    lammps_script = None
-    if os.path.exists(data_dir):
-        for file in os.listdir(data_dir):
-            if file.startswith("in."):
-                lammps_script = os.path.join(data_dir, file)
-                break
-    
-    anim = Animator(df, output_file=f"{save_dir}/chain_motion.mp4", lammps_script=lammps_script)
-    
-    # You can color by 'id', 'vx', 'vy', 'vz', or 'velocity_magnitude' if those columns exist
-    # Axis limits set to 15mm (0.015m) as requested
-    anim.create_animation(start_frame=1, end_frame=None, fps=24, color_by='id', point_size=100, view='z_left_x_down', axis_limits=None)
-
-
 if __name__ == "__main__":
     available_functions = {
         "main": main,
@@ -288,8 +202,6 @@ if __name__ == "__main__":
         "resume_flop_simulation": resume_flop_simulation,
         "run_simulation": run_simulation,
         "generate_linear_chains": generate_linear_chains,
-        "visualize_results": visualize_results,
-        "visualize_chain_flop_results": visualize_chain_flop_results,
         "generate_relaxed_chain_states": generate_relaxed_chain_states,
         "run_hopper_simulation": run_hopper_simulation
     }

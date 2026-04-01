@@ -17,38 +17,51 @@ variable f_x_half equal 0.1 # funnel extent in x direction
 variable h_y_half equal ${y_half}+${eps} # hopper extent in y direction
 variable h_x_half equal ${x_half}+${eps} # hopper extent in y direction
 
+# use _vis regions for visualising geometry
+
 # Entry funnel (Top) - Funneling in the X-direction
-region entry_f_neg plane -${x_half} 0 ${z_bin_top} -${sin_f} 0  -${cos_f}
-region entry_f_pos plane  ${x_half} 0 ${z_bin_top}  ${sin_f} 0  -${cos_f}
-region funnel_bounds block -${f_x_half} ${f_x_half} -${y_half} ${y_half} ${z_bin_top} ${funnel_top} side in
-region funnel_neg intersect 2 entry_f_neg funnel_bounds
-region funnel_pos intersect 2 entry_f_pos funnel_bounds
-fix wall_funnel_neg all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_neg
-fix wall_funnel_pos all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_pos
+region entry_f_neg plane -${x_half} 0 ${z_bin_top} -${sin_f} 0 -${cos_f}
+region entry_f_pos plane  ${x_half} 0 ${z_bin_top}  ${sin_f} 0 -${cos_f}
+region funnel_bounds block -${f_x_half} ${f_x_half} -${y_half} ${y_half} ${z_bin_top} ${funnel_top}
+region funnel_neg_vis intersect 2 entry_f_neg funnel_bounds
+region funnel_pos_vis intersect 2 entry_f_pos funnel_bounds
+region funnel_neg intersect 2 entry_f_neg funnel_bounds side out
+region funnel_pos intersect 2 entry_f_pos funnel_bounds side out
+fix wall_funnel_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region funnel_neg
+fix wall_funnel_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region funnel_pos
 # Funnel side walls
-region funnel_left block -${f_x_half} ${f_x_half} ${y_half} ${h_y_half} ${z_bin_top} ${funnel_top}
-region funnel_right block -${f_x_half} ${f_x_half} -${h_y_half} -${y_half} ${z_bin_top} ${funnel_top}
-fix wall_funnel_left all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_left
-fix wall_funnel_right all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region funnel_right
+region funnel_left_vis block -${f_x_half} ${f_x_half} ${y_half} ${h_y_half} ${z_bin_top} ${funnel_top}
+region funnel_right_vis block -${f_x_half} ${f_x_half} -${h_y_half} -${y_half} ${z_bin_top} ${funnel_top}
+region funnel_left block -${f_x_half} ${f_x_half} ${y_half} ${h_y_half} ${z_bin_top} ${funnel_top} side out
+region funnel_right block -${f_x_half} ${f_x_half} -${h_y_half} -${y_half} ${z_bin_top} ${funnel_top} side out
+fix wall_funnel_left all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region funnel_left
+fix wall_funnel_right all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region funnel_right
+# hopper side walls
+region hopper_pos_vis block -${x_half} ${x_half} ${y_half} ${h_y_half} ${converging_sec_ht} ${z_bin_top}
+region hopper_neg_vis block -${x_half} ${x_half} -${h_y_half} -${y_half} ${converging_sec_ht} ${z_bin_top}
+region hopper_pos block -${x_half} ${x_half} ${y_half} ${h_y_half} ${converging_sec_ht} ${z_bin_top} side out
+region hopper_neg block -${x_half} ${x_half} -${h_y_half} -${y_half} ${converging_sec_ht} ${z_bin_top} side out
+fix wall_hopper_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region hopper_pos
+fix wall_hopper_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region hopper_neg
+# hopper front and back covers
+region hopper_front_vis block ${x_half} ${h_x_half} -${y_half} ${y_half} 0 ${z_bin_top}
+region hopper_back_vis block -${h_x_half} -${x_half} -${y_half} ${y_half} 0 ${z_bin_top}
+region hopper_front block ${x_half} ${h_x_half} -${y_half} ${y_half} 0 ${z_bin_top} side out
+region hopper_back block -${h_x_half} -${x_half} -${y_half} ${y_half} 0 ${z_bin_top} side out
+fix wall_hopper_front all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region hopper_front
+fix wall_hopper_back all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region hopper_back
 # Converging section
 region exit_v_neg plane 0 -${orifice_half} 0 0 -${sin_c} -${cos_c}
 region exit_v_pos plane 0  ${orifice_half} 0 0  ${sin_c} -${cos_c}
 region exit_bounds block -${x_half} ${x_half} -${y_half} ${y_half} 0.0 ${converging_sec_ht}
-region exit_neg intersect 2 exit_v_neg exit_bounds
-region exit_pos intersect 2 exit_v_pos exit_bounds
-fix wall_exit_neg all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region exit_neg
-fix wall_exit_pos all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region exit_pos
-# hopper side walls
-region hopper_pos block -${x_half} ${x_half} ${y_half} ${h_y_half} ${converging_sec_ht} ${z_bin_top}
-region hopper_neg block -${x_half} ${x_half} -${h_y_half} -${y_half} ${converging_sec_ht} ${z_bin_top}
-fix wall_hopper_pos all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_pos
-fix wall_hopper_neg all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_neg
-# hopper front and back covers
-region hopper_front block ${x_half} ${h_x_half} -${y_half} ${y_half} 0 ${z_bin_top}
-region hopper_back block -${h_x_half} -${x_half} -${y_half} ${y_half} 0 ${z_bin_top}
-fix wall_hopper_front all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_front
-fix wall_hopper_back all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region hopper_back
+region exit_neg_vis intersect 2 exit_v_neg exit_bounds
+region exit_pos_vis intersect 2 exit_v_pos exit_bounds
+region exit_neg intersect 2 exit_v_neg exit_bounds side out
+region exit_pos intersect 2 exit_v_pos exit_bounds side out
+fix wall_exit_neg all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region exit_neg
+fix wall_exit_pos all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region exit_pos
 
 # Orifice cover
-region orifice_cover block -${x_half} ${x_half} -${orifice_half} ${orifice_half} -${eps} 0
-fix lid all wall/gran/region hertz/history 1.0e8 1.0e8 5e-4 0.0 0.3 1 region orifice_cover
+region orifice_cover_vis block -${x_half} ${x_half} -${orifice_half} ${orifice_half} -${eps} 0
+region orifice_cover block -${x_half} ${x_half} -${orifice_half} ${orifice_half} -${eps} 0 side out
+fix lid all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 0.0 0.3 1 region orifice_cover

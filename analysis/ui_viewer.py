@@ -27,6 +27,8 @@ class SimDataController:
     def __init__(self):
         self.df: Optional[pd.DataFrame] = None
         self.df_mi: Optional[pd.DataFrame] = None
+        self.df_bonds: Optional[pd.DataFrame] = None
+        self.df_angles: Optional[pd.DataFrame] = None
         self.current_sim_folder: Optional[str] = None
         self.geometry_data: Optional[dict] = None
         self.geometry_script_path: Optional[str] = None
@@ -37,18 +39,28 @@ class SimDataController:
     def load_folder(self, folder: str, force_reload: bool = False):
         try:
             sim = SimulationData(folder)
-            df = sim.load_data(force_reload=force_reload)
-            if df.empty:
+            data_dict = sim.load_data(force_reload=force_reload)
+            df_atoms = data_dict['atoms']
+            if df_atoms is not None and not df_atoms.empty:
+                df_atoms = df_atoms.reset_index()
+            
+            if df_atoms is None or df_atoms.empty:
                 return False, "No dump files found or parsing failed."
             
-            if isinstance(df.index, pd.MultiIndex):
-                df = df.reset_index()
-            
+            # Reset index for common processing if needed, 
+            # though load_dataframe will handle the atoms DF.
             self.current_sim_folder = folder
             self.geometry_data, self.geometry_script_path = load_lammps_geometry(folder)
-            self.load_dataframe(df)
+            
+            # Multi-dataset state
+            self.df_bonds = data_dict['bonds']
+            self.df_angles = data_dict['angles']
+            
+            self.load_dataframe(df_atoms)
             return True, None
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return False, str(e)
 
     def load_dump_files(self, files: list):
@@ -87,9 +99,20 @@ class SimDataController:
 
     def load_dataframe(self, df: pd.DataFrame):
         self.df = df.copy()
+        # Ensure critical columns are numeric for calculation
         for c in ['x', 'y', 'z', 'id', 'timestep']:
-            if c not in self.df.columns:
+            if c in self.df.columns:
+                self.df[c] = pd.to_numeric(self.df[c], errors='coerce')
+            else:
                 raise ValueError(f"Missing column: {c}")
+        
+        # Provide fallback diameter if missing
+        if 'diameter' not in self.df.columns:
+            self.df['diameter'] = 0.01
+        else:
+            self.df['diameter'] = pd.to_numeric(self.df['diameter'], errors='coerce').fillna(0.01)
+
+        self.df.dropna(subset=['x', 'y', 'z', 'id', 'timestep'], inplace=True)
 
         x_min, x_max = self.df['x'].min(), self.df['x'].max()
         y_min, y_max = self.df['y'].min(), self.df['y'].max()
@@ -634,13 +657,12 @@ class ViewerApp(BaseTk):
 
     def _on_data_loaded(self):
         # Notify any open time-series windows of new data
-        for _attr in ('_bond_win', '_angle_win', '_atom_win'):
-            _w = getattr(self, _attr, None)
-            if _w is not None:
-                try:
-                    if _w.winfo_exists():
-                        _w.refresh_df(self.data_ctrl.df_mi)
-                except Exception: pass
+        if self._bond_win and self._bond_win.winfo_exists():
+            self._bond_win.refresh_df(self.data_ctrl.df_bonds)
+        if self._angle_win and self._angle_win.winfo_exists():
+            self._angle_win.refresh_df(self.data_ctrl.df_angles)
+        if self._atom_win and self._atom_win.winfo_exists():
+            self._atom_win.refresh_df(self.data_ctrl.df_mi)
 
         self.ts_listbox.delete(0, tk.END)
         for t in self.data_ctrl.timesteps:
@@ -1010,7 +1032,12 @@ class ViewerApp(BaseTk):
 
         pts = chain_data[['x','y','z']].values
     
-        r = (chain_data['diameter'].values / 2.0)
+        r = 0.005
+        if 'diameter' in chain_data.columns:
+            try:
+                r = (chain_data['diameter'].values / 2.0)
+            except Exception:
+                pass
 
         # Create spheres (GPU instanced → fast)
         spheres = Spheres(pts, r=r, c='blue', alpha=0.6)
@@ -1054,7 +1081,7 @@ class ViewerApp(BaseTk):
             return
         if self._bond_win is None or not self._bond_win.winfo_exists():
             self._bond_win = BondPlotWindow(
-                self, self.data_ctrl.df_mi, self.chain_size_var, self._bond_range_spec)
+                self, self.data_ctrl.df_bonds, self.chain_size_var, self._bond_range_spec)
         else:
             self._bond_win.lift()
 
@@ -1065,7 +1092,7 @@ class ViewerApp(BaseTk):
             return
         if self._angle_win is None or not self._angle_win.winfo_exists():
             self._angle_win = AnglePlotWindow(
-                self, self.data_ctrl.df_mi, self.chain_size_var, self._angle_range_spec)
+                self, self.data_ctrl.df_angles, self.chain_size_var, self._angle_range_spec)
         else:
             self._angle_win.lift()
 
