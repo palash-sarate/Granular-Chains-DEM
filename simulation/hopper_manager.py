@@ -138,6 +138,49 @@ class HopperManager:
         saved_data = f"{cfg.output_dir}/final_hopper.data".replace("\\", "/")
         return saved_data
 
+    def resume_filled_state(self, restart_path: str, source_dir: str, n_fill: int, relax_steps: int,
+                            dt: float = 1e-6, run_name: str = None, seed: int = 12345,
+                            mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
+                            dump_inc: str = "simulation_templates/default_dump.inc") -> str:
+        """Resume a hopper fill simulation from a restart file and add more chains.
+        Returns the path to the saved data file.
+        """
+        if run_name is None:
+            run_name = f"resumed_N{n_fill}_s{seed}"
+
+        # Prepare molecules (ensure we have the .mol files for create_atoms)
+        inc_file = self.prepare_molecules(source_dir, mol_dir)
+        n_templates = len(list(Path(source_dir).glob("*.data")))
+
+        # Determine drop_steps
+        drop_steps = int(5 * (1 / dt) * 1e-2)
+
+        cfg = SimulationConfig(
+            template="in.hopper_fill_resume",
+            simulation="Hopper_Flow",
+            run=run_name,
+            resume_file=restart_path,
+            extra_vars={
+                "viscosity": 0.001,
+                "setup_inc": setup_inc,
+                "dump_inc": dump_inc,
+                "mol_include_file": inc_file,
+                "n_templates": n_templates,
+                "n_fill": n_fill,
+                "drop_steps": int(drop_steps),
+                "relax_steps": relax_steps,
+                "dt": dt,
+                "seed": seed,
+            }
+        )
+
+        print(f"Resuming filled hopper state: {run_name}")
+        # Use runner.resume instead of runner.run
+        self.runner.resume(cfg, verbose=True)
+
+        saved_data = f"{cfg.output_dir}/final_hopper_resume.data".replace("\\", "/")
+        return saved_data
+
     def run_flow_from_saved(self, saved_data_path: str = None, restart_path: str = None,
                             run_name: str = None, freq: float = 5.0, amp: float = 0.005,
                             dt: float = 1e-6, run_steps: int = 10000) -> str:

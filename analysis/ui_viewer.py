@@ -8,7 +8,7 @@ import numpy as np
 from vedo import Plotter, Spheres, Lines, Axes, Box, Cylinder, Cone, Plane, Mesh
 from analysis.utilities import validate_chain_spacing
 from analysis.ts_windows import (BondPlotWindow, AnglePlotWindow, AtomPlotWindow,
-                                   parse_range_spec)
+                                   LeptonPlotWindow, parse_range_spec)
 from analysis.data_manager import SimulationData, parse_simple_data_file, load_lammps_geometry
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
@@ -608,6 +608,8 @@ class ViewerApp(BaseTk):
                   command=self._open_angle_win).pack(fill=tk.X, pady=(4, 0))
         tk.Button(col2, text='Atom Properties…',
                   command=self._open_atom_win).pack(fill=tk.X, pady=(4, 0))
+        tk.Button(col2, text='Lepton Potentials…',
+                  command=self._open_lepton_win).pack(fill=tk.X, pady=(4, 0))
 
         self.plotter = Plotter(
             bg='white',
@@ -638,6 +640,7 @@ class ViewerApp(BaseTk):
         self._bond_win  = None
         self._angle_win = None
         self._atom_win  = None
+        self._lepton_win = None
         # Saved range strings — restored when windows are reopened
         self._bond_range_spec  = ''
         self._angle_range_spec = ''
@@ -1126,6 +1129,37 @@ class ViewerApp(BaseTk):
             pass
         # Force exit to ensure background threads (if any) don't block terminal
         sys.exit(0)
+
+    def _open_lepton_win(self):
+        """Open the Lepton potential visualization window."""
+        if self._lepton_win is not None and self._lepton_win.winfo_exists():
+            self._lepton_win.lift()
+            return
+
+        # Locate lepton.inc
+        path = None
+        if self.data_ctrl.current_sim_folder:
+            p = os.path.join(self.data_ctrl.current_sim_folder, 'lepton.inc')
+            if os.path.exists(p):
+                path = p
+        
+        if not path:
+            # Fallback to templates
+            root = os.getcwd()
+            p = os.path.join(root, 'simulation_templates', 'lepton.inc')
+            if os.path.exists(p):
+                path = p
+        
+        if not path:
+            from tkinter import messagebox as _mb
+            _mb.showerror("Error", "Could not locate lepton.inc in simulation folder or templates.")
+            return
+        
+        try:
+            self._lepton_win = LeptonPlotWindow(self, path)
+        except Exception as e:
+            from tkinter import messagebox as _mb
+            _mb.showerror("Error", f"Failed to open Lepton window: {e}")
 
 
 def run():

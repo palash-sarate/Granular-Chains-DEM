@@ -12,16 +12,16 @@ variable delta equal 1.0e-4    # smoothing angle (rad) ~ 1.15 deg
 
 # Granular pair style parameters
 # normal contact
-variable k_n equal 1e6 # Normal stiffness
-variable nu_n0 equal 50.0 # damping prefactor or a coefficient of restitution
+# variable k_n equal 1e6 # Normal stiffness
+# variable nu_n0 equal 50.0 # damping prefactor or a coefficient of restitution
 # rolling
-variable k_roll equal 1.0e6   # Rolling Friction Stiffness
-variable gamma_roll equal 5000 # Rolling Friction Damping
-variable mu_roll equal 0.3 # Rolling Friction Coefficient
+# variable k_roll equal 1.0e6   # Rolling Friction Stiffness
+# variable gamma_roll equal 5000 # Rolling Friction Damping
+# variable mu_roll equal 0.3 # Rolling Friction Coefficient
 # tangential
-variable k_t equal 1.0e6   # Tangential stiffness coefficient.
-variable x_gamma_t equal 1.0 # dimensionless multiplier for the normal damping
-variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
+# variable k_t equal 1.0e6   # Tangential stiffness coefficient.
+# variable x_gamma_t equal 1.0 # dimensionless multiplier for the normal damping
+# variable mu_s equal 0.3 # is the tangential (or sliding) friction coefficient
 
 pair_style  granular
 pair_coeff  * * hooke 1e6 50.0 & 

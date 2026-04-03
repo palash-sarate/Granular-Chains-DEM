@@ -12,7 +12,7 @@ from ovito.modifiers import ConstructSurfaceModifier
 # --------------------------------------------------
 # Helper: create LAMMPS input script
 # --------------------------------------------------
-def generate_lammps_input(inc_file, dump_file, n_particles,
+def generate_lammps_input(inc_file, dump_file, lattice_spacing,
                          region_bounds, extra_vars, target_region):
 
     xlo, xhi, ylo, yhi, zlo, zhi = region_bounds
@@ -34,8 +34,9 @@ create_box 1 simbox
 # Include geometry
 include {inc_file}
 
-# Fill with random particles
-create_atoms 1 random {n_particles} 12345 {target_region}
+# Fill with structured lattice for perfect edges
+lattice sc {lattice_spacing}
+create_atoms 1 region {target_region}
 
 write_dump all custom {dump_file} id type x y z
 """
@@ -51,13 +52,13 @@ def main():
 
     parser.add_argument("inc", help="Path to .inc file")
     parser.add_argument("--outdir", default="out_mesh", help="Output directory")
-    parser.add_argument("--n_particles", type=int, default=600000, help="Number of sample particles")
-    parser.add_argument("--radius", type=float, default=0.002, help="Surface reconstruction radius")
+    parser.add_argument("--spacing", type=float, default=0.001, help="Lattice spacing for sampling")
+    parser.add_argument("--radius", type=float, default=None, help="Surface reconstruction radius (defaults to 1.2 * spacing)")
     parser.add_argument("--lammps_cmd", default="lmp", help="LAMMPS executable")
 
-    parser.add_argument("--regions", nargs="+", default=["simbox"], help="List of LAMMPS region names to fill with particles")
+    parser.add_argument("--regions", nargs="+", default=["simbox"], help="List of LAMMPS region names to fill")
     parser.add_argument("--bounds", nargs=6, type=float,
-                        default=[-1, 1, -1, 1, -0.02, 1],
+                        default=[-0.2, 0.2, -0.3, 0.3, -0.1, 0.6],
                         help="Sampling box bounds: xlo xhi ylo yhi zlo zhi")
 
     parser.add_argument("--var", action="append",
@@ -86,7 +87,7 @@ def main():
         lmp_script = generate_lammps_input(
             inc_file=inc_file,
             dump_file=dump_file,
-            n_particles=args.n_particles,
+            lattice_spacing=args.spacing,
             region_bounds=args.bounds,
             extra_vars=extra_vars,
             target_region=region
@@ -95,17 +96,18 @@ def main():
         with open(input_file, "w") as f:
             f.write(lmp_script)
 
-        print(f"[{region}] Running LAMMPS...")
+        print(f"[{region}] Running LAMMPS (Lattice fill)...")
         subprocess.run([args.lammps_cmd, "-in", str(input_file)], check=True)
 
         print(f"[{region}] Loading dump into OVITO...")
         pipeline = import_file(str(dump_file))
 
-        print(f"[{region}] Constructing surface...")
+        print(f"[{region}] Constructing surface (Zero smoothing)...")
+        recon_radius = args.radius if args.radius else args.spacing * 1.2
         pipeline.modifiers.append(
             ConstructSurfaceModifier(
-                radius=args.radius,
-                smoothing_level=10
+                radius=recon_radius,
+                smoothing_level=0
             )
         )
 

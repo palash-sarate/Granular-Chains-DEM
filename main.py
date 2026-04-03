@@ -1,6 +1,5 @@
 from analysis.data_manager import SimulationData
 from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
-from analysis.animate import Animator
 import os
 from simulation import SimulationConfig, SimulationRunner
 from simulation.chain_generator import ChainConfig, write_chain_data
@@ -24,11 +23,31 @@ def run_hopper_simulation():
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
     manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
-                                n_fill=100, dt = 1e-6, relax_steps=100000,
-                                run_name="hopper_fill_N4",
-                                seed = 12345,
+                                 n_fill=100, dt = 1e-6, relax_steps=100000,
+                                 run_name="hopper_fill_N4",
+                                 seed = 12345,
+                                 mol_dir = "chain_data/molecules_temp", 
+                                 setup_inc = "simulation_geometries/2D_hopper.inc",
+                                 dump_inc = "simulation_templates/default_dump.inc")
+
+def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10, 
+                       relax_steps=50000, restart_path=None, 
+                       run_name=None):
+    """Resume filling a hopper from an existing restart file."""
+    if not restart_path:
+        print("Error: restart_path is required for resuming.")
+        return
+
+    runner = SimulationRunner(lammps_executable="lmp")
+    manager = HopperManager(runner)
+    manager.resume_filled_state(restart_path=restart_path,
+                                source_dir=source_dir,
+                                n_fill=n_fill,
+                                relax_steps=relax_steps,
+                                run_name=run_name,
+                                dt=1e-6,
                                 mol_dir = "chain_data/molecules_temp", 
-                                setup_inc = "simulation_geometries/2D_hopper.inc",
+                                setup_inc="simulation_geometries/2D_hopper.inc",
                                 dump_inc = "simulation_templates/default_dump.inc")
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
@@ -203,7 +222,8 @@ if __name__ == "__main__":
         "run_simulation": run_simulation,
         "generate_linear_chains": generate_linear_chains,
         "generate_relaxed_chain_states": generate_relaxed_chain_states,
-        "run_hopper_simulation": run_hopper_simulation
+        "run_hopper_simulation": run_hopper_simulation,
+        "resume_hopper_fill": resume_hopper_fill
     }
 
     parser = argparse.ArgumentParser(description="Execute functions from main.py")

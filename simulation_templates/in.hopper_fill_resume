@@ -1,56 +1,64 @@
-# Fill-only hopper template: fill, relax, save (no oscillation)
+# Resume hopper-fill template: read restart, continue filling/relaxing
 # Expects variables: outdir, mol_include_file, n_templates, n_fill, drop_steps,
-# relax_steps, dt, seed, lepton_inc
+# relax_steps, dt, seed, lepton_inc, resume_file, viscosity
 
 units       si
 atom_style hybrid sphere angle
 boundary    f f f
 
-comm_modify vel yes cutoff 0.004
-special_bonds lj/coul 1.0 1.0 1.0
+# 1. READ RESTART
+# This must be the first command after units/atom_style/boundary
+read_restart ${resume_file}
 
-# Box and topology
-region sim_box block -0.5 0.5 -0.5 0.5 -1.0 0.5
-create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 2
-
-fix 2 all gravity 9.81 vector 0 0 -1
-
+# 2. POTENTIALS
+# Re-declare the pair/bond/angle styles used in the simulation
 include ${lepton_inc}
 
-group chain_particles dynamic all region sim_box
-fix 1 all viscous ${viscosity}
-
-# Use the standard NVE integrator for the mobile beads only.
-fix integr all nve/sphere
-
+# 3. GEOMETRY & WALLS
+# Re-declare regions and fix wall/gran/region (not saved in restart)
 include ${setup_inc}
 
-# Molecules
+# 4. MOLECULES
+# Re-declare molecule templates for use in create_atoms
 include ${mol_include_file}
 
-# Settings
-neighbor 0.004 bin
+# 5. GROUPS & DYNAMIC STUFF
+# Sim box for dynamic grouping (consistent with in.hopper_fill)
+region sim_box block -0.5 0.5 -0.25 0.25 -0.1 0.6
+group chain_particles dynamic all region sim_box
+
+# 6. FIXES (RE-DECLARATION)
+# Fixes are cleared upon read_restart, so we must re-define them
+fix 1 all gravity 9.81 vector 0 0 -1
+fix 2 all viscous ${viscosity}
+fix 3 all nve/sphere
+
+# 7. SETTINGS
+# Neighbors and communication settings
+neighbor 0.01 bin
 neigh_modify delay 0 every 1 check yes
+comm_modify vel yes cutoff 0.01
 timestep ${dt}
 
-
+# 8. OUTPUT
 include ${dump_inc}
 
-# Fill loop
+# 9. CONTINUE FILL LOOP
+# This loop adds ${n_fill} additional chains starting from the restart state
 variable i loop ${n_fill}
 label loop_start
     variable r equal floor(random(1,${n_templates}+1,${seed}))
     variable mol_id string m${r}
-    variable rx equal random(-0.02,0.02,${seed})
-    variable ry equal random(-0.02,0.02,${seed})
-    create_atoms 0 single ${rx} ${ry} 0.2 mol ${mol_id} ${seed}
+    variable rx equal random(-0.08,0.08,${seed})
+    variable ry equal random(-0.155, 0.155, ${seed})
+    create_atoms 0 single ${rx} ${ry} 0.5 mol ${mol_id} ${seed}
     run ${drop_steps}
     next i
 jump SELF loop_start
 
-# Relax the filled hopper
+# 10. FINAL RELAXATION
 run ${relax_steps}
 
-# Save state
-write_data ${outdir}/final_hopper.data
-write_restart ${outdir}/restart/restart.fill.bin
+# 11. SAVE STATE
+write_data ${outdir}/final_hopper_resume.data
+write_restart ${outdir}/restart/restart.fill.resume.bin
