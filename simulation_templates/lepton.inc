@@ -5,7 +5,7 @@ variable r_max equal 0.0005 #pot center to center
 variable theta_lim equal 2.4435
 # Stiffnesses
 variable knt2   equal 1.0e6  # High stiffness for bond limit
-variable ktheta equal 1.0e6   # Stiffness for angle limit
+variable ktheta equal 1.0e1   # Stiffness for angle limit
 # smoothing widths (tune as needed)
 variable w   equal 1.0e-4    # smoothing length (m) 0.1 mm
 variable delta equal 1.0e-4    # smoothing angle (rad) ~ 1.15 deg

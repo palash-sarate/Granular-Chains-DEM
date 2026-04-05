@@ -191,21 +191,31 @@ class ViewerApp(BaseTk):
         except: return 4
 
     def _on_data_loaded(self):
+        old_ts = self.current_timestep
         self.analysis_ctrl.refresh_windows()
         self.ts_listbox.delete(0, tk.END)
         for t in self.data_ctrl.timesteps: 
             self.ts_listbox.insert(tk.END, str(t))
             
-        total_frames = len(self.data_ctrl.timesteps)
+        timesteps = self.data_ctrl.timesteps
+        total_frames = len(timesteps)
         self.frame_slider.config(from_=0, to=max(0, total_frames - 1))
-        self.frame_slider.set(0)
-        self.playback_ctrl.update_status(0)
+        
+        target_idx = 0
+        if old_ts is not None and old_ts in timesteps:
+            target_idx = list(timesteps).index(old_ts)
+        
+        self.frame_slider.set(target_idx)
+        self.playback_ctrl.update_status(target_idx)
+        self.ts_listbox.selection_clear(0, tk.END)
+        self.ts_listbox.selection_set(target_idx)
+        self.ts_listbox.activate(target_idx)
+        
         self.renderer.update_persistent_bounds()
-        if self.data_ctrl.timesteps:
-            ts = self.data_ctrl.timesteps[0]
+        if timesteps:
+            ts = timesteps[target_idx]
             self.current_timestep = ts
             self.renderer.show_timestep(ts)
-            self.renderer.fit_view()
         self.refresh_button.config(state=tk.NORMAL)
 
     def _on_batch_ready(self, batch_idx):

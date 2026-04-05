@@ -18,7 +18,8 @@ def run_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10,
                        relax_steps=100000, run_name=None, seed=None, dt = 1e-6,
                        mol_dir = "chain_data/molecules_temp",
                        setup_inc = "simulation_geometries/2D_hopper.inc",
-                       dump_inc = "simulation_templates/default_dump.inc"):
+                       dump_inc = "simulation_templates/default_dump.inc",
+                       viscosity = 0.001):
     if seed is None:
         seed = int(time.time()) % 1000000
 
@@ -30,7 +31,8 @@ def run_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10,
                                  seed = seed,
                                  mol_dir = mol_dir, 
                                  setup_inc = setup_inc,
-                                 dump_inc = dump_inc)
+                                 dump_inc = dump_inc,
+                                 viscosity = viscosity)
 
 def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10, 
                        relax_steps=100000, restart_path=None, 

@@ -33,12 +33,9 @@ class SimulationLoader:
             messagebox.showerror('Error', err)
             return
         
-        self.vtk_ctrl.clear()
-        self.ui_callbacks['clear_vtk_list']()
         self.renderer_ctrl.clear()
         self.renderer_ctrl.update_persistent_bounds()
         self.ui_callbacks['on_load_success']()
-        self.renderer_ctrl.fit_view()
 
     def open_dump_files(self):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files', 'dump*'), ('All', '*.*')])
@@ -51,7 +48,6 @@ class SimulationLoader:
             self.renderer_ctrl.clear()
             self.renderer_ctrl.update_persistent_bounds()
             self.ui_callbacks['on_load_success']()
-            self.renderer_ctrl.fit_view()
 
     def open_data_file(self):
         f = filedialog.askopenfilename(title='Select data file', filetypes=[('Data files', '*.data'), ('All', '*.*')])
@@ -67,7 +63,6 @@ class SimulationLoader:
             self.renderer_ctrl.clear()
             self.renderer_ctrl.update_persistent_bounds()
             self.ui_callbacks['on_load_success']()
-            self.renderer_ctrl.fit_view()
 
     def handle_dropped_files(self, filenames: list):
         if not filenames: return
@@ -90,7 +85,6 @@ class SimulationLoader:
                     self.renderer_ctrl.clear()
                     self.renderer_ctrl.update_persistent_bounds()
                     self.ui_callbacks['on_load_success']()
-                    self.renderer_ctrl.fit_view()
         
         for v in vtks:
             self.ui_callbacks['add_vtk'](v)
