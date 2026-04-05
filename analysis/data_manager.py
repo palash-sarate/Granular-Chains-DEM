@@ -156,76 +156,131 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     return df
 
 class SimulationData:
-    def __init__(self, data_dir, cache_file="sim_cache.pkl"):
+    def __init__(self, data_dir, cache_prefix="sim_cache", batch_size=1000):
         self.data_dir = data_dir
         self.chain_dump_dir = os.path.join(data_dir, "chain")
         self.bond_dump_dir = os.path.join(data_dir, "bond")
         self.angle_dump_dir = os.path.join(data_dir, "angle")
-        self.cache_file = os.path.join(data_dir, cache_file)
-        self.df_atoms = None
-        self.df_bonds = None
-        self.df_angles = None
+        self.cache_prefix = os.path.join(data_dir, cache_prefix)
+        self.batch_size = batch_size
+        
+        self.df_atoms = pd.DataFrame()
+        self.df_bonds = pd.DataFrame()
+        self.df_angles = pd.DataFrame()
+        
+        self.timesteps = []
+        self.atom_files = []
+        self.bond_files = []
+        self.angle_files = []
+        self.loaded_batches = set()
 
-    def load_data(self, force_reload=False):
-        """
-        Loads data from cache if available and fresh; otherwise parses dump files.
-        Returns a dict of DataFrames: {'atoms': df, 'bonds': df, 'angles': df}
-        """
-        if not force_reload and self._is_cache_valid():
+    def _get_cache_file(self, batch_idx):
+        return f"{self.cache_prefix}_batch_{batch_idx}.pkl"
+
+    def load_metadata(self):
+        """Scans directories, sorts dump files by timestep, and extracts all timesteps."""
+        if os.path.isdir(self.chain_dump_dir):
+            self.atom_files = sorted(glob.glob(os.path.join(self.chain_dump_dir, "*.dump")), key=self._get_step)
+        if os.path.isdir(self.bond_dump_dir):
+            self.bond_files = sorted(glob.glob(os.path.join(self.bond_dump_dir, "*.dump")), key=self._get_step)
+        if os.path.isdir(self.angle_dump_dir):
+            self.angle_files = sorted(glob.glob(os.path.join(self.angle_dump_dir, "*.dump")), key=self._get_step)
+
+        # Build list of timesteps from atom files (or others if atom is empty)
+        base_files = self.atom_files or self.bond_files or self.angle_files
+        self.timesteps = [self._get_step(f) for f in base_files]
+        return self.timesteps
+
+    def get_batch_count(self):
+        return max(1, (len(self.timesteps) + self.batch_size - 1) // self.batch_size) if self.timesteps else 0
+
+    def get_batch_index_for_timestep(self, ts):
+        if not self.timesteps: return 0
+        try:
+            # Find index in the metadata timesteps list
+            idx = self.timesteps.index(ts)
+            return idx // self.batch_size
+        except ValueError:
+            return 0
+
+    def load_batch(self, batch_idx, force_reload=False):
+        """Loads a specific batch of data."""
+        if batch_idx in self.loaded_batches and not force_reload:
+            return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
+
+        cache_file = self._get_cache_file(batch_idx)
+        start_idx = batch_idx * self.batch_size
+        end_idx = start_idx + self.batch_size
+
+        batch_atoms_files = self.atom_files[start_idx:end_idx]
+        batch_bonds_files = self.bond_files[start_idx:end_idx]
+        batch_angles_files = self.angle_files[start_idx:end_idx]
+
+        loaded_data = None
+        if not force_reload and self._is_batch_cache_valid(batch_idx, batch_atoms_files + batch_bonds_files + batch_angles_files):
             try:
-                print(f"Loading from cache: {self.cache_file}")
-                with open(self.cache_file, 'rb') as f:
-                    data = pickle.load(f)
-                
-                # Robust check for new dictionary format
-                if isinstance(data, dict) and 'atoms' in data:
-                    self.df_atoms = data.get('atoms')
-                    self.df_bonds = data.get('bonds')
-                    self.df_angles = data.get('angles')
-                    return data
-                else:
-                    print("Cache format outdated, re-parsing...")
+                print(f"Loading batch {batch_idx} from cache: {cache_file}")
+                with open(cache_file, 'rb') as f:
+                    loaded_data = pickle.load(f)
             except Exception as e:
-                print(f"Cache loading failed ({e}), re-parsing...")
-        
-        print("Parsing dump files (this may take a moment)...")
-        self.df_atoms = self._parse_all_dumps(self.chain_dump_dir)
-        self.df_bonds = self._parse_all_dumps(self.bond_dump_dir)
-        self.df_angles = self._parse_all_dumps(self.angle_dump_dir)
-        
-        print("Saving to cache...")
-        data = {
-            'atoms': self.df_atoms,
-            'bonds': self.df_bonds,
-            'angles': self.df_angles
-        }
-        with open(self.cache_file, 'wb') as f:
-            pickle.dump(data, f)
-        
+                print(f"Cache loading failed for batch {batch_idx} ({e}), re-parsing...")
+
+        if loaded_data is None:
+            print(f"Parsing dump files for batch {batch_idx}...")
+            batch_atoms = self._parse_dump_list(batch_atoms_files)
+            batch_bonds = self._parse_dump_list(batch_bonds_files)
+            batch_angles = self._parse_dump_list(batch_angles_files)
+            
+            loaded_data = {
+                'atoms': batch_atoms,
+                'bonds': batch_bonds,
+                'angles': batch_angles
+            }
+            print(f"Saving batch {batch_idx} to cache...")
+            try:
+                with open(cache_file, 'wb') as f:
+                    pickle.dump(loaded_data, f)
+            except Exception as e:
+                print(f"Could not save cache: {e}")
+
+        # Accumulate loaded data
+        if not loaded_data['atoms'].empty:
+            self.df_atoms = pd.concat([self.df_atoms, loaded_data['atoms']]) if not self.df_atoms.empty else loaded_data['atoms']
+            # Re-sort to maintain clean multiindex
+            self.df_atoms = self.df_atoms[~self.df_atoms.index.duplicated(keep='last')].sort_index()
+
+        if not loaded_data['bonds'].empty:
+            self.df_bonds = pd.concat([self.df_bonds, loaded_data['bonds']]) if not self.df_bonds.empty else loaded_data['bonds']
+            self.df_bonds = self.df_bonds[~self.df_bonds.index.duplicated(keep='last')].sort_index()
+
+        if not loaded_data['angles'].empty:
+            self.df_angles = pd.concat([self.df_angles, loaded_data['angles']]) if not self.df_angles.empty else loaded_data['angles']
+            self.df_angles = self.df_angles[~self.df_angles.index.duplicated(keep='last')].sort_index()
+
+        self.loaded_batches.add(batch_idx)
         return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
 
-    def _is_cache_valid(self):
-        """Checks if cache exists and is newer than the latest dump file in any directory."""
-        if not os.path.exists(self.cache_file):
+    def load_data(self, force_reload=False):
+        """Metadata-first loading. Returns only the first batch by default."""
+        self.load_metadata()
+        if self.get_batch_count() > 0:
+            return self.load_batch(0, force_reload=force_reload)
+        return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
+
+    def _is_batch_cache_valid(self, batch_idx, batch_files):
+        """Checks if batch cache exists and is newer than the dump files in it."""
+        cache_file = self._get_cache_file(batch_idx)
+        if not os.path.exists(cache_file):
             return False
         
-        # Check atoms, bonds, and angles for updates
-        dirs = [self.chain_dump_dir, self.bond_dump_dir, self.angle_dump_dir]
-        latest_dump_mtime = 0
-        found_any = False
-        
-        for d in dirs:
-            if not os.path.isdir(d):
-                continue
-            dump_files = glob.glob(os.path.join(d, "*.dump"))
-            if dump_files:
-                found_any = True
-                latest_dump_mtime = max(latest_dump_mtime, max(os.path.getmtime(f) for f in dump_files))
-        
-        if not found_any:
+        if not batch_files:
             return False
             
-        cache_mtime = os.path.getmtime(self.cache_file)
+        latest_dump_mtime = max((os.path.getmtime(f) for f in batch_files if os.path.exists(f)), default=0)
+        if latest_dump_mtime == 0:
+            return False
+            
+        cache_mtime = os.path.getmtime(cache_file)
         return cache_mtime > latest_dump_mtime
 
     def _parse_single_dump(self, filepath):
@@ -281,18 +336,12 @@ class SimulationData:
         match = re.search(r'_(\d+)\.dump', filename)
         return int(match.group(1)) if match else 0
     
-    def _parse_all_dumps(self, dump_dir):
-        """Parses all dump files in directory and returns a MultiIndex DataFrame."""
-        if not os.path.isdir(dump_dir):
-            return pd.DataFrame()
-            
-        dump_files = glob.glob(os.path.join(dump_dir, "*.dump"))
+    def _parse_dump_list(self, dump_files):
+        """Parses a specific list of dump files and returns a MultiIndex DataFrame."""
         if not dump_files:
             return pd.DataFrame()
             
-        print(f"Found {len(dump_files)} dump files to parse in {dump_dir}")
-        # Sort by timestep
-        dump_files.sort(key=self._get_step)
+        print(f"Parsing {len(dump_files)} dump files...")
 
         all_frames = [self._parse_single_dump(f) for f in dump_files]
         all_frames = [f for f in all_frames if not f.empty]
@@ -306,7 +355,7 @@ class SimulationData:
             # For atoms it is 'id', for bonds/angles it is 'index'.
             id_col = 'id' if 'id' in full_df.columns else 'index'
             if id_col not in full_df.columns:
-                print(f"Warning: Neither 'id' nor 'index' found in {dump_dir} dumps.")
+                print(f"Warning: Neither 'id' nor 'index' found in dumps.")
                 return pd.DataFrame()
                 
             full_df.set_index(['timestep', id_col], inplace=True)
@@ -314,6 +363,5 @@ class SimulationData:
             full_df.sort_index(inplace=True)
             return full_df
         except Exception as e:
-            print(f"Failed to assemble DataFrames for {dump_dir}: {e}")
+            print(f"Failed to assemble DataFrames: {e}")
             return pd.DataFrame()
-        return full_df

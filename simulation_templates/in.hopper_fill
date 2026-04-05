@@ -11,7 +11,7 @@ special_bonds lj/coul 1.0 1.0 1.0
 
 # Box and topology
 region sim_box block -0.5 0.5 -0.25 0.25 -0.1 0.6
-create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 2
+create_box 1 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/special/per/atom 10
 
 fix 1 all gravity 9.81 vector 0 0 -1
 
@@ -98,8 +98,10 @@ label loop_start
 jump SELF loop_start
 
 # Relax the filled hopper
+restart 100000 ${outdir}/restart/restart.*.bin
+
 run ${relax_steps}
 
 # Save state
 write_data ${outdir}/final_hopper.data
-write_restart ${outdir}/restart/restart.fill.bin
+write_restart ${outdir}/restart/restart.final.bin

@@ -9,34 +9,39 @@ from pathlib import Path
 import argparse
 import ast
 import sys
+import time
 
 def main():
-    # session_id = str(uuid.uuid4())[:8]
-    # run_flop_simulations()
-    run_hopper_simulation()
-    # generate_relaxed_chain_states(n_beads=4, n_states=5)
-    # generate chain along x for N 4,6,8,10,12,14,16,24,48,100
-    # Ns = [4,6,8,10,12,14,16,24,48,100]
-    # generate_linear_chains(Ns, orientation="horz", output_dir="chains_linear_x")
+    pass
 
-def run_hopper_simulation():
+def run_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10, 
+                       relax_steps=100000, run_name=None, seed=None, dt = 1e-6,
+                       mol_dir = "chain_data/molecules_temp",
+                       setup_inc = "simulation_geometries/2D_hopper.inc",
+                       dump_inc = "simulation_templates/default_dump.inc"):
+    if seed is None:
+        seed = int(time.time()) % 1000000
+
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
-    manager.generate_filled_state(source_dir="chain_data/relaxed/N4", 
-                                 n_fill=100, dt = 1e-6, relax_steps=100000,
-                                 run_name="hopper_fill_N4",
-                                 seed = 12345,
-                                 mol_dir = "chain_data/molecules_temp", 
-                                 setup_inc = "simulation_geometries/2D_hopper.inc",
-                                 dump_inc = "simulation_templates/default_dump.inc")
+    manager.generate_filled_state(source_dir=source_dir, 
+                                 n_fill=n_fill, dt = dt, relax_steps=relax_steps,
+                                 run_name=run_name,
+                                 seed = seed,
+                                 mol_dir = mol_dir, 
+                                 setup_inc = setup_inc,
+                                 dump_inc = dump_inc)
 
 def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10, 
-                       relax_steps=50000, restart_path=None, 
-                       run_name=None):
+                       relax_steps=100000, restart_path=None, 
+                       run_name=None, seed=None):
     """Resume filling a hopper from an existing restart file."""
     if not restart_path:
         print("Error: restart_path is required for resuming.")
         return
+
+    if seed is None:
+        seed = int(time.time()) % 1000000
 
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
@@ -46,7 +51,8 @@ def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10,
                                 relax_steps=relax_steps,
                                 run_name=run_name,
                                 dt=1e-6,
-                                mol_dir = "chain_data/molecules_temp", 
+                                seed = seed,
+                                mol_dir = "chain_data/molecules_temp",
                                 setup_inc="simulation_geometries/2D_hopper.inc",
                                 dump_inc = "simulation_templates/default_dump.inc")
 
@@ -222,7 +228,7 @@ if __name__ == "__main__":
         "run_simulation": run_simulation,
         "generate_linear_chains": generate_linear_chains,
         "generate_relaxed_chain_states": generate_relaxed_chain_states,
-        "run_hopper_simulation": run_hopper_simulation,
+        "run_hopper_fill": run_hopper_fill,
         "resume_hopper_fill": resume_hopper_fill
     }
 
@@ -238,15 +244,38 @@ if __name__ == "__main__":
             return token
 
     positional, keyword = [], {}
-    for token in parsed.func_args:
+    i = 0
+    while i < len(parsed.func_args):
+        token = parsed.func_args[i]
+        
+        # Handle cases like "key=value", "key = value", "key= value", "key =value"
         if "=" in token:
             key, value = token.split("=", 1)
-            keyword[key] = _coerce(value)
+            # If value is empty, the actual value might be the next token
+            if not value and i + 1 < len(parsed.func_args):
+                value = parsed.func_args[i+1]
+                i += 1
+            keyword[key.strip()] = _coerce(value.strip())
+        elif i + 1 < len(parsed.func_args) and parsed.func_args[i+1] == "=":
+            # Handle "key = value"
+            key = token
+            if i + 2 < len(parsed.func_args):
+                value = parsed.func_args[i+2]
+                i += 2
+            else:
+                value = "" # No value provided
+                i += 1
+            keyword[key.strip()] = _coerce(value.strip())
         else:
             positional.append(_coerce(token))
+        i += 1
 
     try:
         available_functions[parsed.func](*positional, **keyword)
     except KeyboardInterrupt:
         print("\nProgram interrupted by user. Exiting gracefully.")
+        sys.exit(1)
+    except TypeError as e:
+        print(f"Error calling '{parsed.func}': {e}")
+        print(f"Arguments provided: positional={positional}, keyword={keyword}")
         sys.exit(1)

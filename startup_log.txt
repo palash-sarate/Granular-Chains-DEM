@@ -1,0 +1,1 @@
+Loading batch 0 from cache: D:\Chains_simulations\dumping_yard\Hopper_Flow\hopper_fill_N4\sim_cache_batch_0.pkl
