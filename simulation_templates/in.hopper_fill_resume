@@ -43,6 +43,8 @@ timestep ${dt}
 # 8. OUTPUT
 include ${dump_inc}
 
+restart ${drop_steps} ${outdir}/restart/restart.*.bin
+
 # 9. CONTINUE FILL LOOP
 # This loop adds ${n_fill} additional chains starting from the restart state
 variable i loop ${n_fill}
@@ -56,6 +58,7 @@ label loop_start
     next i
 jump SELF loop_start
 
+restart 100000 ${outdir}/restart/restart.*.bin
 # 10. FINAL RELAXATION
 run ${relax_steps}
 

@@ -8,11 +8,54 @@ from analysis.data_manager import SimulationData, load_lammps_geometry, parse_si
 
 class SimDataController:
     """Manages loading, parsing, and caching of simulation data."""
+    @property
+    def df(self) -> pd.DataFrame:
+        """Lazy-fused monolithic atoms DataFrame."""
+        if not self.sim_source:
+            return self._df_manual if self._df_manual is not None else pd.DataFrame()
+        
+        # Merge all currently loaded batches for global analysis
+        loaded_dfs = list(self.sim_source.atom_batches.values())
+        if not loaded_dfs: return pd.DataFrame()
+        # Ensure we return a reset index version (as expected by older code)
+        return pd.concat(loaded_dfs).reset_index()
+
+    @property
+    def df_mi(self) -> Optional[pd.DataFrame]:
+        """Lazy-fused MultiIndex atoms DataFrame."""
+        if not self.sim_source:
+            return self._df_mi_manual
+        
+        loaded_dfs = list(self.sim_source.atom_batches.values())
+        if not loaded_dfs: return None
+        return pd.concat(loaded_dfs)
+
+    @property
+    def df_bonds(self) -> pd.DataFrame:
+        """Lazy-fused monolithic bonds DataFrame."""
+        if not self.sim_source:
+            return self._df_bonds_manual if self._df_bonds_manual is not None else pd.DataFrame()
+            
+        loaded_dfs = list(self.sim_source.bond_batches.values())
+        if not loaded_dfs: return pd.DataFrame()
+        return pd.concat(loaded_dfs)
+
+    @property
+    def df_angles(self) -> pd.DataFrame:
+        """Lazy-fused monolithic angles DataFrame."""
+        if not self.sim_source:
+            return self._df_angles_manual if self._df_angles_manual is not None else pd.DataFrame()
+            
+        loaded_dfs = list(self.sim_source.angle_batches.values())
+        if not loaded_dfs: return pd.DataFrame()
+        return pd.concat(loaded_dfs)
+
     def __init__(self):
-        self.df: Optional[pd.DataFrame] = None
-        self.df_mi: Optional[pd.DataFrame] = None
-        self.df_bonds: Optional[pd.DataFrame] = None
-        self.df_angles: Optional[pd.DataFrame] = None
+        # Internal storage for manual/legacy loads
+        self._df_manual: Optional[pd.DataFrame] = None
+        self._df_mi_manual: Optional[pd.DataFrame] = None
+        self._df_bonds_manual: Optional[pd.DataFrame] = None
+        self._df_angles_manual: Optional[pd.DataFrame] = None
         self.current_sim_folder: Optional[str] = None
         self.geometry_data: Optional[dict] = None
         self.geometry_script_path: Optional[str] = None
@@ -29,7 +72,7 @@ class SimDataController:
         self._worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
         self._worker_thread.start()
 
-    def load_folder(self, folder: str, force_reload: bool = False):
+    def load_folder(self, folder: str, force_reload: bool = False, enable_preloading: bool = True):
         try:
             self.sim_source = SimulationData(folder)
             data_dict = self.sim_source.load_data(force_reload=force_reload)
@@ -44,15 +87,33 @@ class SimDataController:
             # Metadata: Store ALL timesteps even if data isn't loaded yet
             self.timesteps = self.sim_source.timesteps
             
-            self.df_bonds = data_dict['bonds']
-            self.df_angles = data_dict['angles']
+            # Identify cached batches for preloading if enabled
+            cached_batches = []
+            if enable_preloading:
+                cached_batches = self.sim_source.get_available_cached_batches()
+                
+                # Batch 0 is already loaded by sim_source.load_data(), 
+                # remove it from the background queue if it was in the cached list
+                if 0 in cached_batches:
+                    cached_batches.remove(0)
+                
+                # Queue remaining cached batches for background loading
+                for b_idx in cached_batches:
+                    if b_idx not in self.loading_batches:
+                        self.loading_batches.add(b_idx)
+                        self.load_queue.put(b_idx)
+            
+            self._df_bonds_manual = data_dict['bonds']
+            self._df_angles_manual = data_dict['angles']
             
             self.load_dataframe(df_atoms, update_timesteps=False)
-            return True, None
+            
+            # Return result and the number of batches we just queued
+            return True, None, len(cached_batches)
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return False, str(e)
+            return False, str(e), 0
 
     def load_dump_files(self, files: list):
         frames = []
@@ -78,47 +139,47 @@ class SimDataController:
         try:
             df = parse_simple_data_file(path)
             if df.empty:
-                return False, "Could not parse the selected data file"
+                return False, "Could not parse the selected data file", 0
             df = df.reset_index()
             self.current_sim_folder = None
             self.geometry_data = None
             self.geometry_script_path = None
             self.load_dataframe(df)
-            return True, None
+            return True, None, 0
         except Exception as e:
-            return False, str(e)
+            return False, str(e), 0
 
     def load_dataframe(self, df: pd.DataFrame, update_timesteps=True):
         if df is None: return
-        self.df = df.copy()
-        if 'timestep' in self.df.index.names:
-            self.df = self.df.reset_index()
+        self._df_manual = df.copy()
+        if 'timestep' in self._df_manual.index.names:
+            self._df_manual = self._df_manual.reset_index()
 
         # Ensure critical columns are numeric
         for c in ['x', 'y', 'z', 'id', 'timestep']:
-            if c in self.df.columns:
-                self.df[c] = pd.to_numeric(self.df[c], errors='coerce')
+            if c in self._df_manual.columns:
+                self._df_manual[c] = pd.to_numeric(self._df_manual[c], errors='coerce')
         
-        if 'diameter' not in self.df.columns:
-            self.df['diameter'] = 0.01
+        if 'diameter' not in self._df_manual.columns:
+            self._df_manual['diameter'] = 0.01
         else:
-            self.df['diameter'] = pd.to_numeric(self.df['diameter'], errors='coerce').fillna(0.01)
+            self._df_manual['diameter'] = pd.to_numeric(self._df_manual['diameter'], errors='coerce').fillna(0.01)
+        
+        self._df_manual.dropna(subset=['x', 'y', 'z', 'id', 'timestep'], inplace=True)
 
-        self.df.dropna(subset=['x', 'y', 'z', 'id', 'timestep'], inplace=True)
-
-        if not self.df.empty:
-            x_min, x_max = self.df['x'].min(), self.df['x'].max()
-            y_min, y_max = self.df['y'].min(), self.df['y'].max()
-            z_min, z_max = self.df['z'].min(), self.df['z'].max()
+        if not self._df_manual.empty:
+            x_min, x_max = self._df_manual['x'].min(), self._df_manual['x'].max()
+            y_min, y_max = self._df_manual['y'].min(), self._df_manual['y'].max()
+            z_min, z_max = self._df_manual['z'].min(), self._df_manual['z'].max()
             self._init_limits = ((x_min, x_max), (y_min, y_max), (z_min, z_max))
 
         try:
-            self.df_mi = self.df.set_index(['timestep', 'id']).sort_index()
+            self._df_mi_manual = self._df_manual.set_index(['timestep', 'id']).sort_index()
         except Exception:
-            self.df_mi = None
+            self._df_mi_manual = None
 
         if update_timesteps:
-            self.timesteps = sorted(self.df['timestep'].unique())
+            self.timesteps = sorted(self._df_manual['timestep'].unique())
             
         if self.on_data_loaded_cb:
             self.on_data_loaded_cb()
@@ -138,21 +199,9 @@ class SimDataController:
                 print(f"Background loading batch {batch_idx}...")
                 data_dict = self.sim_source.load_batch(batch_idx)
                 
-                # Merge new data into main dataframes
-                if not data_dict['atoms'].empty:
-                    new_atoms = data_dict['atoms'].reset_index()
-                    self.df = pd.concat([self.df, new_atoms])
-                    self.df = self.df[~self.df.duplicated(subset=['timestep', 'id'], keep='last')]
-                    self.df_mi = self.df.set_index(['timestep', 'id']).sort_index()
+                # Data is now stored directly in self.sim_source by batch index.
+                # We no longer perform expensive monolithic merges here.
                 
-                if not data_dict['bonds'].empty:
-                    self.df_bonds = pd.concat([self.df_bonds, data_dict['bonds']])
-                    self.df_bonds = self.df_bonds[~self.df_bonds.index.duplicated(keep='last')].sort_index()
-                
-                if not data_dict['angles'].empty:
-                    self.df_angles = pd.concat([self.df_angles, data_dict['angles']])
-                    self.df_angles = self.df_angles[~self.df_angles.index.duplicated(keep='last')].sort_index()
-
                 if self.on_batch_ready_cb:
                     self.on_batch_ready_cb(batch_idx)
             except Exception as e:
@@ -177,6 +226,37 @@ class SimDataController:
         except Exception:
             return None
         return None
+
+    def get_atom_data_at_timestep(self, ts):
+        if self.sim_source:
+            return self.sim_source.get_atoms_at_timestep(ts)
+        
+        # Fallback for manual dataframe loads (e.g. data file or manual dumps)
+        if self.df_mi is None: return pd.DataFrame()
+        try:
+            return self.df_mi.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
+
+    def get_bond_data_at_timestep(self, ts):
+        if self.sim_source:
+            return self.sim_source.get_bonds_at_timestep(ts)
+            
+        if self.df_bonds.empty: return pd.DataFrame()
+        try:
+            return self.df_bonds.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
+
+    def get_angle_data_at_timestep(self, ts):
+        if self.sim_source:
+            return self.sim_source.get_angles_at_timestep(ts)
+            
+        if self.df_angles.empty: return pd.DataFrame()
+        try:
+            return self.df_angles.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
 
     def normalize_dropped_path(self, p: str) -> str:
         p = (p or "").strip()

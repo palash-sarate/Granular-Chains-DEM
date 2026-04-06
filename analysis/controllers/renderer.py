@@ -109,21 +109,23 @@ class SimulationRenderer:
         self._dynamic_actors = []
 
     def show_timestep(self, timestep):
-        if self.data_ctrl.df is None: return
+        # 1. Fetch data for this specific frame
+        frame_data = self.data_ctrl.get_atom_data_at_timestep(timestep)
         
-        subset = self.data_ctrl.df[self.data_ctrl.df['timestep'] == timestep]
-        
-        if subset.empty:
+        # 2. Check if data is available
+        if frame_data is None or frame_data.empty:
             print(f"Timestep {timestep} not loaded. Requesting batch...")
             self.data_ctrl.request_batch_for_timestep(timestep)
             return
 
+        # 3. Clear existing dynamic visuals
         for act in self._dynamic_actors: 
             try: self.plotter.remove(act)
             except Exception: pass
         self._dynamic_actors = []
 
-        actors = self.plot_chain_data(subset)
+        # 4. Generate and display new actors
+        actors = self.plot_chain_data(frame_data)
         
         if self._persistent_view_bounds is None:
             self.update_persistent_bounds()
@@ -146,7 +148,8 @@ class SimulationRenderer:
                 self.plotter.add(g_act)
                 self._dynamic_actors.append(g_act)
         
-        self.hl_ctrl.render_highlights(subset)
+        if self.hl_ctrl:
+            self.hl_ctrl.render_highlights(frame_data)
         self.plotter.render()
 
     def plot_chain_data(self, subset_df: pd.DataFrame):

@@ -22,7 +22,11 @@ class SimulationLoader:
     def load_simulation_folder(self, folder: str, force_reload: bool = False):
         if not folder: return
         self.playback_ctrl.pause()
-        ok, err = self.data_ctrl.load_folder(folder, force_reload=force_reload)
+        pref = self.ui_callbacks.get('enable_preloading', True)
+        if hasattr(pref, 'get'): 
+            pref = pref.get()
+            
+        ok, err, num_queued = self.data_ctrl.load_folder(folder, force_reload=force_reload, enable_preloading=pref)
         if not ok:
             # If it failed to load as a LAMMPS sim, check if it's a folder of VTKs
             vtks = glob.glob(os.path.join(folder, "*.vtk"))
@@ -35,13 +39,13 @@ class SimulationLoader:
         
         self.renderer_ctrl.clear()
         self.renderer_ctrl.update_persistent_bounds()
-        self.ui_callbacks['on_load_success']()
+        self.ui_callbacks['on_load_success'](num_queued)
 
     def open_dump_files(self):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files', 'dump*'), ('All', '*.*')])
         if not files: return
         self.playback_ctrl.pause()
-        ok, err = self.data_ctrl.load_dump_files(list(files))
+        ok, err, num_queued = self.data_ctrl.load_dump_files(list(files))
         if not ok:
             messagebox.showerror('Error', err)
         else:
@@ -56,7 +60,7 @@ class SimulationLoader:
 
     def open_data_file_path(self, path: str):
         self.playback_ctrl.pause()
-        ok, err = self.data_ctrl.load_data_file(path)
+        ok, err, num_queued = self.data_ctrl.load_data_file(path)
         if not ok:
             messagebox.showerror('Error', err)
         else:
@@ -79,12 +83,12 @@ class SimulationLoader:
                 self.open_data_file_path(others[0])
             else:
                 self.playback_ctrl.pause()
-                ok, err = self.data_ctrl.load_dump_files(others)
+                ok, err, num_queued = self.data_ctrl.load_dump_files(others)
                 if not ok: messagebox.showerror('Error', err)
                 else:
                     self.renderer_ctrl.clear()
                     self.renderer_ctrl.update_persistent_bounds()
-                    self.ui_callbacks['on_load_success']()
+                    self.ui_callbacks['on_load_success'](num_queued)
         
         for v in vtks:
             self.ui_callbacks['add_vtk'](v)

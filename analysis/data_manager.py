@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 from typing import Optional, Tuple
 
+from concurrent.futures import ProcessPoolExecutor
 from analysis.lammps_parser import LammpsParser
 
 
@@ -155,27 +156,84 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     df.set_index(['timestep','id'], inplace=True)
     return df
 
+def _parse_single_dump_fast(filepath):
+    """Optimized parsing of a single LAMMPS dump file using the C engine.
+    Top-level function for multiprocessing compatibility.
+    """
+    try:
+        with open(filepath, 'r') as f:
+            # Quickly grab the first several lines to find structure
+            header_lines = [f.readline() for _ in range(15)]
+        
+        timestep = 0
+        count = 0
+        data_start_line = 0
+        cols = []
+
+        for i, line in enumerate(header_lines):
+            if "ITEM: TIMESTEP" in line:
+                try: timestep = int(header_lines[i+1].strip())
+                except: pass
+            elif "ITEM: NUMBER OF" in line:
+                try: count = int(header_lines[i+1].strip())
+                except: pass
+            elif "ITEM: ATOMS" in line or "ITEM: ENTRIES" in line:
+                cols = line.split()[2:]
+                data_start_line = i + 1
+                break
+        
+        if not cols: return pd.DataFrame()
+
+        # Use faster C engine with memory mapping
+        df = pd.read_csv(filepath, 
+                         skiprows=data_start_line,
+                         names=cols, 
+                         nrows=count if count > 0 else None,
+                         sep=r'\s+', 
+                         engine='c',
+                         memory_map=True)
+        
+        # Numeric conversion
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        # Drop malformed rows
+        id_col = 'id' if 'id' in df.columns else 'index'
+        if id_col in df.columns:
+            df.dropna(subset=[id_col], inplace=True)
+        
+        df['timestep'] = timestep
+        return df
+    except Exception as e:
+        print(f"Error parsing {filepath}: {e}")
+    return pd.DataFrame()
+
 class SimulationData:
-    def __init__(self, data_dir, cache_prefix="sim_cache", batch_size=1000):
+    def __init__(self, data_dir, cache_name="sim_cache", batch_size=100):
         self.data_dir = data_dir
         self.chain_dump_dir = os.path.join(data_dir, "chain")
         self.bond_dump_dir = os.path.join(data_dir, "bond")
         self.angle_dump_dir = os.path.join(data_dir, "angle")
-        self.cache_prefix = os.path.join(data_dir, cache_prefix)
+        self.cache_dir = os.path.join(data_dir, cache_name)
         self.batch_size = batch_size
         
-        self.df_atoms = pd.DataFrame()
-        self.df_bonds = pd.DataFrame()
-        self.df_angles = pd.DataFrame()
+        # Ensure cache directory exists
+        if os.path.isdir(self.data_dir):
+            os.makedirs(self.cache_dir, exist_ok=True)
+        
+        self.atom_batches = {}  # Indexed by batch number
+        self.bond_batches = {}
+        self.angle_batches = {}
         
         self.timesteps = []
         self.atom_files = []
         self.bond_files = []
         self.angle_files = []
         self.loaded_batches = set()
+        self.cached_batches = set()
 
     def _get_cache_file(self, batch_idx):
-        return f"{self.cache_prefix}_batch_{batch_idx}.pkl"
+        return os.path.join(self.cache_dir, f"batch_{batch_idx}.pkl")
 
     def load_metadata(self):
         """Scans directories, sorts dump files by timestep, and extracts all timesteps."""
@@ -194,6 +252,25 @@ class SimulationData:
     def get_batch_count(self):
         return max(1, (len(self.timesteps) + self.batch_size - 1) // self.batch_size) if self.timesteps else 0
 
+    def get_available_cached_batches(self):
+        """Returns a list of batch indices that have valid cache files."""
+        available = []
+        batch_count = self.get_batch_count()
+        for i in range(batch_count):
+            start_idx = i * self.batch_size
+            end_idx = start_idx + self.batch_size
+            
+            # Form the list of source files for this batch
+            batch_files = self.atom_files[start_idx:end_idx] + \
+                          self.bond_files[start_idx:end_idx] + \
+                          self.angle_files[start_idx:end_idx]
+            
+            if self._is_batch_cache_valid(i, batch_files):
+                available.append(i)
+        
+        self.cached_batches = set(available)
+        return available
+
     def get_batch_index_for_timestep(self, ts):
         if not self.timesteps: return 0
         try:
@@ -206,7 +283,11 @@ class SimulationData:
     def load_batch(self, batch_idx, force_reload=False):
         """Loads a specific batch of data."""
         if batch_idx in self.loaded_batches and not force_reload:
-            return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
+            return {
+                'atoms': self.atom_batches.get(batch_idx, pd.DataFrame()),
+                'bonds': self.bond_batches.get(batch_idx, pd.DataFrame()),
+                'angles': self.angle_batches.get(batch_idx, pd.DataFrame())
+            }
 
         cache_file = self._get_cache_file(batch_idx)
         start_idx = batch_idx * self.batch_size
@@ -243,29 +324,52 @@ class SimulationData:
             except Exception as e:
                 print(f"Could not save cache: {e}")
 
-        # Accumulate loaded data
+        # Store loaded data by batch index
         if not loaded_data['atoms'].empty:
-            self.df_atoms = pd.concat([self.df_atoms, loaded_data['atoms']]) if not self.df_atoms.empty else loaded_data['atoms']
-            # Re-sort to maintain clean multiindex
-            self.df_atoms = self.df_atoms[~self.df_atoms.index.duplicated(keep='last')].sort_index()
-
+            self.atom_batches[batch_idx] = loaded_data['atoms']
+            
         if not loaded_data['bonds'].empty:
-            self.df_bonds = pd.concat([self.df_bonds, loaded_data['bonds']]) if not self.df_bonds.empty else loaded_data['bonds']
-            self.df_bonds = self.df_bonds[~self.df_bonds.index.duplicated(keep='last')].sort_index()
-
+            self.bond_batches[batch_idx] = loaded_data['bonds']
+            
         if not loaded_data['angles'].empty:
-            self.df_angles = pd.concat([self.df_angles, loaded_data['angles']]) if not self.df_angles.empty else loaded_data['angles']
-            self.df_angles = self.df_angles[~self.df_angles.index.duplicated(keep='last')].sort_index()
+            self.angle_batches[batch_idx] = loaded_data['angles']
 
         self.loaded_batches.add(batch_idx)
-        return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
+        return loaded_data
+
+    def get_atoms_at_timestep(self, ts):
+        batch_idx = self.get_batch_index_for_timestep(ts)
+        batch = self.atom_batches.get(batch_idx)
+        if batch is None or batch.empty: return pd.DataFrame()
+        try:
+            return batch.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
+
+    def get_bonds_at_timestep(self, ts):
+        batch_idx = self.get_batch_index_for_timestep(ts)
+        batch = self.bond_batches.get(batch_idx)
+        if batch is None or batch.empty: return pd.DataFrame()
+        try:
+            return batch.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
+
+    def get_angles_at_timestep(self, ts):
+        batch_idx = self.get_batch_index_for_timestep(ts)
+        batch = self.angle_batches.get(batch_idx)
+        if batch is None or batch.empty: return pd.DataFrame()
+        try:
+            return batch.xs(ts, level='timestep')
+        except (KeyError, TypeError):
+            return pd.DataFrame()
 
     def load_data(self, force_reload=False):
         """Metadata-first loading. Returns only the first batch by default."""
         self.load_metadata()
         if self.get_batch_count() > 0:
             return self.load_batch(0, force_reload=force_reload)
-        return {'atoms': self.df_atoms, 'bonds': self.df_bonds, 'angles': self.df_angles}
+        return {'atoms': pd.DataFrame(), 'bonds': pd.DataFrame(), 'angles': pd.DataFrame()}
 
     def _is_batch_cache_valid(self, batch_idx, batch_files):
         """Checks if batch cache exists and is newer than the dump files in it."""
@@ -283,83 +387,37 @@ class SimulationData:
         cache_mtime = os.path.getmtime(cache_file)
         return cache_mtime > latest_dump_mtime
 
-    def _parse_single_dump(self, filepath):
-        """Parses a single LAMMPS dump file (atoms, bonds, or angles)."""
-        meta = {'timestep': 0}
-        count = 0
-        try:
-            with open(filepath, 'r') as f:
-                curr_line_idx = -1
-                while True:
-                    line = f.readline()
-                    if not line:
-                        break
-                    curr_line_idx += 1
-                    
-                    if "ITEM: TIMESTEP" in line:
-                        step_line = f.readline()
-                        curr_line_idx += 1
-                        if step_line:
-                            try:
-                                meta['timestep'] = int(step_line.strip())
-                            except ValueError:
-                                pass
-                    elif "ITEM: NUMBER OF" in line:
-                        count_line = f.readline()
-                        curr_line_idx += 1
-                        if count_line:
-                            try:
-                                count = int(count_line.strip())
-                            except ValueError:
-                                count = 0
-                    elif "ITEM: ATOMS" in line or "ITEM: ENTRIES" in line:
-                        columns = line.split()[2:]
-                        # SKIP the headers we already read + the ITEM: ATOMS/ENTRIES header itself
-                        df = pd.read_csv(filepath, skiprows=curr_line_idx + 1,
-                                         names=columns, 
-                                         nrows=count if count > 0 else None,
-                                         sep=r'\s+', engine='python')
-                        
-                        # Defensive: drop any rows that failed to parse
-                        for col in df.columns:
-                            df[col] = pd.to_numeric(df[col], errors='coerce')
-                        df.dropna(subset=df.columns.intersection(['x','y','z','id','index','dist','theta']), 
-                                  inplace=True)
-                        
-                        df['timestep'] = meta['timestep']
-                        return df
-        except Exception as e:
-            print(f"Error parsing {filepath}: {e}")
-        return pd.DataFrame()
 
     def _get_step(self, filename):
         match = re.search(r'_(\d+)\.dump', filename)
         return int(match.group(1)) if match else 0
     
     def _parse_dump_list(self, dump_files):
-        """Parses a specific list of dump files and returns a MultiIndex DataFrame."""
+        """Parses a list of dump files in parallel and returns a MultiIndex DataFrame."""
         if not dump_files:
             return pd.DataFrame()
             
-        print(f"Parsing {len(dump_files)} dump files...")
+        print(f"Parsing {len(dump_files)} dump files in parallel...")
 
-        all_frames = [self._parse_single_dump(f) for f in dump_files]
-        all_frames = [f for f in all_frames if not f.empty]
+        # Use ProcessPoolExecutor for true parallelism in Python
+        # Windows requires protection but since this is called from within the app 
+        # it should be safe as long as we're not spawning recursive processes.
+        with ProcessPoolExecutor() as executor:
+            all_frames = list(executor.map(_parse_single_dump_fast, dump_files))
+        
+        all_frames = [f for f in all_frames if f is not None and not f.empty]
         
         if not all_frames:
             return pd.DataFrame()
 
         try:
             full_df = pd.concat(all_frames)
-            # Create MultiIndex (Timestep, ID). 
-            # For atoms it is 'id', for bonds/angles it is 'index'.
             id_col = 'id' if 'id' in full_df.columns else 'index'
             if id_col not in full_df.columns:
-                print(f"Warning: Neither 'id' nor 'index' found in dumps.")
                 return pd.DataFrame()
                 
             full_df.set_index(['timestep', id_col], inplace=True)
-            full_df.index.names = ['timestep', 'id']  # Unified index names
+            full_df.index.names = ['timestep', 'id']
             full_df.sort_index(inplace=True)
             return full_df
         except Exception as e:

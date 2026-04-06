@@ -10,6 +10,7 @@ from analysis.controllers import (
     PlaybackController, SimulationLoader, VtkOverlayController,
     AnalysisToolManager
 )
+from analysis.utils.progress_bar import ProgressBar
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.
@@ -33,6 +34,12 @@ class ViewerApp(BaseTk):
         self.data_ctrl.on_data_loaded_cb = self._on_data_loaded
         self.data_ctrl.on_batch_ready_cb = self._on_batch_ready
         
+        # 2. Progress State
+        self.progress_bar = None
+        self.batches_to_load = 0
+        self.batches_loaded = 0
+        self.enable_preloading_var = tk.BooleanVar(value=True)
+        
         # 2. Vedo Scene & Render Control
         self.plotter = Plotter(bg='white', interactive=True)
         self.vtk_ctrl = VtkOverlayController(self.plotter)
@@ -49,7 +56,8 @@ class ViewerApp(BaseTk):
             'get_current_ts': lambda: self.current_timestep,
             'sync_ui_to_frame': self._sync_ui_to_frame,
             'clear_vtk_list': lambda: self.vtk_listbox.delete(0, tk.END),
-            'add_vtk': self._add_vtk_mesh_ui
+            'add_vtk': self._add_vtk_mesh_ui,
+            'enable_preloading': self.enable_preloading_var
         }
         self.loader_ctrl = SimulationLoader(self, self.data_ctrl, self.playback_ctrl, self.vtk_ctrl, self.renderer, loader_cbs)
 
@@ -75,8 +83,9 @@ class ViewerApp(BaseTk):
         open_row2.pack(fill=tk.X, pady=(4, 0))
         tk.Button(open_row2, text='Open Data...', command=self.loader_ctrl.open_data_file).pack(side=tk.LEFT, fill=tk.X, expand=True)
         tk.Button(open_row2, text='Open VTKs...', command=self._open_vtk_files_ui).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
-        self.refresh_button = tk.Button(col1, text='Refresh', command=lambda: self.loader_ctrl.load_simulation_folder(self.data_ctrl.current_sim_folder, True), state=tk.DISABLED)
+        self.refresh_button = tk.Button(col1, text='Refresh', command=lambda: self.loader_ctrl.load_simulation_folder(self.data_ctrl.current_sim_folder, False), state=tk.DISABLED)
         self.refresh_button.pack(fill=tk.X, pady=(8, 0))
+        tk.Checkbutton(col1, text='Enable Preloading', variable=self.enable_preloading_var).pack(anchor='w', pady=(2, 0))
 
         drop_text = 'Drop files here' if DND_AVAILABLE else 'DND disabled'
         self.drop_label = tk.Label(col1, text=drop_text, relief='ridge', width=22, height=4)
@@ -140,17 +149,31 @@ class ViewerApp(BaseTk):
         tk.Label(col2, text='──── Highlight ────', fg='gray').pack(fill=tk.X, pady=(12, 2))
         hl_mode_frame = tk.Frame(col2); hl_mode_frame.pack(fill=tk.X)
         self.highlight_mode_var = tk.StringVar(value='atom')
+        self.highlight_id_var = tk.StringVar(value='1')
+        self.chain_size_var = tk.StringVar(value='4')
         for m, l in [('atom', 'Atom'), ('bond', 'Bond'), ('angle', 'Angle'), ('chain', 'Chain')]:
             tk.Radiobutton(hl_mode_frame, text=l, variable=self.highlight_mode_var, value=m).pack(side=tk.LEFT)
 
         hl_input_row = tk.Frame(col2)
         hl_input_row.pack(fill=tk.X, pady=(4, 0))
         tk.Label(hl_input_row, text='ID:').pack(side=tk.LEFT)
-        self.highlight_id_var = tk.StringVar(value='1')
-        tk.Entry(hl_input_row, textvariable=self.highlight_id_var, width=5).pack(side=tk.LEFT, padx=(2, 10))
-        tk.Label(hl_input_row, text='N:').pack(side=tk.LEFT)
-        self.chain_size_var = tk.StringVar(value='4')
-        tk.Entry(hl_input_row, textvariable=self.chain_size_var, width=5).pack(side=tk.LEFT, padx=2)
+        
+        def adjust_hl_id(delta):
+            try:
+                val = int(self.highlight_id_var.get())
+                self.highlight_id_var.set(str(max(1, val + delta)))
+                self._apply_highlight_ui()
+            except ValueError:
+                pass
+
+        tk.Button(hl_input_row, text='-', width=2, command=lambda: adjust_hl_id(-1)).pack(side=tk.LEFT)
+        self.hl_id_entry = tk.Entry(hl_input_row, textvariable=self.highlight_id_var, width=5)
+        self.hl_id_entry.pack(side=tk.LEFT, padx=2)
+        tk.Button(hl_input_row, text='+', width=2, command=lambda: adjust_hl_id(1)).pack(side=tk.LEFT)
+
+        tk.Label(hl_input_row, text='N:').pack(side=tk.LEFT, padx=(10, 0))
+        self.chain_size_entry = tk.Entry(hl_input_row, textvariable=self.chain_size_var, width=6)
+        self.chain_size_entry.pack(side=tk.LEFT, padx=5)
 
         hl_btn_row = tk.Frame(col2)
         hl_btn_row.pack(fill=tk.X, pady=(8, 0))
@@ -181,7 +204,7 @@ class ViewerApp(BaseTk):
         return {'show_geometry': self.show_geometry_var.get()}
 
     def _get_ui_vars(self):
-        return {'chain_size': self.chain_size_var}
+        return {'chain_size': self.chain_size_var, 'enable_preloading': self.enable_preloading_var}
 
     def _get_current_rendering_data(self):
         return self.data_ctrl.df, self.current_timestep
@@ -190,7 +213,16 @@ class ViewerApp(BaseTk):
         try: return int(self.chain_size_var.get())
         except: return 4
 
-    def _on_data_loaded(self):
+    def _on_data_loaded(self, num_queued=0):
+        # Handle progress bar if we have background batches to wait for
+        if num_queued > 0:
+            self.batches_to_load = num_queued
+            self.batches_loaded = 0
+            self.progress_bar = ProgressBar(self, title="Preloading Cache", message=f"Loading {num_queued} cached batches...", modal=True)
+            self.progress_bar.set_progress(0, num_queued)
+        else:
+            self.batches_to_load = 0
+            
         old_ts = self.current_timestep
         self.analysis_ctrl.refresh_windows()
         self.ts_listbox.delete(0, tk.END)
@@ -220,8 +252,22 @@ class ViewerApp(BaseTk):
 
     def _on_batch_ready(self, batch_idx):
         """Callback from data controller when a background batch is loaded."""
+        # Ensure UI updates happen on the main thread
+        self.after(0, lambda: self._on_batch_ready_safe(batch_idx))
+
+    def _on_batch_ready_safe(self, batch_idx):
+        pb = getattr(self, 'progress_bar', None)
+        if pb is not None:
+            self.batches_loaded += 1
+            pb.set_progress(self.batches_loaded, self.batches_to_load)
+            pb.set_text(f"Loaded batch {batch_idx+1} of {self.batches_to_load + 1}...")
+            
+            if self.batches_loaded >= self.batches_to_load:
+                self.progress_bar = None
+                pb.finish()
+        
         print(f"Batch {batch_idx} ready. Refreshing UI...")
-        self.after(0, self._refresh_current_view)
+        self._refresh_current_view()
 
     def _refresh_current_view(self):
         # Determine current timestep

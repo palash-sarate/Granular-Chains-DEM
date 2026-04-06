@@ -54,6 +54,8 @@ include ${dump_inc}
 #     next js
 # jump SELF single_loop_start
 
+restart ${drop_steps} ${outdir}/restart/restart.*.bin
+
 # Fill loop
 variable i loop ${n_fill}
 label loop_start
@@ -61,7 +63,7 @@ label loop_start
     variable mol_id string m${r}
     variable rx equal random(-0.08,0.08,${seed})
     variable ry equal random(-0.155, 0.155, ${seed})
-    create_atoms 0 single ${rx} ${ry} 0.5 mol ${mol_id} ${seed}
+    create_atoms 0 single ${rx} ${ry} 0.55 mol ${mol_id} ${seed}
 
     # Check if any atom is in the high-resolution zone
     # run 0
@@ -97,7 +99,6 @@ label loop_start
     next i
 jump SELF loop_start
 
-# Relax the filled hopper
 restart 100000 ${outdir}/restart/restart.*.bin
 
 run ${relax_steps}
