@@ -11,6 +11,9 @@ class SimDataController:
     @property
     def df(self) -> pd.DataFrame:
         """Lazy-fused monolithic atoms DataFrame."""
+        if self.is_preview_mode and self.preview_df is not None:
+            return self.preview_df.reset_index()
+            
         if not self.sim_source:
             return self._df_manual if self._df_manual is not None else pd.DataFrame()
         
@@ -23,6 +26,9 @@ class SimDataController:
     @property
     def df_mi(self) -> Optional[pd.DataFrame]:
         """Lazy-fused MultiIndex atoms DataFrame."""
+        if self.is_preview_mode and self.preview_df is not None:
+            return self.preview_df
+            
         if not self.sim_source:
             return self._df_mi_manual
         
@@ -33,6 +39,10 @@ class SimDataController:
     @property
     def df_bonds(self) -> pd.DataFrame:
         """Lazy-fused monolithic bonds DataFrame."""
+        if self.is_preview_mode:
+            # Restart files don't typically export bonds to the preview dump easily
+            return pd.DataFrame()
+            
         if not self.sim_source:
             return self._df_bonds_manual if self._df_bonds_manual is not None else pd.DataFrame()
             
@@ -43,6 +53,9 @@ class SimDataController:
     @property
     def df_angles(self) -> pd.DataFrame:
         """Lazy-fused monolithic angles DataFrame."""
+        if self.is_preview_mode:
+            return pd.DataFrame()
+            
         if not self.sim_source:
             return self._df_angles_manual if self._df_angles_manual is not None else pd.DataFrame()
             
@@ -59,9 +72,16 @@ class SimDataController:
         self.current_sim_folder: Optional[str] = None
         self.geometry_data: Optional[dict] = None
         self.geometry_script_path: Optional[str] = None
+        
+        # Ghost/Preview Mode state for Restart Editor
+        self.preview_df: Optional[pd.DataFrame] = None
+        self.is_preview_mode: bool = False
+        
+        # New Simulation Mode state
+        self.sim_source: Optional[SimulationData] = None
+        
         self.timesteps: List[int] = []
         self._init_limits: Optional[tuple] = None
-        self.sim_source: Optional[SimulationData] = None
         
         self.on_data_loaded_cb = None
         self.on_batch_ready_cb = None
@@ -74,13 +94,15 @@ class SimDataController:
 
     def load_folder(self, folder: str, force_reload: bool = False, enable_preloading: bool = True):
         try:
-            self.sim_source = SimulationData(folder)
-            data_dict = self.sim_source.load_data(force_reload=force_reload)
+            new_source = SimulationData(folder)
+            data_dict = new_source.load_data(force_reload=force_reload)
             df_atoms = data_dict['atoms']
             
             if df_atoms is None or df_atoms.empty:
-                return False, "No dump files found or parsing failed."
+                return False, "No dump files found or parsing failed.", 0
             
+            # Commit changes only after success
+            self.sim_source = new_source
             self.current_sim_folder = folder
             self.geometry_data, self.geometry_script_path = load_lammps_geometry(folder)
             
@@ -129,11 +151,13 @@ class SimDataController:
             return False, "No valid dump frames parsed."
         
         full = pd.concat(frames).reset_index()
+        self.sim_source = None
         self.current_sim_folder = None
-        self.geometry_data = None
-        self.geometry_script_path = None
+        self._dynamic_actors = []
+        self._persistent_view_bounds = None
+        self._axes = None
         self.load_dataframe(full)
-        return True, None
+        return True, None, 0
 
     def load_data_file(self, path: str):
         try:
@@ -141,6 +165,7 @@ class SimDataController:
             if df.empty:
                 return False, "Could not parse the selected data file", 0
             df = df.reset_index()
+            self.sim_source = None
             self.current_sim_folder = None
             self.geometry_data = None
             self.geometry_script_path = None
@@ -228,7 +253,15 @@ class SimDataController:
         return None
 
     def get_atom_data_at_timestep(self, ts):
+        if self.is_preview_mode and self.preview_df is not None:
+            try:
+                return self.preview_df.xs(ts, level='timestep')
+            except (KeyError, TypeError):
+                return self.preview_df.reset_index().set_index('id')
+
         if self.sim_source:
+            # Trigger background load if batch is missing
+            self.request_batch_for_timestep(ts)
             return self.sim_source.get_atoms_at_timestep(ts)
         
         # Fallback for manual dataframe loads (e.g. data file or manual dumps)
@@ -238,8 +271,16 @@ class SimDataController:
         except (KeyError, TypeError):
             return pd.DataFrame()
 
+    # Compatibility alias for older renderer versions
+    def get_frame_data(self, ts):
+        return self.get_atom_data_at_timestep(ts)
+
     def get_bond_data_at_timestep(self, ts):
+        if self.is_preview_mode:
+            return pd.DataFrame()
+
         if self.sim_source:
+            self.request_batch_for_timestep(ts)
             return self.sim_source.get_bonds_at_timestep(ts)
             
         if self.df_bonds.empty: return pd.DataFrame()
@@ -249,7 +290,11 @@ class SimDataController:
             return pd.DataFrame()
 
     def get_angle_data_at_timestep(self, ts):
+        if self.is_preview_mode:
+            return pd.DataFrame()
+
         if self.sim_source:
+            self.request_batch_for_timestep(ts)
             return self.sim_source.get_angles_at_timestep(ts)
             
         if self.df_angles.empty: return pd.DataFrame()

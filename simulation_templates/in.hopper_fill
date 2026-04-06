@@ -54,46 +54,74 @@ include ${dump_inc}
 #     next js
 # jump SELF single_loop_start
 
+# --- Grid Insertion Logic ---
+# Exclusion zone diameter in meters: 3 * (atoms per chain) * 1mm
+variable chain_size equal ${N}           # IMPORTANT: Passed from hopper_manager
+variable max_batch_size equal 20      # Cap for stability
+
+variable ex_diam equal 3*${chain_size}*0.001
+variable x_f_min equal -0.08
+variable x_f_max equal 0.08
+variable x_width equal ${x_f_max}-${x_f_min}
+variable y_f_min equal -0.155
+variable y_f_max equal 0.155
+variable y_width equal ${y_f_max}-${y_f_min}
+
+# Calculate available grid cells
+variable nx equal floor( ${x_width} / ${ex_diam} )
+variable ny equal floor( (0.155 - (-0.155)) / ${ex_diam} )
+variable grid_total equal ${nx}*${ny}
+
+# Determine batch size (capped) using compatible if/then logic
+variable batch_size equal ${grid_total}
+if "${grid_total} > ${max_batch_size}" then &
+    "variable batch_size equal ${max_batch_size}"
+
+# Re-calculate grid spacing based on actual batch size to spread them out
+variable nx_b equal floor( sqrt( ${batch_size} * ${x_width} / ${y_width} ) )
+# Ensure nx_f is at least 1
+variable nx_f equal ${nx_b}
+if "${nx_b} == 0" then "variable nx_f equal 1"
+
+variable ny_f equal floor( ${batch_size} / ${nx_f} )
+# actual_batch is limited by our grid math
+variable actual_batch equal ${nx_f}*${ny_f}
+
+variable dx equal ${x_width}/${nx_f}
+variable dy equal ${y_width}/${ny_f}
+
+print ">>> Multi-chain Pour Configuration <<<"
+print ">>> Exclusion Diameter: ${ex_diam} m"
+print ">>> Batch Grid: ${nx_f} x ${ny_f} (${actual_batch} chains per drop)"
+
 restart ${drop_steps} ${outdir}/restart/restart.*.bin
 
-# Fill loop
-variable i loop ${n_fill}
+# Fill loop (now stepping by actual_batch)
+# Integer math for ceil(N_FILL / ACTUAL_BATCH):
+variable n_loops equal floor( (${n_fill} + ${actual_batch} - 1) / ${actual_batch} )
+variable i loop ${n_loops}
 label loop_start
-    variable r equal floor(random(1,${n_templates}+1,${seed}))
-    variable mol_id string m${r}
-    variable rx equal random(-0.08,0.08,${seed})
-    variable ry equal random(-0.155, 0.155, ${seed})
-    create_atoms 0 single ${rx} ${ry} 0.55 mol ${mol_id} ${seed}
-
-    # Check if any atom is in the high-resolution zone
-    # run 0
-    # if "${any_in_zone} > 0" then &
-    #     "undump 1" &
-    #     "undump 2" &
-    #     "undump 3" &
-    #     "dump 1 all custom 10 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass" &
-    #     "dump_modify 1 sort id" &
-    #     "dump 2 all local 10 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]" &
-    #     "dump_modify 2 colname 2 dist" &
-    #     "dump_modify 2 colname 3 energy" &
-    #     "dump_modify 2 colname 4 force" &
-    #     "dump 3 all local 10 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]" &
-    #     "dump_modify 3 colname 2 theta" &
-    #     "dump_modify 3 colname 3 energy" &
-    #     "run ${relax_steps}" &
-    # else &
-    #     "undump 1" &
-    #     "undump 2" &
-    #     "undump 3" &
-    #     "dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass" &
-    #     "dump_modify 1 sort id" &
-    #     "dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]" &
-    #     "dump_modify 2 colname 2 dist" &
-    #     "dump_modify 2 colname 3 energy" &
-    #     "dump_modify 2 colname 4 force" &
-    #     "dump 3 all local 1000 ${outdir}/angle/angle_*.dump index c_2[1] c_2[2]" &
-    #     "dump_modify 3 colname 2 theta" &
-    #     "dump_modify 3 colname 3 energy"
+    
+    # Batch insertion sub-loop
+    variable ix loop ${nx_f}
+    label x_loop
+        variable iy loop ${ny_f}
+        label y_loop
+            variable r equal floor(random(1,${n_templates}+1,${seed}))
+            variable mol_id string m${r}
+            
+            # Position with a small jitter (+/- 20% of cell size)
+            variable jx equal (random(-0.2,0.2,${seed}))*${dx}
+            variable jy equal (random(-0.2,0.2,${seed}))*${dy}
+            variable px equal ${x_f_min}+(${ix}-0.5)*${dx}+${jx}
+            variable py equal ${y_f_min}+(${iy}-0.5)*${dy}+${jy}
+            
+            create_atoms 0 single ${px} ${py} 0.55 mol ${mol_id} ${seed}
+            
+            next iy
+            jump SELF y_loop
+        next ix
+        jump SELF x_loop
 
     run ${drop_steps}
     next i

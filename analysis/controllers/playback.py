@@ -25,6 +25,12 @@ class PlaybackController:
         self.frame_label = frame_label
         self.loop_var = loop_var
 
+    @property
+    def current_frame(self) -> int:
+        if self.frame_slider:
+            return int(self.frame_slider.get())
+        return 0
+
     def update_status(self, idx: int):
         if not self.frame_label: return
         timesteps = self.get_timesteps_cb()

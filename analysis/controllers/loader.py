@@ -1,8 +1,12 @@
 import os
 import glob
-from tkinter import filedialog, messagebox
+import subprocess
+import tempfile
+import shutil
+from tkinter import filedialog, messagebox, simpledialog
 import tkinter as tk
 from typing import Optional, Dict, Callable
+import pandas as pd
 
 class SimulationLoader:
     """Orchestrates file/folder loading logic and OS dialogs."""
@@ -92,3 +96,102 @@ class SimulationLoader:
         
         for v in vtks:
             self.ui_callbacks['add_vtk'](v)
+            
+        restarts = [f for f in filenames if f.lower().endswith('.bin')]
+        if restarts:
+            self.open_restart_editor(restarts[0])
+
+    def open_restart_editor(self, path: str):
+        """UI entry point for the Restart Editor."""
+        self.playback_ctrl.pause()
+        self.ui_callbacks['open_restart_editor'](path)
+
+    def run_lammps_script(self, script_content: str, working_dir: str):
+        """Helper to run a LAMMPS script using the project's SimulationRunner.
+        """
+        from simulation import SimulationRunner
+        in_file = os.path.join(working_dir, "in.temp_mod")
+        with open(in_file, "w") as f:
+            f.write(script_content)
+            
+        runner = SimulationRunner(lammps_executable="lmp")
+        # Optimization: Hiding console on Windows requires startupinfo
+        startupinfo = None
+        if os.name == 'nt':
+            import subprocess
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            
+        cmd = [runner.lammps_exe, "-in", "in.temp_mod"]
+        
+        try:
+            # We use a direct subprocess.run here to capture the output and use startupinfo
+            result = subprocess.run(cmd, cwd=working_dir, capture_output=True, text=True, startupinfo=startupinfo, timeout=30)
+            return result.returncode == 0, result.stdout + result.stderr
+        except Exception as e:
+            return False, str(e)
+
+    def visualize_restart_binary(self, restart_path: str):
+        """Converts a binary restart to a temporary dump for preview."""
+        temp_dir = tempfile.mkdtemp()
+        dump_file = os.path.join(temp_dir, "preview.dump")
+        
+        # Avoid backslashes in f-string expressions for Python 3.11 compatibility
+        p_safe = restart_path.replace('\\', '/')
+        d_safe = dump_file.replace('\\', '/')
+        
+        script = f"""
+read_restart "{p_safe}"
+# Use write_dump to export instantly without setting up neighbors/fixes
+write_dump all custom "{d_safe}" id mol type x y z diameter
+"""
+        ok, log = self.run_lammps_script(script, temp_dir)
+        if not ok:
+            shutil.rmtree(temp_dir)
+            return None, f"LAMMPS Error: {log}"
+        
+        if not os.path.exists(dump_file):
+            shutil.rmtree(temp_dir)
+            return None, "LAMMPS failed to generate preview dump."
+            
+        # Parse it
+        from analysis.data_manager import parse_dump_file
+        df = parse_dump_file(dump_file)
+        shutil.rmtree(temp_dir)
+        return df, None
+
+    def apply_restart_modification(self, in_path: str, out_path: str, mol_ids: list, reset_ids: bool = False):
+        """Performs deletions and optionally resets IDs before saving a new restart binary."""
+        temp_dir = tempfile.mkdtemp()
+        
+        # Avoid backslashes in f-string expressions
+        i_safe = in_path.replace('\\', '/')
+        o_safe = out_path.replace('\\', '/')
+        
+        # Logic to delete if any IDs provided
+        del_cmd = ""
+        if mol_ids:
+            logic = " || ".join([f"mol == {mid}" for mid in mol_ids])
+            del_cmd = f"""
+variable to_delete atom "{logic}"
+group d_grp variable to_delete
+delete_atoms group d_grp
+"""
+        
+        # Logic to reset IDs if requested
+        reset_cmd = ""
+        if reset_ids:
+            reset_cmd = """
+reset_atoms id
+reset_atoms mol all compress yes
+"""
+            
+        script = f"""
+read_restart "{i_safe}"
+{del_cmd}
+{reset_cmd}
+write_restart "{o_safe}"
+"""
+        ok, log = self.run_lammps_script(script, temp_dir)
+        shutil.rmtree(temp_dir)
+        return ok, log

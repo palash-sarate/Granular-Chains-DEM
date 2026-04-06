@@ -45,15 +45,71 @@ include ${dump_inc}
 
 restart ${drop_steps} ${outdir}/restart/restart.*.bin
 
-# 9. CONTINUE FILL LOOP
-# This loop adds ${n_fill} additional chains starting from the restart state
-variable i loop ${n_fill}
+# --- Grid Insertion Logic (Resume Mode) ---
+# Exclusion zone diameter in meters: 3 * (atoms per chain) * 1mm
+variable chain_size equal ${N}           # IMPORTANT: Set to your actual chain size
+variable max_batch_size equal 20      # Cap for stability
+
+variable ex_diam equal 3*${chain_size}*0.001
+variable x_f_min equal -0.08
+variable x_f_max equal 0.08
+variable y_f_min equal -0.155
+variable y_f_max equal 0.155
+
+# Calculate available grid cells
+variable nx equal floor((${x_f_max}-${x_f_min})/${ex_diam})
+variable ny equal floor((${y_f_max}-${y_f_min})/${ex_diam})
+variable grid_total equal ${nx}*${ny}
+
+# Determine batch size (capped) using compatible if/then logic
+variable batch_size equal ${grid_total}
+if "${grid_total} > ${max_batch_size}" then &
+    "variable batch_size equal ${max_batch_size}"
+
+# Re-calculate grid spacing based on actual batch size to spread them out
+variable nx_b equal floor( sqrt( ${batch_size} * 0.16 / 0.31 ) )
+# Ensure nx_b is at least 1
+variable nx_f equal ${nx_b}
+if "${nx_b} == 0" then "variable nx_f equal 1"
+
+variable ny_f equal floor( ${batch_size} / ${nx_f} )
+# actual_batch is limited by our grid math
+variable actual_batch equal ${nx_f}*${ny_f}
+
+variable dx equal (${x_f_max}-${x_f_min})/${nx_f}
+variable dy equal (${y_f_max}-${y_f_min})/${ny_f}
+
+print ">>> Multi-chain Pour Configuration (Resume) <<<"
+print ">>> Exclusion Diameter: ${ex_diam} m"
+print ">>> Batch Grid: ${nx_f} x ${ny_f} (${actual_batch} chains per drop)"
+
+# 9. CONTINUE FILL LOOP (now stepping by actual_batch)
+# Integer math for ceil(N_FILL / ACTUAL_BATCH):
+variable n_loops equal floor( (${n_fill} + ${actual_batch} - 1) / ${actual_batch} )
+variable i loop ${n_loops}
 label loop_start
-    variable r equal floor(random(1,${n_templates}+1,${seed}))
-    variable mol_id string m${r}
-    variable rx equal random(-0.08,0.08,${seed})
-    variable ry equal random(-0.155, 0.155, ${seed})
-    create_atoms 0 single ${rx} ${ry} 0.5 mol ${mol_id} ${seed}
+    
+    # Batch insertion sub-loop
+    variable ix loop ${nx_f}
+    label x_loop
+        variable iy loop ${ny_f}
+        label y_loop
+            variable r equal floor(random(1,${n_templates}+1,${seed}))
+            variable mol_id string m${r}
+            
+            # Position with a small jitter (+/- 20% of cell size)
+            variable jx equal (random(-0.2,0.2,${seed}))*${dx}
+            variable jy equal (random(-0.2,0.2,${seed}))*${dy}
+            variable px equal ${x_f_min}+(${ix}-0.5)*${dx}+${jx}
+            variable py equal ${y_f_min}+(${iy}-0.5)*${dy}+${jy}
+            
+            create_atoms 0 single ${px} ${py} 0.55 mol ${mol_id} ${seed}
+            
+            next iy
+            jump SELF y_loop
+        next ix
+        jump SELF x_loop
+
     run ${drop_steps}
     next i
 jump SELF loop_start

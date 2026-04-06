@@ -32,7 +32,6 @@ def detect_lammps_input_script(sim_dir: str) -> Optional[str]:
 
     return None
 
-
 def load_lammps_geometry(sim_dir: str) -> Tuple[Optional[dict], Optional[str]]:
     """Load geometry from an auto-detected LAMMPS input script.
 
@@ -48,7 +47,6 @@ def load_lammps_geometry(sim_dir: str) -> Tuple[Optional[dict], Optional[str]]:
     except Exception as e:
         print(f"Failed to parse LAMMPS geometry from {script_path}: {e}")
         return None, script_path
-
 
 def parse_lammps_geometry_script(script_path: str) -> Optional[dict]:
     """Parse geometry directly from a specific LAMMPS input script path."""
@@ -111,39 +109,62 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     # Typical atom styles: id mol type x y z ... or id type x y z ...
     # We'll try to detect whether second token is integer (mol) or float (x)
     first = data_lines[0]
-    df = None
     try:
-        # try id type x y z
-        arr = np.array(data_lines, dtype=float)
-        # If successful, map columns
-        if arr.shape[1] >= 5:
-            # id,type,x,y,z
-            ids = arr[:,0].astype(int)
-            types = arr[:,1].astype(int)
-            x = arr[:,2]
-            y = arr[:,3]
-            z = arr[:,4]
-            dia = arr[:,5]
-            df = pd.DataFrame({'id': ids, 'type': types, 'x': x, 'y': y, 'z': z, 'diameter': dia})
+        # Typical atom styles: id mol type x y z ... or id type x y z ...
+        # Check first row to build column mapping
+        raw_rows = np.array(data_lines, dtype=float)
+        num_cols = raw_rows.shape[1]
+        
+        # Heuristic to detect mol vs type
+        is_int_col = [np.all(raw_rows[:,i] == raw_rows[:,i].astype(int)) if i < num_cols else False for i in range(num_cols)]
+        
+        col_names = []
+        if num_cols >= 6 and is_int_col[1] and is_int_col[2]:
+             # Likely: id, mol, type, x, y, z ...
+             col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
+        elif num_cols >= 5 and is_int_col[1]:
+             # Likely: id, type, x, y, z ...
+             col_names = ['id', 'type', 'x', 'y', 'z']
+        else:
+             # Fallback: assume minimal id, type, x, y, z
+             col_names = ['id', 'type', 'x', 'y', 'z']
+        
+        # Append extra cols like vx, vy, vz, diameter, mass if they exist
+        std_extras = ['vx', 'vy', 'vz', 'fx', 'fy', 'fz', 'diameter', 'mass']
+        for i in range(len(col_names), num_cols):
+            idx = i - len(col_names)
+            if idx < len(std_extras):
+                col_names.append(std_extras[idx])
+            else:
+                col_names.append(f'v{i}')
+
+        df = pd.DataFrame(raw_rows[:, :len(col_names)], columns=col_names)
+        
+        # Ensure ID, mol, type are integers
+        for c in ['id', 'mol', 'type']:
+            if c in df.columns:
+                df[c] = df[c].astype(int)
+                
     except Exception:
-        # fallback: attempt to parse as mixed tokens
+        # fallback: semi-brute force ID and coords
         rows = []
         for parts in data_lines:
             try:
-                # assume first token id, last three are x y z
                 if len(parts) >= 4:
                     idv = int(parts[0])
+                    # identify if 2nd token is likely mol
+                    molv = int(parts[1]) if len(parts) > 5 else 0
                     x = float(parts[-3])
                     y = float(parts[-2])
                     z = float(parts[-1])
-                    dia = float(parts[4]) if len(parts) > 5 else 0.0
-                    rows.append((idv, x, y, z, dia))
+                    dia = float(parts[4]) if len(parts) > 5 and 'id' not in parts else 0.01 
+                    rows.append((idv, molv, x, y, z, dia))
             except Exception:
                 continue
         if rows:
-            df = pd.DataFrame(rows, columns=['id','x','y','z','diameter'])
+            df = pd.DataFrame(rows, columns=['id', 'mol', 'x', 'y', 'z', 'diameter'])
 
-    if df is None:
+    if df is None or df.empty:
         return pd.DataFrame()
 
     # Ensure columns exist
@@ -154,6 +175,20 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
     # attach timestep 0 for consistency with Animator expectations
     df['timestep'] = 0
     df.set_index(['timestep','id'], inplace=True)
+    return df
+
+def parse_dump_file(filepath: str) -> pd.DataFrame:
+    """Public wrapper for parsing a single LAMMPS dump file.
+    Returns a DataFrame with ['timestep', 'id'] as MultiIndex.
+    """
+    df = _parse_single_dump_fast(filepath)
+    if df is not None and not df.empty:
+        id_col = 'id' if 'id' in df.columns else 'index'
+        if id_col in df.columns:
+            # We enforce a MultiIndex to match the rest of the app's expectations
+            df.set_index(['timestep', id_col], inplace=True)
+            df.index.names = ['timestep', 'id']
+            df.sort_index(inplace=True)
     return df
 
 def _parse_single_dump_fast(filepath):

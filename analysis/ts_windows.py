@@ -36,26 +36,7 @@ _CH_LS = {
     'theta': '-', 'energy': '--'
 }
 
-
-# ── Range-spec parser ──────────────────────────────────────────────────────────
-
-def parse_range_spec(spec: str) -> list:
-    """Parse '1-3,5,7-9,123' → sorted unique list of ints.
-
-    Same syntax as PDF page-range selection.
-    Raises ValueError on bad input.
-    """
-    result = set()
-    for part in spec.split(','):
-        part = part.strip()
-        if not part:
-            continue
-        if '-' in part:
-            a, b = part.split('-', 1)
-            result.update(range(int(a.strip()), int(b.strip()) + 1))
-        else:
-            result.add(int(part))
-    return sorted(result)
+from analysis.utilities import parse_range_spec
 
 # ── Shared base window ─────────────────────────────────────────────────────────
 
@@ -385,9 +366,6 @@ class AtomPlotWindow(_TsWin):
             self.lb.insert(tk.END, f'Atom {aid}  ({len(avail)} channels)')
             ok.append(aid)
         return ok, skip
-
-
-# ── Lepton Potential Visualization ─────────────────────────────────────────────
 
 # ── Lepton Potential Visualization ─────────────────────────────────────────────
 

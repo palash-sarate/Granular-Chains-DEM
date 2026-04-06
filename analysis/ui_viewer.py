@@ -8,9 +8,11 @@ from vedo import Plotter
 from analysis.controllers import (
     SimDataController, SimulationRenderer, HighlightController,
     PlaybackController, SimulationLoader, VtkOverlayController,
-    AnalysisToolManager
+    AnalysisToolManager, RestartEditorController
 )
 from analysis.utils.progress_bar import ProgressBar
+import tempfile
+import shutil
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.
@@ -50,16 +52,34 @@ class ViewerApp(BaseTk):
         self.playback_ctrl = PlaybackController(self, lambda: self.data_ctrl.timesteps, self.renderer.show_timestep)
         self.analysis_ctrl = AnalysisToolManager(self, self.data_ctrl, self._get_ui_vars)
         
-        # UI Callbacks for Loader
+        # 3. Status Bar for Picking
+        self.status_bar = tk.Label(self, text='Click an atom to identify it', bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        # 3.5 Restart Editor logic (initialized early for layout)
+        def on_re_close():
+            # Refresh view after closing editor
+            if self.data_ctrl.current_sim_folder:
+                self.renderer.show_timestep(self.current_timestep)
+            else:
+                self.renderer.clear()
+            self.update_idletasks()
+            self._autosize_and_center()
+        
+        # 4. Loader Interface and specialized controllers
         loader_cbs = {
             'on_load_success': self._on_data_loaded,
             'get_current_ts': lambda: self.current_timestep,
             'sync_ui_to_frame': self._sync_ui_to_frame,
             'clear_vtk_list': lambda: self.vtk_listbox.delete(0, tk.END),
             'add_vtk': self._add_vtk_mesh_ui,
-            'enable_preloading': self.enable_preloading_var
+            'enable_preloading': self.enable_preloading_var,
+            'open_restart_editor': self._on_restart_editor_open
         }
         self.loader_ctrl = SimulationLoader(self, self.data_ctrl, self.playback_ctrl, self.vtk_ctrl, self.renderer, loader_cbs)
+        
+        # Link Picking Callback
+        self.renderer.on_pick_cb = self._on_atom_picked
 
         # ── UI LAYOUT ───────────────────────────────────────────
         ctrl = tk.Frame(self)
@@ -72,6 +92,9 @@ class ViewerApp(BaseTk):
         except Exception:
             tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
         col2 = tk.Frame(ctrl); col2.pack(side=tk.LEFT, fill=tk.Y)
+        
+        # 4. Now we can fully init specialized controllers that need UI parents
+        self.re_ctrl = RestartEditorController(col2, self.data_ctrl, self.loader_ctrl, self.renderer, on_re_close, self._sync_restart_selection)
 
         # ── Column 1 : File & Playback ──────────────────────────
         open_row1 = tk.Frame(col1)
@@ -130,13 +153,12 @@ class ViewerApp(BaseTk):
         view_btns.pack(fill=tk.X, pady=(12, 0))
         tk.Button(view_btns, text='Fit View', command=self.renderer.fit_view).pack(side=tk.LEFT, fill=tk.X, expand=True)
         tk.Button(view_btns, text='Reset View', command=self.renderer.reset_view).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
-        # (Geometry checkbox moved to col2 next to Delete VTKs)
 
-        # ── Column 2 : VTK, Highlight & Analysis ───────────────
-        tk.Label(col2, text='Loaded VTKs:', anchor='w').pack(fill=tk.X, pady=(0, 2))
-        vtk_frame = tk.Frame(col2); vtk_frame.pack(fill=tk.X)
-        self.vtk_listbox = tk.Listbox(vtk_frame, width=22, height=5, selectmode=tk.MULTIPLE, exportselection=False)
-        self.vtk_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        # ── Column 2: Mesh & Utilities ──────────────────────────
+        tk.Label(col2, text='VTK Meshes / Geometry:').pack(anchor='w', pady=(4, 0))
+        vtk_frame = tk.Frame(col2); vtk_frame.pack(fill=tk.BOTH, expand=True)
+        self.vtk_listbox = tk.Listbox(vtk_frame, selectmode=tk.MULTIPLE, height=5)
+        self.vtk_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.vtk_listbox.bind('<<ListboxSelect>>', self._on_vtk_select_ui)
         vtk_scroll = tk.Scrollbar(vtk_frame, orient=tk.VERTICAL); vtk_scroll.config(command=self.vtk_listbox.yview); vtk_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.vtk_listbox.config(yscrollcommand=vtk_scroll.set)
@@ -160,10 +182,12 @@ class ViewerApp(BaseTk):
         
         def adjust_hl_id(delta):
             try:
-                val = int(self.highlight_id_var.get())
+                # Only work if it's a single integer
+                val = int(self.highlight_id_var.get().strip())
                 self.highlight_id_var.set(str(max(1, val + delta)))
                 self._apply_highlight_ui()
             except ValueError:
+                # If it's a range like "1-3,5", incrementing doesn't make sense
                 pass
 
         tk.Button(hl_input_row, text='-', width=2, command=lambda: adjust_hl_id(-1)).pack(side=tk.LEFT)
@@ -193,8 +217,16 @@ class ViewerApp(BaseTk):
         tk.Button(analysis_row2, text='Atoms…', command=self.analysis_ctrl.open_atom_win).pack(side=tk.LEFT, fill=tk.X, expand=True)
         tk.Button(analysis_row2, text='Lepton…', command=self.analysis_ctrl.open_lepton_win).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
 
-        self.current_timestep = None
+        tk.Label(col2, text='──── Restart Editor ────', fg='gray').pack(fill=tk.X, pady=(12, 2))
+        tk.Button(col2, text='Edit Restart File', command=lambda: self.loader_ctrl.open_restart_editor(filedialog.askopenfilename(filetypes=[('Restart Files', '*.bin')]))).pack(fill=tk.X)
+        # Note: self.re_ctrl.panel is ready and will be packed by re_ctrl.open()
+
+        # 4. Finalize UI & Show Plotter
+        self.plotter.show(interactive=False)
+        self.update_idletasks()
         self._autosize_and_center()
+        
+        # Keybinds
         self.bind('<space>', lambda e: self.playback_ctrl.toggle_play())
         self.bind('<Left>', lambda e: self.playback_ctrl.step_prev())
         self.bind('<Right>', lambda e: self.playback_ctrl.step_next())
@@ -207,11 +239,31 @@ class ViewerApp(BaseTk):
         return {'chain_size': self.chain_size_var, 'enable_preloading': self.enable_preloading_var}
 
     def _get_current_rendering_data(self):
-        return self.data_ctrl.df, self.current_timestep
+        """Standardizes data retrieval for highlighter/export during both normal and preview modes."""
+        ts = self.current_timestep
+        # For simulation folders, we need to get the actual frame data for the current TS
+        if self.data_ctrl.sim_source:
+            df = self.data_ctrl.get_atom_data_at_timestep(ts)
+            return df, ts
+        return self.data_ctrl.df_mi, ts
 
     def _get_chain_size(self):
         try: return int(self.chain_size_var.get())
         except: return 4
+
+    @property
+    def current_timestep(self):
+        # Safety for call during initialization
+        if not hasattr(self, 'playback_ctrl') or self.playback_ctrl is None:
+            return 0
+            
+        # In preview mode, we treat everything as step 0
+        if self.data_ctrl.is_preview_mode:
+            return 0
+        try:
+            return int(self.data_ctrl.timesteps[self.playback_ctrl.current_frame])
+        except (AttributeError, IndexError, TypeError):
+            return 0
 
     def _on_data_loaded(self, num_queued=0):
         # Handle progress bar if we have background batches to wait for
@@ -246,7 +298,6 @@ class ViewerApp(BaseTk):
         self.renderer.update_persistent_bounds()
         if timesteps:
             ts = timesteps[target_idx]
-            self.current_timestep = ts
             self.renderer.show_timestep(ts)
         self.refresh_button.config(state=tk.NORMAL)
 
@@ -274,7 +325,6 @@ class ViewerApp(BaseTk):
         idx = int(self.frame_slider.get())
         if 0 <= idx < len(self.data_ctrl.timesteps):
             ts = self.data_ctrl.timesteps[idx]
-            self.current_timestep = ts
             self.renderer.show_timestep(ts)
             self.analysis_ctrl.refresh_windows()
 
@@ -283,7 +333,6 @@ class ViewerApp(BaseTk):
         self.ts_listbox.selection_clear(0, tk.END)
         self.ts_listbox.selection_set(idx)
         self.ts_listbox.activate(idx)
-        self.current_timestep = ts
         self.renderer.show_timestep(ts)
 
     def _add_vtk_mesh_ui(self, path):
@@ -292,7 +341,7 @@ class ViewerApp(BaseTk):
             self.vtk_listbox.insert(tk.END, res)
             self.vtk_listbox.selection_set(self.vtk_listbox.size() - 1)
             self.renderer.update_persistent_bounds()
-            if self.current_timestep: self.renderer.show_timestep(self.current_timestep)
+            if self.current_timestep is not None: self.renderer.show_timestep(self.current_timestep)
         else: print(f"VTK load failed: {res}")
 
     def _open_vtk_files_ui(self):
@@ -308,14 +357,12 @@ class ViewerApp(BaseTk):
         sel = self.ts_listbox.curselection()
         if sel:
             idx = sel[0]; ts = self.data_ctrl.timesteps[idx]
-            self.current_timestep = ts
             self.frame_slider.set(idx); self.renderer.show_timestep(ts)
 
     def _on_slider_ui(self, val):
         idx = int(float(val))
         if 0 <= idx < len(self.data_ctrl.timesteps):
             ts = self.data_ctrl.timesteps[idx]
-            self.current_timestep = ts
             self.ts_listbox.selection_clear(0, tk.END); self.ts_listbox.selection_set(idx); self.ts_listbox.activate(idx)
             self.playback_ctrl.update_status(idx); self.renderer.show_timestep(ts)
 
@@ -323,7 +370,7 @@ class ViewerApp(BaseTk):
         sel = self.vtk_listbox.curselection()
         for i in range(self.vtk_listbox.size()):
             self.vtk_ctrl.set_visibility(self.vtk_listbox.get(i), i in sel)
-        if self.current_timestep: self.renderer.show_timestep(self.current_timestep)
+        if self.current_timestep is not None: self.renderer.show_timestep(self.current_timestep)
         else: self.plotter.render()
 
     def _delete_selected_vtks_ui(self):
@@ -333,26 +380,61 @@ class ViewerApp(BaseTk):
         self.vtk_ctrl.remove_meshes(names)
         for i in reversed(sel): self.vtk_listbox.delete(i)
         self.renderer.update_persistent_bounds()
-        if self.current_timestep: self.renderer.show_timestep(self.current_timestep)
+        if self.current_timestep is not None: self.renderer.show_timestep(self.current_timestep)
         else: self.plotter.render()
 
     def _apply_highlight_ui(self):
         try:
-            ok, res = self.hl_ctrl.apply(self.highlight_mode_var.get(), int(self.highlight_id_var.get().strip()))
+            # Pass the raw string to support ranges like "1-4,6"
+            spec = self.highlight_id_var.get().strip()
+            if not spec: return
+            
+            ok, res = self.hl_ctrl.apply(self.highlight_mode_var.get(), spec)
             self.highlight_status.config(text=res, fg='black' if ok else 'red')
-            if ok and self.current_timestep:
+            if ok:
                 self.renderer.show_timestep(self.current_timestep)
             else:
                 self.plotter.render()
-        except: self.highlight_status.config(text='Invalid ID', fg='red')
+        except Exception as e:
+            self.highlight_status.config(text=f'Highlight Error: {str(e)}', fg='red')
+            import traceback
+            traceback.print_exc()
 
     def _clear_highlight_ui(self):
         self.hl_ctrl.clear(); self.highlight_status.config(text='—', fg='gray'); self.plotter.render()
 
     def _on_draw_toggle_ui(self):
         self.vtk_ctrl.set_master_visibility(self.show_geometry_var.get())
-        if self.current_timestep: self.renderer.show_timestep(self.current_timestep)
+        if self.current_timestep is not None: self.renderer.show_timestep(self.current_timestep)
         else: self.plotter.render()
+
+    # ── Restart Editor Logic ──────────────────────────────
+    def _on_atom_picked(self, info: dict):
+        """Callback from renderer when an atom is clicked."""
+        msg = f"Atom ID: {info['id']} | Mol/Chain: {info['mol']} | Type: {info['type']} | Pos: {info['pos']}"
+        self.status_bar.config(text=msg, fg='blue')
+        
+        # In Restart Editor mode, toggle selection
+        if self.data_ctrl.is_preview_mode:
+            self.re_ctrl.toggle_molecule(info['mol'])
+        else:
+            # Traditional behavior: just log and copy
+            self.clipboard_clear()
+            self.clipboard_append(str(info['mol']))
+
+    def _on_restart_editor_open(self, path: str):
+        """Callback when a restart file is loaded for editing."""
+        # Clear highlights from any previous work
+        self._clear_highlight_ui()
+        self.re_ctrl.open(path)
+        self.update_idletasks()
+        self._autosize_and_center()
+
+    def _sync_restart_selection(self, ids_str: str):
+        """Syncs the selection from Restart Editor to the main Highlighter."""
+        self.highlight_mode_var.set('chain')
+        self.highlight_id_var.set(ids_str)
+        self._apply_highlight_ui()
 
 
     def _autosize_and_center(self) -> None:

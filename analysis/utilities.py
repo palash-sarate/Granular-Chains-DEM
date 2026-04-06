@@ -19,6 +19,22 @@ def get_dt_token(dt: float) -> str:
     # print(f"DT token: {dt_token}")
     return dt_token
 
+def parse_range_spec(spec: str) -> list:
+    """Parse '1-3,5,7-9,123' → sorted unique list of ints."""
+    result = set()
+    for part in spec.split(','):
+        part = part.strip()
+        if not part: continue
+        if '-' in part:
+            try:
+                a, b = part.split('-', 1)
+                result.update(range(int(a.strip()), int(b.strip()) + 1))
+            except ValueError: continue
+        else:
+            try: result.add(int(part))
+            except ValueError: continue
+    return sorted(result)
+
 def get_viscosity_token(viscosity: float) -> str:
     """
     Converts a float viscosity into a string token suitable for filenames.

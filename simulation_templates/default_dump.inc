@@ -7,7 +7,7 @@ thermo_style custom step pe ke ebond eangle etotal ecoul emol edihed epair evdwl
 
 # Dumps (Note: 'append yes' is not strictly needed if filenames have step numbers, 
 # but good if you use single filenames)
-dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id type x y z vx vy vz fx fy fz diameter mass
+dump 1 all custom 1000 ${outdir}/chain/chain_*.dump id mol type x y z vx vy vz fx fy fz diameter mass
 dump_modify 1 sort id
 dump 2 all local 1000 ${outdir}/bond/bond_*.dump index c_1[1] c_1[2] c_1[3]
 dump_modify 2 colname 2 dist

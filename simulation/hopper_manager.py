@@ -99,7 +99,7 @@ class HopperManager:
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
                               mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
-                              viscosity: float = 0.001) -> str:
+                              viscosity: float = 0.001, N: int = 4) -> str:
         
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
@@ -130,6 +130,7 @@ class HopperManager:
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "seed": seed,
+                "N": N,
             }
         )
 
@@ -142,7 +143,8 @@ class HopperManager:
     def resume_filled_state(self, restart_path: str, source_dir: str, n_fill: int, relax_steps: int,
                             dt: float = 1e-6, run_name: str = None, seed: int = 12345,
                             mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
-                            dump_inc: str = "simulation_templates/default_dump.inc") -> str:
+                            dump_inc: str = "simulation_templates/default_dump.inc", viscosity: float = 0.001,
+                            N: int = 4) -> str:
         """Resume a hopper fill simulation from a restart file and add more chains.
         Returns the path to the saved data file.
         """
@@ -162,7 +164,7 @@ class HopperManager:
             run=run_name,
             resume_file=restart_path,
             extra_vars={
-                "viscosity": 0.001,
+                "viscosity": viscosity,
                 "setup_inc": setup_inc,
                 "dump_inc": dump_inc,
                 "mol_include_file": inc_file,
@@ -172,6 +174,7 @@ class HopperManager:
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "seed": seed,
+                "N": N,
             }
         )
 

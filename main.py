@@ -19,24 +19,32 @@ def run_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10,
                        mol_dir = "chain_data/molecules_temp",
                        setup_inc = "simulation_geometries/2D_hopper.inc",
                        dump_inc = "simulation_templates/default_dump.inc",
-                       viscosity = 0.001):
+                       viscosity = 0.001, N=4):
     if seed is None:
         seed = int(time.time()) % 1000000
 
     runner = SimulationRunner(lammps_executable="lmp")
     manager = HopperManager(runner)
     manager.generate_filled_state(source_dir=source_dir, 
-                                 n_fill=n_fill, dt = dt, relax_steps=relax_steps,
+                                 n_fill=n_fill, 
+                                 dt = dt, 
+                                 relax_steps=relax_steps,
                                  run_name=run_name,
                                  seed = seed,
                                  mol_dir = mol_dir, 
                                  setup_inc = setup_inc,
                                  dump_inc = dump_inc,
-                                 viscosity = viscosity)
+                                 viscosity = viscosity,
+                                 N=N)
 
-def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10, 
-                       relax_steps=100000, restart_path=None, 
-                       run_name=None, seed=None):
+def resume_hopper_fill(restart_path=None, 
+                       source_dir="chain_data/relaxed/N4", n_fill=10, 
+                       relax_steps=100000, run_name=None, seed=None, dt = 1e-6,
+                       mol_dir = "chain_data/molecules_temp",
+                       setup_inc = "simulation_geometries/2D_hopper.inc",
+                       dump_inc = "simulation_templates/default_dump.inc",
+                       viscosity = 0.001, N=4):
+
     """Resume filling a hopper from an existing restart file."""
     if not restart_path:
         print("Error: restart_path is required for resuming.")
@@ -52,11 +60,13 @@ def resume_hopper_fill(source_dir="chain_data/relaxed/N4", n_fill=10,
                                 n_fill=n_fill,
                                 relax_steps=relax_steps,
                                 run_name=run_name,
-                                dt=1e-6,
+                                dt=dt,
                                 seed = seed,
-                                mol_dir = "chain_data/molecules_temp",
-                                setup_inc="simulation_geometries/2D_hopper.inc",
-                                dump_inc = "simulation_templates/default_dump.inc")
+                                mol_dir = mol_dir,
+                                setup_inc=setup_inc,
+                                dump_inc = dump_inc,
+                                viscosity = viscosity,
+                                N=N)
 
 def generate_relaxed_chain_states(n_beads=4, n_states=10, forced = False):
     runner = SimulationRunner(lammps_executable="lmp")
