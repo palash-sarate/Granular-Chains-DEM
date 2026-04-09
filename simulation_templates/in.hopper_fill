@@ -76,7 +76,7 @@ variable y_width equal ${y_f_max}-${y_f_min}
 
 # Calculate available grid cells
 variable nx equal floor( ${x_width} / ${ex_diam} )
-variable ny equal floor( (0.155 - (-0.155)) / ${ex_diam} )
+variable ny equal floor( ${y_width} / ${ex_diam} )
 variable grid_total equal ${nx}*${ny}
 
 # Determine batch size (capped) using compatible if/then logic
