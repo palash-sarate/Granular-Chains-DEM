@@ -63,6 +63,13 @@ class SimDataController:
         if not loaded_dfs: return pd.DataFrame()
         return pd.concat(loaded_dfs)
 
+    @property
+    def metadata(self):
+        """Persistent metadata for the current simulation."""
+        if self.sim_source:
+            return self.sim_source.metadata
+        return None
+
     def __init__(self):
         # Internal storage for manual/legacy loads
         self._df_manual: Optional[pd.DataFrame] = None

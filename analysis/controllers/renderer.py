@@ -17,8 +17,51 @@ class SimulationRenderer:
         self._persistent_view_bounds = None
         self._axes = None
         
+        # Consistent color palette for chains (using a mix of vibrant colors)
+        self._chain_palette = [
+            '#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a',
+            '#d62728', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94',
+            '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d',
+            '#17becf', '#9edae5', 'blue', 'green', 'purple', 'orange', 'cyan',
+            'magenta', 'gold', 'teal', 'olive', 'brown', 'pink'
+        ]
+        
         # Add interactive picker callback
         self.plotter.add_callback('LeftButtonPress', self._on_mouse_click)
+        # Add interaction callback to save camera state
+        self.plotter.add_callback('InteractionEvent', self._on_interaction)
+
+    def _on_interaction(self, event):
+        """Called during camera/actor interaction."""
+        self.save_camera_state()
+
+    def save_camera_state(self):
+        """Save the current camera parameters to simulation metadata."""
+        if not self.data_ctrl.metadata: return
+        
+        cam = self.plotter.camera
+        state = {
+            'pos': list(cam.GetPosition()),
+            'fp': list(cam.GetFocalPoint()),
+            'up': list(cam.GetViewUp()),
+            'scale': cam.GetParallelScale()
+        }
+        self.data_ctrl.metadata.set("camera_state", state)
+
+    def restore_camera_state(self):
+        """Restore camera parameters from simulation metadata."""
+        if not self.data_ctrl.metadata: return
+        
+        state = self.data_ctrl.metadata.get("camera_state")
+        if not state: return
+        
+        print("Restoring camera state from metadata...")
+        cam = self.plotter.camera
+        if 'pos' in state: cam.SetPosition(state['pos'])
+        if 'fp' in state: cam.SetFocalPoint(state['fp'])
+        if 'up' in state: cam.SetViewUp(state['up'])
+        if 'scale' in state: cam.SetParallelScale(state['scale'])
+        self.plotter.render()
 
     def _on_mouse_click(self, event):
         """Identify atom under the mouse click."""
@@ -127,19 +170,27 @@ class SimulationRenderer:
         self._dynamic_actors = []
         
         # 2. Render Atoms
-        pos = frame_data[['x', 'y', 'z']].values
-        dias = frame_data['diameter'].values
+        # We group by ('mol', 'diameter') to ensure each chain gets a unique, stable color.
+        # Fallback to 'type' if 'mol' is missing.
+        group_cols = ['mol', 'diameter'] if 'mol' in frame_data.columns else ['type', 'diameter']
         
-        # Colors based on type
-        types = frame_data['type'].values
-        colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'black']
-        
-        # Group by (type, diameter) to ensure constant r and c for each vedo actor
-        # This works around the vedo limitation where c and r cannot both be sequences.
-        for (t, d), group in frame_data.groupby(['type', 'diameter']):
+        for group_keys, group in frame_data.groupby(group_cols):
+            if isinstance(group_keys, tuple):
+                m_id, d = group_keys
+            else:
+                m_id, d = group_keys, group['diameter'].iloc[0]
+
             group_pos = group[['x', 'y', 'z']].values
             r_val = d / 2
-            c_val = colors[(int(t)-1)%len(colors)]
+            
+            # Map mol_id to palette index consistently
+            try:
+                # Handle potential non-numeric mol_ids gracefully
+                idx = int(float(m_id))
+            except (ValueError, TypeError):
+                idx = hash(str(m_id))
+            
+            c_val = self._chain_palette[idx % len(self._chain_palette)]
             
             spheres = Spheres(group_pos, r=r_val, c=c_val)
             self.plotter.add(spheres)

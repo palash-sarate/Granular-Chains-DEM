@@ -13,6 +13,8 @@ from analysis.controllers import (
 from analysis.utils.progress_bar import ProgressBar
 import tempfile
 import shutil
+from simulation.orchestrator import SimulationOrchestrator
+from analysis.controllers.simulation_launcher import SimulationLauncherController
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.
@@ -66,6 +68,9 @@ class ViewerApp(BaseTk):
             self.update_idletasks()
             self._autosize_and_center()
         
+        # 3.6 Simulation Launcher
+        self.orchestrator = SimulationOrchestrator(lammps_executable="lmp")
+
         # 4. Loader Interface and specialized controllers
         loader_cbs = {
             'on_load_success': self._on_data_loaded,
@@ -91,10 +96,17 @@ class ViewerApp(BaseTk):
             ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
         except Exception:
             tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        col2 = tk.Frame(ctrl); col2.pack(side=tk.LEFT, fill=tk.Y)
+        col2 = tk.Frame(ctrl); col2.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+        try:
+            import tkinter.ttk as ttk
+            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
+        except Exception:
+            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
+        col3 = tk.Frame(ctrl); col3.pack(side=tk.LEFT, fill=tk.Y)
         
         # 4. Now we can fully init specialized controllers that need UI parents
         self.re_ctrl = RestartEditorController(col2, self.data_ctrl, self.loader_ctrl, self.renderer, on_re_close, self._sync_restart_selection)
+        self.sim_launcher = SimulationLauncherController(col3, self.orchestrator, on_simulation_started=lambda: self.refresh_button.invoke())
 
         # ── Column 1 : File & Playback ──────────────────────────
         open_row1 = tk.Frame(col1)
@@ -120,7 +132,7 @@ class ViewerApp(BaseTk):
             except Exception: pass
 
         tk.Label(col1, text='Timesteps:').pack(anchor='w', pady=(8, 0))
-        self.ts_listbox = tk.Listbox(col1, width=22, height=6)
+        self.ts_listbox = tk.Listbox(col1, width=22, height=6, exportselection=False)
         self.ts_listbox.pack(fill=tk.Y)
         self.ts_listbox.bind('<<ListboxSelect>>', self._on_ts_select_ui)
 
@@ -157,7 +169,7 @@ class ViewerApp(BaseTk):
         # ── Column 2: Mesh & Utilities ──────────────────────────
         tk.Label(col2, text='VTK Meshes / Geometry:').pack(anchor='w', pady=(4, 0))
         vtk_frame = tk.Frame(col2); vtk_frame.pack(fill=tk.BOTH, expand=True)
-        self.vtk_listbox = tk.Listbox(vtk_frame, selectmode=tk.MULTIPLE, height=5)
+        self.vtk_listbox = tk.Listbox(vtk_frame, selectmode=tk.MULTIPLE, height=5, exportselection=False)
         self.vtk_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.vtk_listbox.bind('<<ListboxSelect>>', self._on_vtk_select_ui)
         vtk_scroll = tk.Scrollbar(vtk_frame, orient=tk.VERTICAL); vtk_scroll.config(command=self.vtk_listbox.yview); vtk_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -275,6 +287,11 @@ class ViewerApp(BaseTk):
         else:
             self.batches_to_load = 0
             
+        # Ensure fresh VTK state for new folder metadata
+        self.vtk_ctrl.metadata = None
+        self.vtk_ctrl.clear()
+        self.vtk_listbox.delete(0, tk.END)
+
         old_ts = self.current_timestep
         self.analysis_ctrl.refresh_windows()
         self.ts_listbox.delete(0, tk.END)
@@ -299,6 +316,25 @@ class ViewerApp(BaseTk):
         if timesteps:
             ts = timesteps[target_idx]
             self.renderer.show_timestep(ts)
+            
+        # NEW: Restore metadata-driven state from simulation folder
+        if self.data_ctrl.metadata:
+            # 1. Restore VTK mesh overlays
+            # This also links the controller to the metadata for future additions
+            self.vtk_ctrl.restore_from_metadata(self.data_ctrl.metadata)
+            
+            # 2. Sync the VTK listbox in UI with the restored meshes and visibility
+            self.vtk_listbox.delete(0, tk.END)
+            for i, (name, data) in enumerate(self.vtk_ctrl.vtk_meshes.items()):
+                self.vtk_listbox.insert(tk.END, name)
+                if data['visible']:
+                    self.vtk_listbox.selection_set(i)
+                else:
+                    self.vtk_listbox.selection_clear(i)
+            
+            # 3. Restore Camera state
+            self.renderer.restore_camera_state()
+
         self.refresh_button.config(state=tk.NORMAL)
 
     def _on_batch_ready(self, batch_idx):

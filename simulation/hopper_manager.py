@@ -99,7 +99,8 @@ class HopperManager:
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
                               mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
-                              viscosity: float = 0.001, N: int = 4) -> str:
+                              viscosity: float = 0.001, N: int = 4, fill_template: str = "in.hopper_fill",
+                              outdir: str = None) -> str:
         
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
@@ -112,13 +113,14 @@ class HopperManager:
         n_templates = len(list(Path(source_dir).glob("*.data")))
 
         # Determine default drop_steps similar to run_hopper_flow
-        drop_steps = int(5 * (1 / dt) * 1e-2)
+        # drop_steps = int(5 * (1 / dt) * 1e-2)
 
         cfg = SimulationConfig(
-            template="in.hopper_fill",
+            template=fill_template,
             simulation="Hopper_Flow",
             run=run_name,
             data_file=None,
+            outdir_override=outdir,
             extra_vars={
                 "viscosity": viscosity,
                 "setup_inc": setup_inc,
@@ -126,7 +128,7 @@ class HopperManager:
                 "mol_include_file": inc_file,
                 "n_templates": n_templates,
                 "n_fill": n_fill,
-                "drop_steps": int(drop_steps),
+                # "drop_steps": int(drop_steps),
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "seed": seed,
@@ -140,29 +142,61 @@ class HopperManager:
         saved_data = f"{cfg.output_dir}/final_hopper.data".replace("\\", "/")
         return saved_data
 
-    def resume_filled_state(self, restart_path: str, source_dir: str, n_fill: int, relax_steps: int,
-                            dt: float = 1e-6, run_name: str = None, seed: int = 12345,
+    def resume_filled_state(self, run_name: str, source_dir: str, n_fill: int, relax_steps: int,
+                            dt: float = 1e-6, restart_path: str = None, seed: int = 12345,
                             mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
-                            dump_inc: str = "simulation_templates/default_dump.inc", viscosity: float = 0.001,
-                            N: int = 4) -> str:
+                            dump_inc: str = "simulation_templates/default_dump.inc", 
+                            viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
+                            N: int = 4, outdir: str = None) -> str:
         """Resume a hopper fill simulation from a restart file and add more chains.
         Returns the path to the saved data file.
         """
-        if run_name is None:
-            run_name = f"resumed_N{n_fill}_s{seed}"
+        
+        if restart_path is None:
+            # Look for restart files in potential locations:
+            # 1. The custom outdir (if provided)
+            # 2. The default directory computed from run_name
+            search_dirs = []
+            if outdir:
+                search_dirs.append(outdir)
+            
+            default_dir = SimulationConfig.compute_output_dir("Hopper_Flow", run_name)
+            if default_dir not in search_dirs:
+                search_dirs.append(default_dir)
+
+            found_restart = False
+            for d in search_dirs:
+                restart_search_dir = os.path.join(d, "restart").replace("\\", "/")
+                
+                if not os.path.exists(restart_search_dir):
+                    continue
+                
+                restart_files = [f for f in os.listdir(restart_search_dir) if f.endswith(".bin")]
+                if not restart_files:
+                    continue
+                    
+                restart_files.sort(key=lambda x: os.path.getmtime(os.path.join(restart_search_dir, x)))
+                restart_path = os.path.join(restart_search_dir, restart_files[-1]).replace("\\", "/")
+                print(f"Using latest restart file found in {d}: {restart_path}")
+                found_restart = True
+                break
+                
+            if not found_restart:
+                 raise FileNotFoundError(f"Could not find any restart files (.bin) in searched locations: {search_dirs}")
 
         # Prepare molecules (ensure we have the .mol files for create_atoms)
         inc_file = self.prepare_molecules(source_dir, mol_dir)
         n_templates = len(list(Path(source_dir).glob("*.data")))
 
         # Determine drop_steps
-        drop_steps = int(5 * (1 / dt) * 1e-2)
+        # drop_steps = int(5 * (1 / dt) * 1e-2)
 
         cfg = SimulationConfig(
-            template="in.hopper_fill_resume",
+            template=fill_template,
             simulation="Hopper_Flow",
             run=run_name,
             resume_file=restart_path,
+            outdir_override=outdir,
             extra_vars={
                 "viscosity": viscosity,
                 "setup_inc": setup_inc,
@@ -170,7 +204,7 @@ class HopperManager:
                 "mol_include_file": inc_file,
                 "n_templates": n_templates,
                 "n_fill": n_fill,
-                "drop_steps": int(drop_steps),
+                # "drop_steps": int(drop_steps),
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "seed": seed,

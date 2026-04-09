@@ -46,12 +46,22 @@ class SimulationConfig:
     regions: Optional[List[str]] = None        # each entry: a 'region ...' line or multiline chunk
     wall_blocks: Optional[List[str]] = None    # each entry: a 'fix ...' wall block (string / multiline)
     walls: Optional[Dict[str, Any]] = None     # keep-compatible: structured walls (converted by runner if present)
+    
+    # Custom output directory override
+    outdir_override: Optional[str] = None
+
+    @staticmethod
+    def compute_output_dir(simulation: str, run: str) -> str:
+        """Statically computes the output directory path."""
+        return f"dumping_yard/{simulation}/{run}"
 
     @property
     def output_dir(self) -> str:
-        """Constructs the output directory path from simulation and run."""
+        """Constructs the output directory path from simulation and run, or uses override if provided."""
+        if self.outdir_override:
+            return self.outdir_override.replace("\\", "/")
         # Use forward slashes for LAMMPS compatibility even on Windows
-        return f"dumping_yard/{self.simulation}/{self.run}"
+        return self.compute_output_dir(self.simulation, self.run)
 
     def to_lammps_vars(self) -> Dict[str, str]:
         """Converts config to a dictionary of LAMMPS variable arguments."""

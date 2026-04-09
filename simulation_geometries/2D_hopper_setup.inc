@@ -1,0 +1,2 @@
+include simulation_geometries/2D_hopper.inc
+include simulation_geometries/2D_hopper_stubs_array.inc

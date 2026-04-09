@@ -11,6 +11,7 @@ class VtkOverlayController:
         self._scene_bounds = None
         self._colors = ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta']
         self.master_visible = True
+        self.metadata = None  # Will be set when a folder is loaded
 
     def set_master_visibility(self, visible: bool):
         self.master_visible = visible
@@ -36,9 +37,21 @@ class VtkOverlayController:
                 self.plotter.add(mesh)
             
             self.vtk_meshes[name] = {'actor': mesh, 'visible': True, 'path': path}
+            self._sync_to_metadata()
             return True, name
         except Exception as e:
             return False, str(e)
+
+    def _sync_to_metadata(self):
+        if self.metadata:
+            # Save both path and visibility state
+            vtk_info = [
+                {'path': data['path'], 'visible': data['visible']} 
+                for data in self.vtk_meshes.values()
+            ]
+            self.metadata.set("vtk_configs", vtk_info)
+            # Add legacy support by also updating vtk_paths for older viewer versions if any
+            self.metadata.set("vtk_paths", [d['path'] for d in vtk_info])
 
     def set_visibility(self, name: str, visible: bool):
         if name in self.vtk_meshes:
@@ -49,6 +62,7 @@ class VtkOverlayController:
             else:
                 try: self.plotter.remove(act)
                 except Exception: pass
+            self._sync_to_metadata()
             self.plotter.render()
 
     def remove_meshes(self, names: list):
@@ -58,6 +72,7 @@ class VtkOverlayController:
                 try: self.plotter.remove(act)
                 except Exception: pass
                 del self.vtk_meshes[name]
+        self._sync_to_metadata()
 
     def clear(self):
         for mesh_data in self.vtk_meshes.values():
@@ -66,6 +81,7 @@ class VtkOverlayController:
         self.vtk_meshes.clear()
         self.vtk_color_idx = 0
         self._scene_bounds = None
+        self._sync_to_metadata()
 
     def recompute_bounds(self, init_limits: Optional[tuple], only_visible=True):
         if init_limits is not None:
@@ -101,3 +117,31 @@ class VtkOverlayController:
             zmin - z_pad, zmax + z_pad
         ]
         return self._scene_bounds
+
+    def restore_from_metadata(self, metadata):
+        """Attempts to reload VTK files saved in the metadata."""
+        self.metadata = metadata
+        if not metadata: return
+        
+        # Support both new 'vtk_configs' and legacy 'vtk_paths'
+        configs = metadata.get("vtk_configs")
+        if configs:
+            print(f"Restoring {len(configs)} VTK overlays (with visibility) from metadata...")
+            for cfg in configs:
+                p = cfg.get('path')
+                visible = cfg.get('visible', True)
+                if p and os.path.exists(p):
+                    ok, name = self.add_mesh(p)
+                    if ok:
+                        self.set_visibility(name, visible)
+                else:
+                    print(f"Warning: VTK file not found for restoration: {p}")
+        else:
+            paths = metadata.get("vtk_paths", [])
+            if not paths: return
+            print(f"Restoring {len(paths)} VTK overlays (legacy mode) from metadata...")
+            for p in paths:
+                if os.path.exists(p):
+                    self.add_mesh(p)
+                else:
+                    print(f"Warning: VTK file not found for restoration: {p}")

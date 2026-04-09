@@ -13,7 +13,7 @@ from ovito.modifiers import ConstructSurfaceModifier
 # Helper: create LAMMPS input script
 # --------------------------------------------------
 def generate_lammps_input(inc_file, dump_file, lattice_spacing,
-                         region_bounds, extra_vars, target_region):
+                         region_bounds, extra_vars, target_regions):
 
     xlo, xhi, ylo, yhi, zlo, zhi = region_bounds
 
@@ -36,10 +36,12 @@ include {inc_file}
 
 # Fill with structured lattice for perfect edges
 lattice sc {lattice_spacing}
-create_atoms 1 region {target_region}
-
-write_dump all custom {dump_file} id type x y z
 """
+    for region in target_regions:
+        script += f"create_atoms 1 region {region}\n"
+
+    script += f"\nwrite_dump all custom {dump_file} id type x y z\n"
+    return script
 
     return script
 
@@ -57,6 +59,7 @@ def main():
     parser.add_argument("--lammps_cmd", default="lmp", help="LAMMPS executable")
 
     parser.add_argument("--regions", nargs="+", default=["simbox"], help="List of LAMMPS region names to fill")
+    parser.add_argument("--combined", action="store_true", help="Extract all regions into a single mesh file")
     parser.add_argument("--bounds", nargs=6, type=float,
                         default=[-0.2, 0.2, -0.3, 0.3, -0.1, 0.6],
                         help="Sampling box bounds: xlo xhi ylo yhi zlo zhi")
@@ -79,9 +82,13 @@ def main():
 
     vtk_files = []
 
-    for region in args.regions:
-        dump_file = outdir / f"dump_{region}.lammpstrj"
-        input_file = outdir / f"in.generate_{region}"
+    # Batch processing or Individual processing
+    batches = [args.regions] if args.combined else [[r] for r in args.regions]
+
+    for batch in batches:
+        label = "combined" if args.combined else batch[0]
+        dump_file = outdir / f"dump_{label}.lammpstrj"
+        input_file = outdir / f"in.generate_{label}"
 
         # Generate LAMMPS input
         lmp_script = generate_lammps_input(
@@ -90,19 +97,19 @@ def main():
             lattice_spacing=args.spacing,
             region_bounds=args.bounds,
             extra_vars=extra_vars,
-            target_region=region
+            target_regions=batch
         )
 
         with open(input_file, "w") as f:
             f.write(lmp_script)
 
-        print(f"[{region}] Running LAMMPS (Lattice fill)...")
+        print(f"[{label}] Running LAMMPS (Lattice fill for {len(batch)} regions)...")
         subprocess.run([args.lammps_cmd, "-in", str(input_file)], check=True)
 
-        print(f"[{region}] Loading dump into OVITO...")
+        print(f"[{label}] Loading dump into OVITO...")
         pipeline = import_file(str(dump_file))
 
-        print(f"[{region}] Constructing surface (Zero smoothing)...")
+        print(f"[{label}] Constructing surface (Zero smoothing)...")
         recon_radius = args.radius if args.radius else args.spacing * 1.2
         pipeline.modifiers.append(
             ConstructSurfaceModifier(
@@ -111,9 +118,9 @@ def main():
             )
         )
 
-        vtk_file = outdir / f"{region}_mesh.vtk"
+        vtk_file = outdir / f"{label}_mesh.vtk"
 
-        print(f"[{region}] Exporting mesh to {vtk_file}...")
+        print(f"[{label}] Exporting mesh to {vtk_file}...")
         export_file(pipeline, str(vtk_file), format="vtk/trimesh", key="surface")
         vtk_files.append(vtk_file)
 

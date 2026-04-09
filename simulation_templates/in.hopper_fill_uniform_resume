@@ -43,6 +43,7 @@ timestep ${dt}
 # 8. OUTPUT
 include ${dump_inc}
 
+
 # --- Grid Insertion Logic (Resume Mode) ---
 # Exclusion zone diameter in meters: 3 * (atoms per chain) * 1mm
 variable chain_size equal ${N}           # IMPORTANT: Set to your actual chain size
@@ -59,8 +60,8 @@ variable finish_drop_steps equal floor(${drop_time}/${dt})
 variable x_f_min equal -0.08
 variable x_f_max equal 0.08
 variable x_width equal ${x_f_max}-${x_f_min}
-variable y_f_min equal -0.155
-variable y_f_max equal 0.155
+variable y_f_min equal -0.15
+variable y_f_max equal 0.15
 variable y_width equal ${y_f_max}-${y_f_min}
 
 # Calculate available grid cells
@@ -89,6 +90,7 @@ variable dy equal (${y_f_max}-${y_f_min})/${ny_f}
 print ">>> Multi-chain Pour Configuration (Resume) <<<"
 print ">>> Exclusion Diameter: ${ex_diam} m"
 print ">>> Batch Grid: ${nx_f} x ${ny_f} (${actual_batch} chains per drop)"
+print ">>> Drop Steps: ${drop_steps}"
 
 restart ${drop_steps} ${outdir}/restart/restart.*.bin
 
@@ -100,6 +102,13 @@ variable n_loops equal floor( (${n_fill} + ${actual_batch} - 1) / ${actual_batch
 variable i loop ${n_loops}
 label loop_start
     
+    # --- Uniform Distribution Logic ---
+    # Generate batch-wide random offsets to shift the entire grid.
+    # We use $() immediate evaluation to "lock" the offset for the duration of this batch.
+    variable batch_seed equal ${seed}+${i}
+    variable ox equal $(random(0.0,v_dx,v_batch_seed))
+    variable oy equal $(random(0.0,v_dy,v_batch_seed))
+
     # Batch insertion sub-loop
     variable ix loop ${nx_f}
     label x_loop
@@ -108,11 +117,16 @@ label loop_start
             variable r equal floor(random(1,${n_templates}+1,${seed}))
             variable mol_id string m${r}
             
-            # Position with a small jitter (+/- 20% of cell size)
-            variable jx equal (random(-0.2,0.2,${seed}))*${dx}
-            variable jy equal (random(-0.2,0.2,${seed}))*${dy}
-            variable px equal ${x_f_min}+(${ix}-0.5)*${dx}+${jx}
-            variable py equal ${y_f_min}+(${iy}-0.5)*${dy}+${jy}
+            # Calculate wrapped position
+            # We shift the grid center by ox/oy and wrap around if it exceeds bounds.
+            # Using ${ix} to bake the current loop index into the formula evaluation.
+            variable px_raw equal v_x_f_min+(${ix}-0.5)*v_dx+v_ox
+            variable py_raw equal v_y_f_min+(${iy}-0.5)*v_dy+v_oy
+            
+            # Wrap logic using logical multiplication (safe alternative to ternary operator)
+            # (A > B) returns 1.0 if true, 0.0 if false.
+            variable px equal v_px_raw-(v_px_raw>v_x_f_max)*v_x_width
+            variable py equal v_py_raw-(v_py_raw>v_y_f_max)*v_y_width
             
             create_atoms 0 single ${px} ${py} 0.55 mol ${mol_id} ${seed}
             

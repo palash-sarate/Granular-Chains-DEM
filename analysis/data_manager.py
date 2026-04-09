@@ -4,7 +4,8 @@ import os
 import re
 import pickle
 import numpy as np
-from typing import Optional, Tuple
+import json
+from typing import Optional, Tuple, Any, Dict
 
 from concurrent.futures import ProcessPoolExecutor
 from analysis.lammps_parser import LammpsParser
@@ -243,6 +244,50 @@ def _parse_single_dump_fast(filepath):
         print(f"Error parsing {filepath}: {e}")
     return pd.DataFrame()
 
+class SimulationMetadata:
+    """Manages persistent metadata for a simulation folder."""
+    def __init__(self, data_dir: str, filename: str = "sim_metadata.json"):
+        self.path = os.path.join(data_dir, filename)
+        self._data: Dict[str, Any] = {}
+        self.load()
+
+    def load(self):
+        if os.path.exists(self.path):
+            try:
+                with open(self.path, 'r') as f:
+                    self._data = json.load(f)
+            except Exception as e:
+                print(f"Failed to load metadata from {self.path}: {e}")
+                self._data = {}
+        else:
+            self._data = {}
+
+    def save(self):
+        try:
+            # Ensure the directory exists (though it usually should)
+            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            with open(self.path, 'w') as f:
+                json.dump(self._data, f, indent=4)
+        except Exception as e:
+            print(f"Failed to save metadata to {self.path}: {e}")
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return self._data.get(key, default)
+
+    def set(self, key: str, value: Any):
+        self._data[key] = value
+        self.save()
+
+    def update(self, delta: Dict[str, Any]):
+        self._data.update(delta)
+        self.save()
+
+    def __getitem__(self, key):
+        return self._data.get(key)
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
 class SimulationData:
     def __init__(self, data_dir, cache_name="sim_cache", batch_size=100):
         self.data_dir = data_dir
@@ -252,9 +297,12 @@ class SimulationData:
         self.cache_dir = os.path.join(data_dir, cache_name)
         self.batch_size = batch_size
         
-        # Ensure cache directory exists
+        # Ensure directories exist
         if os.path.isdir(self.data_dir):
             os.makedirs(self.cache_dir, exist_ok=True)
+            self.metadata = SimulationMetadata(self.data_dir)
+        else:
+            self.metadata = None
         
         self.atom_batches = {}  # Indexed by batch number
         self.bond_batches = {}

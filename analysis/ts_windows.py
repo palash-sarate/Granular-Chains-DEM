@@ -88,7 +88,7 @@ class _TsWin(tk.Toplevel):
         tk.Label(lf, text='Active series:', anchor='w').pack(fill=tk.X)
         li = tk.Frame(lf)
         li.pack(fill=tk.X)
-        self.lb = tk.Listbox(li, height=3, width=52, activestyle='none')
+        self.lb = tk.Listbox(li, height=3, width=52, activestyle='none', exportselection=False)
         sb = tk.Scrollbar(li, orient=tk.VERTICAL, command=self.lb.yview)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
         self.lb.config(yscrollcommand=sb.set)

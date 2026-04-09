@@ -10,6 +10,7 @@ import shutil
 class SimulationRunner:
     def __init__(self, lammps_executable: str = "lmp"):
         self.lammps_exe = lammps_executable
+        self.output_dir = ""
 
     def generate_input_script(self, config: SimulationConfig, template_path: str, output_path: str):
         """
@@ -72,8 +73,20 @@ class SimulationRunner:
         
         # Clean directory if requested
         if clean and os.path.exists(outdir):
-            print(f"Cleaning output directory: {outdir}")
-            shutil.rmtree(outdir)
+            print(f"Surgical cleanup of output directory: {outdir}")
+            # Instead of deleting everything, we delete specific subdirs and files
+            # but preserve sim_metadata.json
+            for item in os.listdir(outdir):
+                item_path = os.path.join(outdir, item)
+                if item == "sim_metadata.json":
+                    continue
+                try:
+                    if os.path.isdir(item_path):
+                        shutil.rmtree(item_path)
+                    else:
+                        os.remove(item_path)
+                except Exception as e:
+                    print(f"Warning: Could not remove {item_path}: {e}")
             
         # Create main output dir and subdirectories
         subdirs = ["bond", "angle", "restart", "chain"]
@@ -93,6 +106,7 @@ class SimulationRunner:
         Otherwise, runs config.input_script directly (assuming it's ready).
         """
         # Prepare directories first
+        self.output_dir = config.output_dir
         if prep_dirs:
             self._prepare_directories(config, clean=clean_dir)
         
@@ -120,10 +134,14 @@ class SimulationRunner:
             
         self._execute(cmd, verbose)
 
-    def resume(self, config: SimulationConfig, verbose: bool = True):
+    def resume(self, config: SimulationConfig, verbose: bool = True, prep_dirs: bool = True):
         """
         Resumes the simulation from a restart file.
         """
+        self.output_dir = config.output_dir
+        if prep_dirs:
+            # For resumption, we typically don't want to clean the directory
+            self._prepare_directories(config, clean=False)
 
         if config.template:
             template_path = f"simulation_templates/{config.template}"

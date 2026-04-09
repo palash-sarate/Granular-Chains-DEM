@@ -6,7 +6,7 @@ from analysis.utilities import parse_range_spec
 
 class HighlightController:
     """Manages highlight state and rendering of highlighted atoms."""
-    _HL_COLORS = {'atom': 'yellow', 'bond': 'orange', 'angle': 'violet', 'chain': 'cyan'}
+    _HL_COLORS = {'atom': 'red', 'bond': '#39FF14', 'angle': 'violet', 'chain': 'black'}
     
     def __init__(self, plotter: Plotter, get_data_cb, get_cs_cb):
         self.plotter = plotter

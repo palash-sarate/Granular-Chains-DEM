@@ -1,0 +1,190 @@
+import os
+import sys
+import time
+import ast
+from pathlib import Path
+from typing import List, Optional, Dict, Any
+
+from simulation import SimulationConfig, SimulationRunner
+from simulation.chain_generator import ChainConfig, write_chain_data
+from simulation.library_generator import LibraryGenerator
+from simulation.hopper_manager import HopperManager
+from analysis.utilities import get_dt_token, get_viscosity_token, ETAEstimator
+
+class SimulationOrchestrator:
+    def __init__(self, lammps_executable: str = "lmp"):
+        self.lammps_executable = lammps_executable
+
+    def run_hopper_fill(self, 
+                        source_dir: str = "chain_data/relaxed/N4", 
+                        fill_template: str = "in.hopper_fill",
+                        n_fill: int = 10, 
+                        relax_steps: int = 100000, 
+                        run_name: Optional[str] = None, 
+                        seed: Optional[int] = None, 
+                        dt: float = 1e-6,
+                        mol_dir: str = "chain_data/molecules_temp",
+                        setup_inc: str = "simulation_geometries/2D_hopper.inc",
+                        dump_inc: str = "simulation_templates/default_dump.inc",
+                        viscosity: float = 0.001, 
+                        N: int = 4,
+                        outdir: Optional[str] = None):
+        """Pre-fill a hopper with relaxed molecular chains."""
+        if seed is None:
+            seed = int(time.time()) % 1000000
+
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        manager = HopperManager(runner)
+        manager.generate_filled_state(source_dir=source_dir, 
+                                     fill_template=fill_template,
+                                     n_fill=n_fill, 
+                                     dt=dt, 
+                                     relax_steps=relax_steps,
+                                     run_name=run_name,
+                                     seed=seed,
+                                     mol_dir=mol_dir, 
+                                     setup_inc=setup_inc,
+                                     dump_inc=dump_inc,
+                                     viscosity=viscosity,
+                                     N=N,
+                                     outdir=outdir)
+
+    def resume_hopper_fill(self, 
+                          restart_path: str = None, 
+                          source_dir: str = "chain_data/relaxed/N4", 
+                          fill_template: str = "in.hopper_fill_resume",
+                          n_fill: int = 10, 
+                          relax_steps: int = 100000, 
+                          run_name: Optional[str] = None, 
+                          seed: Optional[int] = None, 
+                          dt: float = 1e-6,
+                          mol_dir: str = "chain_data/molecules_temp",
+                          setup_inc: str = "simulation_geometries/2D_hopper.inc",
+                          dump_inc: str = "simulation_templates/default_dump.inc",
+                          viscosity: float = 0.001, 
+                          N: int = 4,
+                          outdir: Optional[str] = None):
+        """Resume filling a hopper from a binary restart file."""
+        if seed is None:
+            seed = int(time.time()) % 1000000
+
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        manager = HopperManager(runner)
+        manager.resume_filled_state(restart_path=restart_path,
+                                    fill_template=fill_template,
+                                    source_dir=source_dir,
+                                    n_fill=n_fill,
+                                    relax_steps=relax_steps,
+                                    run_name=run_name,
+                                    dt=dt,
+                                    seed=seed,
+                                    mol_dir=mol_dir, 
+                                    setup_inc=setup_inc,
+                                    dump_inc=dump_inc,
+                                    viscosity=viscosity,
+                                    N=N,
+                                    outdir=outdir)
+
+    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6):
+        """Run a single chain-flop simulation to analyze mobility."""
+        viscosity_token = get_viscosity_token(viscosity)
+        dt_token = get_dt_token(dt)
+
+        config = SimulationConfig(**{
+                "template": "in.chain_flop_template",
+                "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+                "lepton_file": "simulation_templates/lepton.inc",
+                "simulation": "Chain_flop",
+                "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+                "extra_vars":{
+                    "viscosity": viscosity,
+                    "run_steps": run_steps,
+                    "dt": dt
+                },
+            })
+        
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        print(f"Running simulation: {config.simulation}=>{config.run}")
+        runner.run(config)
+
+    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000"):
+        """Resume a chain-flop simulation from a restart point."""
+        viscosity_token = get_viscosity_token(viscosity)
+        dt_token = get_dt_token(dt)
+
+        config = SimulationConfig(**{
+                "template": "in.chain_flop_resume",
+                "resume_file": f"./dumping_yard/Chain_flop/N{N}_Viscosity_{viscosity_token}_dt_{dt_token}/restart/restart.{resume_token}.bin",
+                "simulation": "Chain_flop",
+                "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+                "extra_vars":{
+                    "viscosity": viscosity,
+                    "run_steps": run_steps,
+                    "dt": dt
+                },
+            })
+        
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        print(f"Resuming simulation: {config.simulation}=>{config.run}")
+        runner.resume(config)
+
+    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False):
+        """Generate a library of relaxed chain states for future hopper insertions."""
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        lib_gen = LibraryGenerator(runner, forced)
+        lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
+
+    def generate_chains(self, Ns: str = "4,6,8", orientation: str = "x", output_dir_name: str = "linear_x"):
+        """Generate initial linear chain data files."""
+        # Convert comma-separated string to list of ints for CLI/UI convenience
+        if isinstance(Ns, str):
+            N_list = [int(n.strip()) for n in Ns.split(",")]
+        else:
+            N_list = Ns if isinstance(Ns, list) else [Ns]
+
+        for N in N_list:
+            print(f"Generating linear chain with {N} beads, orientation={orientation}...")
+            linear_config = ChainConfig(
+                beads=N,
+                spacing=0.0025,
+                mode="linear",
+                orientation=orientation,
+                output_dir=Path(f"chain_data/{output_dir_name}"),
+            )
+            path = write_chain_data(linear_config)
+            print(f"Created: {path}")
+
+    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6):
+        """Run a batch of flop simulations across multiple parameters."""
+        total = len(Ns) * len(run_steps) * len(viscosities)
+        eta = ETAEstimator(total=total)
+        eta.start()
+        completed = 0
+
+        for N in Ns:
+            for run_step in run_steps:
+                for viscosity in viscosities:
+                    completed += 1
+                    viscosity_token = get_viscosity_token(viscosity)
+                    dt_token = get_dt_token(dt)
+                    config = SimulationConfig(**{
+                        "template": "in.chain_flop_template",
+                        "data_file": f"chains_linear_x/N{N}_chain_horz.data",
+                        "lepton_file": "simulation_templates/lepton.inc",
+                        "simulation": "Chain_flop",
+                        "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+                        "extra_vars":{
+                            "viscosity": viscosity,
+                            "run_steps": run_step,
+                            "dt": dt
+                        },
+                    })
+                    print(f"[{completed}/{total}] Running {config.run}...")
+                    runner = SimulationRunner(lammps_executable=self.lammps_executable)
+                    runner.run(config, verbose=False, clean_dir=True)
+                    eta.update(completed)
+
+    def run_hopper_flow(self, N: int = 4, run_steps: int = 200000, orifice_width: float = 0.05, dt: float = 1e-6):
+        """(Upcoming) Run a hopper discharge/flow simulation."""
+        print(f"Hopper Flow Simulation (N={N}) - Backend logic coming soon!")
+        # This will be implemented as a separate template logic
