@@ -63,7 +63,7 @@ variable ex_diam equal 3*${chain_size}*0.001
 variable time_gap equal 2*sqrt(${ex_diam}/9.81)
 variable drop_steps equal floor(${time_gap}/${dt})
 
-variable z_drop equal 0.55 # height from which chains are dropped
+variable z_drop equal 0.51 # height from which chains are dropped
 variable drop_time equal sqrt(${z_drop}/9.81)
 variable finish_drop_steps equal floor(${drop_time}/${dt})
 

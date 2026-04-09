@@ -56,7 +56,9 @@ class HopperManager:
                         run_name: str = "hopper_test",
                         dt: float = 1e-6,
                         run_steps: int = 10000,
-                        setup_inc: str = "simulation_geometries/2D_hopper_flow_setup.inc"
+                        setup_inc: str = "simulation_geometries/2D_hopper_flow_setup.inc",
+                        num_procs: int = None, 
+                        num_threads: int = 1
                         ):
         
         if drop_steps is None:
@@ -87,7 +89,9 @@ class HopperManager:
                 "run_steps": run_steps, # Post-fill run
                 "dt": dt,
                 "drop_steps": int(drop_steps)
-            }
+            },
+            num_procs=num_procs,
+            num_threads=num_threads
         )
         
         # 3. Run
@@ -100,7 +104,7 @@ class HopperManager:
                               mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
                               viscosity: float = 0.001, N: int = 4, fill_template: str = "in.hopper_fill",
-                              outdir: str = None) -> str:
+                              outdir: str = None, num_procs: int = None, num_threads: int = 1) -> str:
         
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
@@ -133,7 +137,9 @@ class HopperManager:
                 "dt": dt,
                 "seed": seed,
                 "N": N,
-            }
+            },
+            num_procs=num_procs,
+            num_threads=num_threads
         )
 
         print(f"Generating filled hopper state: {run_name}")
@@ -147,7 +153,7 @@ class HopperManager:
                             mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                             dump_inc: str = "simulation_templates/default_dump.inc", 
                             viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
-                            N: int = 4, outdir: str = None) -> str:
+                            N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1) -> str:
         """Resume a hopper fill simulation from a restart file and add more chains.
         Returns the path to the saved data file.
         """
@@ -209,7 +215,9 @@ class HopperManager:
                 "dt": dt,
                 "seed": seed,
                 "N": N,
-            }
+            },
+            num_procs=num_procs,
+            num_threads=num_threads
         )
 
         print(f"Resuming filled hopper state: {run_name}")
@@ -221,7 +229,7 @@ class HopperManager:
 
     def run_flow_from_saved(self, saved_data_path: str = None, restart_path: str = None,
                             run_name: str = None, freq: float = 5.0, amp: float = 0.005,
-                            dt: float = 1e-6, run_steps: int = 10000) -> str:
+                            dt: float = 1e-6, run_steps: int = 10000, num_procs: int = None, num_threads: int = 1) -> str:
         """Run an oscillating hopper flow starting from a saved data or restart file.
         Provide either `saved_data_path` or `restart_path` (restart preferred).
         Returns the output directory path.
@@ -242,7 +250,9 @@ class HopperManager:
             run=run_name,
             data_file=saved_data_path or "",
             resume_file=restart_path or None,
-            extra_vars=extra
+            extra_vars=extra,
+            num_procs=num_procs,
+            num_threads=num_threads
         )
 
         print(f"Running hopper flow from saved state: {run_name}")

@@ -106,27 +106,39 @@ class SimulationLoader:
         self.playback_ctrl.pause()
         self.ui_callbacks['open_restart_editor'](path)
 
-    def run_lammps_script(self, script_content: str, working_dir: str):
-        """Helper to run a LAMMPS script using the project's SimulationRunner.
+    def run_lammps_script(self, script_content: str, working_dir: str, num_procs: Optional[int] = None):
+        """Helper to run a LAMMPS script using the project's SimulationRunner logic with MPI support.
         """
+        import os
         from simulation import SimulationRunner
         in_file = os.path.join(working_dir, "in.temp_mod")
         with open(in_file, "w") as f:
             f.write(script_content)
             
         runner = SimulationRunner(lammps_executable="lmp")
-        # Optimization: Hiding console on Windows requires startupinfo
+        
+        # Determine processor count
+        nprocs = num_procs if num_procs is not None else os.cpu_count()
+        
+        # Build command with MPI if needed
+        base_cmd = [runner.lammps_exe, "-in", "in.temp_mod"]
+        cmd = base_cmd
+        if nprocs and nprocs > 1:
+            cmd = ["mpiexec", "-n", str(nprocs)] + base_cmd
+
+        # Optimization: Hiding console on Windows
         startupinfo = None
         if os.name == 'nt':
             import subprocess
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
-        cmd = [runner.lammps_exe, "-in", "in.temp_mod"]
-        
         try:
             # We use a direct subprocess.run here to capture the output and use startupinfo
-            result = subprocess.run(cmd, cwd=working_dir, capture_output=True, text=True, startupinfo=startupinfo, timeout=30)
+            env = os.environ.copy()
+            env["OMP_NUM_THREADS"] = "1" # Stick to 1 thread for MPI utilities
+            
+            result = subprocess.run(cmd, cwd=working_dir, capture_output=True, text=True, startupinfo=startupinfo, timeout=60, env=env)
             return result.returncode == 0, result.stdout + result.stderr
         except Exception as e:
             return False, str(e)

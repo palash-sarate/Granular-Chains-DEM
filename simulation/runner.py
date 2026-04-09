@@ -127,12 +127,11 @@ class SimulationRunner:
   
         cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps.log"]
         
-        # We can still pass variables via command line as a backup or for variables not in the script
         # vars_dict = config.to_lammps_vars()
         # for key, value in vars_dict.items():
         #     cmd.extend(["-var", key, value])
             
-        self._execute(cmd, verbose)
+        self._execute(cmd, config, verbose)
 
     def resume(self, config: SimulationConfig, verbose: bool = True, prep_dirs: bool = True):
         """
@@ -158,17 +157,24 @@ class SimulationRunner:
         # for key, value in vars_dict.items():
         #     cmd.extend(["-var", key, value])
             
-        self._execute(cmd, verbose)
+        self._execute(cmd, config, verbose)
 
-    def _execute(self, cmd: List[str], verbose: bool):
-        # If a log_file is provided, write both stdout and stderr to it.
-        # When verbose is True and no log_file is provided, stream to terminal.
+    def _execute(self, cmd: List[str], config: SimulationConfig, verbose: bool):
+        # 1. Wrap command with mpiexec if parallelism is requested
+        nprocs = config.num_procs if config.num_procs is not None else os.cpu_count()
+        if nprocs and nprocs > 1:
+            cmd = ["mpiexec", "-n", str(nprocs)] + cmd
+            
+        # 2. Prepare environment (OpenMP tuning)
+        env = os.environ.copy()
+        env["OMP_NUM_THREADS"] = str(config.num_threads)
+
         cmd_str = ' '.join(cmd)
 
         if verbose:
             print(f"Executing: {cmd_str}")
-            subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True, env=env)
         else:
             # Discard output
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env)
             print("Simulation completed.")

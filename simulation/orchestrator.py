@@ -28,7 +28,9 @@ class SimulationOrchestrator:
                         dump_inc: str = "simulation_templates/default_dump.inc",
                         viscosity: float = 0.001, 
                         N: int = 4,
-                        outdir: Optional[str] = None):
+                        outdir: Optional[str] = None,
+                        num_procs: int = None,
+                        num_threads: int = 1):
         """Pre-fill a hopper with relaxed molecular chains."""
         if seed is None:
             seed = int(time.time()) % 1000000
@@ -47,7 +49,9 @@ class SimulationOrchestrator:
                                      dump_inc=dump_inc,
                                      viscosity=viscosity,
                                      N=N,
-                                     outdir=outdir)
+                                     outdir=outdir,
+                                     num_procs=num_procs,
+                                     num_threads=num_threads)
 
     def resume_hopper_fill(self, 
                           restart_path: str = None, 
@@ -63,7 +67,9 @@ class SimulationOrchestrator:
                           dump_inc: str = "simulation_templates/default_dump.inc",
                           viscosity: float = 0.001, 
                           N: int = 4,
-                          outdir: Optional[str] = None):
+                          outdir: Optional[str] = None,
+                          num_procs: int = None,
+                          num_threads: int = 1):
         """Resume filling a hopper from a binary restart file."""
         if seed is None:
             seed = int(time.time()) % 1000000
@@ -83,31 +89,35 @@ class SimulationOrchestrator:
                                     dump_inc=dump_inc,
                                     viscosity=viscosity,
                                     N=N,
-                                    outdir=outdir)
+                                    outdir=outdir,
+                                    num_procs=num_procs,
+                                    num_threads=num_threads)
 
-    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6):
+    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1):
         """Run a single chain-flop simulation to analyze mobility."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
 
-        config = SimulationConfig(**{
-                "template": "in.chain_flop_template",
-                "data_file": f"chains_linear_x/N{N}_chain_horz.data",
-                "lepton_file": "simulation_templates/lepton.inc",
-                "simulation": "Chain_flop",
-                "run": f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
-                "extra_vars":{
-                    "viscosity": viscosity,
-                    "run_steps": run_steps,
-                    "dt": dt
-                },
-            })
+        config = SimulationConfig(
+            template="in.chain_flop_template",
+            data_file=f"chains_linear_x/N{N}_chain_horz.data",
+            lepton_file="simulation_templates/lepton.inc",
+            simulation="Chain_flop",
+            run=f"N{N}_Viscosity_{viscosity_token}_dt_{dt_token}",
+            extra_vars={
+                "viscosity": viscosity,
+                "run_steps": run_steps,
+                "dt": dt
+            },
+            num_procs=num_procs,
+            num_threads=num_threads
+        )
         
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         print(f"Running simulation: {config.simulation}=>{config.run}")
         runner.run(config)
 
-    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000"):
+    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000", num_procs: int = None, num_threads: int = 1):
         """Resume a chain-flop simulation from a restart point."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
@@ -122,16 +132,20 @@ class SimulationOrchestrator:
                     "run_steps": run_steps,
                     "dt": dt
                 },
-            })
+            },
+            num_procs=num_procs,
+            num_threads=num_threads
+        )
         
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         print(f"Resuming simulation: {config.simulation}=>{config.run}")
         runner.resume(config)
 
-    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False):
+    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, num_procs: int = None, num_threads: int = 1):
         """Generate a library of relaxed chain states for future hopper insertions."""
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         lib_gen = LibraryGenerator(runner, forced)
+        # We need to update LibraryGenerator to accept parallelism too, but for now we can pass it to config if it creates any
         lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
 
     def generate_chains(self, Ns: str = "4,6,8", orientation: str = "x", output_dir_name: str = "linear_x"):
@@ -154,7 +168,7 @@ class SimulationOrchestrator:
             path = write_chain_data(linear_config)
             print(f"Created: {path}")
 
-    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6):
+    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6, num_procs: int = None, num_threads: int = 1):
         """Run a batch of flop simulations across multiple parameters."""
         total = len(Ns) * len(run_steps) * len(viscosities)
         eta = ETAEstimator(total=total)
@@ -178,7 +192,9 @@ class SimulationOrchestrator:
                             "run_steps": run_step,
                             "dt": dt
                         },
-                    })
+                    }, 
+                    num_procs=num_procs,
+                    num_threads=num_threads)
                     print(f"[{completed}/{total}] Running {config.run}...")
                     runner = SimulationRunner(lammps_executable=self.lammps_executable)
                     runner.run(config, verbose=False, clean_dir=True)

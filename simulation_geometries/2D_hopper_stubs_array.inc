@@ -33,7 +33,8 @@ variable iz loop ${nz}
         
         # Region name: s_Z_Y
         # Cylinder parallel to X-axis
-        region s_${iz}_${iy} cylinder x ${cy} ${cz} ${stub_radius} -${f_x_half} ${f_x_half}
+        region s_${iz}_${iy} cylinder x ${cy} ${cz} ${stub_radius} -${f_x_half} ${f_x_half} side out
+        region s_${iz}_${iy}_vis cylinder x ${cy} ${cz} ${stub_radius} -${f_x_half} ${f_x_half}
         print "Region ${iz} ${iy} created"
         # Physical wall fix
         fix f_s_${iz}_${iy} all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 5e-4 0.3 1 region s_${iz}_${iy}
@@ -52,3 +53,17 @@ variable y_start delete
 variable y_span delete
 variable z_start delete
 variable z_span delete
+
+
+# vis command
+# 1. Generate the updated list for the top 2 rows with correct suffixing
+# $regions = (1..2 | % { $iz=$_; 1..12 | % { "s_${iz}_$($_)_vis" } })
+
+# # 2. Run the extractor
+# python analysis/geometry_extractor.py simulation_geometries/2D_hopper_stubs_array.inc `
+#     --regions $regions `
+#     --var y_half=0.155 `
+#     --var z_bin_top=0.4 `
+#     --var funnel_top=0.5 `
+#     --var f_x_half=0.1 `
+#     --spacing 0.0005

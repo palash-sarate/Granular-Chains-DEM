@@ -81,6 +81,12 @@ class SimulationLauncherController:
                 var = tk.BooleanVar(value=bool(default_val))
                 widget = tk.Checkbutton(row, variable=var)
                 widget.pack(side=tk.LEFT)
+            elif name == 'num_procs' and (default_val is None or default_val == inspect.Parameter.empty):
+                # Default to max cores for the UI, can be dialed down
+                detected_cores = os.cpu_count() or 1
+                var = tk.StringVar(value=str(detected_cores))
+                widget = tk.Entry(row, textvariable=var, width=20)
+                widget.pack(side=tk.LEFT, fill=tk.X, expand=True)
             elif name.endswith('_dir') or name.endswith('_path'):
                 var = tk.StringVar(value=str(default_val))
                 widget = tk.Entry(row, textvariable=var, width=15)

@@ -47,6 +47,10 @@ class SimulationConfig:
     wall_blocks: Optional[List[str]] = None    # each entry: a 'fix ...' wall block (string / multiline)
     walls: Optional[Dict[str, Any]] = None     # keep-compatible: structured walls (converted by runner if present)
     
+    # Parallelism
+    num_procs: Optional[int] = None
+    num_threads: int = 1
+    
     # Custom output directory override
     outdir_override: Optional[str] = None
 

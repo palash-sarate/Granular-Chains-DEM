@@ -30,6 +30,9 @@ class SimulationRenderer:
         self.plotter.add_callback('LeftButtonPress', self._on_mouse_click)
         # Add interaction callback to save camera state
         self.plotter.add_callback('InteractionEvent', self._on_interaction)
+        
+        # Setup view orientation buttons
+        self._setup_view_buttons()
 
     def _on_interaction(self, event):
         """Called during camera/actor interaction."""
@@ -62,6 +65,84 @@ class SimulationRenderer:
         if 'up' in state: cam.SetViewUp(state['up'])
         if 'scale' in state: cam.SetParallelScale(state['scale'])
         self.plotter.render()
+
+    def _setup_view_buttons(self):
+        """Adds interactive buttons for camera orientation."""
+        # Standard backgrounds
+        bg = ("#f0f0f0", "#333333") # (off-white, dark gray)
+        
+        # ISO View
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("iso"),
+            states=["Iso"],
+            font="Arial", size=18,
+            pos=(0.70, 0.05),
+            bc=bg
+        )
+        # X View (Front/YZ)
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("x"),
+            states=["X"],
+            font="Arial", size=18,
+            pos=(0.77, 0.05),
+            bc=bg
+        )
+        # Y View (Side/XZ)
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("y"),
+            states=["Y"],
+            font="Arial", size=18,
+            pos=(0.84, 0.05),
+            bc=bg
+        )
+        # Z View (Top/XY)
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("z"),
+            states=["Z"],
+            font="Arial", size=18,
+            pos=(0.91, 0.05),
+            bc=bg
+        )
+
+    def _set_camera_view(self, axis: str):
+        """Transitions the camera to a standard axis view while keeping focal context."""
+        cam = self.plotter.camera
+        fp = np.array(cam.GetFocalPoint())
+        curr_pos = np.array(cam.GetPosition())
+        
+        # Calculate distance to keep zoom level consistent
+        dist = np.linalg.norm(curr_pos - fp)
+        if dist < 1e-6:
+            # Fallback if camera is at focal point
+            dist = 1.0 
+            if self._persistent_view_bounds:
+                b = self._persistent_view_bounds
+                dist = max(b[1]-b[0], b[3]-b[2], b[5]-b[4]) * 2
+
+        if axis == "x":
+            new_pos = fp + np.array([dist, 0, 0])
+            up = (0, 0, 1)
+        elif axis == "y":
+            new_pos = fp + np.array([0, dist, 0])
+            up = (0, 0, 1)
+        elif axis == "z":
+            new_pos = fp + np.array([0, 0, dist])
+            up = (0, 1, 0)
+        elif axis == "iso":
+            # 45 deg view
+            vec = np.array([1, 1, 1]) / np.sqrt(3)
+            new_pos = fp + vec * dist
+            up = (0, 0, 1)
+        else:
+            return
+
+        cam.SetPosition(new_pos)
+        cam.SetViewUp(up)
+        # Ensure focus is locked back on point
+        cam.SetFocalPoint(fp)
+        
+        self.plotter.render()
+        self.save_camera_state() # Store the new view immediately
 
     def _on_mouse_click(self, event):
         """Identify atom under the mouse click."""

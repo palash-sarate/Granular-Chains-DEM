@@ -44,7 +44,7 @@ variable ex_diam equal 3*${chain_size}*0.001
 variable time_gap equal 2*sqrt(${ex_diam}/9.81)
 variable drop_steps equal floor(${time_gap}/${dt})
 
-variable z_drop equal 0.55
+variable z_drop equal 0.51
 variable drop_time equal sqrt(${z_drop}/9.81)
 variable finish_drop_steps equal floor(${drop_time}/${dt})
 
@@ -117,7 +117,7 @@ label loop_start
             variable px equal v_px_raw-(v_px_raw>v_x_f_max)*v_x_width
             variable py equal v_py_raw-(v_py_raw>v_y_f_max)*v_y_width
             
-            create_atoms 0 single ${px} ${py} 0.55 mol ${mol_id} ${seed}
+            create_atoms 0 single ${px} ${py} ${z_drop} mol ${mol_id} ${seed}
             
             next iy
             jump SELF y_loop
