@@ -8,7 +8,7 @@ from vedo import Plotter
 from analysis.controllers import (
     SimDataController, SimulationRenderer, HighlightController,
     PlaybackController, SimulationLoader, VtkOverlayController,
-    AnalysisToolManager, RestartEditorController
+    AnalysisToolManager, RestartEditorController, MovieExporterController
 )
 from analysis.utils.progress_bar import ProgressBar
 import tempfile
@@ -102,11 +102,18 @@ class ViewerApp(BaseTk):
             ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
         except Exception:
             tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        col3 = tk.Frame(ctrl); col3.pack(side=tk.LEFT, fill=tk.Y)
+        col3 = tk.Frame(ctrl); col3.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+        try:
+            import tkinter.ttk as ttk
+            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
+        except Exception:
+            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
+        col4 = tk.Frame(ctrl); col4.pack(side=tk.LEFT, fill=tk.Y)
         
         # 4. Now we can fully init specialized controllers that need UI parents
         self.re_ctrl = RestartEditorController(col2, self.data_ctrl, self.loader_ctrl, self.renderer, on_re_close, self._sync_restart_selection)
         self.sim_launcher = SimulationLauncherController(col3, self.orchestrator, on_simulation_started=lambda: self.refresh_button.invoke())
+        self.movie_exporter = MovieExporterController(col4, self.data_ctrl, self.renderer, self.plotter)
 
         # ── Column 1 : File & Playback ──────────────────────────
         open_row1 = tk.Frame(col1)
@@ -334,6 +341,9 @@ class ViewerApp(BaseTk):
             
             # 3. Restore Camera state
             self.renderer.restore_camera_state()
+
+        # 4. Sync Movie Exporter
+        self.movie_exporter._set_range_from_loader()
 
         self.refresh_button.config(state=tk.NORMAL)
 

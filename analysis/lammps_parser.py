@@ -42,19 +42,12 @@ class LammpsParser:
             parts = line.split()
             command = parts[0]
 
-            # if command == 'region':
-            #     self._parse_region(parts)
-            # el
             if command == 'create_box':
                 self._parse_create_box(parts)
             elif command == 'boundary':
                 self.boundary = parts[1:4]
-            # elif command == 'variable':
-            #     self._parse_variable(parts)
-            # elif command == 'include':
-            #     include_target = self._resolve_include_target(parts[1:], including_dir)
-            #     if include_target:
-            #         self._parse_file(include_target, visited)
+            elif command == 'timestep':
+                self._parse_timestep(parts)
 
     def _resolve_include_target(self, include_tokens, including_dir: str) -> Optional[str]:
         """Resolve `include` path tokens to a concrete file path.
@@ -134,6 +127,14 @@ class LammpsParser:
             except ValueError:
                 self.variables[name] = value
 
+    def _parse_timestep(self, parts):
+        # timestep dt
+        if len(parts) >= 2:
+            try:
+                self.dt = float(parts[1])
+            except ValueError:
+                self.dt = 0.001 # Default
+
     def _parse_create_box(self, parts):
         # create_box N region-ID
         # Find the region ID argument
@@ -144,5 +145,6 @@ class LammpsParser:
     def get_geometry(self):
         return {
             'box_region': self.box_region_id,
-            'boundary': self.boundary
+            'boundary': self.boundary,
+            'dt': getattr(self, 'dt', 0.001)
         }

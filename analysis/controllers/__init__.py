@@ -6,3 +6,4 @@ from .loader import SimulationLoader
 from .vtk_overlay import VtkOverlayController
 from .analysis_tools import AnalysisToolManager
 from .restart_editor import RestartEditorController
+from .movie_exporter import MovieExporterController
