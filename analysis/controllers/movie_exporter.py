@@ -27,6 +27,11 @@ class MovieExporterController:
         self.show_scalebar_var = tk.BooleanVar(value=False)
         self.show_timestamp_var = tk.BooleanVar(value=True)
         self.dt_var = tk.StringVar(value="0.001") # Default dt
+        # Scalebar and timestamp UI options
+        self.scalebar_width_var = tk.StringVar(value="0.2")   # fraction of view width
+        self.scalebar_height_var = tk.StringVar(value="0.02") # fraction of view height / font scale for Text2D fallback
+        self.timestamp_pos_var = tk.StringVar(value="top-right")
+        self.timestamp_font_var = tk.StringVar(value="0.8")   # Text2D font size scalar
         
         self._setup_ui()
 
@@ -59,6 +64,16 @@ class MovieExporterController:
         
         tk.Checkbutton(settings_frame, text="Scalebar", variable=self.show_scalebar_var).grid(row=2, column=0, columnspan=2, sticky='w')
         tk.Checkbutton(settings_frame, text="Timestamp", variable=self.show_timestamp_var).grid(row=3, column=0, columnspan=2, sticky='w')
+        # Scalebar size controls
+        tk.Label(settings_frame, text="Scalebar W:").grid(row=4, column=0, sticky='w')
+        tk.Entry(settings_frame, textvariable=self.scalebar_width_var, width=8).grid(row=4, column=1, padx=2, pady=2, sticky='w')
+        tk.Label(settings_frame, text="Scalebar H:").grid(row=5, column=0, sticky='w')
+        tk.Entry(settings_frame, textvariable=self.scalebar_height_var, width=8).grid(row=5, column=1, padx=2, pady=2, sticky='w')
+        # Timestamp controls
+        tk.Label(settings_frame, text="Timestamp Pos:").grid(row=6, column=0, sticky='w')
+        tk.OptionMenu(settings_frame, self.timestamp_pos_var, "top-right", "top-left", "bottom-right", "bottom-left").grid(row=6, column=1, padx=2, pady=2, sticky='w')
+        tk.Label(settings_frame, text="Timestamp Size:").grid(row=7, column=0, sticky='w')
+        tk.Entry(settings_frame, textvariable=self.timestamp_font_var, width=8).grid(row=7, column=1, padx=2, pady=2, sticky='w')
 
         # File
         file_frame = tk.Frame(self.parent)
@@ -90,9 +105,70 @@ class MovieExporterController:
                 self.dt_var.set(str(self.data_ctrl.geometry_data['dt']))
 
     def _browse_file(self):
-        f = filedialog.asksaveasfilename(defaultextension=".mp4", filetypes=[("MP4 Video", "*.mp4"), ("GIF Image", "*.gif"), ("All Files", "*.*")])
+        # Default initial directory to the current simulation folder (if available)
+        initial_dir = None
+        if getattr(self.data_ctrl, 'sim_source', None):
+            initial_dir = getattr(self.data_ctrl.sim_source, 'data_dir', None)
+        if not initial_dir and getattr(self.data_ctrl, 'current_sim_folder', None):
+            initial_dir = self.data_ctrl.current_sim_folder
+        if not initial_dir:
+            initial_dir = os.getcwd()
+
+        initial_file = os.path.basename(self.filename_var.get()) if self.filename_var.get() else "simulation_movie.mp4"
+        f = filedialog.asksaveasfilename(initialdir=initial_dir, initialfile=initial_file, defaultextension=".mp4", filetypes=[("MP4 Video", "*.mp4"), ("GIF Image", "*.gif"), ("All Files", "*.*")])
         if f:
-            self.filename_var.set(f)
+            # Normalize and store the chosen path
+            self.filename_var.set(os.path.normpath(f))
+
+    def _set_plotter_ui_visible(self, visible: bool):
+        """Show or hide interactive UI elements that live inside the vedo Plotter (buttons, sliders)."""
+        try:
+            # Buttons (returned by add_button)
+            for b in getattr(self.plotter, 'buttons', []) or []:
+                try:
+                    if visible:
+                        if hasattr(b, 'on') and callable(b.on):
+                            b.on()
+                        elif hasattr(b, 'enable') and callable(b.enable):
+                            b.enable()
+                        else:
+                            actor = getattr(b, 'actor', None)
+                            if actor is not None:
+                                actor.SetVisibility(1)
+                    else:
+                        if hasattr(b, 'off') and callable(b.off):
+                            b.off()
+                        elif hasattr(b, 'disable') and callable(b.disable):
+                            b.disable()
+                        else:
+                            actor = getattr(b, 'actor', None)
+                            if actor is not None:
+                                actor.SetVisibility(0)
+                except Exception:
+                    try:
+                        actor = getattr(b, 'actor', None)
+                        if actor is not None:
+                            actor.SetVisibility(1 if visible else 0)
+                    except Exception:
+                        pass
+
+            # Sliders (returned by add_slider)
+            for s in getattr(self.plotter, 'sliders', []) or []:
+                try:
+                    if visible and hasattr(s, 'on') and callable(s.on):
+                        s.on()
+                    elif (not visible) and hasattr(s, 'off') and callable(s.off):
+                        s.off()
+                except Exception:
+                    try:
+                        actor = getattr(s, 'actor', None)
+                        if actor is not None:
+                            actor.SetVisibility(1 if visible else 0)
+                    except Exception:
+                        pass
+        except Exception:
+            # Best-effort: silently ignore if plotter doesn't expose these attributes
+            pass
 
     def _update_overlays(self, ts):
         """Adds or updates temporary overlays for recording/preview."""
@@ -103,10 +179,48 @@ class MovieExporterController:
         self._movie_actors = []
 
         if self.show_scalebar_var.get():
-            # In vedo, add_scalebar is a method of Plotter that returns the actor
-            sb = self.plotter.add_scalebar(pos=(0.8, 0.05), c='black')
+            sb = None
+            try:
+                sb_w = float(self.scalebar_width_var.get())
+            except Exception:
+                sb_w = 0.2
+            try:
+                sb_h = float(self.scalebar_height_var.get())
+            except Exception:
+                sb_h = 0.02
+
+            # Try a few possible vedo Plotter method names for adding a scalebar
+            for method in ("add_scalebar", "addScalarBar", "add_scalar_bar", "addScalarbar"):
+                fn = getattr(self.plotter, method, None)
+                if callable(fn):
+                    try:
+                        try:
+                            sb = fn(pos=(0.8, 0.05), c='black', width=sb_w, height=sb_h)
+                        except TypeError:
+                            try:
+                                sb = fn(pos=(0.8, 0.05), c='black', size=(sb_w, sb_h))
+                            except TypeError:
+                                try:
+                                    sb = fn(pos=(0.8, 0.05), c='black')
+                                except TypeError:
+                                    sb = fn()
+                    except Exception:
+                        sb = None
+                    break
+
             if sb:
                 self._movie_actors.append(sb)
+            else:
+                # Fallback: create a Text2D based bar using block characters
+                chars = max(3, int(sb_w * 40))
+                bar_str = '█' * chars
+                s_font = max(0.4, sb_h * 20)
+                s_text = Text2D(bar_str, pos='bottom-right', s=s_font, c='black', bg='white', alpha=0.9)
+                try:
+                    self.plotter.add(s_text)
+                except Exception:
+                    pass
+                self._movie_actors.append(s_text)
 
         if self.show_timestamp_var.get():
             try:
@@ -115,17 +229,27 @@ class MovieExporterController:
                 txt = f"Time: {time:.4f} s\nStep: {ts}"
             except:
                 txt = f"Step: {ts}"
-            
-            t2d = Text2D(txt, pos='top-right', s=0.8, c='black', bg='white', alpha=0.7)
+            pos = self.timestamp_pos_var.get() if hasattr(self, 'timestamp_pos_var') else 'top-right'
+            try:
+                s_font = float(self.timestamp_font_var.get())
+            except Exception:
+                s_font = 0.8
+            t2d = Text2D(txt, pos=pos, s=s_font, c='black', bg='white', alpha=0.7)
             self.plotter.add(t2d)
             self._movie_actors.append(t2d)
 
     def toggle_preview(self):
         if self.preview_active:
+            # Stop preview and restore UI
             self.preview_active = False
             self.preview_btn.config(text="Preview", bg='#e1f5fe')
             self.status_label.config(text="Preview stopped")
+            try: self._set_plotter_ui_visible(True)
+            except: pass
         else:
+            # Hide vedo on-screen buttons while previewing
+            try: self._set_plotter_ui_visible(False)
+            except: pass
             self.preview_active = True
             self.preview_btn.config(text="Stop Preview", bg='#ffecb3')
             self._run_preview()
@@ -144,7 +268,14 @@ class MovieExporterController:
                 return
             
             self.status_label.config(text=f"Previewing {len(timesteps)} frames...")
-            
+            try:
+                fps_preview = int(self.fps_var.get())
+                if fps_preview <= 0:
+                    fps_preview = 30
+            except Exception:
+                fps_preview = 30
+            delay_ms = max(1, int(1000 / fps_preview))
+
             def step_loop(idx):
                 if not self.preview_active or idx >= len(timesteps):
                     if self.preview_active: # Finished normally
@@ -156,8 +287,8 @@ class MovieExporterController:
                 self._update_overlays(ts)
                 self.plotter.render()
                 
-                # Schedule next frame (approx 30fps for preview if possible)
-                self.parent.after(10, lambda: step_loop(idx + 1))
+                # Schedule next frame according to FPS setting
+                self.parent.after(delay_ms, lambda: step_loop(idx + 1))
             
             step_loop(0)
             
@@ -175,6 +306,21 @@ class MovieExporterController:
         if not filename:
             messagebox.showerror("Error", "No filename specified.")
             return
+
+        # If the user provided a relative filename (or just a basename),
+        # save it inside the simulation output directory when available.
+        if not os.path.isabs(filename):
+            sim_dir = None
+            if getattr(self.data_ctrl, 'sim_source', None):
+                sim_dir = getattr(self.data_ctrl.sim_source, 'data_dir', None)
+            if not sim_dir and getattr(self.data_ctrl, 'current_sim_folder', None):
+                sim_dir = self.data_ctrl.current_sim_folder
+            if sim_dir:
+                filename = os.path.join(sim_dir, filename)
+            else:
+                filename = os.path.join(os.getcwd(), filename)
+            filename = os.path.normpath(filename)
+            self.filename_var.set(filename)
 
         try:
             start = int(self.start_ts_var.get())
@@ -197,6 +343,9 @@ class MovieExporterController:
         self.status_label.config(text="Exporting... (UI locked)", fg='red')
         self.export_btn.config(state=tk.DISABLED)
         self.preview_btn.config(state=tk.DISABLED)
+        # Hide vedo UI (buttons/sliders) during export so they are not captured
+        try: self._set_plotter_ui_visible(False)
+        except: pass
         
         # vedo Video setup
         # Note: on Windows, ffmpeg must be installed.
@@ -227,6 +376,9 @@ class MovieExporterController:
             except: pass
             
         finally:
+            # Restore vedo UI now that export is done
+            try: self._set_plotter_ui_visible(True)
+            except: pass
             self._exporting = False
             self.status_label.config(text="Ready", fg='gray')
             self.export_btn.config(state=tk.NORMAL)
