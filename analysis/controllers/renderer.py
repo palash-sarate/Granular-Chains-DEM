@@ -251,29 +251,29 @@ class SimulationRenderer:
         self._dynamic_actors = []
         
         # 2. Render Atoms
-        # We group by ('mol', 'diameter') to ensure each chain gets a unique, stable color.
-        # Fallback to 'type' if 'mol' is missing.
-        group_cols = ['mol', 'diameter'] if 'mol' in frame_data.columns else ['type', 'diameter']
+        # Group by 'diameter' to minimize the number of actors created.
+        # Vedo's Spheres allows scalar 'r' with vector 'c', making this extremely fast.
+        has_mol = 'mol' in frame_data.columns
+        id_col = 'mol' if has_mol else ('type' if 'type' in frame_data.columns else None)
+        palette_size = len(self._chain_palette)
         
-        for group_keys, group in frame_data.groupby(group_cols):
-            if isinstance(group_keys, tuple):
-                m_id, d = group_keys
-            else:
-                m_id, d = group_keys, group['diameter'].iloc[0]
-
+        for d, group in frame_data.groupby('diameter'):
             group_pos = group[['x', 'y', 'z']].values
-            r_val = d / 2
+            r_val = float(d) / 2.0
             
-            # Map mol_id to palette index consistently
-            try:
-                # Handle potential non-numeric mol_ids gracefully
-                idx = int(float(m_id))
-            except (ValueError, TypeError):
-                idx = hash(str(m_id))
+            if id_col is not None:
+                ids = group[id_col].values
+                try:
+                    # Fast path for numeric arrays
+                    num_ids = ids.astype(float).astype(int)
+                except (ValueError, TypeError):
+                    num_ids = [hash(str(v)) for v in ids]
+                
+                c_vals = [self._chain_palette[int(i) % palette_size] for i in num_ids]
+            else:
+                c_vals = ['gray'] * len(group)
             
-            c_val = self._chain_palette[idx % len(self._chain_palette)]
-            
-            spheres = Spheres(group_pos, r=r_val, c=c_val)
+            spheres = Spheres(group_pos, r=r_val, c=c_vals)
             self.plotter.add(spheres)
             self._dynamic_actors.append(spheres)
         

@@ -1,78 +1,124 @@
 import os
 import sys
 import argparse
-import ast
-import time
-from pathlib import Path
+from typing import List, Optional
 
 from simulation.orchestrator import SimulationOrchestrator
 
 def main():
-    """Main entry point for CLI. Instantiate orchestrator and handle help/defaults."""
-    print("LAMMPS Chain Simulation CLI")
-    print("Use --help to see available functions and arguments.")
-
-if __name__ == "__main__":
-    orchestrator = SimulationOrchestrator(lammps_executable="lmp")
+    parser = argparse.ArgumentParser(description="LAMMPS Chain Simulation CLI")
+    parser.add_argument("--lammps-exe", default="lmp", help="Path to LAMMPS executable (default: lmp)")
     
-    # Map CLI command names to Orchestrator methods
-    available_functions = {
-        "main": main,
-        "run_flop_simulations": orchestrator.run_flop_batch,
-        "run_flop_simulation": orchestrator.run_flop_simulation,
-        "resume_flop_simulation": orchestrator.resume_flop_simulation,
-        "generate_linear_chains": orchestrator.generate_chains,
-        "generate_relaxed_chain_states": orchestrator.generate_relaxed_library,
-        "run_hopper_fill": orchestrator.run_hopper_fill,
-        "resume_hopper_fill": orchestrator.resume_hopper_fill,
-    }
+    subparsers = parser.add_subparsers(dest="command", help="Simulation commands", required=True)
 
-    parser = argparse.ArgumentParser(description="Execute functions from the Simulation Orchestrator")
-    parser.add_argument("func", nargs="?", default="main", choices=available_functions.keys())
-    parser.add_argument("func_args", nargs="*", help="Positional or key=value arguments")
-    parsed = parser.parse_args()
+    # 1. run_hopper_fill
+    p_fill = subparsers.add_parser("run_hopper_fill", help="Pre-fill a hopper with relaxed molecular chains")
+    p_fill.add_argument("--source_dir", default="chain_data/relaxed/N4", help="Directory containing relaxed chains")
+    p_fill.add_argument("--fill_template", default="in.hopper_fill", help="LAMMPS input template name")
+    p_fill.add_argument("--n_fill", type=int, default=10, help="Number of chains to insert")
+    p_fill.add_argument("--relax_steps", type=int, default=100000, help="Number of relaxation steps")
+    p_fill.add_argument("--run_name", help="Custom run name")
+    p_fill.add_argument("--seed", type=int, help="Random seed")
+    p_fill.add_argument("--dt", type=float, default=1e-6, help="Timestep size")
+    p_fill.add_argument("--mol_dir", default="chain_data/molecules_temp", help="Temporary molecules directory")
+    p_fill.add_argument("--setup_inc", default="simulation_geometries/2D_hopper.inc", help="Geometry setup file")
+    p_fill.add_argument("--dump_inc", default="simulation_templates/default_dump.inc", help="Dump settings file")
+    p_fill.add_argument("--viscosity", type=float, default=0.001, help="Simulated viscosity")
+    p_fill.add_argument("--N", type=int, default=4, help="Chain length (beads)")
+    p_fill.add_argument("--outdir", help="Output directory override")
+    p_fill.add_argument("--num_procs", type=int, help="Number of MPI processes")
+    p_fill.add_argument("--num_threads", type=int, default=1, help="Number of OpenMP threads")
 
-    def _coerce(token: str):
-        try:
-            return ast.literal_eval(token)
-        except (ValueError, SyntaxError):
-            return token
+    # 2. resume_hopper_fill
+    p_resume_h = subparsers.add_parser("resume_hopper_fill", help="Resume hopper filling from a restart file")
+    p_resume_h.add_argument("--restart_path", required=True, help="Path to .bin restart file")
+    p_resume_h.add_argument("--source_dir", default="chain_data/relaxed/N4")
+    p_resume_h.add_argument("--fill_template", default="in.hopper_fill_resume")
+    p_resume_h.add_argument("--n_fill", type=int, default=10)
+    p_resume_h.add_argument("--relax_steps", type=int, default=100000)
+    p_resume_h.add_argument("--run_name")
+    p_resume_h.add_argument("--seed", type=int)
+    p_resume_h.add_argument("--dt", type=float, default=1e-6)
+    p_resume_h.add_argument("--mol_dir", default="chain_data/molecules_temp")
+    p_resume_h.add_argument("--setup_inc", default="simulation_geometries/2D_hopper.inc")
+    p_resume_h.add_argument("--dump_inc", default="simulation_templates/default_dump.inc")
+    p_resume_h.add_argument("--viscosity", type=float, default=0.001)
+    p_resume_h.add_argument("--N", type=int, default=4)
+    p_resume_h.add_argument("--outdir")
+    p_resume_h.add_argument("--num_procs", type=int)
+    p_resume_h.add_argument("--num_threads", type=int, default=1)
 
-    positional, keyword = [], {}
-    i = 0
-    while i < len(parsed.func_args):
-        token = parsed.func_args[i]
-        
-        if "=" in token:
-            key, value = token.split("=", 1)
-            if not value and i + 1 < len(parsed.func_args):
-                value = parsed.func_args[i+1]
-                i += 1
-            keyword[key.strip()] = _coerce(value.strip())
-        elif i + 1 < len(parsed.func_args) and parsed.func_args[i+1] == "=":
-            key = token
-            if i + 2 < len(parsed.func_args):
-                value = parsed.func_args[i+2]
-                i += 2
-            else:
-                value = ""
-                i += 1
-            keyword[key.strip()] = _coerce(value.strip())
-        else:
-            positional.append(_coerce(token))
-        i += 1
+    # 3. run_flop_simulation
+    p_flop = subparsers.add_parser("run_flop_simulation", help="Run a single chain-flop mobility simulation")
+    p_flop.add_argument("--N", type=int, default=4)
+    p_flop.add_argument("--run_steps", type=int, default=50000)
+    p_flop.add_argument("--viscosity", type=float, default=0.001)
+    p_flop.add_argument("--dt", type=float, default=1e-6)
+    p_flop.add_argument("--num_procs", type=int)
+    p_flop.add_argument("--num_threads", type=int, default=1)
 
+    # 4. resume_flop_simulation
+    p_resume_f = subparsers.add_parser("resume_flop_simulation", help="Resume a chain-flop simulation")
+    p_resume_f.add_argument("--N", type=int, default=4)
+    p_resume_f.add_argument("--run_steps", type=int, default=50000)
+    p_resume_f.add_argument("--viscosity", type=float, default=0.001)
+    p_resume_f.add_argument("--dt", type=float, default=1e-6)
+    p_resume_f.add_argument("--resume_token", required=True, help="Timestep token of the restart file")
+    p_resume_f.add_argument("--num_procs", type=int)
+    p_resume_f.add_argument("--num_threads", type=int, default=1)
+
+    # 5. generate_relaxed_library
+    p_lib = subparsers.add_parser("generate_relaxed_library", help="Generate relaxed chain states library")
+    p_lib.add_argument("--n_beads", type=int, default=4)
+    p_lib.add_argument("--n_states", type=int, default=10)
+    p_lib.add_argument("--forced", action="store_true", help="Force re-generation if check exists")
+    p_lib.add_argument("--num_procs", type=int)
+    p_lib.add_argument("--num_threads", type=int, default=1)
+
+    # 6. generate_linear_chains
+    p_chains = subparsers.add_parser("generate_linear_chains", help="Generate initial linear chain data files")
+    p_chains.add_argument("--Ns", default="4,6,8", help="Comma-separated chain lengths")
+    p_chains.add_argument("--orientation", default="x", choices=["x", "y", "z"])
+    p_chains.add_argument("--output_dir_name", default="linear_x")
+
+    # 7. run_flop_batch
+    p_batch = subparsers.add_parser("run_flop_batch", help="Run a batch of flop simulations")
+    p_batch.add_argument("--Ns", default="4,6", help="Comma-separated chain lengths")
+    p_batch.add_argument("--run_steps", default="50000", help="Comma-separated run steps")
+    p_batch.add_argument("--viscosities", default="0.001", help="Comma-separated viscosities")
+    p_batch.add_argument("--dt", type=float, default=1e-6)
+    p_batch.add_argument("--num_procs", type=int)
+    p_batch.add_argument("--num_threads", type=int, default=1)
+
+    args = parser.parse_args()
+    
+    # Initialize orchestrator
+    orchestrator = SimulationOrchestrator(lammps_executable=args.lammps_exe)
+    
+    # Extract command and arguments
+    cmd_name = args.command
+    cmd_args = vars(args)
+    
+    # Remove metadata args not passed to methods
+    cmd_args.pop("command")
+    cmd_args.pop("lammps_exe")
+    
+    # Handle list-based arguments for run_flop_batch and generate_linear_chains
+    if cmd_name == "run_flop_batch":
+        cmd_args["Ns"] = [int(n.strip()) for n in str(cmd_args["Ns"]).split(",")]
+        cmd_args["run_steps"] = [int(s.strip()) for s in str(cmd_args["run_steps"]).split(",")]
+        cmd_args["viscosities"] = [float(v.strip()) for v in str(cmd_args["viscosities"]).split(",")]
+    
+    # Execute the method
+    print(f"Executing command: {cmd_name}")
     try:
-        available_functions[parsed.func](*positional, **keyword)
-    except KeyboardInterrupt:
-        print("\nProgram interrupted by user. Exiting gracefully.")
-        sys.exit(1)
-    except TypeError as e:
-        print(f"Error calling '{parsed.func}': {e}")
-        print(f"Arguments provided: positional={positional}, keyword={keyword}")
-        sys.exit(1)
+        method = getattr(orchestrator, cmd_name)
+        method(**cmd_args)
     except Exception as e:
-        print(f"Simulation Error: {e}")
+        print(f"Error executing simulation: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
+
+if __name__ == "__main__":
+    main()

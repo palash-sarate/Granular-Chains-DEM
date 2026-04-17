@@ -26,7 +26,7 @@ class MovieExporterController:
         self.filename_var = tk.StringVar(value="simulation_movie.mp4")
         self.show_scalebar_var = tk.BooleanVar(value=False)
         self.show_timestamp_var = tk.BooleanVar(value=True)
-        self.dt_var = tk.StringVar(value="0.001") # Default dt
+        self.dt_var = tk.StringVar(value="0.000001") # Default dt
         # Scalebar and timestamp UI options
         self.scalebar_width_var = tk.StringVar(value="0.2")   # fraction of view width
         self.scalebar_height_var = tk.StringVar(value="0.02") # fraction of view height / font scale for Text2D fallback
@@ -101,8 +101,8 @@ class MovieExporterController:
             self.start_ts_var.set(str(timesteps[0]))
             self.end_ts_var.set(str(timesteps[-1]))
             # Also try to update dt from geometry data if available
-            if self.data_ctrl.geometry_data and 'dt' in self.data_ctrl.geometry_data:
-                self.dt_var.set(str(self.data_ctrl.geometry_data['dt']))
+            # if self.data_ctrl.geometry_data and 'dt' in self.data_ctrl.geometry_data:
+            #     self.dt_var.set(str(self.data_ctrl.geometry_data['dt']))
 
     def _browse_file(self):
         # Default initial directory to the current simulation folder (if available)
@@ -170,13 +170,15 @@ class MovieExporterController:
             # Best-effort: silently ignore if plotter doesn't expose these attributes
             pass
 
-    def _update_overlays(self, ts):
-        """Adds or updates temporary overlays for recording/preview."""
+    def _init_overlays(self):
+        """Initializes constant overlays and creates the text actor for timestamps once."""
         # Clear previous movie-specific actors
         for act in self._movie_actors:
             try: self.plotter.remove(act)
             except: pass
         self._movie_actors = []
+        self._timestamp_actor = None
+        self._scalebar_actor = None
 
         if self.show_scalebar_var.get():
             sb = None
@@ -210,6 +212,7 @@ class MovieExporterController:
 
             if sb:
                 self._movie_actors.append(sb)
+                self._scalebar_actor = sb
             else:
                 # Fallback: create a Text2D based bar using block characters
                 chars = max(3, int(sb_w * 40))
@@ -221,22 +224,27 @@ class MovieExporterController:
                 except Exception:
                     pass
                 self._movie_actors.append(s_text)
+                self._scalebar_actor = s_text
 
         if self.show_timestamp_var.get():
+            pos = self.timestamp_pos_var.get() if hasattr(self, 'timestamp_pos_var') else 'top-right'
+            try: s_font = float(self.timestamp_font_var.get())
+            except Exception: s_font = 0.8
+            t2d = Text2D("Preparing...", pos=pos, s=s_font, c='black', bg='white', alpha=0.7)
+            self.plotter.add(t2d)
+            self._movie_actors.append(t2d)
+            self._timestamp_actor = t2d
+
+    def _update_timestamp(self, ts):
+        """Fast update of timestamp text without recreating VTK actors."""
+        if getattr(self, '_timestamp_actor', None):
             try:
                 dt = float(self.dt_var.get())
                 time = ts * dt
                 txt = f"Time: {time:.4f} s\nStep: {ts}"
             except:
                 txt = f"Step: {ts}"
-            pos = self.timestamp_pos_var.get() if hasattr(self, 'timestamp_pos_var') else 'top-right'
-            try:
-                s_font = float(self.timestamp_font_var.get())
-            except Exception:
-                s_font = 0.8
-            t2d = Text2D(txt, pos=pos, s=s_font, c='black', bg='white', alpha=0.7)
-            self.plotter.add(t2d)
-            self._movie_actors.append(t2d)
+            self._timestamp_actor.text(txt)
 
     def toggle_preview(self):
         if self.preview_active:
@@ -275,6 +283,7 @@ class MovieExporterController:
             except Exception:
                 fps_preview = 30
             delay_ms = max(1, int(1000 / fps_preview))
+            self._init_overlays()
 
             def step_loop(idx):
                 if not self.preview_active or idx >= len(timesteps):
@@ -284,7 +293,7 @@ class MovieExporterController:
                 
                 ts = timesteps[idx]
                 self.renderer.show_timestep(ts)
-                self._update_overlays(ts)
+                self._update_timestamp(ts)
                 self.plotter.render()
                 
                 # Schedule next frame according to FPS setting
@@ -352,16 +361,20 @@ class MovieExporterController:
         video = Video(filename, fps=fps)
         
         try:
+            self._init_overlays()
             total = len(timesteps)
             for i, ts in enumerate(timesteps):
                 self.status_label.config(text=f"Exporting frame {i+1}/{total}...")
-                self.parent.update() # Keep UI responsive enough to show status
+                
+                if i % 5 == 0:
+                    # Update UI less frequently to avoid main thread event pump bottleneck
+                    self.parent.update() 
                 
                 # Render frame
                 # We use the renderer's normal flow, but we can't use 'after' here
                 # because we want to stick to the export speed.
                 self.renderer.show_timestep(ts)
-                self._update_overlays(ts)
+                self._update_timestamp(ts)
                 self.plotter.render()
                 
                 # Capture

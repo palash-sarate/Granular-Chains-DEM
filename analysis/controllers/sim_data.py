@@ -223,6 +223,20 @@ class SimDataController:
             self.loading_batches.add(batch_idx)
             self.load_queue.put(batch_idx)
 
+    def cache_all_remaining(self):
+        """Queues all remaining cached batches for background loading."""
+        if not self.sim_source:
+            return 0
+            
+        cached_batches = self.sim_source.get_available_cached_batches()
+        new_queued = 0
+        for b_idx in cached_batches:
+            if b_idx not in self.sim_source.loaded_batches and b_idx not in self.loading_batches:
+                self.loading_batches.add(b_idx)
+                self.load_queue.put(b_idx)
+                new_queued += 1
+        return new_queued
+
     def _worker_loop(self):
         while True:
             batch_idx = self.load_queue.get()

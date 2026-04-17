@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -M trishac@iisc.ac.in
+#PBS -m aeb
+#PBS -V
+#PBS -N Trials_ROM_Final
+#PBS -q workq
+#PBS -l walltime=02:00:00
+#PBS -l nodes=1:ppn=32
+#PBS -l mem=128gb
+
+# 1. Force the working directory
+cd /home/chandan/trisha_work/Trial
+
+# 2. Activate environment
+source /home/chandan/miniconda3/bin/activate rom_env
+
+# 3. Use -u for unbuffered output so you see progress instantly
+# and use 'python' exactly as you did in the manual run
+python -u ed.py >> output_trials.log 2>&1

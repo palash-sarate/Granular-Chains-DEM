@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Optional, Dict, Callable
@@ -165,6 +166,7 @@ class ViewerApp(BaseTk):
 
         self.loop_var = tk.BooleanVar(value=True)
         tk.Checkbutton(playback_frame, text='Loop', variable=self.loop_var).pack(side=tk.LEFT, padx=(4, 0))
+        tk.Button(playback_frame, text='Cache All', command=self._on_cache_all_ui).pack(side=tk.LEFT, padx=(4, 0))
 
         self.playback_ctrl.link_widgets(self.frame_slider, self.fps_entry, self.play_btn, self.frame_label, self.loop_var)
 
@@ -454,6 +456,21 @@ class ViewerApp(BaseTk):
         if self.current_timestep is not None: self.renderer.show_timestep(self.current_timestep)
         else: self.plotter.render()
 
+    def _on_cache_all_ui(self):
+        if not self.data_ctrl.sim_source:
+            return
+            
+        new_queued = self.data_ctrl.cache_all_remaining()
+        if new_queued > 0:
+            if self.progress_bar is None:
+                self.batches_to_load = new_queued
+                self.batches_loaded = 0
+                self.progress_bar = ProgressBar(self, title="Caching", message=f"Loading {new_queued} cached batches...", modal=True)
+                self.progress_bar.set_progress(0, new_queued)
+            else:
+                self.batches_to_load += new_queued
+                self.progress_bar.set_progress(self.batches_loaded, self.batches_to_load)
+
     # ── Restart Editor Logic ──────────────────────────────
     def _on_atom_picked(self, info: dict):
         """Callback from renderer when an atom is clicked."""
@@ -509,7 +526,13 @@ class ViewerApp(BaseTk):
 
 
 def run():
+    parser = argparse.ArgumentParser(description="Chains Simulation Viewer")
+    parser.add_argument("sim_path", nargs="?", default=None, help="Path to simulation folder or file to load")
+    args, unknown = parser.parse_known_args()
+
     app = ViewerApp()
+    if args.sim_path:
+        app.after(100, lambda: app.loader_ctrl.handle_dropped_files([args.sim_path]))
     try:
         app.mainloop()
     finally:
