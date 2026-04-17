@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N LAMMPS_Bench_Full
+#PBS -q workq
+#PBS -l walltime=01:00:00
+#PBS -l nodes=1:ppn=128
+#PBS -l mem=64gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+#PBS -V
+
+# ==============================================================================
+# Performance Benchmarking Job Script
+# ==============================================================================
+
+# 1. Set working directory
+cd /home/guest/palash/Granular-Chains-DEM
+
+# 2. Activate environment
+source /home/guest/miniconda3/bin/activate gchain
+
+# 3. Run the full benchmark suite
+# This script tests CPU vs GPU and various thread counts (24-128)
+python -u benchmark_performance.py >> Cluster\ job\ scripts/benchmark_output.log 2>&1
+
+# ==============================================================================

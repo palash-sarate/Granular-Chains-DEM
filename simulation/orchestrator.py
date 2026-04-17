@@ -30,7 +30,9 @@ class SimulationOrchestrator:
                         N: int = 4,
                         outdir: Optional[str] = None,
                         num_procs: int = None,
-                        num_threads: int = 1):
+                        num_threads: int = 1,
+                        use_kokkos: bool = True,
+                        use_intel: bool = True):
         """Pre-fill a hopper with relaxed molecular chains."""
         if seed is None:
             seed = int(time.time()) % 1000000
@@ -51,7 +53,9 @@ class SimulationOrchestrator:
                                      N=N,
                                      outdir=outdir,
                                      num_procs=num_procs,
-                                     num_threads=num_threads)
+                                     num_threads=num_threads,
+                                     use_kokkos=use_kokkos,
+                                     use_intel=use_intel)
 
     def resume_hopper_fill(self, 
                           restart_path: str = None, 
@@ -69,7 +73,9 @@ class SimulationOrchestrator:
                           N: int = 4,
                           outdir: Optional[str] = None,
                           num_procs: int = None,
-                          num_threads: int = 1):
+                          num_threads: int = 1,
+                          use_kokkos: bool = True,
+                          use_intel: bool = True):
         """Resume filling a hopper from a binary restart file."""
         if seed is None:
             seed = int(time.time()) % 1000000
@@ -91,9 +97,11 @@ class SimulationOrchestrator:
                                     N=N,
                                     outdir=outdir,
                                     num_procs=num_procs,
-                                    num_threads=num_threads)
+                                    num_threads=num_threads,
+                                    use_kokkos=use_kokkos,
+                                    use_intel=use_intel)
 
-    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1):
+    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Run a single chain-flop simulation to analyze mobility."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
@@ -110,14 +118,16 @@ class SimulationOrchestrator:
                 "dt": dt
             },
             num_procs=num_procs,
-            num_threads=num_threads
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
         )
         
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         print(f"Running simulation: {config.simulation}=>{config.run}")
         runner.run(config)
 
-    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000", num_procs: int = None, num_threads: int = 1):
+    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000", num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Resume a chain-flop simulation from a restart point."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
@@ -134,14 +144,16 @@ class SimulationOrchestrator:
                 },
             },
             num_procs=num_procs,
-            num_threads=num_threads
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
         )
         
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         print(f"Resuming simulation: {config.simulation}=>{config.run}")
         runner.resume(config)
 
-    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, num_procs: int = None, num_threads: int = 1):
+    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Generate a library of relaxed chain states for future hopper insertions."""
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         lib_gen = LibraryGenerator(runner, forced)
@@ -168,7 +180,7 @@ class SimulationOrchestrator:
             path = write_chain_data(linear_config)
             print(f"Created: {path}")
 
-    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6, num_procs: int = None, num_threads: int = 1):
+    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Run a batch of flop simulations across multiple parameters."""
         total = len(Ns) * len(run_steps) * len(viscosities)
         eta = ETAEstimator(total=total)
@@ -194,7 +206,9 @@ class SimulationOrchestrator:
                         },
                     }, 
                     num_procs=num_procs,
-                    num_threads=num_threads)
+                    num_threads=num_threads,
+                    use_kokkos=use_kokkos,
+                    use_intel=use_intel)
                     print(f"[{completed}/{total}] Running {config.run}...")
                     runner = SimulationRunner(lammps_executable=self.lammps_executable)
                     runner.run(config, verbose=False, clean_dir=True)

@@ -11,6 +11,35 @@ class SimulationRunner:
     def __init__(self, lammps_executable: str = "lmp"):
         self.lammps_exe = lammps_executable
         self.output_dir = ""
+        self._features = None # Cache for lmp -h features
+
+    def _get_lammps_features(self) -> List[str]:
+        """Detect supported packages from lmp -h."""
+        if self._features is not None:
+            return self._features
+        try:
+            result = subprocess.run([self.lammps_exe, "-h"], 
+                                 capture_output=True, text=True, timeout=5)
+            # Find the 'Installed packages:' section
+            packages = []
+            capture = False
+            for line in result.stdout.splitlines():
+                if "Installed packages:" in line:
+                    capture = True
+                    continue
+                if capture:
+                    if not line.strip() or line.startswith("List of"):
+                        break
+                    packages.extend(line.split())
+            self._features = packages
+            return packages
+        except Exception:
+            self._features = []
+            return []
+
+    def _has_gpu(self) -> bool:
+        """Detect if local machine has an NVIDIA GPU via nvidia-smi."""
+        return shutil.which("nvidia-smi") is not None
 
     def generate_input_script(self, config: SimulationConfig, template_path: str, output_path: str):
         """
@@ -124,12 +153,31 @@ class SimulationRunner:
             self.generate_input_script(config, template_path, script_to_run)            
         else:
             raise ValueError("Either input_script or template must be provided in the config.")
-  
+   
         cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps.log"]
         
-        # vars_dict = config.to_lammps_vars()
-        # for key, value in vars_dict.items():
-        #     cmd.extend(["-var", key, value])
+        # Auto-detect features to ensure portability
+        supported_pkgs = self._get_lammps_features()
+        gpu_available = self._has_gpu()
+
+        # Add KOKKOS flags if enabled and supported
+        if config.use_kokkos and "KOKKOS" in supported_pkgs:
+            # -k on: enable kokkos
+            # g 1: use 1 GPU (if available)
+            # t config.num_threads: use N threads
+            # -sf kk: use kokkos suffix for styles
+            kokkos_cmd = ["-k", "on"]
+            if gpu_available:
+                kokkos_cmd.extend(["g", "1"])
+            kokkos_cmd.extend(["t", str(config.num_threads), "-sf", "kk"])
+            
+            cmd.extend(kokkos_cmd)
+            print(f"Applying KOKKOS acceleration (GPU={gpu_available}, threads={config.num_threads})")
+            
+        elif config.use_intel and "INTEL" in supported_pkgs:
+            # -sf intel: use intel suffix
+            cmd.extend(["-sf", "intel"])
+            print("Applying INTEL acceleration")
             
         self._execute(cmd, config, verbose)
 

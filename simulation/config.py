@@ -50,6 +50,8 @@ class SimulationConfig:
     # Parallelism
     num_procs: Optional[int] = None
     num_threads: int = 1
+    use_kokkos: bool = True
+    use_intel: bool = True
     
     # Custom output directory override
     outdir_override: Optional[str] = None

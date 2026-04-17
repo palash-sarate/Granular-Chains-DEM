@@ -1,0 +1,39 @@
+#!/bin/bash
+#PBS -N LAMMPS_GChain_GPU
+#PBS -q workq
+#PBS -l walltime=04:00:00
+#PBS -l nodes=1:ppn=64
+#PBS -l mem=64gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+#PBS -V
+
+# ==============================================================================
+# LAMMPS High-Performance GPU Job Script
+# Optimized for AMD EPYC (Zen 4) + NVIDIA RTX A6000
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd /home/guest/palash/Granular-Chains-DEM
+
+# 2. Activate the conda environment with the optimized LAMMPS build
+source /home/guest/miniconda3/bin/activate gchain
+
+# 3. Force CUDA to see only those GPUs assigned to the job (optional but safe)
+# export CUDA_VISIBLE_DEVICES=0
+
+# 4. Run the simulation
+# --num_threads 64: Matches one OpenMP thread per physical core (best for EPYC 9554)
+# KOKKOS auto-detection in our Runner will handle the GPU flags.
+python -u main.py run_flop_simulation \
+    --N 48 \
+    --run_steps 500000 \
+    --num_threads 64 \
+    --viscosity 0.001 \
+    --dt 1e-6
+
+# ==============================================================================
+# Troubleshooting:
+# - If you see 'OMP_PROC_BIND' warnings, you can add 'export OMP_PROC_BIND=spread'
+# - If not using GPU, add '--no-kokkos' to the command above.
+# ==============================================================================
