@@ -1,0 +1,53 @@
+#!/bin/bash
+#PBS -N Verify_Env
+#PBS -q workq
+#PBS -l walltime=00:30:00
+#PBS -l nodes=master:ppn=32
+
+# Email notifications (abort, begin, end)
+#PBS -m abe
+
+# Email address for notifications
+#PBS -M palashsarate@iisc.ac.in
+
+# Standard output file
+#PBS -o PBS_Output/Verify_env.log
+# Standard error file
+#PBS -e PBS_Output/Verify_env_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+## Change to directory the PBS script was submitted from
+cd $PBS_O_WORKDIR
+
+echo "=== 1. HARDWARE CHECK ==="
+lscpu | grep "Model name"
+nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader
+echo ""
+
+# 2. Environment Check
+echo "=== 2. ENVIRONMENT CHECK ==="
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+echo "Python Path: $(which python)"
+python --version
+echo ""
+
+# 3. Functional Test
+echo "=== 3. FUNCTIONAL TEST ==="
+python -u main.py generate_relaxed_library \
+    --n_beads 4 \
+    --n_states 1 \
+    --num_threads 32 \
+    --num_procs 32 
+    # --forced
+
+if [ -f "chain_data/relaxed/N4/state_0.data" ]; then
+    echo "SUCCESS: Relaxed state file generated correctly."
+else
+    echo "FAILURE: Output file not found!"
+fi
+
+echo "=== VERIFICATION COMPLETE ==="

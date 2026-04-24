@@ -14,7 +14,10 @@ class LibraryGenerator:
 
     def generate_library(self, n_beads: int, n_states: int,
                          output_dir: str = "chain_data/relaxed",
-                         config: SimulationConfig = None):
+                         num_procs: int = None,
+                         num_threads: int = 1,
+                         use_kokkos: bool = True,
+                         use_intel: bool = True):
         """
         Generates a library of relaxed chain states.
         
@@ -75,7 +78,11 @@ class LibraryGenerator:
                     "dt": 1e-6,
                     # "viscosity": 0.0005,
                     "temperature": 1e15
-                }
+                },
+                num_procs=num_procs,
+                num_threads=num_threads,
+                use_kokkos=use_kokkos,
+                use_intel=use_intel
             )
             
             print(f"  [State {i+1}/{n_states}] Running relaxation (Seed: {seed})...")

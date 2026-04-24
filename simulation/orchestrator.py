@@ -157,8 +157,14 @@ class SimulationOrchestrator:
         """Generate a library of relaxed chain states for future hopper insertions."""
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         lib_gen = LibraryGenerator(runner, forced)
-        # We need to update LibraryGenerator to accept parallelism too, but for now we can pass it to config if it creates any
-        lib_gen.generate_library(n_beads=n_beads, n_states=n_states)
+        lib_gen.generate_library(
+            n_beads=n_beads, 
+            n_states=n_states,
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
+        )
 
     def generate_chains(self, Ns: str = "4,6,8", orientation: str = "x", output_dir_name: str = "linear_x"):
         """Generate initial linear chain data files."""

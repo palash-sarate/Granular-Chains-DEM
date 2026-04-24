@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -N DebugPath
+#PBS -q workq
+#PBS -l walltime=00:05:00
+#PBS -l nodes=1:ppn=1
+#PBS -V
+
+echo "=== DEBUG START ==="
+echo "User: $(whoami)"
+echo "ID: $(id)"
+echo "Hostname: $(hostname)"
+echo "Current Dir: $(pwd)"
+echo "Listing /home/guest/palash/:"
+ls -ld /home/guest/palash/Granular-Chains-DEM || echo "Cannot access project dir"
+
+echo "=== ENVIRONMENT ==="
+env | grep PBS
+
+echo "=== ATTEMPTING CD ==="
+cd /home/guest/palash/Granular-Chains-DEM && echo "Successfully changed directory" || echo "CD FAILED"

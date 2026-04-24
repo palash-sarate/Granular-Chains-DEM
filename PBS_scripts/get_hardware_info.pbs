@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N hardware_info_job
+#PBS -l nodes=master:ppn=1
+#PBS -l walltime=00:01:00
+
+# Email notifications (abort, begin, end)
+#PBS -m abe
+
+# Email address for notifications
+#PBS -M palashsarate@iisc.ac.in
+
+# Standard output file
+#PBS -o PBS_Output/hardware_info.log
+
+# Standard error file
+#PBS -e PBS_Output/hardware_error.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+## Change to directory the PBS script was submitted from
+cd $PBS_O_WORKDIR
+
+echo "================================================"
+echo "NODE HARDWARE INFORMATION"
+echo "Time: $(date)"
+echo "Hostname: $(hostname)"
+echo "================================================"
+
+echo -e "\n--- CPU INFO ---"
+lscpu | grep -E "Model name|CPU\(s\):|Thread\(s\) per core|Core\(s\) per socket"
+
+echo -e "\n--- RAM INFO ---"
+free -h
+
+echo -e "\n--- GPU INFO ---"
+if command -v nvidia-smi &> /dev/null
+then
+    nvidia-smi -L
+    nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+else
+    echo "No NVIDIA GPU detected"
+fi
+echo "================================================"

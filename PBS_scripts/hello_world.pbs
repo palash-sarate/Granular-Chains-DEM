@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N HelloWorld
+#PBS -q workq
+#PBS -l walltime=00:01:00
+#PBS -l nodes=master:ppn=1
+
+
+# Set working directory
+cd /home/guest/palash/Granular-Chains-DEM
+
+echo "------------------------------------------------"
+echo "Minimal Job Test"
+# echo "Host: $(hostname)"
+# echo "Time: $(date)"
+echo "Directory: $(pwd)"
+echo "------------------------------------------------"
+# echo "Python: $(which python)"
+echo "Environment:"
+# env | grep -E "USER|PATH|PWD"
+echo "------------------------------------------------"
+echo "Success!"

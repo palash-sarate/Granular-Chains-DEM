@@ -9,3 +9,5 @@ temp_frame*
 *__pycache__/
 /out_mesh
 *.mp4
+
+/PBS_Output

@@ -1,0 +1,34 @@
+#!/bin/bash
+# Job name
+#PBS -N my_python_job
+
+# Standard output file
+#PBS -o output.log
+
+# Standard error file
+#PBS -e error.log
+
+# Request 1 node with 32 CPUs and 1 GPU
+#PBS -l nodes=1:ppn=32
+
+# Set maximum runtime (HH:MM:SS)
+#PBS -l walltime=99:00:00
+
+
+# Email notifications (abort, begin, end)
+#PBS -m abe
+
+# Email address for notifications
+#PBS -M cbharti@iisc.ac.in
+
+# Navigate to the working directory
+PBS_WORKDIR=/home/chandan/chandan_work/cluster_work/python_work/sdof
+cd $PBS_WORKDIR
+
+# Load Conda and activate the environment
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate pytorch
+
+# Run the Python script
+python Hello.py > output.log 2>&1 
+

@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N MinimalTest
+#PBS -q workq
+#PBS -l walltime=00:05:00
+#PBS -l nodes=1:ppn=1
+
+echo "Running on: $(hostname)"
+echo "PBS_O_WORKDIR: $PBS_O_WORKDIR"
+
+cd $PBS_O_WORKDIR || { echo "CD failed"; exit 1; }
+
+echo "Current dir: $(pwd)"
+ls -l
+
+echo "Success!"
