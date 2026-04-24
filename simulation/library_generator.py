@@ -1,6 +1,7 @@
 import os
 import shutil
 import random
+import concurrent.futures
 from pathlib import Path
 from .runner import SimulationRunner
 from .config import SimulationConfig
@@ -14,6 +15,8 @@ class LibraryGenerator:
 
     def generate_library(self, n_beads: int, n_states: int,
                          output_dir: str = "chain_data/relaxed",
+                         dump_inc: str = "simulation_templates/default_dump.inc",
+                         n_parallel: int = 1,
                          num_procs: int = None,
                          num_threads: int = 1,
                          use_kokkos: bool = True,
@@ -51,32 +54,29 @@ class LibraryGenerator:
         # we need "temp_lib_gen/N...data"
         rel_data_path = base_chain_path.relative_to("chain_data")
         
-        # 3. Loop to generate states
-        for i in range(n_states):
+        # 3. Define single state generation task
+        def run_single_state(i):
             seed = random.randint(1, 999999)
             run_name = f"relax_N{n_beads}_state_{i}"
             
-            # if forced is True, we skip generation if the final relaxed chain data 
-            # already exists in chain_data/relaxed/N{n_beads}/state_i.data
             final_dest = target_dir / f"state_{i}.data"
             if not self.forced and final_dest.exists():
                 print(f"  [State {i+1}/{n_states}] Skipping (already exists): {final_dest}")
-                continue
+                return
             
             # Config for relaxation
             sim_config = SimulationConfig(
                 template="in.relax_3d_gen",
-                data_file=str(rel_data_path).replace("\\", "/"), # Ensure forward slashes for LAMMPS
-                dump_file= "simulation_templates/default_dump.inc", # Assuming this is a standard include for dumping
+                data_file=str(rel_data_path).replace("\\", "/"),
+                dump_file=dump_inc, 
                 simulation="Relax_3d_Library_Gen",
                 run=run_name,
                 extra_vars={
                     "seed": seed,
-                    "motion_steps": 500000, # 1s of relaxation
-                    "explore_steps": 200000, # 1s of relaxation
-                    "viscous_relax_steps": 300000, # 1s of relaxation
+                    "motion_steps": 500000, 
+                    "explore_steps": 200000, 
+                    "viscous_relax_steps": 300000, 
                     "dt": 1e-6,
-                    # "viscosity": 0.0005,
                     "temperature": 1e15
                 },
                 num_procs=num_procs,
@@ -85,22 +85,34 @@ class LibraryGenerator:
                 use_intel=use_intel
             )
             
-            print(f"  [State {i+1}/{n_states}] Running relaxation (Seed: {seed})...")
+            print(f"  [State {i+1}/{n_states}] Starting relaxation (Seed: {seed})...")
             try:
-                self.runner.run(sim_config, verbose=False)
+                # We need a fresh runner or a thread-safe runner
+                # Since SimulationRunner is lightweight and uses subprocess, 
+                # we'll use the existing one but be mindful of its state if any.
+                # Actually, creating a fresh runner for each thread is safer.
+                from .runner import SimulationRunner
+                runner = SimulationRunner(lammps_executable=self.runner.lammps_exe)
+                runner.run(sim_config, verbose=False)
                 
                 # 4. Move and Rename Output
-                # The output will be in dumping_yard/Library_Gen/relax_N.../relaxed_chain.data
                 generated_file = Path(f"dumping_yard/Relax_3d_Library_Gen/{run_name}/relaxed_chain.data")
-                # copy the chain data to the target directory with a standardized name
                 if generated_file.exists():
-                    final_dest = target_dir / f"state_{i}.data"
                     shutil.copy(generated_file, final_dest)
                     print(f"    -> Saved: {final_dest}")
                 else:
                     print(f"    -> Error: Output file not found for state {i}")
             except Exception as e:
-                print(f"    -> Simulation failed: {e}")
+                print(f"    -> Simulation failed for state {i}: {e}")
+
+        # 4. Execute in Parallel
+        if n_parallel > 1:
+            print(f"  Running in parallel with {n_parallel} workers...")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=n_parallel) as executor:
+                executor.map(run_single_state, range(n_states))
+        else:
+            for i in range(n_states):
+                run_single_state(i)
 
         # 5. Cleanup
         # shutil.rmtree(temp_chain_dir) 

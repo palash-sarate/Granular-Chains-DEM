@@ -2,8 +2,13 @@ import typer
 from rich.console import Console
 from rich.table import Table
 from rich import print as rprint
-from .pulse_core import PBSManager
 import os
+import sys
+try:
+    from .pulse_core import PBSManager
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from pulse_core import PBSManager
 import subprocess
 
 app = typer.Typer(help="Pulse: Smart PBS Job Manager")

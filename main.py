@@ -80,6 +80,8 @@ def main():
     p_lib.add_argument("--n_beads", type=int, default=4)
     p_lib.add_argument("--n_states", type=int, default=10)
     p_lib.add_argument("--forced", action="store_true", help="Force re-generation if check exists")
+    p_lib.add_argument("--dump_inc", default="simulation_templates/default_dump.inc", help="Dump settings file")
+    p_lib.add_argument("--inParallel", type=int, default=1, dest="n_parallel", help="Number of simulations to run in parallel")
     p_lib.add_argument("--num_procs", type=int)
     p_lib.add_argument("--num_threads", type=int, default=1)
     p_lib.add_argument("--no-kokkos", action="store_false", dest="use_kokkos", help="Disable KOKKOS acceleration")

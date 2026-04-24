@@ -153,13 +153,15 @@ class SimulationOrchestrator:
         print(f"Resuming simulation: {config.simulation}=>{config.run}")
         runner.resume(config)
 
-    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
+    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, dump_inc: str = "simulation_templates/default_dump.inc", n_parallel: int = 1, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Generate a library of relaxed chain states for future hopper insertions."""
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         lib_gen = LibraryGenerator(runner, forced)
         lib_gen.generate_library(
             n_beads=n_beads, 
             n_states=n_states,
+            dump_inc=dump_inc,
+            n_parallel=n_parallel,
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos,

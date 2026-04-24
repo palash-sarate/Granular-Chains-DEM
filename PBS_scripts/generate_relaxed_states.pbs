@@ -3,7 +3,7 @@
 #PBS -q workq
 #PBS -l walltime=12:00:00
 #PBS -l nodes=master:ppn=64
-#PBS -l mem=64gb
+#PBS -l mem=128gb
 #PBS -m aeb
 #PBS -M palashsarate@iisc.ac.in
 # Standard output file
@@ -46,7 +46,8 @@ do
     python -u main.py generate_relaxed_library \
         --n_beads $N \
         --n_states 100 \
-        --num_procs 64 \
+        --inParallel 64 \
+        --num_procs 1 \
         --num_threads 1 \
         --forced
         

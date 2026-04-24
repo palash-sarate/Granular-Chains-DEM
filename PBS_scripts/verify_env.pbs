@@ -40,8 +40,8 @@ echo "=== 3. FUNCTIONAL TEST ==="
 python -u main.py generate_relaxed_library \
     --n_beads 4 \
     --n_states 1 \
-    --num_threads 32 \
-    --num_procs 32 
+    --num_procs 16 \
+    --num_threads 4
     # --forced
 
 if [ -f "chain_data/relaxed/N4/state_0.data" ]; then
