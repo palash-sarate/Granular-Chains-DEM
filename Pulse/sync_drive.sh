@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-folders=("chain_data" "dumping_yard")
+folders=("chain_data" "dumping_yard" "PBS_Output")
 ZIP_DIR="Zips_dir"
 mkdir -p "$ZIP_DIR"
 

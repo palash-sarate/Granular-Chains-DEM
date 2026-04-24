@@ -1,0 +1,101 @@
+#!/bin/bash
+#PBS -N Hopper_Fill_Batch
+#PBS -q workq
+#PBS -l walltime=12:00:00
+#PBS -l nodes=master:ppn=64
+#PBS -l mem=128gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/hopper_fill_batch.log
+# Standard error file
+#PBS -e PBS_Output/hopper_fill_batch_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# PBS Script to Generate Hopper Filled States
+# This script creates 10 filled states for each specified chain length.
+# n_fill is calculated as 24000 / N to keep the total bead count constant.
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate the conda environment
+echo "=== 2. ENVIRONMENT CHECK ==="
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+echo "Python Path: $(which python)"
+python --version
+echo ""
+
+# 3. Parameters
+# Chain lengths to process
+CHAIN_LENGTHS=(4 12 24 48)
+STATES_PER_N=10
+TOTAL_ATOMS=24000
+
+# Parallelism configuration
+PARALLEL_JOBS=4
+THREADS_PER_JOB=16
+
+echo "=== 3. STARTING BATCH PROCESSING (PARALLEL) ==="
+echo "Target Total Atoms: $TOTAL_ATOMS"
+echo "Chain Lengths: ${CHAIN_LENGTHS[*]}"
+echo "States per N: $STATES_PER_N"
+echo "Running $PARALLEL_JOBS simulations in parallel, each with $THREADS_PER_JOB threads."
+echo ""
+
+# Ensure log directory for individual runs exists
+mkdir -p PBS_Output/hopper_fill_runs
+
+for n in "${CHAIN_LENGTHS[@]}"
+do
+    # Calculate n_fill = 24000 / N
+    N_FILL=$((TOTAL_ATOMS / n))
+    
+    echo "------------------------------------------------------------------------------"
+    echo "Processing Chain Length N = $n | n_fill = $N_FILL"
+    echo "------------------------------------------------------------------------------"
+    
+    for state in $(seq 1 $STATES_PER_N)
+    do
+        # Unique run name for each state
+        RUN_NAME="hopper_fill_N${n}_rain_uniform_stubs_state_${state}"
+        SEED=$((n * 1000 + state * 123 + RANDOM % 1000))
+        LOG_FILE="PBS_Output/hopper_fill_runs/${RUN_NAME}.log"
+        
+        echo "[N=$n][State $state] Queuing: $RUN_NAME (Seed: $SEED)"
+        
+        # Run in background
+        python -u main.py run_hopper_fill \
+            --source_dir "chain_data/relaxed/N${n}" \
+            --fill_template "simulation_templates/in.hopper_fill_uniform" \
+            --n_fill $N_FILL \
+            --run_name "$RUN_NAME" \
+            --setup_inc "simulation_geometries/2D_hopper_stubs_array.inc" \
+            --dump_inc "simulation_templates/default_dump.inc" \
+            --N $n \
+            --seed $SEED \
+            --num_procs 1 \
+            --num_threads $THREADS_PER_JOB \
+            --relax_steps 100000 > "$LOG_FILE" 2>&1 &
+            
+        # Limit number of parallel jobs
+        # Check current running background jobs
+        while [ $(jobs -r | wc -l) -ge $PARALLEL_JOBS ]; do
+            sleep 60
+        done
+    done
+done
+
+# Wait for all remaining background jobs to finish
+echo "All states queued. Waiting for final simulations to complete..."
+wait
+
+echo "=============================================================================="
+echo "All hopper filled states generated successfully."
+echo "=============================================================================="
