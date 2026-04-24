@@ -256,3 +256,53 @@ class PBSManager:
         if job_id in cache:
             del cache[job_id]
             PBSManager.save_metadata(cache)
+
+    @staticmethod
+    def get_node_temperatures() -> Dict[str, float]:
+        """Fetches CPU and GPU temperatures from the system."""
+        temps = {}
+        
+        # 1. GPU Temperature (via nvidia-smi)
+        try:
+            gpu_out = subprocess.getoutput("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits")
+            if gpu_out and gpu_out.isdigit():
+                temps["gpu"] = float(gpu_out)
+        except Exception:
+            pass
+            
+        # 2. CPU Temperature (via hwmon)
+        try:
+            # We look for Tdie or similar in hwmon
+            # Find which hwmon is the CPU
+            for i in range(10):
+                path = f"/sys/class/hwmon/hwmon{i}/name"
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        name = f.read().strip()
+                    
+                    # k10temp is common for AMD, coretemp for Intel
+                    if name in ["k10temp", "coretemp"]:
+                        # Try to find a better sensor than Tctl (which has offsets)
+                        # We look for Tccd1 or Tdie
+                        target_sensor = "temp1_input" # Default fallback
+                        for j in range(1, 10):
+                            label_path = f"/sys/class/hwmon/hwmon{i}/temp{j}_label"
+                            if os.path.exists(label_path):
+                                with open(label_path, 'r') as f:
+                                    label = f.read().strip()
+                                if label in ["Tccd1", "Tdie"]:
+                                    target_sensor = f"temp{j}_input"
+                                    break
+                                elif label == "Tctl":
+                                    # If Tctl is all we have, we'll use it but it's less ideal
+                                    pass
+
+                        temp_path = f"/sys/class/hwmon/hwmon{i}/{target_sensor}"
+                        if os.path.exists(temp_path):
+                            with open(temp_path, 'r') as f:
+                                temps["cpu"] = float(f.read().strip()) / 1000.0
+                        break
+        except Exception:
+            pass
+            
+        return temps

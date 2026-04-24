@@ -193,6 +193,16 @@ if "master" in subprocess.getoutput("hostname"):
     except:
         col_gpu1.write("GPU monitoring unavailable")
 
+    # 6. Thermal Status
+    st.markdown("### 🌡️ Thermal Status")
+    col_t_cpu, col_t_gpu, col_t_empty1, col_t_empty2 = st.columns(4)
+    
+    temps = PBSManager.get_node_temperatures()
+    if "cpu" in temps:
+        col_t_cpu.metric("CPU Temp", f"{temps['cpu']:.1f} °C", delta=f"{temps['cpu']-60:.1f} °C" if temps['cpu'] > 60 else None, delta_color="inverse")
+    if "gpu" in temps:
+        col_t_gpu.metric("GPU Temp", f"{temps['gpu']:.1f} °C", delta=f"{temps['gpu']-70:.1f} °C" if temps['gpu'] > 70 else None, delta_color="inverse")
+
 # Auto-refresh
 time.sleep(refresh_rate)
 st.rerun()

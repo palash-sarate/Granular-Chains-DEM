@@ -669,6 +669,13 @@
         "job_name": "Verify_Env"
     },
     "3034": {
+        "cpupercent": "6360",
+        "cput": "45:01:47",
+        "mem": "5.20 GB",
+        "ncpus": "64",
+        "vmem": "464.74 GB",
+        "walltime": "00:54:58",
+        "exit_status": "0",
         "owner": "guest",
         "job_name": "Relaxed_States_Generation"
     },
