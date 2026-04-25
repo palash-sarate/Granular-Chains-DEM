@@ -1,15 +1,15 @@
 #!/bin/bash
-#PBS -N Hopper_Fill_Batch
+#PBS -N Hopper_Fill_Batch_N4
 #PBS -q workq
-#PBS -l walltime=12:00:00
-#PBS -l nodes=master:ppn=64
-#PBS -l mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -l nodes=master:ppn=32
+#PBS -l mem=64gb
 #PBS -m aeb
 #PBS -M palashsarate@iisc.ac.in
 # Standard output file
-#PBS -o PBS_Output/hopper_fill_batch.log
+#PBS -o PBS_Output/hopper_fill_batch_N4.log
 # Standard error file
-#PBS -e PBS_Output/hopper_fill_batch_err.log
+#PBS -e PBS_Output/hopper_fill_batch_N4_err.log
 
 ## Specify the shell to be bash
 #PBS -S /bin/bash
@@ -34,23 +34,24 @@ echo ""
 
 # 3. Parameters
 # Chain lengths to process
-CHAIN_LENGTHS=(4 12 24 48)
+CHAIN_LENGTHS=(4)
 STATES_PER_N=10
 TOTAL_ATOMS=24000
 
 # Parallelism configuration
-PARALLEL_JOBS=4
-THREADS_PER_JOB=16
+PARALLEL_JOBS=1
+PROCS_PER_JOB=8
+THREADS_PER_JOB=1
 
 echo "=== 3. STARTING BATCH PROCESSING (PARALLEL) ==="
 echo "Target Total Atoms: $TOTAL_ATOMS"
 echo "Chain Lengths: ${CHAIN_LENGTHS[*]}"
 echo "States per N: $STATES_PER_N"
-echo "Running $PARALLEL_JOBS simulations in parallel, each with $THREADS_PER_JOB threads."
+echo "Running $PARALLEL_JOBS simulations in parallel, each with $PROCS_PER_JOB procs and $THREADS_PER_JOB threads."
 echo ""
 
 # Ensure log directory for individual runs exists
-mkdir -p PBS_Output/hopper_fill_runs
+mkdir -p PBS_Output/hopper_fill_runs_tall
 
 for n in "${CHAIN_LENGTHS[@]}"
 do
@@ -66,23 +67,25 @@ do
         # Unique run name for each state
         RUN_NAME="hopper_fill_N${n}_rain_uniform_stubs_state_${state}"
         SEED=$((n * 1000 + state * 123 + RANDOM % 1000))
-        LOG_FILE="PBS_Output/hopper_fill_runs/${RUN_NAME}.log"
+        LOG_FILE="PBS_Output/hopper_fill_runs_tall/${RUN_NAME}.log"
         
         echo "[N=$n][State $state] Queuing: $RUN_NAME (Seed: $SEED)"
         
         # Run in background
         python -u main.py run_hopper_fill \
             --source_dir "chain_data/relaxed/N${n}" \
-            --fill_template "simulation_templates/in.hopper_fill_uniform" \
+            --fill_template "in.hopper_fill_uniform_tall" \
             --n_fill $N_FILL \
             --run_name "$RUN_NAME" \
-            --setup_inc "simulation_geometries/2D_hopper_stubs_array.inc" \
+            --setup_inc "simulation_geometries/2D_hopper_setup.inc" \
             --dump_inc "simulation_templates/default_dump.inc" \
             --N $n \
             --seed $SEED \
-            --num_procs 1 \
+            --num_procs $PROCS_PER_JOB \
             --num_threads $THREADS_PER_JOB \
-            --relax_steps 100000 > "$LOG_FILE" 2>&1 &
+            --no-intel \
+            --relax_steps 100000 > $LOG_FILE 2>&1 &
+            # --no-kokkos \
             
         # Limit number of parallel jobs
         # Check current running background jobs

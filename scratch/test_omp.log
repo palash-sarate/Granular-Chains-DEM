@@ -1,0 +1,10 @@
+LAMMPS (22 Jul 2025 - Update 4)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+package omp 64
+set 64 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+variable outdir string benchmarking/sequential/CPU-Pure-64T
+ERROR: Cannot redefine variable outdir with a different style (src/variable.cpp:340)
+Last input line: variable outdir string benchmarking/sequential/CPU-Pure-64T 
+                                 ^^^^^^

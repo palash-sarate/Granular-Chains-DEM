@@ -16,7 +16,7 @@ class SimulationOrchestrator:
         self.lammps_executable = lammps_executable
 
     def run_hopper_fill(self, 
-                        source_dir: str = "chain_data/relaxed/N4", 
+                        source_dir: Optional[str] = None, 
                         fill_template: str = "in.hopper_fill",
                         n_fill: int = 10, 
                         relax_steps: int = 100000, 
@@ -29,11 +29,14 @@ class SimulationOrchestrator:
                         viscosity: float = 0.001, 
                         N: int = 4,
                         outdir: Optional[str] = None,
-                        num_procs: int = None,
+                        num_procs: int = 1,
                         num_threads: int = 1,
                         use_kokkos: bool = True,
                         use_intel: bool = True):
         """Pre-fill a hopper with relaxed molecular chains."""
+        if source_dir is None:
+            source_dir = f"chain_data/relaxed/N{N}"
+            
         if seed is None:
             seed = int(time.time()) % 1000000
 
