@@ -104,7 +104,9 @@ class HopperManager:
                               mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
                               viscosity: float = 0.001, N: int = 4, fill_template: str = "in.hopper_fill",
-                              outdir: str = None, num_procs: int = None, num_threads: int = 1) -> str:
+                              outdir: str = None, num_procs: int = None, num_threads: int = 1,
+                              use_kokkos: bool = True, use_intel: bool = True,
+                              clean_dir: bool = True) -> str:
         
         """Create a filled hopper state from relaxed chain files and save data+restart.
         Returns the path to the saved data file (forward-slashes).
@@ -139,11 +141,24 @@ class HopperManager:
                 "N": N,
             },
             num_procs=num_procs,
-            num_threads=num_threads
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
         )
 
-        print(f"Generating filled hopper state: {run_name}")
-        self.runner.run(cfg, verbose=True, clean_dir=True)
+        # Prepare directories manually first so we can place the insertion file inside
+        if clean_dir:
+            self.runner._prepare_directories(cfg, clean=True)
+
+        # If using the tall template, pre-generate the insertion file via Python
+        if "tall" in fill_template:
+            output_dir = cfg.output_dir
+            insertion_file, z_max = self._generate_tall_insertion_file(output_dir, n_fill, n_templates, seed, N)
+            cfg.extra_vars["insertion_file"] = insertion_file
+            cfg.extra_vars["z_max"] = z_max
+
+        # Tell runner not to clean/prep again (prep_dirs=False)
+        self.runner.run(cfg, verbose=True, clean_dir=False, prep_dirs=False)
 
         saved_data = f"{cfg.output_dir}/final_hopper.data".replace("\\", "/")
         return saved_data
@@ -153,7 +168,8 @@ class HopperManager:
                             mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
                             dump_inc: str = "simulation_templates/default_dump.inc", 
                             viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
-                            N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1) -> str:
+                            N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1,
+                            use_kokkos: bool = True, use_intel: bool = True) -> str:
         """Resume a hopper fill simulation from a restart file and add more chains.
         Returns the path to the saved data file.
         """
@@ -217,7 +233,9 @@ class HopperManager:
                 "N": N,
             },
             num_procs=num_procs,
-            num_threads=num_threads
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
         )
 
         print(f"Resuming filled hopper state: {run_name}")
@@ -259,3 +277,73 @@ class HopperManager:
         self.runner.run(cfg, verbose=True, clean_dir=True)
         return cfg.output_dir
 
+    def _generate_tall_insertion_file(self, outdir: str, n_fill: int, n_templates: int, seed: int, N: int):
+        """
+        Generates a 3D grid of insertion coordinates in a tall column via Python.
+        Writes 'create_atoms' commands to a file to be included by LAMMPS.
+        Returns (insertion_file_path, z_max).
+        """
+        import math
+        import random
+        
+        # Use a local random instance to avoid interfering with other parts of the program
+        rng = random.Random(seed)
+        
+        # Grid bounds (matched to in.hopper_fill_uniform)
+        x_min, x_max = -0.08, 0.08
+        y_min, y_max = -0.15, 0.15
+        z_start = 0.51
+        
+        x_width = x_max - x_min
+        y_width = y_max - y_min
+        
+        # Exclusion diameter (3 * N * 1mm)
+        ex_diam = 3 * N * 0.001
+        
+        nx = max(1, int(x_width / ex_diam))
+        ny = max(1, int(y_width / ex_diam))
+        grid_2d = nx * ny
+        
+        nz = math.ceil(n_fill / grid_2d)
+        dz = ex_diam # Vertical spacing
+        
+        insertion_lines = []
+        count = 0
+        z_max = z_start
+        
+        for iz in range(nz):
+            if count >= n_fill: break
+            
+            # Random offset for this layer to avoid perfect vertical alignment
+            ox = rng.uniform(0, x_width/nx)
+            oy = rng.uniform(0, y_width/ny)
+            
+            pz = z_start + iz * dz
+            z_max = max(z_max, pz)
+            
+            for ix in range(nx):
+                if count >= n_fill: break
+                for iy in range(ny):
+                    if count >= n_fill: break
+                    
+                    px = x_min + (ix + 0.5) * (x_width/nx) + ox
+                    py = y_min + (iy + 0.5) * (y_width/ny) + oy
+                    
+                    # Wrap x/y if offset pushed them out
+                    if px > x_max: px -= x_width
+                    if py > y_max: py -= y_width
+                    
+                    mol_id = rng.randint(1, n_templates)
+                    # Unique seed for each molecule placement (for random rotation)
+                    mol_seed = seed + count
+                    
+                    insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz:.6f} mol m{mol_id} {mol_seed}")
+                    count += 1
+        
+        insertion_path = os.path.join(outdir, "insertions.inc").replace("\\", "/")
+        os.makedirs(outdir, exist_ok=True)
+        with open(insertion_path, 'w') as f:
+            f.write("\n".join(insertion_lines))
+            
+        print(f"Generated 3D insertion file with {count} molecules: {insertion_path} (z_max={z_max:.3f})")
+        return insertion_path, z_max

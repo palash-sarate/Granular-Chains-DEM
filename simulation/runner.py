@@ -28,8 +28,10 @@ class SimulationRunner:
                     capture = True
                     continue
                 if capture:
-                    if not line.strip() or line.startswith("List of"):
+                    if line.startswith("List of"):
                         break
+                    if not line.strip():
+                        continue
                     packages.extend(line.split())
             self._features = packages
             return packages
@@ -160,29 +162,7 @@ class SimulationRunner:
    
         cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps.log"]
         
-        # Auto-detect features to ensure portability
-        supported_pkgs = self._get_lammps_features()
-        gpu_available = self._has_gpu()
-
-        # Add KOKKOS flags if enabled and supported
-        if config.use_kokkos and "KOKKOS" in supported_pkgs:
-            # -k on: enable kokkos
-            # g 1: use 1 GPU (if available)
-            # t config.num_threads: use N threads
-            # -sf kk: use kokkos suffix for styles
-            kokkos_cmd = ["-k", "on"]
-            if gpu_available:
-                kokkos_cmd.extend(["g", "1"])
-            kokkos_cmd.extend(["t", str(config.num_threads), "-sf", "kk"])
-            
-            cmd.extend(kokkos_cmd)
-            print(f"Applying KOKKOS acceleration (GPU={gpu_available}, threads={config.num_threads})")
-            
-        elif config.use_intel and "INTEL" in supported_pkgs:
-            # -sf intel: use intel suffix
-            cmd.extend(["-sf", "intel"])
-            print("Applying INTEL acceleration")
-            
+        self._apply_acceleration(cmd, config)
         self._execute(cmd, config, verbose)
 
     def resume(self, config: SimulationConfig, verbose: bool = True, prep_dirs: bool = True):
@@ -204,22 +184,59 @@ class SimulationRunner:
         
         cmd = [self.lammps_exe, "-in", script_to_run, "-log", f"{config.output_dir}/lammps_resume.log"]
         
-        # We can still pass variables via command line as a backup or for variables not in the script
-        # vars_dict = config.to_lammps_vars()
-        # for key, value in vars_dict.items():
-        #     cmd.extend(["-var", key, value])
-            
+        self._apply_acceleration(cmd, config)
         self._execute(cmd, config, verbose)
+
+    def _apply_acceleration(self, cmd: List[str], config: SimulationConfig):
+        """Detects hardware and applies optimal acceleration flags to the command."""
+        supported_pkgs = self._get_lammps_features()
+        gpu_available = self._has_gpu()
+
+        # Try KOKKOS
+        if config.use_kokkos and "KOKKOS" in supported_pkgs:
+            kokkos_cmd = ["-k", "on"]
+            if gpu_available:
+                kokkos_cmd.extend(["g", "1"])
+                print(f"Applying KOKKOS acceleration (GPU=Detected, threads={config.num_threads})")
+            else:
+                print(f"WARNING: GPU not detected via nvidia-smi. Falling back to KOKKOS-CPU (threads={config.num_threads})")
+            
+            kokkos_cmd.extend([
+                "t", str(config.num_threads),
+                "-sf", "kk",
+                "-pk", "kokkos", "newton", "on", "neigh", "half"
+            ])
+            cmd.extend(kokkos_cmd)
+            return
+
+        # Try INTEL
+        if config.use_intel and "INTEL" in supported_pkgs:
+            cmd.extend(["-sf", "intel"])
+            print(f"Applying INTEL acceleration (threads={config.num_threads})")
+            return
+        
+        # Fallback to OPENMP
+        if config.num_threads > 1 and "OPENMP" in supported_pkgs:
+            cmd.extend(["-sf", "omp", "-pk", "omp", str(config.num_threads)])
+            print(f"Applying OPENMP acceleration (threads={config.num_threads})")
+        else:
+            print(f"Standard execution (no acceleration) with {config.num_threads} threads.")
 
     def _execute(self, cmd: List[str], config: SimulationConfig, verbose: bool):
         # 1. Wrap command with mpiexec if parallelism is requested
-        nprocs = config.num_procs if config.num_procs is not None else os.cpu_count()
+        nprocs = config.num_procs if config.num_procs is not None else 1
         if nprocs and nprocs > 1:
-            cmd = ["mpiexec", "-n", str(nprocs)] + cmd
+            if config.num_threads > 1:
+                # Hybrid MPI+OpenMP: Bind each MPI process to a set of cores equal to num_threads
+                cmd = ["mpiexec", "--map-by", f"socket:PE={config.num_threads}", "--bind-to", "core", "-n", str(nprocs)] + cmd
+            else:
+                cmd = ["mpiexec", "--bind-to", "core", "--map-by", "socket", "-n", str(nprocs)] + cmd
             
         # 2. Prepare environment (OpenMP tuning)
         env = os.environ.copy()
         env["OMP_NUM_THREADS"] = str(config.num_threads)
+        env["OMP_PROC_BIND"] = "spread"
+        env["OMP_PLACES"] = "cores"
 
         cmd_str = ' '.join(cmd)
 

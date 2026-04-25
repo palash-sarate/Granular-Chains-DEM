@@ -48,7 +48,7 @@ class SimulationConfig:
     walls: Optional[Dict[str, Any]] = None     # keep-compatible: structured walls (converted by runner if present)
     
     # Parallelism
-    num_procs: Optional[int] = None
+    num_procs: int = 1
     num_threads: int = 1
     use_kokkos: bool = True
     use_intel: bool = True

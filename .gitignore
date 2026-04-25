@@ -12,3 +12,4 @@ temp_frame*
 
 /PBS_Output
 /Zips_dir/
+/benchmarking/**
