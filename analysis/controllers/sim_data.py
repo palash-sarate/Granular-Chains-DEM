@@ -96,10 +96,24 @@ class SimDataController:
         # Async loading state
         self.load_queue = Queue()
         self.loading_batches = set()
+        self._stop_flag = False
         self._worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
         self._worker_thread.start()
 
+    def stop_caching(self):
+        """Clears the queue and stops background processing."""
+        self._stop_flag = True
+        # Clear the queue
+        while not self.load_queue.empty():
+            try:
+                self.load_queue.get_nowait()
+                self.load_queue.task_done()
+            except:
+                break
+        self.loading_batches.clear()
+
     def load_folder(self, folder: str, force_reload: bool = False, enable_preloading: bool = True):
+        self._stop_flag = False
         try:
             new_source = SimulationData(folder)
             data_dict = new_source.load_data(force_reload=force_reload)
@@ -241,19 +255,22 @@ class SimDataController:
         while True:
             batch_idx = self.load_queue.get()
             if batch_idx is None: break
+            
+            if self._stop_flag:
+                self.load_queue.task_done()
+                continue
+                
             try:
                 print(f"Background loading batch {batch_idx}...")
                 data_dict = self.sim_source.load_batch(batch_idx)
-                
-                # Data is now stored directly in self.sim_source by batch index.
-                # We no longer perform expensive monolithic merges here.
                 
                 if self.on_batch_ready_cb:
                     self.on_batch_ready_cb(batch_idx)
             except Exception as e:
                 print(f"Error loading batch {batch_idx}: {e}")
             finally:
-                self.loading_batches.remove(batch_idx)
+                if batch_idx in self.loading_batches:
+                    self.loading_batches.remove(batch_idx)
                 self.load_queue.task_done()
 
     def _parse_single_dump(self, f: str):

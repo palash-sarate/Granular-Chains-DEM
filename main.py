@@ -77,9 +77,13 @@ def main():
 
     # 5. generate_relaxed_library
     p_lib = subparsers.add_parser("generate_relaxed_library", help="Generate relaxed chain states library")
-    p_lib.add_argument("--n_beads", type=int, default=4)
+    p_lib.add_argument("--n_beads", default="4")
     p_lib.add_argument("--n_states", type=int, default=10)
     p_lib.add_argument("--forced", action="store_true", help="Force re-generation if check exists")
+    p_lib.add_argument("--template", default="in.relax_3d_gen", help="LAMMPS input template name")
+    p_lib.add_argument("--output_dir", default="chain_data/relaxed", help="Base output directory")
+    p_lib.add_argument("--run_name_prefix", help="Prefix for simulation run names")
+    p_lib.add_argument("--simulation_name", default="Relax_Library_Gen", help="Simulation group name in dumping_yard")
     p_lib.add_argument("--dump_inc", default="simulation_templates/default_dump.inc", help="Dump settings file")
     p_lib.add_argument("--inParallel", type=int, default=1, dest="n_parallel", help="Number of simulations to run in parallel")
     p_lib.add_argument("--num_procs", type=int)
@@ -103,6 +107,26 @@ def main():
     p_batch.add_argument("--num_threads", type=int, default=1)
     p_batch.add_argument("--no-kokkos", action="store_false", dest="use_kokkos", help="Disable KOKKOS acceleration")
     p_batch.add_argument("--no-intel", action="store_false", dest="use_intel", help="Disable INTEL acceleration")
+
+    # 8. run_grid_batch_relaxation
+    p_grid = subparsers.add_parser("run_grid_batch_relaxation", help="Run a super-simulation for batch relaxation")
+    p_grid.add_argument("--n_beads", default="4,8,12,24,48,100")
+    p_grid.add_argument("--n_states", type=int, default=50)
+    p_grid.add_argument("--output_dir", default="chain_data/relaxed_grid")
+    p_grid.add_argument("--spacing", type=float, default=0.5)
+    p_grid.add_argument("--dt", type=float, default=1e-6)
+    p_grid.add_argument("--num_procs", type=int, default=1)
+    p_grid.add_argument("--num_threads", type=int, default=1)
+    p_grid.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
+    p_grid.add_argument("--no-intel", action="store_false", dest="use_intel")
+    p_grid.add_argument("--lepton_file", default="simulation_templates/lepton.inc")
+    p_grid.add_argument("--dump_file", default="simulation_templates/quiet_dump.inc")
+    p_grid.add_argument("--simulation", default="Grid_Relaxation_Batch")
+    p_grid.add_argument("--seed", type=int, default=None)
+    p_grid.add_argument("--motion_steps", type=int, default=500000)
+    p_grid.add_argument("--explore_steps", type=int, default=200000)
+    p_grid.add_argument("--viscous_relax_steps", type=int, default=300000)
+    p_grid.add_argument("--temperature", type=float, default=1e15)
 
     args = parser.parse_args()
     

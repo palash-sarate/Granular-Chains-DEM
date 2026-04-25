@@ -2,7 +2,10 @@ import os
 import subprocess
 import re
 import json
+import time
+from datetime import datetime
 from typing import List, Dict, Optional
+import numpy as np
 
 class PBSManager:
     METADATA_FILE = "Pulse/pulse_metadata.json"
@@ -306,3 +309,128 @@ class PBSManager:
             pass
             
         return temps
+
+class SimulationMonitor:
+    @staticmethod
+    def estimate_eta(directory: str, target_timestep: int) -> Dict:
+        """
+        Estimates the ETA for a running simulation based on dump files.
+        Logic:
+        1. Scan directory for chain_{timestep}.dump files.
+        2. Filter for every 10th file (based on sorted order).
+        3. Get modification times.
+        4. Extrapolate to target_timestep using a quadratic fit (handles slowdown).
+        """
+        if not os.path.exists(directory):
+            return {"error": f"Directory not found: {directory}"}
+
+        # 1. Collect all chain_*.dump files
+        files = []
+        try:
+            for f in os.listdir(directory):
+                match = re.match(r'chain_(\d+)\.dump', f)
+                if match:
+                    timestep = int(match.group(1))
+                    files.append((timestep, os.path.getmtime(os.path.join(directory, f))))
+        except Exception as e:
+            return {"error": f"Error scanning directory: {str(e)}"}
+
+        if not files:
+            return {"error": "No dump files found matching 'chain_*.dump'"}
+
+        files.sort() # Sort by timestep
+
+        # 2. Sample data points
+        # Every 10th file (0, 10, 20...)
+        sampled_files = files[::10]
+        
+        # Ensure we always include the latest file for better precision
+        if files[-1] not in sampled_files:
+            sampled_files.append(files[-1])
+            sampled_files.sort()
+
+        if len(sampled_files) < 2:
+            if len(files) >= 2:
+                sampled_files = files # Use all if we don't have enough for sampling
+            else:
+                return {"error": "Insufficient data: Need at least 2 dump files."}
+
+        # 3. Prepare for fit
+        x = np.array([f[0] for f in sampled_files])
+        y = np.array([f[1] for f in sampled_files]) # Timestamps in seconds
+
+        current_time = time.time()
+        current_timestep = files[-1][0]
+        
+        if current_timestep >= target_timestep:
+            return {
+                "status": "Target Reached",
+                "current_timestep": current_timestep,
+                "target_timestep": target_timestep,
+                "progress_percent": 100.0,
+                "time_remaining_hr": 0.0,
+                "time_elapsed_hr": (files[-1][1] - files[0][1]) / 3600.0,
+                "completion_time": datetime.fromtimestamp(files[-1][1]).strftime("%Y-%m-%d %H:%M:%S"),
+                "cost_per_10k_steps": 0.0,
+                "cost_history": [],
+                "data_points": len(sampled_files),
+                "last_updated": datetime.now().strftime("%H:%M:%S"),
+                "message": "The simulation has already reached or passed the target timestep."
+            }
+
+        # 4. Perform Extrapolation
+        # Quadratic fit: y = ax^2 + bx + c
+        # We use a 2nd degree polynomial because the computational cost often 
+        # increases linearly with time in growing systems, making total time quadratic.
+        degree = 2 if len(sampled_files) >= 3 else 1
+        
+        # Fit
+        coeffs = np.polyfit(x, y, degree)
+        poly = np.poly1d(coeffs)
+        
+        # Estimate completion time
+        estimated_completion_time = poly(target_timestep)
+        
+        # Safety Check: If quadratic extrapolation goes "backward" or is unrealistically fast 
+        # (can happen if the simulation recently sped up), fallback to latest linear rate.
+        last_x, last_y = files[-1]
+        prev_x, prev_y = files[-min(len(files), 5)] # Compare with something recent
+        
+        if last_x != prev_x:
+            latest_rate = (last_y - prev_y) / (last_x - prev_x)
+            linear_eta = last_y + (target_timestep - last_x) * latest_rate
+            
+            # If quadratic is faster than linear (rare in slowing sims) or in the past, use linear
+            if estimated_completion_time < current_time or estimated_completion_time < linear_eta:
+                estimated_completion_time = linear_eta
+
+        # Calculate metrics
+        time_remaining_sec = max(0, estimated_completion_time - current_time)
+        time_remaining_hr = time_remaining_sec / 3600.0
+        
+        # Time elapsed since the first discovered dump file
+        start_time = files[0][1]
+        time_elapsed_hr = (current_time - start_time) / 3600.0
+        
+        # Real world time
+        completion_dt = datetime.fromtimestamp(estimated_completion_time)
+        
+        # Performance trend (Seconds per 10k steps)
+        # We look at the derivative of the polynomial at the current timestep
+        # poly'(x) = 2ax + b
+        deriv = np.polyder(poly)
+        current_cost_per_step = deriv(current_timestep)
+        
+        return {
+            "status": "Active",
+            "current_timestep": current_timestep,
+            "target_timestep": target_timestep,
+            "progress_percent": (current_timestep / target_timestep) * 100,
+            "time_remaining_hr": time_remaining_hr,
+            "time_elapsed_hr": time_elapsed_hr,
+            "completion_time": completion_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "cost_per_10k_steps": current_cost_per_step * 10000 / 60.0, # in minutes
+            "cost_history": (deriv(x) * 10000 / 60.0).tolist(), # Convert numpy array to list for JSON/session_state
+            "data_points": len(sampled_files),
+            "last_updated": datetime.now().strftime("%H:%M:%S")
+        }

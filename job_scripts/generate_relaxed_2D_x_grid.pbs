@@ -1,0 +1,50 @@
+#!/bin/bash
+#PBS -N Grid_Relaxation_SuperSim
+#PBS -q workq
+#PBS -l walltime=12:00:00
+#PBS -l nodes=master:ppn=64
+#PBS -l mem=128gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/grid_relaxation_supersim.log
+# Standard error file
+#PBS -e PBS_Output/grid_relaxation_supersim_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# PBS Script for Super-Simulation Grid Relaxation
+# Packs all chains into one box and uses GPU (KOKKOS) for maximum speed.
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate environment
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+echo "Starting Super-Simulation Grid Relaxation at: $(date)"
+
+# Launch ONE massive simulation for all N values and all states
+# This will utilize KOKKOS and the GPU for the entire batch.
+python -u main.py run_grid_batch_relaxation \
+    --n_beads "4,8,10,12,24,48,100" \
+    --n_states 50 \
+    --output_dir "chain_data/relaxed_2D_x" \
+    --spacing 0.5 \
+    --num_procs 8 \
+    --num_threads 1 \
+    --lepton_file "simulation_templates/lepton.inc" \
+    --dump_file "simulation_templates/default_dump.inc" \
+    --simulation "Relax_2D_Library_Gen" \
+    --motion_steps 500000 \
+    --explore_steps 200000 \
+    --viscous_relax_steps 300000 \
+    --temperature 1e15
+
+echo "=============================================================================="
+echo "Super-Simulation and splitting complete at: $(date)"
+echo "=============================================================================="

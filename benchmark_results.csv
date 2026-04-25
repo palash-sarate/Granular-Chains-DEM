@@ -1,1 +1,0 @@
-type,parallel_jobs,threads_per_job,use_kokkos,use_intel,total_wall_time,throughput_states_per_hr,loop_time

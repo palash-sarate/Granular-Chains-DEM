@@ -1,0 +1,49 @@
+#!/bin/bash
+#PBS -N Relaxed_2D_States_Batch
+#PBS -q workq
+#PBS -l walltime=24:00:00
+#PBS -l nodes=master:ppn=128
+#PBS -l mem=28gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/generate_relaxed_2D_x_batch.log
+# Standard error file
+#PBS -e PBS_Output/generate_relaxed_2D_x_batch_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# PBS Script to Batch Generate 2D Relaxed Chain Libraries
+# Optimized for full 64-core utilization across multiple N values.
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate environment
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+echo "Starting Batch 2D Library Generation at: $(date)"
+
+# 3. Batch generate across all desired N values
+# This uses a single pool of 64 workers to process all N-states simultaneously.
+python -u main.py generate_relaxed_library \
+    --n_beads "4,8,10,12,24,48,100" \
+    --n_states 50 \
+    --inParallel 100 \
+    --num_procs 1 \
+    --num_threads 1 \
+    --template "in.relax_2d_gen" \
+    --dump_inc "simulation_templates/default_dump.inc" \
+    --output_dir "chain_data/relaxed_2D_x" \
+    --run_name_prefix "relax_N{N}_2D_x" \
+    --simulation_name "Relax_2D_Library_Gen" \
+    --no-kokkos \
+    --forced
+
+echo "=============================================================================="
+echo "Batch generation complete at: $(date)"
+echo "=============================================================================="

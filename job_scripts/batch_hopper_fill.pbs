@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -N Hopper_Fill_Batch_N4
 #PBS -q workq
-#PBS -l walltime=24:00:00
-#PBS -l nodes=master:ppn=32
+#PBS -l walltime=10:00:00
+#PBS -l nodes=master:ppn=128
 #PBS -l mem=64gb
 #PBS -m aeb
 #PBS -M palashsarate@iisc.ac.in
@@ -35,12 +35,12 @@ echo ""
 # 3. Parameters
 # Chain lengths to process
 CHAIN_LENGTHS=(4)
-STATES_PER_N=10
+STATES_PER_N=1
 TOTAL_ATOMS=24000
 
 # Parallelism configuration
 PARALLEL_JOBS=1
-PROCS_PER_JOB=8
+PROCS_PER_JOB=64
 THREADS_PER_JOB=1
 
 echo "=== 3. STARTING BATCH PROCESSING (PARALLEL) ==="
@@ -74,18 +74,19 @@ do
         # Run in background
         python -u main.py run_hopper_fill \
             --source_dir "chain_data/relaxed/N${n}" \
-            --fill_template "in.hopper_fill_uniform_tall" \
+            --fill_template "in.hopper_fill_uniform" \
             --n_fill $N_FILL \
             --run_name "$RUN_NAME" \
             --setup_inc "simulation_geometries/2D_hopper_setup.inc" \
             --dump_inc "simulation_templates/default_dump.inc" \
             --N $n \
+            --viscosity 0.0001 \
             --seed $SEED \
             --num_procs $PROCS_PER_JOB \
             --num_threads $THREADS_PER_JOB \
             --no-intel \
+            --no-kokkos \
             --relax_steps 100000 > $LOG_FILE 2>&1 &
-            # --no-kokkos \
             
         # Limit number of parallel jobs
         # Check current running background jobs

@@ -1,0 +1,49 @@
+# LAMMPS Grid-Based Batch Relaxation Template
+# Optimized for KOKKOS and high-count chain relaxation
+
+units       si
+atom_style hybrid sphere angle
+boundary    f f f
+
+comm_modify vel yes cutoff 0.05
+special_bonds lj/coul 1.0 1.0 1.0
+
+read_data ${data_file}
+
+# --- FORCE FIELD ---
+include ${lepton_inc}
+
+neighbor 0.005 bin
+neigh_modify delay 0 every 1 check yes
+
+# Increase communication cutoff to ensure stability with grid layout
+comm_modify cutoff 0.1 
+
+group chain_particles type 1
+
+timestep ${dt}
+
+# Include the external dump settings (e.g., quiet_dump.inc or default_dump.inc)
+include ${dump_inc}
+
+# --- Step 1: Initialize 2D Restricted Motion ---
+# Random shaking in YZ plane
+velocity all create ${temperature} ${seed} mom yes rot yes
+velocity all set 0.0 NULL NULL
+fix freeze_x all setforce 0.0 NULL NULL
+
+fix 1 all nve
+run ${motion_steps}
+
+# --- Step 2: Exploration Phase ---
+run ${explore_steps}
+
+# --- Step 3: Viscous Relaxation ---
+fix 2 all viscous 10.0
+run ${viscous_relax_steps}
+
+# --- Step 4: Final Minimization ---
+minimize 1e-12 1e-12 10000 100000
+
+# Write the final large grid state
+write_data ${outdir}/relaxed_grid.data

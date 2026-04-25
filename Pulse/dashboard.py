@@ -1,9 +1,57 @@
 import streamlit as st
 import pandas as pd
-from pulse_core import PBSManager
+import sys
+import os
 import time
 import subprocess
 import psutil
+import tempfile
+
+# Add project root to sys.path to allow importing from analysis module
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from pulse_core import PBSManager, SimulationMonitor
+from analysis.controllers.sim_data import SimDataController
+from analysis.controllers.renderer import SimulationRenderer
+from analysis.controllers.highlighter import HighlightController
+from vedo import Plotter
+
+def st_directory_picker(label, key, base_path):
+    """A simple directory picker for Streamlit."""
+    if key not in st.session_state:
+        st.session_state[key] = base_path
+        
+    curr = st.session_state[key]
+    
+    # Ensure path exists
+    if not os.path.exists(curr):
+        curr = base_path
+        st.session_state[key] = base_path
+
+    st.markdown(f"**{label}**")
+    st.code(curr, language="bash")
+    
+    c1, c2, c3 = st.columns([1, 1, 3])
+    if c1.button("⬆️ Up", key=f"{key}_up"):
+        st.session_state[key] = os.path.dirname(curr)
+        st.rerun()
+    if c2.button("🏠 Home", key=f"{key}_home"):
+        st.session_state[key] = base_path
+        st.rerun()
+        
+    try:
+        subdirs = sorted([d for d in os.listdir(curr) if os.path.isdir(os.path.join(curr, d)) and not d.startswith(".")])
+        if subdirs:
+            chosen = st.selectbox("Browse subdirectories:", ["-- Select to enter --"] + subdirs, key=f"{key}_browse")
+            if chosen != "-- Select to enter --":
+                st.session_state[key] = os.path.join(curr, chosen)
+                st.rerun()
+    except Exception as e:
+        st.error(f"Access error: {e}")
+        
+    return st.session_state[key]
 
 st.set_page_config(page_title="Pulse Dashboard", page_icon="⚡", layout="wide")
 
@@ -18,8 +66,8 @@ user_filter = st.sidebar.text_input("User Filter", value="guest")
 if st.sidebar.button("Refresh Now"):
     st.rerun()
 
-# Create Tabs for Active vs History
-tab1, tab2 = st.tabs(["📊 Active Queue", "history 🕰️ Job History"])
+# Create Tabs for Active vs History vs ETA vs Visualizer
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Active Queue", "🕰️ Job History", "⏱️ Simulation ETA", "🎥 Visualizer"])
 
 with tab1:
     # Fetch active jobs
@@ -168,6 +216,268 @@ with tab2:
             st.rerun()
     else:
         st.info("No historical jobs found in metadata. Try running a Bulk Scan above!")
+
+with tab3:
+    st.subheader("⏱️ Simulation ETA Estimator")
+    st.markdown("Analyze dump timestamps to estimate completion time, accounting for simulation slowdown.")
+    
+    base_yard = "/home/guest/palash/Granular-Chains-DEM/dumping_yard"
+    
+    # 1. Advanced Picker vs Quick Picker
+    pick_mode = st.radio("Selection Mode", ["🔍 Auto-Detect", "📂 Manual Browser"], horizontal=True)
+    
+    dump_dir = ""
+    
+    if pick_mode == "🔍 Auto-Detect":
+        # Find all directories containing chain_*.dump
+        with st.spinner("Scanning dumping_yard..."):
+            detected = []
+            if os.path.exists(base_yard):
+                # We limit depth for speed
+                for root, dirs, files in os.walk(base_yard):
+                    if any(f.startswith("chain_") and f.endswith(".dump") for f in files):
+                        detected.append(root)
+                    if len(detected) > 20: break # Safety limit
+            
+            if detected:
+                dump_dir = st.selectbox("Select an active simulation dump folder:", detected)
+            else:
+                st.warning("No active dump folders (chain_*.dump) found in dumping_yard.")
+                st.info("Try switching to 'Manual Browser' mode.")
+    else:
+        dump_dir = st_directory_picker("Select Dump Directory", "eta_browser_path", base_yard)
+
+    # 2. Target Timestep
+    target_ts = st.number_input(
+        "Target Timestep", 
+        value=int(st.session_state.get("eta_target_ts", 2000000)),
+        step=100000,
+        help="The timestep you want to reach."
+    )
+    st.session_state["eta_target_ts"] = target_ts
+    
+    if dump_dir:
+        # Save for persistence
+        st.session_state["eta_dump_dir"] = dump_dir
+        
+        with st.spinner("Analyzing simulation progress..."):
+            eta_data = SimulationMonitor.estimate_eta(dump_dir, target_ts)
+            
+        if "error" in eta_data:
+            st.error(eta_data["error"])
+        else:
+            # 2. Key Metrics
+            st.divider()
+            m_col1, m_col2, m_col3 = st.columns(3)
+            
+            # Progress bar
+            progress = min(1.0, eta_data['progress_percent'] / 100.0)
+            st.progress(progress, text=f"Simulation Progress: {eta_data['progress_percent']:.1f}%")
+            
+            # Format Time Elapsed
+            e_hrs = int(eta_data['time_elapsed_hr'])
+            e_mins = int((eta_data['time_elapsed_hr'] - e_hrs) * 60)
+            m_col1.metric("Time Elapsed", f"{e_hrs}h {e_mins}m")
+
+            # Format ETA
+            hrs = int(eta_data['time_remaining_hr'])
+            mins = int((eta_data['time_remaining_hr'] - hrs) * 60)
+            m_col2.metric("ETA Remaining", f"{hrs}h {mins}m")
+            
+            m_col3.metric("Real-world Completion", eta_data['completion_time'].split(" ")[1], help=eta_data['completion_time'])
+
+            # 3. Status Card
+            st.divider()
+            s1, s2, s3 = st.columns(3)
+            s1.metric("Steps Remaining", f"{target_ts - eta_data['current_timestep']:,}")
+            
+            # Format Cost per 10k steps
+            cost_m = eta_data['cost_per_10k_steps']
+            if cost_m >= 1:
+                cost_str = f"{int(cost_m)}m"
+            else:
+                cost_str = f"{int(cost_m * 60)}s"
+            
+            s2.markdown("**Cost per 10k steps**")
+            sc1, sc2, sc3 = s2.columns([1, 1.5, 0.5], vertical_alignment="bottom")
+            sc1.metric("", cost_str, label_visibility="collapsed")
+            if eta_data.get("cost_history"):
+                sc2.line_chart(eta_data["cost_history"], height=60, use_container_width=True)
+            # sc3 acts as a spacer
+            
+            s3.metric("Data Points", f"{eta_data['data_points']}")
+            if eta_data.get("status") == "Target Reached":
+                st.success(f"✅ {eta_data['message']}")
+            else:
+                st.info(f"🎯 **Target Reached By:** {eta_data['completion_time']}")
+            
+            # 4. Performance Insights
+            with st.expander("📈 Performance Details"):
+                p_col1, p_col2 = st.columns(2)
+                p_col1.write(f"**Current Timestep:** {eta_data['current_timestep']:,}")
+                p_col1.write(f"**Data points sampled:** {eta_data['data_points']}")
+                p_col2.write(f"**Current Speed:** {eta_data['cost_per_10k_steps']:.1f} min / 10k steps")
+                p_col2.write(f"**Last File Sync:** {eta_data['last_updated']}")
+                
+                st.caption("Note: Estimation uses a quadratic fit to account for simulation slowdown as more particles enter the system.")
+
+    else:
+        st.info("Enter a dump directory path above to begin tracking.")
+
+with tab4:
+    st.subheader("🎥 Advanced Simulation Visualizer")
+    st.markdown("Leverage the full power of the analysis viewer to explore simulation states in 3D.")
+    
+    # 1. Folder Selection (Shared base path)
+    viz_mode = st.radio("Selection Mode", ["🔍 Auto-Detect", "📂 Manual Browser"], horizontal=True, key="viz_pick_mode")
+    viz_dir = ""
+    
+    if viz_mode == "🔍 Auto-Detect":
+        with st.spinner("Scanning for simulation data..."):
+            detected_viz = []
+            if os.path.exists(base_yard):
+                for root, dirs, files in os.walk(base_yard):
+                    if any(f.startswith("chain_") and f.endswith(".dump") for f in files):
+                        # If we found dump files, the simulation root is either this folder
+                        # or its parent (if this folder is named 'chain')
+                        if os.path.basename(root).lower() == "chain":
+                            detected_viz.append(os.path.dirname(root))
+                        else:
+                            detected_viz.append(root)
+                    if len(detected_viz) > 20: break
+            if detected_viz:
+                viz_dir = st.selectbox("Select simulation to visualize:", detected_viz, key="viz_select")
+            else:
+                st.warning("No dump folders found.")
+    else:
+        viz_dir = st_directory_picker("Select Simulation Folder", "viz_browser_path", base_yard)
+    
+    col_pre1, col_pre2 = st.columns([1, 1])
+    enable_pre = col_pre1.checkbox("Enable Background Preloading", value=True, help="Automatically parse and cache all dump files in the background.")
+    if st.button("🛑 Stop Caching", use_container_width=True):
+        if "viz_data_ctrl" in st.session_state:
+            st.session_state.viz_data_ctrl.stop_caching()
+            st.warning("Background caching stopped.")
+
+    if viz_dir:
+        # Resolve the simulation root (handles case where user selects 'chain' folder directly)
+        resolved_dir = st.session_state.viz_data_ctrl.resolve_sim_root(viz_dir) if "viz_data_ctrl" in st.session_state else viz_dir
+        if not resolved_dir:
+            resolved_dir = viz_dir # Fallback
+            
+        # 2. Initialize Controllers in Session State
+        if "viz_data_ctrl" not in st.session_state or st.session_state.get("viz_last_dir") != resolved_dir:
+            st.session_state.viz_data_ctrl = SimDataController()
+            with st.spinner(f"Loading metadata from {os.path.basename(resolved_dir)}..."):
+                success, msg, _ = st.session_state.viz_data_ctrl.load_folder(resolved_dir, enable_preloading=enable_pre)
+                if not success:
+                    st.error(f"Failed to load: {msg}")
+                else:
+                    st.session_state.viz_last_dir = resolved_dir
+        
+        data_ctrl = st.session_state.viz_data_ctrl
+        
+        # 3. Caching Progress Bar (for background parsing)
+        if data_ctrl.sim_source:
+            total_b = data_ctrl.sim_source.get_batch_count()
+            loaded_b = len(data_ctrl.sim_source.loaded_batches)
+            
+            if loaded_b < total_b:
+                st.progress(loaded_b / total_b, text=f"⚡ Background Caching: {loaded_b}/{total_b} batches loaded")
+                if st.button("🔄 Update Timesteps", help="Refresh the slider with newly cached timesteps"):
+                    st.rerun()
+            elif loaded_b == total_b:
+                st.success(f"✅ All {total_b} batches ( {len(data_ctrl.timesteps)} timesteps) cached in memory.", icon="🔥")
+
+        if data_ctrl.timesteps:
+            # 3. Controls Layout
+            c1, c2 = st.columns([1, 3])
+            
+            with c1:
+                st.markdown("### 🕹️ Controls")
+                target_ts = st.select_slider("Timestep", options=data_ctrl.timesteps, value=data_ctrl.timesteps[0])
+                
+                show_geo = st.checkbox("Show Geometry", value=True)
+                show_axes = st.checkbox("Show Axes", value=True)
+                
+                st.divider()
+                st.markdown("### 🔦 Highlighting")
+                hl_mode = st.selectbox("Mode", ["chain", "atom", "bond", "angle"])
+                hl_spec = st.text_input("ID(s)", value="", placeholder="e.g. 1-5, 10", help="Use ranges like 1-5 or comma separated lists.")
+                
+                render_btn = st.button("🚀 Render Frame", use_container_width=True)
+
+            with c2:
+                if render_btn or "viz_html" in st.session_state:
+                    if render_btn:
+                        with st.spinner("Rendering 3D scene..."):
+                            # Setup Plotter
+                            plt = Plotter(offscreen=True, bg='white')
+                            
+                            # Setup Controllers (using the same logic as ui_viewer.py)
+                            # Note: vtk_ctrl and hl_ctrl are needed for the renderer
+                            from analysis.controllers.vtk_overlay import VtkOverlayController
+                            vtk_ctrl = VtkOverlayController(plt)
+                            
+                            # Highlighter needs a callback to get current data
+                            hl_ctrl = HighlightController(plt, 
+                                                        lambda: (data_ctrl.get_atom_data_at_timestep(target_ts), target_ts),
+                                                        lambda: int(st.session_state.get("eta_target_ts", 4))) # Fallback for N
+                            
+                            renderer = SimulationRenderer(plt, data_ctrl, vtk_ctrl, hl_ctrl, lambda: {'show_geometry': show_geo})
+                            
+                            # Apply Highlight if spec is provided
+                            if hl_spec.strip():
+                                success, msg = hl_ctrl.apply(hl_mode, hl_spec)
+                                if not success:
+                                    st.warning(msg)
+                                else:
+                                    st.caption(f"Applied: {msg}")
+
+                            # Render the timestep
+                            renderer.show_timestep(target_ts)
+                            if show_axes:
+                                renderer.update_persistent_bounds()
+                                renderer.update_axes()
+                            
+                            # Export to X3D (more compatible in headless than HTML/k3d)
+                            temp_x3d = os.path.join(tempfile.gettempdir(), f"pulse_viz_{target_ts}.x3d")
+                            plt.export(temp_x3d)
+                            
+                            with open(temp_x3d, 'r') as f:
+                                x3d_content = f.read()
+                            
+                            # Wrap in X3DOM template for interactive browser viewing
+                            # Remove XML declaration to embed cleanly
+                            if "?>" in x3d_content:
+                                x3d_content = x3d_content.split("?>", 1)[1]
+
+                            st.session_state.viz_html = f"""
+                            <html>
+                            <head>
+                                <script type='text/javascript' src='https://www.x3dom.org/download/x3dom.js'> </script>
+                                <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'></link>
+                                <style>
+                                    x3d {{ width: 100%; height: 650px; border: 1px solid #eee; border-radius: 8px; }}
+                                    body {{ margin: 0; padding: 0; background: white; }}
+                                </style>
+                            </head>
+                            <body>
+                                {x3d_content}
+                            </body>
+                            </html>
+                            """
+                            
+                            # Cleanup actors
+                            plt.close()
+                    
+                    # Display the rendered HTML
+                    import streamlit.components.v1 as components
+                    components.html(st.session_state.viz_html, height=700, scrolling=True)
+        else:
+            st.info("No timesteps discovered in this folder.")
+    else:
+        st.info("Select a simulation folder to begin visualization.")
 
 # 5. System Status (Master Node only)
 if "master" in subprocess.getoutput("hostname"):

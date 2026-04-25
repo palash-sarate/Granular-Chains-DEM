@@ -156,13 +156,33 @@ class SimulationOrchestrator:
         print(f"Resuming simulation: {config.simulation}=>{config.run}")
         runner.resume(config)
 
-    def generate_relaxed_library(self, n_beads: int = 4, n_states: int = 10, forced: bool = False, dump_inc: str = "simulation_templates/default_dump.inc", n_parallel: int = 1, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
+    def generate_relaxed_library(self, n_beads: Any = 4, n_states: int = 10, forced: bool = False, 
+                                 output_dir: str = "chain_data/relaxed",
+                                 template: str = "in.relax_3d_gen",
+                                 run_name_prefix: Optional[str] = None,
+                                 simulation_name: str = "Relax_Library_Gen",
+                                 dump_inc: str = "simulation_templates/default_dump.inc", 
+                                 n_parallel: int = 1, num_procs: int = None, num_threads: int = 1, 
+                                 use_kokkos: bool = True, use_intel: bool = True):
         """Generate a library of relaxed chain states for future hopper insertions."""
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         lib_gen = LibraryGenerator(runner, forced)
-        lib_gen.generate_library(
-            n_beads=n_beads, 
-            n_states=n_states,
+        
+        # Handle single N vs multiple Ns
+        if isinstance(n_beads, str):
+            n_beads_list = [int(n.strip()) for n in n_beads.split(",")]
+        elif isinstance(n_beads, list):
+            n_beads_list = n_beads
+        else:
+            n_beads_list = [int(n_beads)]
+
+        lib_gen.generate_batch_library(
+            n_beads_list=n_beads_list, 
+            n_states_per_n=n_states,
+            output_dir=output_dir,
+            template=template,
+            run_name_prefix=run_name_prefix,
+            simulation_name=simulation_name,
             dump_inc=dump_inc,
             n_parallel=n_parallel,
             num_procs=num_procs,
@@ -224,6 +244,84 @@ class SimulationOrchestrator:
                     runner = SimulationRunner(lammps_executable=self.lammps_executable)
                     runner.run(config, verbose=False, clean_dir=True)
                     eta.update(completed)
+
+    def run_grid_batch_relaxation(self, n_beads: Any = "4,8,12,24,48,100", n_states: int = 50,
+                                  output_dir: str = "chain_data/relaxed_grid",
+                                  spacing: float = 0.5,
+                                  seed: Optional[int] = None,
+                                  dt: float = 1e-6,
+                                  num_procs: int = 1,
+                                  num_threads: int = 1,
+                                  use_kokkos: bool = True,
+                                  use_intel: bool = True,
+                                  lepton_file: str = "simulation_templates/lepton.inc",
+                                  dump_file: str = "simulation_templates/quiet_dump.inc",
+                                  simulation: str = "Grid_Relaxation_Batch",
+                                  motion_steps: int = 500000,
+                                  explore_steps: int = 200000,
+                                  viscous_relax_steps: int = 300000,
+                                  temperature: float = 1e15):
+        """
+        Runs a massive batch relaxation using a single grid-based simulation.
+        This is the most performant way to generate large libraries using GPUs.
+        """
+        from simulation.grid_manager import GridRelaxManager
+        from simulation.runner import SimulationRunner
+        from simulation.config import SimulationConfig
+        
+        if seed is None:
+            seed = int(time.time()) % 1000000
+            
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        grid_manager = GridRelaxManager(runner)
+        
+        # 1. Parse N list
+        if isinstance(n_beads, str):
+            n_beads_list = [int(n.strip()) for n in n_beads.split(",")]
+        elif isinstance(n_beads, list):
+            n_beads_list = n_beads
+        else:
+            n_beads_list = [int(n_beads)]
+            
+        # 2. Generate Grid Data
+        print(f"--- Preparing Grid Data for {len(n_beads_list)} N-values x {n_states} states ---")
+        grid_data_path, metadata = grid_manager.generate_grid_data(n_beads_list, n_states, spacing)
+        
+        # 3. Configure Super-Simulation
+        # We'll use a specific run name in dumping yard
+        run_name = f"Grid_Relax_Batch_{len(n_beads_list)}N_{n_states}S"
+        
+        config = SimulationConfig(
+            template="in.grid_relax",
+            data_file=str(grid_data_path),
+            lepton_file=lepton_file,
+            dump_file=dump_file, 
+            simulation=simulation,
+            run=run_name,
+            extra_vars={
+                "seed": seed,
+                "motion_steps": motion_steps, 
+                "explore_steps": explore_steps, 
+                "viscous_relax_steps": viscous_relax_steps, 
+                "dt": dt,
+                "temperature": temperature
+            },
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            use_intel=use_intel
+        )
+        
+        # 4. Run the Super-Simulation
+        print(f"--- Starting Super-Simulation: {run_name} ---")
+        runner.run(config)
+        
+        # 5. Split Results
+        final_grid_data = Path(config.output_dir) / "relaxed_grid.data"
+        if final_grid_data.exists():
+            grid_manager.split_grid_results(final_grid_data, metadata, output_dir)
+        else:
+            print(f"Error: Final grid data not found at {final_grid_data}")
 
     def run_hopper_flow(self, N: int = 4, run_steps: int = 200000, orifice_width: float = 0.05, dt: float = 1e-6):
         """(Upcoming) Run a hopper discharge/flow simulation."""
