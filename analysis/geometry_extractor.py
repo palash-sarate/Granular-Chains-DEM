@@ -58,7 +58,8 @@ def main():
     parser.add_argument("--radius", type=float, default=None, help="Surface reconstruction radius (defaults to 1.2 * spacing)")
     parser.add_argument("--lammps_cmd", default="lmp", help="LAMMPS executable")
 
-    parser.add_argument("--regions", nargs="+", default=["simbox"], help="List of LAMMPS region names to fill")
+    parser.add_argument("--regions", nargs="+", help="List of LAMMPS region names to fill")
+    parser.add_argument("--auto-vis", action="store_true", help="Automatically find regions ending in _vis in the .inc file")
     parser.add_argument("--combined", action="store_true", help="Extract all regions into a single mesh file")
     parser.add_argument("--bounds", nargs=6, type=float,
                         default=[-0.2, 0.2, -0.3, 0.3, -0.1, 0.6],
@@ -79,6 +80,21 @@ def main():
         for v in args.var:
             k, val = v.split("=")
             extra_vars[k] = val
+
+    # Auto-detect regions if requested or if no regions provided
+    if args.auto_vis or not args.regions:
+        with open(inc_file, "r") as f:
+            detected = [line.split()[1] for line in f if line.strip().startswith("region") and "_vis" in line]
+        if detected:
+            print(f"[INFO] Auto-detected {len(detected)} visualization regions.")
+            if args.regions:
+                # Deduplicate if some were manually provided
+                args.regions = list(set(args.regions + detected))
+            else:
+                args.regions = detected
+        else:
+            if not args.regions:
+                args.regions = ["simbox"]
 
     vtk_files = []
 
@@ -125,6 +141,10 @@ def main():
         vtk_files.append(vtk_file)
 
     print(f"[DONE] Generated {len(vtk_files)} meshes.")
+
+    if not os.environ.get("DISPLAY"):
+        print("[INFO] No DISPLAY detected. Skipping interactive visualization.")
+        return
 
     try:
         import vedo

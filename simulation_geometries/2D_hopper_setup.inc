@@ -1,2 +1,4 @@
 include simulation_geometries/2D_hopper.inc
+include simulation_geometries/2D_hopper_orifice.inc
+include simulation_geometries/2D_hopper_funnel.inc
 include simulation_geometries/2D_hopper_stubs_array.inc

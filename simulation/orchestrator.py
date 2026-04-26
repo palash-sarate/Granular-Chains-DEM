@@ -323,6 +323,86 @@ class SimulationOrchestrator:
         else:
             print(f"Error: Final grid data not found at {final_grid_data}")
 
+    def run_grid_hopper_filling(self, n_hoppers: int = 4, n_fill: int = 10, N: int = 4,
+                                spacing: float = 1.0, relax_steps: int = 500000,
+                                seed: Optional[int] = None, dt: float = 1e-6,
+                                output_dir: str = "chain_data/grid_filled",
+                                source_dir: Optional[str] = None,
+                                hopper_template_data: str = "simulation_geometries/2D_hopper.data",
+                                lepton_file: str = "simulation_templates/lepton.inc",
+                                dump_file: str = "simulation_templates/quiet_dump.inc",
+                                viscosity: float = 0.001,
+                                num_procs: int = 1, num_threads: int = 1,
+                                use_kokkos: bool = True,
+                                mode: str = "2D_stacked",
+                                simulation: str = "Grid_Hopper_Filling",
+                                template: str = "in.grid_hopper_fill"):
+        """
+        Main entry point for grid-based batch hopper filling.
+        Packs multiple hoppers into one simulation box for faster generation.
+        """
+        from simulation.grid_hopper_manager import GridHopperManager
+        from simulation.runner import SimulationRunner
+        
+        if seed is None:
+            seed = int(time.time()) % 1000000
+            
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        grid_manager = GridHopperManager(runner)
+        
+        grid_manager.run_grid_filling(
+            n_hoppers=n_hoppers,
+            n_fill_per_hopper=n_fill,
+            N=N,
+            spacing=spacing,
+            relax_steps=relax_steps,
+            seed=seed,
+            dt=dt,
+            output_dir=output_dir,
+            source_dir=source_dir,
+            hopper_template_data=hopper_template_data,
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            viscosity=viscosity,
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            mode=mode,
+            simulation=simulation,
+            template=template
+        )
+
+    def resume_grid_hopper_filling(self, restart_path: str, relax_steps: int = 500000,
+                                  dt: float = 1e-6, output_dir: str = "chain_data/grid_filled",
+                                  lepton_file: str = "simulation_templates/lepton.inc",
+                                  dump_file: str = "simulation_templates/quiet_dump.inc",
+                                  viscosity: float = 0.001,
+                                  num_procs: int = 1, num_threads: int = 1,
+                                  use_kokkos: bool = True,
+                                  template: str = "in.grid_hopper_fill_resume"):
+        """
+        Resumes a grid hopper filling simulation from a restart file.
+        """
+        from simulation.grid_hopper_manager import GridHopperManager
+        from simulation.runner import SimulationRunner
+        
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        grid_manager = GridHopperManager(runner)
+        
+        grid_manager.resume_grid_filling(
+            restart_path=restart_path,
+            relax_steps=relax_steps,
+            dt=dt,
+            output_dir=output_dir,
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            viscosity=viscosity,
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos,
+            template=template
+        )
+
     def run_hopper_flow(self, N: int = 4, run_steps: int = 200000, orifice_width: float = 0.05, dt: float = 1e-6):
         """(Upcoming) Run a hopper discharge/flow simulation."""
         print(f"Hopper Flow Simulation (N={N}) - Backend logic coming soon!")

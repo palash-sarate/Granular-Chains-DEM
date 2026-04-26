@@ -16,7 +16,7 @@ from pulse_core import PBSManager, SimulationMonitor
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
 from analysis.controllers.highlighter import HighlightController
-from vedo import Plotter
+import vedo
 
 def st_directory_picker(label, key, base_path):
     """A simple directory picker for Streamlit."""
@@ -300,7 +300,7 @@ with tab3:
             
             s2.markdown("**Cost per 10k steps**")
             sc1, sc2, sc3 = s2.columns([1, 1.5, 0.5], vertical_alignment="bottom")
-            sc1.metric("", cost_str, label_visibility="collapsed")
+            sc1.metric("Speed", cost_str, label_visibility="collapsed")
             if eta_data.get("cost_history"):
                 sc2.line_chart(eta_data["cost_history"], height=60, use_container_width=True)
             # sc3 acts as a spacer
@@ -321,163 +321,103 @@ with tab3:
                 
                 st.caption("Note: Estimation uses a quadratic fit to account for simulation slowdown as more particles enter the system.")
 
-    else:
-        st.info("Enter a dump directory path above to begin tracking.")
-
 with tab4:
-    st.subheader("🎥 Advanced Simulation Visualizer")
-    st.markdown("Leverage the full power of the analysis viewer to explore simulation states in 3D.")
+    st.subheader("🎥 VTK Geometry Visualizer")
+    st.markdown("Directly visualize VTK mesh files generated from analytical geometry or simulation results.")
     
-    # 1. Folder Selection (Shared base path)
-    viz_mode = st.radio("Selection Mode", ["🔍 Auto-Detect", "📂 Manual Browser"], horizontal=True, key="viz_pick_mode")
-    viz_dir = ""
+    # 1. Simple File Selection
+    vtk_path = st.text_input("Enter VTK File Path:", 
+                            value=st.session_state.get("last_vtk_path", os.path.join(ROOT_DIR, "out_mesh/replicated_geometry/combined_mesh.vtk")),
+                            placeholder="e.g. out_mesh/replicated_geometry/combined_mesh.vtk")
     
-    if viz_mode == "🔍 Auto-Detect":
-        with st.spinner("Scanning for simulation data..."):
-            detected_viz = []
-            if os.path.exists(base_yard):
-                for root, dirs, files in os.walk(base_yard):
-                    if any(f.startswith("chain_") and f.endswith(".dump") for f in files):
-                        # If we found dump files, the simulation root is either this folder
-                        # or its parent (if this folder is named 'chain')
-                        if os.path.basename(root).lower() == "chain":
-                            detected_viz.append(os.path.dirname(root))
-                        else:
-                            detected_viz.append(root)
-                    if len(detected_viz) > 20: break
-            if detected_viz:
-                viz_dir = st.selectbox("Select simulation to visualize:", detected_viz, key="viz_select")
-            else:
-                st.warning("No dump folders found.")
-    else:
-        viz_dir = st_directory_picker("Select Simulation Folder", "viz_browser_path", base_yard)
+    # Quick select from common locations
+    st.markdown("**Common Locations:**")
+    c1, c2 = st.columns(2)
+    if c1.button("📂 Replicated Grid Mesh"):
+        vtk_path = os.path.join(ROOT_DIR, "out_mesh/replicated_geometry/combined_mesh.vtk")
+        st.session_state["last_vtk_path"] = vtk_path
     
-    col_pre1, col_pre2 = st.columns([1, 1])
-    enable_pre = col_pre1.checkbox("Enable Background Preloading", value=True, help="Automatically parse and cache all dump files in the background.")
-    if st.button("🛑 Stop Caching", use_container_width=True):
-        if "viz_data_ctrl" in st.session_state:
-            st.session_state.viz_data_ctrl.stop_caching()
-            st.warning("Background caching stopped.")
+    st.divider()
 
-    if viz_dir:
-        # Resolve the simulation root (handles case where user selects 'chain' folder directly)
-        resolved_dir = st.session_state.viz_data_ctrl.resolve_sim_root(viz_dir) if "viz_data_ctrl" in st.session_state else viz_dir
-        if not resolved_dir:
-            resolved_dir = viz_dir # Fallback
-            
-        # 2. Initialize Controllers in Session State
-        if "viz_data_ctrl" not in st.session_state or st.session_state.get("viz_last_dir") != resolved_dir:
-            st.session_state.viz_data_ctrl = SimDataController()
-            with st.spinner(f"Loading metadata from {os.path.basename(resolved_dir)}..."):
-                success, msg, _ = st.session_state.viz_data_ctrl.load_folder(resolved_dir, enable_preloading=enable_pre)
-                if not success:
-                    st.error(f"Failed to load: {msg}")
-                else:
-                    st.session_state.viz_last_dir = resolved_dir
+    if vtk_path and os.path.exists(vtk_path):
+        st.session_state["last_vtk_path"] = vtk_path
         
-        data_ctrl = st.session_state.viz_data_ctrl
+        c_v1, c_v2 = st.columns([1, 3])
         
-        # 3. Caching Progress Bar (for background parsing)
-        if data_ctrl.sim_source:
-            total_b = data_ctrl.sim_source.get_batch_count()
-            loaded_b = len(data_ctrl.sim_source.loaded_batches)
+        with c_v1:
+            st.markdown("### 🕹️ View Options")
+            mesh_color = st.color_picker("Mesh Color", "#ADD8E6")
+            mesh_alpha = st.slider("Opacity", 0.0, 1.0, 0.8)
+            show_axes = st.checkbox("Show Axes", value=True)
+            render_btn = st.button("🚀 Render VTK", use_container_width=True)
             
-            if loaded_b < total_b:
-                st.progress(loaded_b / total_b, text=f"⚡ Background Caching: {loaded_b}/{total_b} batches loaded")
-                if st.button("🔄 Update Timesteps", help="Refresh the slider with newly cached timesteps"):
-                    st.rerun()
-            elif loaded_b == total_b:
-                st.success(f"✅ All {total_b} batches ( {len(data_ctrl.timesteps)} timesteps) cached in memory.", icon="🔥")
+            st.info(f"File: {os.path.basename(vtk_path)}\nSize: {os.path.getsize(vtk_path)/1024:.1f} KB")
 
-        if data_ctrl.timesteps:
-            # 3. Controls Layout
-            c1, c2 = st.columns([1, 3])
-            
-            with c1:
-                st.markdown("### 🕹️ Controls")
-                target_ts = st.select_slider("Timestep", options=data_ctrl.timesteps, value=data_ctrl.timesteps[0])
-                
-                show_geo = st.checkbox("Show Geometry", value=True)
-                show_axes = st.checkbox("Show Axes", value=True)
-                
-                st.divider()
-                st.markdown("### 🔦 Highlighting")
-                hl_mode = st.selectbox("Mode", ["chain", "atom", "bond", "angle"])
-                hl_spec = st.text_input("ID(s)", value="", placeholder="e.g. 1-5, 10", help="Use ranges like 1-5 or comma separated lists.")
-                
-                render_btn = st.button("🚀 Render Frame", use_container_width=True)
-
-            with c2:
-                if render_btn or "viz_html" in st.session_state:
-                    if render_btn:
-                        with st.spinner("Rendering 3D scene..."):
-                            # Setup Plotter
-                            plt = Plotter(offscreen=True, bg='white')
+        with c_v2:
+            if render_btn or "vtk_viz_html" in st.session_state:
+                if render_btn:
+                    with st.spinner("Rendering VTK Mesh..."):
+                        # Setup Plotter
+                        plt = vedo.Plotter(offscreen=True, bg='white')
+                        
+                        try:
+                            mesh = vedo.load(vtk_path)
+                            if hasattr(mesh, "c"):
+                                mesh.c(mesh_color).alpha(mesh_alpha)
+                            plt.add(mesh)
                             
-                            # Setup Controllers (using the same logic as ui_viewer.py)
-                            # Note: vtk_ctrl and hl_ctrl are needed for the renderer
-                            from analysis.controllers.vtk_overlay import VtkOverlayController
-                            vtk_ctrl = VtkOverlayController(plt)
-                            
-                            # Highlighter needs a callback to get current data
-                            hl_ctrl = HighlightController(plt, 
-                                                        lambda: (data_ctrl.get_atom_data_at_timestep(target_ts), target_ts),
-                                                        lambda: int(st.session_state.get("eta_target_ts", 4))) # Fallback for N
-                            
-                            renderer = SimulationRenderer(plt, data_ctrl, vtk_ctrl, hl_ctrl, lambda: {'show_geometry': show_geo})
-                            
-                            # Apply Highlight if spec is provided
-                            if hl_spec.strip():
-                                success, msg = hl_ctrl.apply(hl_mode, hl_spec)
-                                if not success:
-                                    st.warning(msg)
-                                else:
-                                    st.caption(f"Applied: {msg}")
-
-                            # Render the timestep
-                            renderer.show_timestep(target_ts)
                             if show_axes:
-                                renderer.update_persistent_bounds()
-                                renderer.update_axes()
+                                plt.add(vedo.Axes(mesh))
                             
-                            # Export to X3D (more compatible in headless than HTML/k3d)
-                            temp_x3d = os.path.join(tempfile.gettempdir(), f"pulse_viz_{target_ts}.x3d")
+                            # Ensure camera is centered on the mesh
+                            plt.reset_camera()
+                            plt.render()
+                                
+                            # Export to X3D for Streamlit compatibility
+                            temp_x3d = os.path.join(tempfile.gettempdir(), f"pulse_vtk_viz.x3d")
                             plt.export(temp_x3d)
                             
                             with open(temp_x3d, 'r') as f:
                                 x3d_content = f.read()
                             
-                            # Wrap in X3DOM template for interactive browser viewing
-                            # Remove XML declaration to embed cleanly
                             if "?>" in x3d_content:
                                 x3d_content = x3d_content.split("?>", 1)[1]
 
-                            st.session_state.viz_html = f"""
+                            # Wrap in X3DOM template for interactive browser viewing
+                            # Add a viewpoint that looks at the center of the grid
+                            st.session_state.vtk_viz_html = f"""
                             <html>
                             <head>
                                 <script type='text/javascript' src='https://www.x3dom.org/download/x3dom.js'> </script>
                                 <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'></link>
                                 <style>
-                                    x3d {{ width: 100%; height: 650px; border: 1px solid #eee; border-radius: 8px; }}
-                                    body {{ margin: 0; padding: 0; background: white; }}
+                                    x3d {{ width: 100%; height: 650px; border: 1px solid #333; border-radius: 8px; background: #222; }}
+                                    body {{ margin: 0; padding: 0; background: #111; color: white; }}
                                 </style>
                             </head>
                             <body>
-                                {x3d_content}
+                                <x3d>
+                                    <scene>
+                                        <viewpoint position='2.5 2.5 8' orientation='0 0 1 0' centerOfRotation='2.5 2.5 0'></viewpoint>
+                                        <navigationInfo type='"EXAMINE" "ANY"'></navigationInfo>
+                                        <background skyColor='0.1 0.1 0.1'></background>
+                                        {x3d_content}
+                                    </scene>
+                                </x3d>
                             </body>
                             </html>
                             """
-                            
-                            # Cleanup actors
+                        except Exception as e:
+                            st.error(f"Failed to render VTK: {e}")
+                        finally:
                             plt.close()
-                    
-                    # Display the rendered HTML
+                
+                if "vtk_viz_html" in st.session_state:
                     import streamlit.components.v1 as components
-                    components.html(st.session_state.viz_html, height=700, scrolling=True)
-        else:
-            st.info("No timesteps discovered in this folder.")
+                    components.html(st.session_state.vtk_viz_html, height=700, scrolling=True)
     else:
-        st.info("Select a simulation folder to begin visualization.")
+        st.warning(f"File not found: {vtk_path}")
+        st.info("Please provide a valid path to a .vtk file.")
 
 # 5. System Status (Master Node only)
 if "master" in subprocess.getoutput("hostname"):
