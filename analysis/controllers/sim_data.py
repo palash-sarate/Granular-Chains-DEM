@@ -180,9 +180,9 @@ class SimDataController:
         self.load_dataframe(full)
         return True, None, 0
 
-    def load_data_file(self, path: str):
+    def load_data_file(self, path: str, manual_map: dict = None):
         try:
-            df = parse_simple_data_file(path)
+            df = parse_simple_data_file(path, manual_map=manual_map)
             if df.empty:
                 return False, "Could not parse the selected data file", 0
             df = df.reset_index()

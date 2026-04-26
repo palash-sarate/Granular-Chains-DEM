@@ -17,6 +17,77 @@ import shutil
 from simulation.orchestrator import SimulationOrchestrator
 from analysis.controllers.simulation_launcher import SimulationLauncherController
 
+class ColumnMapDialog(tk.Toplevel):
+    def __init__(self, parent, filepath):
+        super().__init__(parent)
+        self.title("Manual Column Mapping")
+        self.filepath = filepath
+        self.result = None
+        self.transient(parent)
+        self.grab_set()
+
+        # Read preview
+        preview_text = ""
+        try:
+            with open(filepath, 'r') as f:
+                lines = f.readlines()
+            # Find atoms section for better preview
+            atom_start = 0
+            for i, line in enumerate(lines):
+                if "Atoms" in line:
+                    atom_start = i + 1
+                    break
+            preview_lines = lines[atom_start:atom_start+10]
+            preview_text = "".join(preview_lines)
+        except Exception as e:
+            preview_text = f"Error reading preview: {e}"
+
+        tk.Label(self, text=f"File: {os.path.basename(filepath)}", font=('Arial', 10, 'bold')).pack(pady=5)
+        tk.Label(self, text="Preview (first 10 atom lines):").pack(anchor='w', padx=10)
+        
+        preview_box = tk.Text(self, height=10, width=80, font=('Courier', 9))
+        preview_box.insert('1.0', preview_text)
+        preview_box.config(state='disabled')
+        preview_box.pack(padx=10, pady=5)
+
+        tk.Label(self, text="Enter 0-based column indices (LAMMPS default: id=0, type=1, x=2, y=3, z=4):").pack(pady=5)
+
+        form = tk.Frame(self)
+        form.pack(pady=10)
+
+        self.entries = {}
+        fields = [('id', 0), ('type', 1), ('x', 2), ('y', 3), ('z', 4), ('mol', 5), ('diameter', 6)]
+        
+        for i, (field, default) in enumerate(fields):
+            tk.Label(form, text=f"{field}:").grid(row=i//2, column=(i%2)*2, padx=5, pady=2, sticky='e')
+            e = tk.Entry(form, width=5)
+            e.insert(0, str(default))
+            e.grid(row=i//2, column=(i%2)*2 + 1, padx=5, pady=2, sticky='w')
+            self.entries[field] = e
+
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(pady=10)
+        tk.Button(btn_frame, text="Apply Mapping", command=self._on_apply, width=15, bg='#4CAF50', fg='white').pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="Cancel", command=self.destroy, width=10).pack(side=tk.LEFT, padx=5)
+
+        self.geometry("650x500")
+        self._center_window()
+
+    def _center_window(self):
+        self.update_idletasks()
+        width = self.winfo_width()
+        height = self.winfo_height()
+        x = (self.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.winfo_screenheight() // 2) - (height // 2)
+        self.geometry(f'{width}x{height}+{x}+{y}')
+
+    def _on_apply(self):
+        try:
+            self.result = {k: int(e.get()) for k, e in self.entries.items() if e.get().strip()}
+            self.destroy()
+        except ValueError:
+            messagebox.showerror("Error", "Column indices must be integers.")
+
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.
 try:
@@ -80,7 +151,8 @@ class ViewerApp(BaseTk):
             'clear_vtk_list': lambda: self.vtk_listbox.delete(0, tk.END),
             'add_vtk': self._add_vtk_mesh_ui,
             'enable_preloading': self.enable_preloading_var,
-            'open_restart_editor': self._on_restart_editor_open
+            'open_restart_editor': self._on_restart_editor_open,
+            'ask_column_mapping': self._ask_column_mapping
         }
         self.loader_ctrl = SimulationLoader(self, self.data_ctrl, self.playback_ctrl, self.vtk_ctrl, self.renderer, loader_cbs)
         
@@ -473,6 +545,11 @@ class ViewerApp(BaseTk):
                 self.progress_bar.set_progress(self.batches_loaded, self.batches_to_load)
 
     # ── Restart Editor Logic ──────────────────────────────
+    def _ask_column_mapping(self, filepath):
+        dialog = ColumnMapDialog(self, filepath)
+        self.wait_window(dialog)
+        return dialog.result
+
     def _on_atom_picked(self, info: dict):
         """Callback from renderer when an atom is clicked."""
         msg = f"Atom ID: {info['id']} | Mol/Chain: {info['mol']} | Type: {info['type']} | Pos: {info['pos']}"

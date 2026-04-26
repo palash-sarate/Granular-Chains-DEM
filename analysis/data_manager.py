@@ -12,12 +12,7 @@ from analysis.lammps_parser import LammpsParser
 
 
 def detect_lammps_input_script(sim_dir: str) -> Optional[str]:
-    """Auto-detect a likely LAMMPS input script in a simulation folder.
-
-    Preference order:
-    1) Files starting with ``in.`` (e.g. ``in.hopper_fill``)
-    2) Files ending with ``.in``
-    """
+    """Auto-detect a likely LAMMPS input script in a simulation folder."""
     if not sim_dir or not os.path.isdir(sim_dir):
         return None
 
@@ -34,11 +29,7 @@ def detect_lammps_input_script(sim_dir: str) -> Optional[str]:
     return None
 
 def load_lammps_geometry(sim_dir: str) -> Tuple[Optional[dict], Optional[str]]:
-    """Load geometry from an auto-detected LAMMPS input script.
-
-    Returns:
-        (geometry_dict_or_none, script_path_or_none)
-    """
+    """Load geometry from an auto-detected LAMMPS input script."""
     script_path = detect_lammps_input_script(sim_dir)
     if not script_path:
         return None, None
@@ -56,165 +47,122 @@ def parse_lammps_geometry_script(script_path: str) -> Optional[dict]:
     parser = LammpsParser(script_path)
     return parser.get_geometry()
 
-def parse_simple_data_file(path: str) -> pd.DataFrame:
-    """Attempt a best-effort parse of a LAMMPS data file to extract atom positions.
-    Returns a DataFrame with columns ['id','type','x','y','z','vx','vy','vz','diameter'] when available.
-    This is intentionally permissive and will return an empty DataFrame if parsing fails.
-    """
+def parse_simple_data_file(path: str, manual_map: dict = None) -> pd.DataFrame:
+    """Parses a single LAMMPS data file, identifying columns by heuristics or manual map."""
     if not os.path.exists(path):
         return pd.DataFrame()
 
     with open(path, 'r') as f:
         lines = f.readlines()
 
-    # Find the 'Atoms' section
-    start = None
+    # Find the Atoms section
+    atom_start = -1
     for i, line in enumerate(lines):
-        if line.strip().startswith('Atoms'):
-            start = i + 1
+        if line.strip().startswith("Atoms"):
+            atom_start = i + 1
             break
-
-    if start is None:
+            
+    if atom_start == -1:
         return pd.DataFrame()
 
-    # Advance past any blank/comment lines after the 'Atoms' header
-    idx = start
-    while idx < len(lines) and (lines[idx].strip() == '' or lines[idx].strip().startswith('#')):
-        idx += 1
-
-    # Read numeric lines until next blank or a new section header (e.g., Velocities, Bonds, Angles, Bonds, Masses)
-    SECTION_HEADERS = set(['Velocities', 'Bonds', 'Angles', 'Masses', 'PairIJ', 'Velocities', 'Bonds', 'Angles'])
-    data_lines = []
-    for line in lines[idx:]:
-        s = line.strip()
-        if s == '':
-            break
-        # Stop if line looks like a section header (word with no numbers)
-        first_tok = s.split()[0]
-        if first_tok in SECTION_HEADERS:
-            break
-        # skip comments
-        if s.startswith('#'):
+    # Read atom data until blank line or next section
+    rows = []
+    SECTION_HEADERS = set(['Velocities', 'Bonds', 'Angles', 'Masses', 'PairIJ'])
+    for i in range(atom_start, len(lines)):
+        line = lines[i].strip()
+        if not line:
+            if rows: break
             continue
-        parts = line.split()
-        # require at least id and x y z (3 coords + id -> 4)
-        if len(parts) < 4:
-            # if a short non-data line appears, stop parsing atoms
+        if line.split()[0] in SECTION_HEADERS:
             break
-        data_lines.append(parts)
+        parts = line.split()
+        if len(parts) < 3: continue
+        rows.append(parts)
 
-    if not data_lines:
+    if not rows:
         return pd.DataFrame()
 
-    # Convert to DataFrame trying to map common formats.
-    # Typical atom styles: id mol type x y z ... or id type x y z ...
-    # We'll try to detect whether second token is integer (mol) or float (x)
-    first = data_lines[0]
-    try:
-        # Typical atom styles: id mol type x y z ... or id type x y z ...
-        # Check first row to build column mapping
-        raw_rows = np.array(data_lines, dtype=float)
-        num_cols = raw_rows.shape[1]
-        
-        # Heuristic to detect common LAMMPS data formats
-        is_int_col = [np.all(raw_rows[:,i] == raw_rows[:,i].astype(int)) if i < num_cols else False for i in range(num_cols)]
-        
-        col_names = []
-        # Standard: id type x y z ... OR id mol type x y z ...
-        # We look for the first float (non-int) column to find 'x'
-        first_float_idx = -1
-        for i in range(2, min(5, num_cols)):
-            if not is_int_col[i]:
-                first_float_idx = i
-                break
-        
-        if first_float_idx == 2:
-             # id, type, x, y, z ...
-             col_names = ['id', 'type', 'x', 'y', 'z']
-        elif first_float_idx == 3:
-             # id, mol/type, type/x... wait, id, mol, type, x, y, z
-             col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
-        elif first_float_idx == -1 and num_cols >= 5:
-             # Fallback for 2D/3D alignment where even coordinates look like ints
-             # In hybrid styles, x,y,z are almost always 2,3,4 or 3,4,5
-             if is_int_col[2] and is_int_col[3] and is_int_col[4] and num_cols >= 6:
-                 # Likely id, mol, type, x, y, z
-                 col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
-             else:
-                 col_names = ['id', 'type', 'x', 'y', 'z']
-        else:
-             col_names = ['id', 'type', 'x', 'y', 'z']
-        
-        # Identify extras by looking for specific values
-        # For granular: we often have diameter around index 6 or 7
-        remaining_indices = list(range(len(col_names), num_cols))
-        for idx in remaining_indices:
-            # Check if this column looks like a diameter (all values same and > 0 and < 1.0)
-            if np.all(raw_rows[:, idx] > 0) and np.all(raw_rows[:, idx] < 0.5) and np.unique(raw_rows[:, idx]).size == 1:
-                col_names.append('diameter')
+    raw_rows = np.array(rows, dtype=object)
+    num_cols = raw_rows.shape[1]
+
+    if manual_map:
+        # manual_map looks like {'x': 2, 'y': 3, 'z': 4, ...}
+        df_cols = {}
+        for name, idx in manual_map.items():
+            if idx < num_cols:
+                try:
+                    df_cols[name] = pd.to_numeric(raw_rows[:, idx], errors='coerce')
+                except Exception: pass
+        df = pd.DataFrame(df_cols)
+    else:
+        # Use heuristics
+        try:
+            data_numeric = raw_rows.astype(float)
+            is_int_col = [np.all(data_numeric[:,i] == data_numeric[:,i].astype(int)) for i in range(num_cols)]
+            
+            col_names = []
+            first_float_idx = -1
+            for i in range(2, min(5, num_cols)):
+                if not is_int_col[i]:
+                    first_float_idx = i
+                    break
+            
+            if first_float_idx == 2:
+                col_names = ['id', 'type', 'x', 'y', 'z']
+            elif first_float_idx == 3:
+                col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
+            elif first_float_idx == -1 and num_cols >= 5:
+                if is_int_col[2] and is_int_col[3] and is_int_col[4] and num_cols >= 6:
+                    col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
+                else:
+                    col_names = ['id', 'type', 'x', 'y', 'z']
             else:
-                col_names.append(f'v{idx}')
+                col_names = ['id', 'type', 'x', 'y', 'z']
 
-        df = pd.DataFrame(raw_rows[:, :len(col_names)], columns=col_names)
-        
-        # Ensure ID, mol, type are integers
-        for c in ['id', 'mol', 'type']:
-            if c in df.columns:
-                df[c] = df[c].astype(int)
+            remaining = list(range(len(col_names), num_cols))
+            for idx in remaining:
+                if np.all(data_numeric[:, idx] > 0) and np.all(data_numeric[:, idx] < 0.5) and np.unique(data_numeric[:, idx]).size == 1:
+                    col_names.append('diameter')
+                else:
+                    col_names.append(f'v{idx}')
                 
-    except Exception:
-        # fallback: semi-brute force ID and coords
-        rows = []
-        for parts in data_lines:
-            try:
-                if len(parts) >= 4:
-                    idv = int(parts[0])
-                    # identify if 2nd token is likely mol
-                    molv = int(parts[1]) if len(parts) > 5 else 0
-                    x = float(parts[-3])
-                    y = float(parts[-2])
-                    z = float(parts[-1])
-                    dia = float(parts[4]) if len(parts) > 5 and 'id' not in parts else 0.01 
-                    rows.append((idv, molv, x, y, z, dia))
-            except Exception:
-                continue
-        if rows:
-            df = pd.DataFrame(rows, columns=['id', 'mol', 'x', 'y', 'z', 'diameter'])
+            df = pd.DataFrame(data_numeric[:, :len(col_names)], columns=col_names)
+            for c in ['id', 'mol', 'type']:
+                if c in df.columns:
+                    df[c] = df[c].astype(int)
+        except Exception:
+            return pd.DataFrame()
 
-    if df is None or df.empty:
+    if df.empty:
         return pd.DataFrame()
 
-    # Ensure columns exist
     for c in ['vx','vy','vz','diameter']:
         if c not in df.columns:
-            df[c] = 0.0
+            df[c] = 0.0 if c != 'diameter' else 0.01
 
-    # attach timestep 0 for consistency with Animator expectations
     df['timestep'] = 0
-    df.set_index(['timestep','id'], inplace=True)
+    if 'id' in df.columns:
+        df.set_index(['timestep','id'], inplace=True)
+    else:
+        df['id'] = range(len(df))
+        df.set_index(['timestep','id'], inplace=True)
     return df
 
 def parse_dump_file(filepath: str) -> pd.DataFrame:
-    """Public wrapper for parsing a single LAMMPS dump file.
-    Returns a DataFrame with ['timestep', 'id'] as MultiIndex.
-    """
+    """Public wrapper for parsing a single LAMMPS dump file."""
     df = _parse_single_dump_fast(filepath)
     if df is not None and not df.empty:
         id_col = 'id' if 'id' in df.columns else 'index'
         if id_col in df.columns:
-            # We enforce a MultiIndex to match the rest of the app's expectations
             df.set_index(['timestep', id_col], inplace=True)
             df.index.names = ['timestep', 'id']
             df.sort_index(inplace=True)
     return df
 
 def _parse_single_dump_fast(filepath):
-    """Optimized parsing of a single LAMMPS dump file using the C engine.
-    Top-level function for multiprocessing compatibility.
-    """
+    """Optimized parsing of a single LAMMPS dump file using the C engine."""
     try:
         with open(filepath, 'r') as f:
-            # Quickly grab the first several lines to find structure
             header_lines = [f.readline() for _ in range(15)]
         
         timestep = 0
@@ -236,7 +184,6 @@ def _parse_single_dump_fast(filepath):
         
         if not cols: return pd.DataFrame()
 
-        # Use faster C engine with memory mapping
         df = pd.read_csv(filepath, 
                          skiprows=data_start_line,
                          names=cols, 
@@ -245,11 +192,9 @@ def _parse_single_dump_fast(filepath):
                          engine='c',
                          memory_map=True)
         
-        # Numeric conversion
         for col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
         
-        # Drop malformed rows
         id_col = 'id' if 'id' in df.columns else 'index'
         if id_col in df.columns:
             df.dropna(subset=[id_col], inplace=True)
@@ -280,7 +225,6 @@ class SimulationMetadata:
 
     def save(self):
         try:
-            # Ensure the directory exists (though it usually should)
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             with open(self.path, 'w') as f:
                 json.dump(self._data, f, indent=4)
@@ -313,14 +257,13 @@ class SimulationData:
         self.cache_dir = os.path.join(data_dir, cache_name)
         self.batch_size = batch_size
         
-        # Ensure directories exist
         if os.path.isdir(self.data_dir):
             os.makedirs(self.cache_dir, exist_ok=True)
             self.metadata = SimulationMetadata(self.data_dir)
         else:
             self.metadata = None
         
-        self.atom_batches = {}  # Indexed by batch number
+        self.atom_batches = {}
         self.bond_batches = {}
         self.angle_batches = {}
         
@@ -335,7 +278,6 @@ class SimulationData:
         return os.path.join(self.cache_dir, f"batch_{batch_idx}.pkl")
 
     def load_metadata(self):
-        """Scans directories, sorts dump files by timestep, and extracts all timesteps."""
         if os.path.isdir(self.chain_dump_dir):
             self.atom_files = sorted(glob.glob(os.path.join(self.chain_dump_dir, "*.dump")), key=self._get_step)
         if os.path.isdir(self.bond_dump_dir):
@@ -343,7 +285,6 @@ class SimulationData:
         if os.path.isdir(self.angle_dump_dir):
             self.angle_files = sorted(glob.glob(os.path.join(self.angle_dump_dir, "*.dump")), key=self._get_step)
 
-        # Build list of timesteps from atom files (or others if atom is empty)
         base_files = self.atom_files or self.bond_files or self.angle_files
         self.timesteps = [self._get_step(f) for f in base_files]
         return self.timesteps
@@ -351,36 +292,15 @@ class SimulationData:
     def get_batch_count(self):
         return max(1, (len(self.timesteps) + self.batch_size - 1) // self.batch_size) if self.timesteps else 0
 
-    def get_available_cached_batches(self):
-        """Returns a list of batch indices that have valid cache files."""
-        available = []
-        batch_count = self.get_batch_count()
-        for i in range(batch_count):
-            start_idx = i * self.batch_size
-            end_idx = start_idx + self.batch_size
-            
-            # Form the list of source files for this batch
-            batch_files = self.atom_files[start_idx:end_idx] + \
-                          self.bond_files[start_idx:end_idx] + \
-                          self.angle_files[start_idx:end_idx]
-            
-            if self._is_batch_cache_valid(i, batch_files):
-                available.append(i)
-        
-        self.cached_batches = set(available)
-        return available
-
     def get_batch_index_for_timestep(self, ts):
         if not self.timesteps: return 0
         try:
-            # Find index in the metadata timesteps list
             idx = self.timesteps.index(ts)
             return idx // self.batch_size
         except ValueError:
             return 0
 
     def load_batch(self, batch_idx, force_reload=False):
-        """Loads a specific batch of data."""
         if batch_idx in self.loaded_batches and not force_reload:
             return {
                 'atoms': self.atom_batches.get(batch_idx, pd.DataFrame()),
@@ -399,39 +319,24 @@ class SimulationData:
         loaded_data = None
         if not force_reload and self._is_batch_cache_valid(batch_idx, batch_atoms_files + batch_bonds_files + batch_angles_files):
             try:
-                print(f"Loading batch {batch_idx} from cache: {cache_file}")
                 with open(cache_file, 'rb') as f:
                     loaded_data = pickle.load(f)
-            except Exception as e:
-                print(f"Cache loading failed for batch {batch_idx} ({e}), re-parsing...")
+            except Exception: pass
 
         if loaded_data is None:
-            print(f"Parsing dump files for batch {batch_idx}...")
             batch_atoms = self._parse_dump_list(batch_atoms_files)
             batch_bonds = self._parse_dump_list(batch_bonds_files)
             batch_angles = self._parse_dump_list(batch_angles_files)
             
-            loaded_data = {
-                'atoms': batch_atoms,
-                'bonds': batch_bonds,
-                'angles': batch_angles
-            }
-            print(f"Saving batch {batch_idx} to cache...")
+            loaded_data = {'atoms': batch_atoms, 'bonds': batch_bonds, 'angles': batch_angles}
             try:
                 with open(cache_file, 'wb') as f:
                     pickle.dump(loaded_data, f)
-            except Exception as e:
-                print(f"Could not save cache: {e}")
+            except Exception: pass
 
-        # Store loaded data by batch index
-        if not loaded_data['atoms'].empty:
-            self.atom_batches[batch_idx] = loaded_data['atoms']
-            
-        if not loaded_data['bonds'].empty:
-            self.bond_batches[batch_idx] = loaded_data['bonds']
-            
-        if not loaded_data['angles'].empty:
-            self.angle_batches[batch_idx] = loaded_data['angles']
+        if not loaded_data['atoms'].empty: self.atom_batches[batch_idx] = loaded_data['atoms']
+        if not loaded_data['bonds'].empty: self.bond_batches[batch_idx] = loaded_data['bonds']
+        if not loaded_data['angles'].empty: self.angle_batches[batch_idx] = loaded_data['angles']
 
         self.loaded_batches.add(batch_idx)
         return loaded_data
@@ -440,85 +345,37 @@ class SimulationData:
         batch_idx = self.get_batch_index_for_timestep(ts)
         batch = self.atom_batches.get(batch_idx)
         if batch is None or batch.empty: return pd.DataFrame()
-        try:
-            return batch.xs(ts, level='timestep')
-        except (KeyError, TypeError):
-            return pd.DataFrame()
-
-    def get_bonds_at_timestep(self, ts):
-        batch_idx = self.get_batch_index_for_timestep(ts)
-        batch = self.bond_batches.get(batch_idx)
-        if batch is None or batch.empty: return pd.DataFrame()
-        try:
-            return batch.xs(ts, level='timestep')
-        except (KeyError, TypeError):
-            return pd.DataFrame()
-
-    def get_angles_at_timestep(self, ts):
-        batch_idx = self.get_batch_index_for_timestep(ts)
-        batch = self.angle_batches.get(batch_idx)
-        if batch is None or batch.empty: return pd.DataFrame()
-        try:
-            return batch.xs(ts, level='timestep')
-        except (KeyError, TypeError):
-            return pd.DataFrame()
+        try: return batch.xs(ts, level='timestep')
+        except: return pd.DataFrame()
 
     def load_data(self, force_reload=False):
-        """Metadata-first loading. Returns only the first batch by default."""
         self.load_metadata()
         if self.get_batch_count() > 0:
             return self.load_batch(0, force_reload=force_reload)
         return {'atoms': pd.DataFrame(), 'bonds': pd.DataFrame(), 'angles': pd.DataFrame()}
 
     def _is_batch_cache_valid(self, batch_idx, batch_files):
-        """Checks if batch cache exists and is newer than the dump files in it."""
         cache_file = self._get_cache_file(batch_idx)
-        if not os.path.exists(cache_file):
-            return False
-        
-        if not batch_files:
-            return False
-            
+        if not os.path.exists(cache_file) or not batch_files: return False
         latest_dump_mtime = max((os.path.getmtime(f) for f in batch_files if os.path.exists(f)), default=0)
-        if latest_dump_mtime == 0:
-            return False
-            
-        cache_mtime = os.path.getmtime(cache_file)
-        return cache_mtime > latest_dump_mtime
-
+        return os.path.getmtime(cache_file) > latest_dump_mtime
 
     def _get_step(self, filename):
         match = re.search(r'_(\d+)\.dump', filename)
         return int(match.group(1)) if match else 0
     
     def _parse_dump_list(self, dump_files):
-        """Parses a list of dump files in parallel and returns a MultiIndex DataFrame."""
-        if not dump_files:
-            return pd.DataFrame()
-            
-        print(f"Parsing {len(dump_files)} dump files in parallel...")
-
-        # Use ProcessPoolExecutor for true parallelism in Python
-        # Windows requires protection but since this is called from within the app 
-        # it should be safe as long as we're not spawning recursive processes.
+        if not dump_files: return pd.DataFrame()
         with ProcessPoolExecutor() as executor:
             all_frames = list(executor.map(_parse_single_dump_fast, dump_files))
-        
         all_frames = [f for f in all_frames if f is not None and not f.empty]
-        
-        if not all_frames:
-            return pd.DataFrame()
-
+        if not all_frames: return pd.DataFrame()
         try:
             full_df = pd.concat(all_frames)
             id_col = 'id' if 'id' in full_df.columns else 'index'
-            if id_col not in full_df.columns:
-                return pd.DataFrame()
-                
+            if id_col not in full_df.columns: return pd.DataFrame()
             full_df.set_index(['timestep', id_col], inplace=True)
             full_df.index.names = ['timestep', 'id']
             full_df.sort_index(inplace=True)
             return full_df
-        except Exception as e:
-            print(f"Failed to assemble DataFrames: {e}")
-            return pd.DataFrame()
+        except: return pd.DataFrame()

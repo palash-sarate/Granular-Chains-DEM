@@ -64,7 +64,14 @@ class SimulationLoader:
 
     def open_data_file_path(self, path: str):
         self.playback_ctrl.pause()
-        ok, err, num_queued = self.data_ctrl.load_data_file(path)
+        
+        manual_map = None
+        if messagebox.askyesno("Column Mapping", "Do you want to manually specify column indices for this data file?"):
+            manual_map = self.ui_callbacks['ask_column_mapping'](path)
+            if manual_map is None: # User cancelled
+                return
+
+        ok, err, num_queued = self.data_ctrl.load_data_file(path, manual_map=manual_map)
         if not ok:
             messagebox.showerror('Error', err)
         else:
