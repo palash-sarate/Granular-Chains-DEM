@@ -286,7 +286,7 @@ class ViewerApp(BaseTk):
         except (AttributeError, IndexError, TypeError):
             return 0
 
-    def _on_data_loaded(self, num_queued=0):
+    def _on_data_loaded(self, num_queued=0, clear_vtk=True):
         # Handle progress bar if we have background batches to wait for
         if num_queued > 0:
             self.batches_to_load = num_queued
@@ -296,10 +296,11 @@ class ViewerApp(BaseTk):
         else:
             self.batches_to_load = 0
             
-        # Ensure fresh VTK state for new folder metadata
-        self.vtk_ctrl.metadata = None
-        self.vtk_ctrl.clear()
-        self.vtk_listbox.delete(0, tk.END)
+        # Ensure fresh VTK state for new folder metadata (optional)
+        if clear_vtk:
+            self.vtk_ctrl.metadata = None
+            self.vtk_ctrl.clear()
+            self.vtk_listbox.delete(0, tk.END)
 
         old_ts = self.current_timestep
         self.analysis_ctrl.refresh_windows()

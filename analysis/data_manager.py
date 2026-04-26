@@ -121,14 +121,28 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
         
         col_names = []
         # Standard: id type x y z ... OR id mol type x y z ...
-        if num_cols >= 6 and is_int_col[0] and is_int_col[1] and not is_int_col[2]:
-             # Likely: id, type, x, y, z, ... (where x is the first float)
+        # We look for the first float (non-int) column to find 'x'
+        first_float_idx = -1
+        for i in range(2, min(5, num_cols)):
+            if not is_int_col[i]:
+                first_float_idx = i
+                break
+        
+        if first_float_idx == 2:
+             # id, type, x, y, z ...
              col_names = ['id', 'type', 'x', 'y', 'z']
-        elif num_cols >= 6 and is_int_col[0] and is_int_col[1] and is_int_col[2]:
-             # Likely: id, mol, type, x, y, z ...
+        elif first_float_idx == 3:
+             # id, mol/type, type/x... wait, id, mol, type, x, y, z
              col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
+        elif first_float_idx == -1 and num_cols >= 5:
+             # Fallback for 2D/3D alignment where even coordinates look like ints
+             # In hybrid styles, x,y,z are almost always 2,3,4 or 3,4,5
+             if is_int_col[2] and is_int_col[3] and is_int_col[4] and num_cols >= 6:
+                 # Likely id, mol, type, x, y, z
+                 col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
+             else:
+                 col_names = ['id', 'type', 'x', 'y', 'z']
         else:
-             # Default fallback
              col_names = ['id', 'type', 'x', 'y', 'z']
         
         # Identify extras by looking for specific values

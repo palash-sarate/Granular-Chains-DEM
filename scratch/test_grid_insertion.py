@@ -56,14 +56,19 @@ def main():
 
     # 4. Create Dummy LAMMPS Script to generate a data file for visualization
     dummy_in = temp_dir / "dummy_visualize.in"
+    
+    # Calculate box to fit all hoppers
+    x_max_h = (n_hoppers - 1) % nx_h * spacing + 1.0
+    y_max_h = (n_hoppers - 1) // nx_h * spacing + 1.0
+    
     with open(dummy_in, 'w') as f:
         f.write(f"""
 units lj
 atom_style hybrid molecular sphere
 boundary p p p
 
-# Minimal box to hold the particles
-region world block -1.0 1.0 -0.5 0.5 0.0 {z_max + 0.5}
+# Box expanded to fit all hoppers
+region world block -1.0 {x_max_h} -1.0 {y_max_h} 0.0 {z_max + 0.5}
 create_box 1 world bond/types 1 angle/types 1 extra/bond/per/atom 5 extra/angle/per/atom 5 extra/special/per/atom 10
 
 # Load molecule templates
@@ -86,7 +91,7 @@ write_data {temp_dir / 'inserted_state.data'}
         subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
         print(f"SUCCESS: Data file created at {temp_dir / 'inserted_state.data'}")
     except subprocess.CalledProcessError as e:
-        print(f"ERROR running LAMMPS:\n{e.stderr}")
+        print(f"ERROR running LAMMPS:\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}")
 
     # 5. Cleanup
     print(f"--- Cleaning up temporary molecule files ---")

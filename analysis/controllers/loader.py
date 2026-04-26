@@ -70,7 +70,7 @@ class SimulationLoader:
         else:
             self.renderer_ctrl.clear()
             self.renderer_ctrl.update_persistent_bounds()
-            self.ui_callbacks['on_load_success']()
+            self.ui_callbacks['on_load_success'](clear_vtk=False)
 
     def handle_dropped_files(self, filenames: list):
         if not filenames: return
@@ -92,7 +92,7 @@ class SimulationLoader:
                 else:
                     self.renderer_ctrl.clear()
                     self.renderer_ctrl.update_persistent_bounds()
-                    self.ui_callbacks['on_load_success'](num_queued)
+                    self.ui_callbacks['on_load_success'](num_queued, clear_vtk=False)
         
         for v in vtks:
             self.ui_callbacks['add_vtk'](v)

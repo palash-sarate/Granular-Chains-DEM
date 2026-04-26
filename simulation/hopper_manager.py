@@ -334,10 +334,7 @@ class HopperManager:
                     if py > y_max: py -= y_width
                     
                     mol_id = rng.randint(1, n_templates)
-                    # Unique seed for each molecule placement (for random rotation)
-                    mol_seed = seed + count
-                    
-                    insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz:.6f} mol m{mol_id} {mol_seed}")
+                    insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
                     count += 1
         
         insertion_path = os.path.join(outdir, "insertions.inc").replace("\\", "/")

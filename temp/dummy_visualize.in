@@ -3,8 +3,8 @@ units lj
 atom_style hybrid molecular sphere
 boundary p p p
 
-# Minimal box to hold the particles
-region world block -1.0 1.0 -0.5 0.5 0.0 1.9249999999999998
+# Box expanded to fit all hoppers
+region world block -1.0 3.0 -1.0 3.0 0.0 1.9249999999999998
 create_box 1 world bond/types 1 angle/types 1 extra/bond/per/atom 5 extra/angle/per/atom 5 extra/special/per/atom 10
 
 # Load molecule templates

@@ -332,8 +332,7 @@ class GridHopperManager:
                         py = y_min + (iy + 0.5) * (y_width/ny) + offset[1]
                         
                         mol_id = rng.randint(1, n_templates)
-                        mol_seed = seed + total_inserted
-                        insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz+offset[2]:.6f} mol m{mol_id} {mol_seed}")
+                        insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz+offset[2]:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
                         count += 1
                         total_inserted += 1
             else:
