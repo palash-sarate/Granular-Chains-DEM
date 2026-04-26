@@ -40,9 +40,9 @@ python -u main.py run_grid_hopper_filling \
     --viscosity 0.001 \
     --dt 1e-6 \
     --spacing 2.0 \
-    --relax_steps 1000000 \
+    --relax_steps 10001 \
     --simulation "Grid_Hopper_Filling" \
-    --num_procs 16 \
+    --num_procs 8 \
     --num_threads 1 \
     --mode 2D_stacked
 

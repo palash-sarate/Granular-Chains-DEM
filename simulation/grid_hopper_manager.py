@@ -284,8 +284,23 @@ class GridHopperManager:
         insertion_lines = []
         
         # Internal pouring grid relative to hopper center
-        # For 2D_stacked, we use the narrow gap dimensions
-        y_min, y_max = -0.15, 0.15
+        # y_half from 2D_hopper.inc is 0.155
+        hopper_y_half = 0.155
+        
+        # If chains are oriented horizontally or can tumble, 
+        # we need a buffer of at least N*bead_radius/2.
+        # Even for vertical stacking, we want a small safety margin.
+        bead_diam = 0.003
+        safe_buffer = max(0.005, (N * bead_diam / 2.0) + 0.002)
+        
+        y_max = hopper_y_half - safe_buffer
+        y_min = -hopper_y_half + safe_buffer
+        
+        # Ensure we didn't shrink the region to nothing for very long chains
+        if y_max <= y_min:
+            y_max = 0.001
+            y_min = -0.001
+            
         z_start = 0.51
         y_width = y_max - y_min
         

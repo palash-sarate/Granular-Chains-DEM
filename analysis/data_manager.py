@@ -116,28 +116,30 @@ def parse_simple_data_file(path: str) -> pd.DataFrame:
         raw_rows = np.array(data_lines, dtype=float)
         num_cols = raw_rows.shape[1]
         
-        # Heuristic to detect mol vs type
+        # Heuristic to detect common LAMMPS data formats
         is_int_col = [np.all(raw_rows[:,i] == raw_rows[:,i].astype(int)) if i < num_cols else False for i in range(num_cols)]
         
         col_names = []
-        if num_cols >= 6 and is_int_col[1] and is_int_col[2]:
+        # Standard: id type x y z ... OR id mol type x y z ...
+        if num_cols >= 6 and is_int_col[0] and is_int_col[1] and not is_int_col[2]:
+             # Likely: id, type, x, y, z, ... (where x is the first float)
+             col_names = ['id', 'type', 'x', 'y', 'z']
+        elif num_cols >= 6 and is_int_col[0] and is_int_col[1] and is_int_col[2]:
              # Likely: id, mol, type, x, y, z ...
              col_names = ['id', 'mol', 'type', 'x', 'y', 'z']
-        elif num_cols >= 5 and is_int_col[1]:
-             # Likely: id, type, x, y, z ...
-             col_names = ['id', 'type', 'x', 'y', 'z']
         else:
-             # Fallback: assume minimal id, type, x, y, z
+             # Default fallback
              col_names = ['id', 'type', 'x', 'y', 'z']
         
-        # Append extra cols like vx, vy, vz, diameter, mass if they exist
-        std_extras = ['vx', 'vy', 'vz', 'fx', 'fy', 'fz', 'diameter', 'mass']
-        for i in range(len(col_names), num_cols):
-            idx = i - len(col_names)
-            if idx < len(std_extras):
-                col_names.append(std_extras[idx])
+        # Identify extras by looking for specific values
+        # For granular: we often have diameter around index 6 or 7
+        remaining_indices = list(range(len(col_names), num_cols))
+        for idx in remaining_indices:
+            # Check if this column looks like a diameter (all values same and > 0 and < 1.0)
+            if np.all(raw_rows[:, idx] > 0) and np.all(raw_rows[:, idx] < 0.5) and np.unique(raw_rows[:, idx]).size == 1:
+                col_names.append('diameter')
             else:
-                col_names.append(f'v{i}')
+                col_names.append(f'v{idx}')
 
         df = pd.DataFrame(raw_rows[:, :len(col_names)], columns=col_names)
         

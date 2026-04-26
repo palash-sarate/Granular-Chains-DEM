@@ -1,0 +1,20 @@
+
+units lj
+atom_style hybrid molecular sphere
+boundary p p p
+
+# Minimal box to hold the particles
+region world block -1.0 1.0 -0.5 0.5 0.0 1.9249999999999998
+create_box 1 world bond/types 1 angle/types 1 extra/bond/per/atom 5 extra/angle/per/atom 5 extra/special/per/atom 10
+
+# Load molecule templates
+include /home/guest/palash/Granular-Chains-DEM/temp/molecules/molecules.inc
+
+# Perform insertions
+include /home/guest/palash/Granular-Chains-DEM/temp/insertions.inc
+
+mass 1 1.0
+set type 1 diameter 0.002
+
+# Write out for visualization
+write_data /home/guest/palash/Granular-Chains-DEM/temp/inserted_state.data
