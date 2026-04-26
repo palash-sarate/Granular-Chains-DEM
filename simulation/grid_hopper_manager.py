@@ -305,10 +305,9 @@ class GridHopperManager:
         y_width = y_max - y_min
         
         # Exclusion distance for 2D stacking
-        # Horizontal (Y) gap: beads are ~2mm, so 2.5mm spacing is safe
-        # Vertical (Z) gap: length of chain + small buffer
-        dy_gap = 0.003 
-        dz_gap = (N * 0.0025) + 0.005 
+        # Scaling by N * 3mm ensures enough room for relaxed squiggles
+        dy_gap = N * 0.003 
+        dz_gap = N * 0.003
 
         z_max_global = z_start
         total_inserted = 0
