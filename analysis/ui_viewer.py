@@ -1,6 +1,14 @@
 import os
 import sys
 import argparse
+
+# Add project root to sys.path if running as script to support absolute imports
+if __name__ == '__main__':
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    _root_dir = os.path.dirname(_script_dir)
+    if _root_dir not in sys.path:
+        sys.path.insert(0, _root_dir)
+
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Optional, Dict, Callable

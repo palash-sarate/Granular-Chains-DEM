@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -N Grid_Filling_Benchmark
+#PBS -q workq
+#PBS -l walltime=06:00:00
+#PBS -l nodes=master:ppn=64
+#PBS -l mem=128gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/grid_filling_benchmark.log
+# Standard error file
+#PBS -e PBS_Output/grid_filling_benchmark_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# Grid Hopper Filling Scaling Benchmark Job
+# This script runs a series of simulations to find the optimal configuration
+# for batch hopper filling simulations.
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate environment
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+echo "------------------------------------------------------------"
+echo "Starting Grid Hopper Filling Benchmark at: $(date)"
+echo "Node: $(hostname)"
+echo "------------------------------------------------------------"
+
+# Ensure output directory for PBS logs exists
+mkdir -p PBS_Output
+
+# Run the automated benchmark script
+python -u benchmark_grid_filling.py
+
+echo "------------------------------------------------------------"
+echo "Benchmark Suite complete at: $(date)"
+echo "------------------------------------------------------------"
