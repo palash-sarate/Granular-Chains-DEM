@@ -1176,5 +1176,510 @@
     "3092": {
         "owner": "guest",
         "job_name": "Hopper_Fill_Batch_N4"
+    },
+    "3093": {
+        "cpupercent": "254",
+        "cput": "01:22:53",
+        "mem": "25.35 GB",
+        "ncpus": "8",
+        "vmem": "72.49 GB",
+        "walltime": "00:35:08",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3094": {
+        "cpupercent": "256",
+        "cput": "01:02:47",
+        "mem": "13.38 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:26:12",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3095": {
+        "cpupercent": "235",
+        "cput": "00:38:32",
+        "mem": "12.59 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:16:39",
+        "exit_status": "271",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3096": {
+        "cpupercent": "269",
+        "cput": "13:26:35",
+        "mem": "13.40 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "05:19:36",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3097": {
+        "cpupercent": "100",
+        "cput": "00:00:01",
+        "mem": "0 KB",
+        "ncpus": "64",
+        "vmem": "0 KB",
+        "walltime": "00:00:01",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Relaxed_2D_States_Generation"
+    },
+    "3098": {
+        "cpupercent": "2448",
+        "cput": "01:06:27",
+        "mem": "3.76 GB",
+        "ncpus": "64",
+        "vmem": "275.16 GB",
+        "walltime": "00:31:29",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Relaxed_2D_States_Generation"
+    },
+    "3099": {
+        "cpupercent": "2400",
+        "cput": "00:30:23",
+        "mem": "3.67 GB",
+        "ncpus": "64",
+        "vmem": "275.15 GB",
+        "walltime": "00:13:43",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Relaxed_2D_States_Generation"
+    },
+    "3100": {
+        "cpupercent": "2880",
+        "cput": "00:12:16",
+        "mem": "4.69 GB",
+        "ncpus": "64",
+        "vmem": "349.71 GB",
+        "walltime": "00:04:00",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Relaxed_2D_States_Batch"
+    },
+    "3101": {
+        "cpupercent": "4100",
+        "cput": "01:09:18",
+        "mem": "7.39 GB",
+        "ncpus": "128",
+        "vmem": "549.55 GB",
+        "walltime": "00:31:25",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Relaxed_2D_States_Batch"
+    },
+    "3102": {
+        "cpupercent": "700",
+        "cput": "00:00:07",
+        "mem": "0 KB",
+        "ncpus": "64",
+        "vmem": "0 KB",
+        "walltime": "00:00:01",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Relaxation_SuperSim"
+    },
+    "3103": {
+        "cpupercent": "333",
+        "cput": "00:00:20",
+        "mem": "0 KB",
+        "ncpus": "64",
+        "vmem": "0 KB",
+        "walltime": "00:00:06",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Relaxation_SuperSim"
+    },
+    "3104": {
+        "cpupercent": "630",
+        "cput": "00:14:21",
+        "mem": "15.72 GB",
+        "ncpus": "64",
+        "vmem": "71.99 GB",
+        "walltime": "00:02:00",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Relaxation_SuperSim"
+    },
+    "3105": {
+        "cpupercent": "799",
+        "cput": "11:44:50",
+        "mem": "15.76 GB",
+        "ncpus": "64",
+        "vmem": "72.00 GB",
+        "walltime": "01:28:22",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Relaxation_SuperSim"
+    },
+    "3106": {
+        "cpupercent": "260",
+        "cput": "01:27:18",
+        "mem": "13.41 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:35:48",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3107": {
+        "cpupercent": "268",
+        "cput": "01:26:44",
+        "mem": "13.44 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:35:12",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_check"
+    },
+    "3108": {
+        "cpupercent": "128",
+        "cput": "00:11:10",
+        "mem": "12.23 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:06:19",
+        "exit_status": "271",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3109": {
+        "cpupercent": "258",
+        "cput": "01:27:23",
+        "mem": "13.43 GB",
+        "ncpus": "8",
+        "vmem": "57.98 GB",
+        "walltime": "00:35:55",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3110": {
+        "cpupercent": "261",
+        "cput": "01:27:26",
+        "mem": "13.40 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:36:08",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3111": {
+        "cpupercent": "265",
+        "cput": "01:27:07",
+        "mem": "13.49 GB",
+        "ncpus": "8",
+        "vmem": "57.43 GB",
+        "walltime": "00:35:53",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3112": {
+        "cpupercent": "266",
+        "cput": "02:52:50",
+        "mem": "24.59 GB",
+        "ncpus": "8",
+        "vmem": "58.49 GB",
+        "walltime": "01:11:57",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3113": {
+        "cpupercent": "252",
+        "cput": "01:12:51",
+        "mem": "13.41 GB",
+        "ncpus": "8",
+        "vmem": "57.43 GB",
+        "walltime": "00:30:17",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3114": {
+        "cpupercent": "85",
+        "cput": "00:05:02",
+        "mem": "3.95 GB",
+        "ncpus": "8",
+        "vmem": "58.24 GB",
+        "walltime": "00:02:31",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3115": {
+        "cpupercent": "33",
+        "cput": "00:00:01",
+        "mem": "0 KB",
+        "ncpus": "8",
+        "vmem": "0 KB",
+        "walltime": "00:00:03",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3116": {
+        "cpupercent": "19",
+        "cput": "00:00:01",
+        "mem": "0 KB",
+        "ncpus": "8",
+        "vmem": "0 KB",
+        "walltime": "00:00:05",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3117": {
+        "cpupercent": "647",
+        "cput": "09:06:00",
+        "mem": "25.00 GB",
+        "ncpus": "8",
+        "vmem": "71.88 GB",
+        "walltime": "03:11:59",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3118": {
+        "cpupercent": "349",
+        "cput": "00:00:07",
+        "mem": "0 KB",
+        "ncpus": "64",
+        "vmem": "0 KB",
+        "walltime": "00:00:02",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3119": {
+        "cpupercent": "1467",
+        "cput": "05:28:09",
+        "mem": "8.88 GB",
+        "ncpus": "64",
+        "vmem": "113.34 GB",
+        "walltime": "00:39:37",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3120": {
+        "cpupercent": "762",
+        "cput": "01:10:23",
+        "mem": "8.88 GB",
+        "ncpus": "64",
+        "vmem": "65.27 GB",
+        "walltime": "00:09:13",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3121": {
+        "cpupercent": "627",
+        "cput": "00:18:39",
+        "mem": "4.12 GB",
+        "ncpus": "64",
+        "vmem": "60.56 GB",
+        "walltime": "00:02:41",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3122": {
+        "cpupercent": "563",
+        "cput": "00:05:58",
+        "mem": "4.12 GB",
+        "ncpus": "64",
+        "vmem": "60.56 GB",
+        "walltime": "00:00:58",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3123": {
+        "cpupercent": "638",
+        "cput": "00:20:37",
+        "mem": "4.12 GB",
+        "ncpus": "64",
+        "vmem": "60.56 GB",
+        "walltime": "00:02:38",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3124": {
+        "cpupercent": "771",
+        "cput": "01:14:41",
+        "mem": "6.60 GB",
+        "ncpus": "64",
+        "vmem": "62.99 GB",
+        "walltime": "00:09:42",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3125": {
+        "cpupercent": "800",
+        "cput": "14:52:50",
+        "mem": "11.10 GB",
+        "ncpus": "64",
+        "vmem": "67.62 GB",
+        "walltime": "04:28:45",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3126": {
+        "cpupercent": "558",
+        "cput": "00:05:18",
+        "mem": "1.59 GB",
+        "ncpus": "64",
+        "vmem": "57.92 GB",
+        "walltime": "00:01:00",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3127": {
+        "cpupercent": "543",
+        "cput": "00:03:01",
+        "mem": "1.61 GB",
+        "ncpus": "64",
+        "vmem": "57.93 GB",
+        "walltime": "00:00:37",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3128": {
+        "cpupercent": "1598",
+        "cput": "11:51:41",
+        "mem": "11.40 GB",
+        "ncpus": "64",
+        "vmem": "117.09 GB",
+        "walltime": "00:44:44",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3129": {
+        "cpupercent": "5475",
+        "cput": "41:31:36",
+        "mem": "14.50 GB",
+        "ncpus": "64",
+        "vmem": "455.01 GB",
+        "walltime": "01:13:25",
+        "exit_status": "271",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3130": {
+        "cpupercent": "6393",
+        "cput": "79:59:08",
+        "mem": "20.44 GB",
+        "ncpus": "64",
+        "vmem": "464.61 GB",
+        "walltime": "01:15:22",
+        "exit_status": "0",
+        "owner": "guest",
+        "job_name": "Grid_Filling_Benchmark"
+    },
+    "3131": {
+        "cpupercent": "259",
+        "cput": "01:27:04",
+        "mem": "13.37 GB",
+        "ncpus": "8",
+        "vmem": "58.30 GB",
+        "walltime": "00:35:56",
+        "exit_status": "0",
+        "owner": "varsha",
+        "job_name": "FE_ML_plate_training_onnnereyav"
+    },
+    "3132": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3133": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3134": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3135": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3136": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3137": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3138": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3139": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3140": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3141": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3142": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3143": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3144": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3145": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3146": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3147": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3148": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3149": {
+        "owner": "N/A",
+        "status": "not_found"
+    },
+    "3150": {
+        "owner": "N/A",
+        "status": "not_found"
     }
 }

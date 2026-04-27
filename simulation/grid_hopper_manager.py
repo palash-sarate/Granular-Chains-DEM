@@ -30,9 +30,8 @@ class GridHopperManager:
                          mode: str = "2D_stacked",
                          simulation: str = "Grid_Hopper_Filling",
                          template: str = "in.grid_hopper_fill"):
-        """
-        Main entry point for grid-based batch hopper filling using analytical regions.
-        """
+        import time
+        t_start = time.time()
         if source_dir is None:
             source_dir = f"chain_data/relaxed/N{N}"
             
@@ -44,7 +43,7 @@ class GridHopperManager:
         n_templates = len(list(Path(source_dir).glob("*.data")))
 
         # 2. Setup Grid Geometry (Analytical Regions)
-        run_name = f"Grid_Fill_{n_hoppers}H_N{N}_S{seed}"
+        run_name = f"Grid_Fill_{n_hoppers}H_N{N}_P{num_procs}T{num_threads}_S{seed}"
         job_dir = Path(f"dumping_yard/Grid_Hopper_Filling/{run_name}")
         job_dir.mkdir(parents=True, exist_ok=True)
         
@@ -54,6 +53,8 @@ class GridHopperManager:
         insertion_file, z_max = self._generate_grid_insertion_file(
             job_dir, n_hoppers, n_fill_per_hopper, n_templates, seed, N, spacing, metadata, mode=mode
         )
+
+        setup_duration = time.time() - t_start
 
         # 4. Configure & Run Simulation
         config = SimulationConfig(
@@ -99,6 +100,8 @@ class GridHopperManager:
             self.split_grid_results(final_grid_data, metadata, output_dir)
         else:
             print(f"Error: Final grid data not found at {final_grid_data}")
+
+        return setup_duration
 
     def resume_grid_filling(self, restart_path: str, relax_steps: int = 500000,
                            dt: float = 1e-6, output_dir: str = "chain_data/grid_filled",

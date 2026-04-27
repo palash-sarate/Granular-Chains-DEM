@@ -328,7 +328,7 @@ class SimulationOrchestrator:
                                 seed: Optional[int] = None, dt: float = 1e-6,
                                 output_dir: str = "chain_data/grid_filled",
                                 source_dir: Optional[str] = None,
-                                hopper_template_data: str = "simulation_geometries/2D_hopper.data",
+                                hopper_template_data: str = "simulation_geometries/2D_hopper.inc",
                                 lepton_file: str = "simulation_templates/lepton.inc",
                                 dump_file: str = "simulation_templates/quiet_dump.inc",
                                 viscosity: float = 0.001,
@@ -350,7 +350,7 @@ class SimulationOrchestrator:
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         grid_manager = GridHopperManager(runner)
         
-        grid_manager.run_grid_filling(
+        return grid_manager.run_grid_filling(
             n_hoppers=n_hoppers,
             n_fill_per_hopper=n_fill,
             N=N,
