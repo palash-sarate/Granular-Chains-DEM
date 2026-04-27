@@ -106,7 +106,7 @@ def main():
     p_batch.add_argument("--num_procs", type=int)
     p_batch.add_argument("--num_threads", type=int, default=1)
     p_batch.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
-    p_grid.add_argument("--no-intel", action="store_false", dest="use_intel")
+    p_batch.add_argument("--no-intel", action="store_false", dest="use_intel")
 
     # 8. run_grid_batch_relaxation
     p_grid = subparsers.add_parser("run_grid_batch_relaxation", help="Run a super-simulation for batch relaxation")
@@ -131,23 +131,24 @@ def main():
     # 9. run_grid_hopper_filling
     p_grid_h = subparsers.add_parser("run_grid_hopper_filling", help="Run a super-simulation for batch hopper filling")
     p_grid_h.add_argument("--n_hoppers", type=int, default=4)
-    p_grid_h.add_argument("--n_fill", type=int, default=10)
-    p_grid_h.add_argument("--N", type=int, default=4)
+    p_grid_h.add_argument("--n_fill", default="10")
+    p_grid_h.add_argument("--N", default="4")
     p_grid_h.add_argument("--spacing", type=float, default=2.0)
     p_grid_h.add_argument("--relax_steps", type=int, default=500000)
     p_grid_h.add_argument("--dt", type=float, default=1e-6)
     p_grid_h.add_argument("--output_dir", default="chain_data/grid_filled")
     p_grid_h.add_argument("--source_dir", help="Directory containing relaxed chains")
-    p_grid_h.add_argument("--hopper_template_data", default="simulation_geometries/2D_hopper.data")
+    p_grid_h.add_argument("--hopper_template_data", default="simulation_geometries/2D_hopper.inc")
     p_grid_h.add_argument("--lepton_file", default="simulation_templates/lepton.inc")
     p_grid_h.add_argument("--dump_file", default="simulation_templates/quiet_dump.inc")
     p_grid_h.add_argument("--viscosity", type=float, default=0.001)
     p_grid_h.add_argument("--num_procs", type=int, default=1)
     p_grid_h.add_argument("--num_threads", type=int, default=1)
     p_grid_h.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
-    p_grid_h.add_argument("--mode", choices=["2D_stacked", "3D"], default="2D_stacked")
+    p_grid_h.add_argument("--mode", choices=["2D_stacked", "3D_grid"], default="2D_stacked")
     p_grid_h.add_argument("--simulation", default="Grid_Hopper_Filling")
     p_grid_h.add_argument("--template", default="in.grid_hopper_fill")
+    p_grid_h.add_argument("--geometry_vars", type=str, help="JSON string for per-hopper geometry variables")
 
     # 10. resume_grid_hopper_filling
     p_res_grid = subparsers.add_parser("resume_grid_hopper_filling", help="Resume a super-simulation for batch hopper filling")
@@ -180,6 +181,28 @@ def main():
         cmd_args["run_steps"] = [int(s.strip()) for s in str(cmd_args["run_steps"]).split(",")]
         cmd_args["viscosities"] = [float(v.strip()) for v in str(cmd_args["viscosities"]).split(",")]
     
+    if cmd_name == "run_grid_hopper_filling":
+        # Parse N and n_fill into lists
+        if isinstance(cmd_args["N"], str):
+            cmd_args["N"] = [int(n.strip()) for n in cmd_args["N"].split(",")]
+        else:
+            cmd_args["N"] = [cmd_args["N"]]
+            
+        if isinstance(cmd_args["n_fill"], str):
+            cmd_args["n_fill"] = [int(n.strip()) for n in cmd_args["n_fill"].split(",")]
+        else:
+            cmd_args["n_fill"] = [cmd_args["n_fill"]]
+
+        # Handle geometry_vars JSON
+        if cmd_args.get("geometry_vars"):
+            try:
+                cmd_args["geometry_vars"] = json.loads(cmd_args["geometry_vars"])
+            except Exception as e:
+                print(f"Error parsing --geometry_vars JSON: {e}")
+                sys.exit(1)
+        else:
+            cmd_args["geometry_vars"] = {}
+
     if cmd_name == "generate_linear_chains":
         cmd_name = "generate_chains"
     

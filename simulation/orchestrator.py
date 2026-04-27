@@ -323,7 +323,7 @@ class SimulationOrchestrator:
         else:
             print(f"Error: Final grid data not found at {final_grid_data}")
 
-    def run_grid_hopper_filling(self, n_hoppers: int = 4, n_fill: int = 10, N: int = 4,
+    def run_grid_hopper_filling(self, n_hoppers: int = 4, n_fill: Any = 10, N: Any = 4,
                                 spacing: float = 1.0, relax_steps: int = 500000,
                                 seed: Optional[int] = None, dt: float = 1e-6,
                                 output_dir: str = "chain_data/grid_filled",
@@ -336,7 +336,8 @@ class SimulationOrchestrator:
                                 use_kokkos: bool = True,
                                 mode: str = "2D_stacked",
                                 simulation: str = "Grid_Hopper_Filling",
-                                template: str = "in.grid_hopper_fill"):
+                                template: str = "in.grid_hopper_fill",
+                                geometry_vars: Dict[str, Any] = None):
         """
         Main entry point for grid-based batch hopper filling.
         Packs multiple hoppers into one simulation box for faster generation.
@@ -369,7 +370,8 @@ class SimulationOrchestrator:
             use_kokkos=use_kokkos,
             mode=mode,
             simulation=simulation,
-            template=template
+            template=template,
+            geometry_vars=geometry_vars
         )
 
     def resume_grid_hopper_filling(self, restart_path: str, relax_steps: int = 500000,

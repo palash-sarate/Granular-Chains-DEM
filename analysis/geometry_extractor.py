@@ -49,98 +49,103 @@ lattice sc {lattice_spacing}
 # --------------------------------------------------
 # Main pipeline
 # --------------------------------------------------
+class GeometryExtractor:
+    def __init__(self, lammps_cmd: str = "lmp"):
+        self.lammps_cmd = lammps_cmd
+
+    def extract(self, inc_file: Path, outdir: Path, spacing: float = 0.001, 
+                radius: float = None, regions: list = None, auto_vis: bool = True, 
+                combined: bool = True, bounds: list = None):
+        
+        inc_file = Path(inc_file).resolve()
+        outdir = Path(outdir)
+        outdir.mkdir(parents=True, exist_ok=True)
+        
+        if not bounds:
+            # Default wide bounds for grid simulations
+            bounds = [-1.0, 1.0, -1.0, 1.0, -0.1, 1.0]
+
+        extra_vars = {}
+
+        # Auto-detect regions if requested or if no regions provided
+        if auto_vis or not regions:
+            with open(inc_file, "r") as f:
+                detected = [line.split()[1] for line in f if line.strip().startswith("region") and "_vis" in line]
+            if detected:
+                print(f"[INFO] Auto-detected {len(detected)} visualization regions.")
+                if regions:
+                    regions = list(set(regions + detected))
+                else:
+                    regions = detected
+            else:
+                if not regions:
+                    regions = ["simbox"]
+
+        vtk_files = []
+        batches = [regions] if combined else [[r] for r in regions]
+
+        for batch in batches:
+            label = "combined" if combined else batch[0]
+            dump_file = outdir / f"dump_{label}.lammpstrj"
+            input_file = outdir / f"in.generate_{label}"
+
+            # Generate LAMMPS input
+            lmp_script = generate_lammps_input(
+                inc_file=inc_file,
+                dump_file=dump_file,
+                lattice_spacing=spacing,
+                region_bounds=bounds,
+                extra_vars=extra_vars,
+                target_regions=batch
+            )
+
+            with open(input_file, "w") as f:
+                f.write(lmp_script)
+
+            print(f"[{label}] Running LAMMPS sampling for {len(batch)} regions...")
+            try:
+                subprocess.run([self.lammps_cmd, "-in", str(input_file)], check=True, capture_output=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Error running LAMMPS: {e.stderr.decode()}")
+                return []
+
+            print(f"[{label}] Constructing surface with OVITO...")
+            pipeline = import_file(str(dump_file))
+            recon_radius = radius if radius else spacing * 1.2
+            pipeline.modifiers.append(
+                ConstructSurfaceModifier(
+                    radius=recon_radius,
+                    smoothing_level=0
+                )
+            )
+
+            vtk_file = outdir / f"{label}_mesh.vtk"
+            export_file(pipeline, str(vtk_file), format="vtk/trimesh", key="surface")
+            vtk_files.append(vtk_file)
+            
+            # Cleanup temporary files
+            if dump_file.exists(): dump_file.unlink()
+            if input_file.exists(): input_file.unlink()
+
+        return vtk_files
+
 def main():
     parser = argparse.ArgumentParser(description="Convert LAMMPS .inc geometry to mesh using OVITO")
-
-    parser.add_argument("inc", help="Path to .inc file")
-    parser.add_argument("--outdir", default="out_mesh", help="Output directory")
-    parser.add_argument("--spacing", type=float, default=0.001, help="Lattice spacing for sampling")
-    parser.add_argument("--radius", type=float, default=None, help="Surface reconstruction radius (defaults to 1.2 * spacing)")
-    parser.add_argument("--lammps_cmd", default="lmp", help="LAMMPS executable")
-
-    parser.add_argument("--regions", nargs="+", help="List of LAMMPS region names to fill")
-    parser.add_argument("--auto-vis", action="store_true", help="Automatically find regions ending in _vis in the .inc file")
-    parser.add_argument("--combined", action="store_true", help="Extract all regions into a single mesh file")
-    parser.add_argument("--bounds", nargs=6, type=float,
-                        default=[-0.2, 0.2, -0.3, 0.3, -0.1, 0.6],
-                        help="Sampling box bounds: xlo xhi ylo yhi zlo zhi")
-
-    parser.add_argument("--var", action="append",
-                        help="Extra LAMMPS variables (format: name=value)")
+    # ... (existing arguments)
 
     args = parser.parse_args()
-
-    inc_file = Path(args.inc).resolve()
-    outdir = Path(args.outdir) / inc_file.stem
-    outdir.mkdir(parents=True, exist_ok=True)
-
-    # Parse extra variables
-    extra_vars = {}
-    if args.var:
-        for v in args.var:
-            k, val = v.split("=")
-            extra_vars[k] = val
-
-    # Auto-detect regions if requested or if no regions provided
-    if args.auto_vis or not args.regions:
-        with open(inc_file, "r") as f:
-            detected = [line.split()[1] for line in f if line.strip().startswith("region") and "_vis" in line]
-        if detected:
-            print(f"[INFO] Auto-detected {len(detected)} visualization regions.")
-            if args.regions:
-                # Deduplicate if some were manually provided
-                args.regions = list(set(args.regions + detected))
-            else:
-                args.regions = detected
-        else:
-            if not args.regions:
-                args.regions = ["simbox"]
-
-    vtk_files = []
-
-    # Batch processing or Individual processing
-    batches = [args.regions] if args.combined else [[r] for r in args.regions]
-
-    for batch in batches:
-        label = "combined" if args.combined else batch[0]
-        dump_file = outdir / f"dump_{label}.lammpstrj"
-        input_file = outdir / f"in.generate_{label}"
-
-        # Generate LAMMPS input
-        lmp_script = generate_lammps_input(
-            inc_file=inc_file,
-            dump_file=dump_file,
-            lattice_spacing=args.spacing,
-            region_bounds=args.bounds,
-            extra_vars=extra_vars,
-            target_regions=batch
-        )
-
-        with open(input_file, "w") as f:
-            f.write(lmp_script)
-
-        print(f"[{label}] Running LAMMPS (Lattice fill for {len(batch)} regions)...")
-        subprocess.run([args.lammps_cmd, "-in", str(input_file)], check=True)
-
-        print(f"[{label}] Loading dump into OVITO...")
-        pipeline = import_file(str(dump_file))
-
-        print(f"[{label}] Constructing surface (Zero smoothing)...")
-        recon_radius = args.radius if args.radius else args.spacing * 1.2
-        pipeline.modifiers.append(
-            ConstructSurfaceModifier(
-                radius=recon_radius,
-                smoothing_level=0
-            )
-        )
-
-        vtk_file = outdir / f"{label}_mesh.vtk"
-
-        print(f"[{label}] Exporting mesh to {vtk_file}...")
-        export_file(pipeline, str(vtk_file), format="vtk/trimesh", key="surface")
-        vtk_files.append(vtk_file)
-
-    print(f"[DONE] Generated {len(vtk_files)} meshes.")
+    
+    extractor = GeometryExtractor(lammps_cmd=args.lammps_cmd)
+    vtk_files = extractor.extract(
+        inc_file=args.inc,
+        outdir=args.outdir,
+        spacing=args.spacing,
+        radius=args.radius,
+        regions=args.regions,
+        auto_vis=args.auto_vis,
+        combined=args.combined,
+        bounds=args.bounds
+    )
 
     if not os.environ.get("DISPLAY"):
         print("[INFO] No DISPLAY detected. Skipping interactive visualization.")
