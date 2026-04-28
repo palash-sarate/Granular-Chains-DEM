@@ -164,6 +164,34 @@ def main():
     p_res_grid.add_argument("--num_threads", type=int, default=1)
     p_res_grid.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
     p_res_grid.add_argument("--template", default="in.grid_hopper_fill_resume")
+    p_res_grid.add_argument("--seed", type=int, default=None)
+
+    # 11. run_grid_hopper_flow
+    p_flow = subparsers.add_parser("run_grid_hopper_flow", help="Transition filled hoppers to oscillatory flow")
+    p_flow.add_argument("--source_dir", required=True, help="Directory of a Grid_Hopper_Filling run")
+    p_flow.add_argument("--run_steps", type=int, default=1000000)
+    p_flow.add_argument("--freq", type=str, default="10.0", help="Freq (single float or JSON list)")
+    p_flow.add_argument("--amp", type=str, default="0.01", help="Amp (single float or JSON list)")
+    p_flow.add_argument("--osc_dir", choices=['x','y','z'], default='z')
+    p_flow.add_argument("--dt", type=float, default=1e-6)
+    p_flow.add_argument("--output_dir", default="chain_data/grid_flow")
+    p_flow.add_argument("--num_procs", type=int, default=1)
+    p_flow.add_argument("--num_threads", type=int, default=1)
+    p_flow.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
+    p_flow.add_argument("--simulation", default="Grid_Hopper_Flow")
+    p_flow.add_argument("--template", default="in.grid_hopper_flow")
+    p_flow.add_argument("--seed", type=int, default=None)
+
+    # 12. resume_grid_hopper_flow
+    p_res_flow = subparsers.add_parser("resume_grid_hopper_flow", help="Resume a grid flow simulation")
+    p_res_flow.add_argument("--restart_path", required=True)
+    p_res_flow.add_argument("--run_steps", type=int, default=1000000)
+    p_res_flow.add_argument("--dt", type=float, default=1e-6)
+    p_res_flow.add_argument("--num_procs", type=int, default=1)
+    p_res_flow.add_argument("--num_threads", type=int, default=1)
+    p_res_flow.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
+    p_res_flow.add_argument("--template", default="in.grid_hopper_flow_resume")
+    p_res_flow.add_argument("--seed", type=int, default=None)
 
     args = parser.parse_args()
     
@@ -203,6 +231,21 @@ def main():
                 sys.exit(1)
         else:
             cmd_args["geometry_vars"] = {}
+
+    if cmd_name == "run_grid_hopper_flow":
+        # Parse freq and amp
+        for key in ["freq", "amp"]:
+            val = cmd_args[key]
+            if isinstance(val, str):
+                if "[" in val:
+                    try:
+                        cmd_args[key] = json.loads(val)
+                    except:
+                        cmd_args[key] = [float(x.strip()) for x in val.strip("[]").split(",")]
+                elif "," in val:
+                    cmd_args[key] = [float(x.strip()) for x in val.split(",")]
+                else:
+                    cmd_args[key] = float(val)
 
     if cmd_name == "generate_linear_chains":
         cmd_name = "generate_chains"

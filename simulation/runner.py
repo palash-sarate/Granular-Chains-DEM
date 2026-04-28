@@ -10,6 +10,16 @@ import shutil
 class SimulationRunner:
     def __init__(self, lammps_executable: str = "lmp"):
         self.lammps_exe = lammps_executable
+        
+        # Windows fallback: if 'lmp' not in PATH, look for local './lmp.exe'
+        if not shutil.which(self.lammps_exe):
+            local_win = "./lmp.exe"
+            local_linux = "./lmp"
+            if os.path.exists(local_win):
+                self.lammps_exe = os.path.abspath(local_win)
+            elif os.path.exists(local_linux):
+                self.lammps_exe = os.path.abspath(local_linux)
+                
         self.output_dir = ""
         self._features = None # Cache for lmp -h features
 
@@ -226,11 +236,15 @@ class SimulationRunner:
         # 1. Wrap command with mpiexec if parallelism is requested
         nprocs = config.num_procs if config.num_procs is not None else 1
         if nprocs and nprocs > 1:
-            if config.num_threads > 1:
-                # Hybrid MPI+OpenMP: Bind each MPI process to a set of cores equal to num_threads
-                cmd = ["mpiexec", "--map-by", f"socket:PE={config.num_threads}", "--bind-to", "core", "-n", str(nprocs)] + cmd
+            if sys.platform == "win32":
+                # Windows MS-MPI doesn't support --bind-to or --map-by flags
+                cmd = ["mpiexec", "-n", str(nprocs)] + cmd
             else:
-                cmd = ["mpiexec", "--bind-to", "core", "--map-by", "socket", "-n", str(nprocs)] + cmd
+                if config.num_threads > 1:
+                    # Hybrid MPI+OpenMP: Bind each MPI process to a set of cores equal to num_threads
+                    cmd = ["mpiexec", "--map-by", f"socket:PE={config.num_threads}", "--bind-to", "core", "-n", str(nprocs)] + cmd
+                else:
+                    cmd = ["mpiexec", "--bind-to", "core", "--map-by", "socket", "-n", str(nprocs)] + cmd
             
         # 2. Prepare environment (OpenMP tuning)
         env = os.environ.copy()

@@ -13,6 +13,35 @@ class GridHopperManager:
     def __init__(self, runner: SimulationRunner):
         self.runner = runner
 
+    def _resolve_includes(self, path: Path):
+        lines = []
+        with open(path, 'r') as f:
+            for line in f:
+                if line.strip().startswith("include"):
+                    inc_path = Path(line.split()[1])
+                    if not inc_path.is_absolute():
+                        inc_path = path.parent / inc_path
+                    lines.extend(self._resolve_includes(inc_path))
+                else:
+                    lines.append(line)
+        return lines
+
+    def _generate_resume_path(self, job_dir: Path, seed: int) -> Tuple[Path, str]:
+        """
+        Generates a standardized resume path: OriginalName_S<seed1>_S<seed2>
+        """
+        original_name = job_dir.name
+        # Clean up any legacy _ResN suffixes if present
+        import re
+        base_name = re.sub(r'_Res\d+', '', original_name)
+        run_name = f"{base_name}_S{seed}"
+        
+        # Determine the simulation type from the job_dir path
+        # dumping_yard/<SimulationType>/<RunName>
+        sim_type = job_dir.parent.name
+        new_path = Path(f"dumping_yard/{sim_type}/{run_name}")
+        return new_path, run_name
+
     def run_grid_filling(self, n_hoppers: int, n_fill_per_hopper: Any, N: Any, 
                          hopper_template_data: str = "simulation_geometries/2D_hopper_setup.inc",
                          source_dir: str = None,
@@ -47,6 +76,20 @@ class GridHopperManager:
             n_fill_list = list(n_fill_per_hopper)
             if len(n_fill_list) < n_hoppers:
                 n_fill_list = (n_fill_list * (n_hoppers // len(n_fill_list) + 1))[:n_hoppers]
+        
+        # 1b. Normalize geometry variables
+        normalized_geo_vars = [{} for _ in range(n_hoppers)]
+        if geometry_vars:
+            for var_name, values in geometry_vars.items():
+                if isinstance(values, (list, tuple)):
+                    # Cycle values if shorter than n_hoppers
+                    expanded = (list(values) * (n_hoppers // len(values) + 1))[:n_hoppers]
+                    for i in range(n_hoppers):
+                        normalized_geo_vars[i][var_name] = expanded[i]
+                else:
+                    # Single value applied to all
+                    for i in range(n_hoppers):
+                        normalized_geo_vars[i][var_name] = values
 
         # 2. Prepare molecules from multiple N sources
         from .hopper_manager import HopperManager
@@ -55,12 +98,18 @@ class GridHopperManager:
         mol_dir.mkdir(parents=True, exist_ok=True)
         
         unique_Ns = sorted(list(set(N_list)))
+        relaxed_sources = {} # N -> source_path
         mol_ranges = {} # N -> { 'start': int, 'count': int }
         combined_inc_lines = []
         current_id_offset = 0
         
         for n_val in unique_Ns:
-            n_source = Path(f"chain_data/relaxed/N{n_val}")
+            if source_dir:
+                n_source = Path(source_dir) / f"N{n_val}"
+            else:
+                n_source = Path(f"chain_data/relaxed/N{n_val}")
+            
+            relaxed_sources[n_val] = str(n_source).replace("\\", "/")
             data_files = list(n_source.glob("*.data"))
             if not data_files:
                 print(f"Warning: No templates found for N={n_val} in {n_source}")
@@ -84,7 +133,7 @@ class GridHopperManager:
         
         # 3. Setup Grid Geometry (Analytical Regions)
         run_name = f"Grid_Fill_{n_hoppers}H_MixedN_S{seed}"
-        job_dir = Path(f"dumping_yard/Grid_Hopper_Filling/{run_name}")
+        job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         job_dir.mkdir(parents=True, exist_ok=True)
         
         geometry_inc, metadata = self._generate_replicated_geometry(
@@ -95,14 +144,16 @@ class GridHopperManager:
         try:
             from analysis.geometry_extractor import GeometryExtractor
             print(f"--- Generating VTK Mesh for UI Visualization ---")
-            extractor = GeometryExtractor(lammps_cmd=self.runner.lammps_executable)
+            extractor = GeometryExtractor(lammps_cmd=self.runner.lammps_exe)
             # Calculate bounds based on grid size to ensure we capture all hoppers
-            grid_dim = math.ceil(n_hoppers**(1/3))
-            max_xy = grid_dim * spacing
-            vtk_bounds = [-spacing, max_xy, -spacing, max_xy, -0.1, 1.0]
+            cols = math.ceil(math.sqrt(n_hoppers))
+            rows = math.ceil(n_hoppers / cols)
+            max_x = cols * spacing
+            max_y = rows * spacing
+            vtk_bounds = [-spacing, max_x, -spacing, max_y, -0.1, 1.0]
             
             extractor.extract(
-                inc_file=job_dir / geometry_inc,
+                inc_file=geometry_inc,
                 outdir=job_dir / "Geometry_vtk",
                 auto_vis=True,
                 combined=False,
@@ -157,19 +208,22 @@ class GridHopperManager:
                 "spacing": spacing,
                 "geometry_vars": normalized_geo_vars,
                 "geometry_inc": geometry_inc,
-                "simulation": simulation
+                "simulation": simulation,
+                "relaxed_sources": relaxed_sources
             }, f)
 
-        self.runner.run(config)
+        self.runner.run(config, clean_dir=False)
         
         # 5. Split Results
         for k in metadata:
             metadata[k]['N'] = N_list[k]
             metadata[k]['n_fill'] = n_fill_list[k]
+            metadata[k]['source_dir'] = relaxed_sources.get(N_list[k])
 
         final_grid_data = Path(config.output_dir) / "final_grid.data"
         if final_grid_data.exists():
-            self.split_grid_results(final_grid_data, metadata, output_dir, spacing=spacing)
+            split_dir = Path(config.output_dir) / "split_states"
+            self.split_grid_results(final_grid_data, metadata, str(split_dir), spacing=spacing)
         else:
             print(f"Error: Final grid data not found at {final_grid_data}")
 
@@ -181,15 +235,19 @@ class GridHopperManager:
                            dump_file: str = "simulation_templates/quiet_dump.inc",
                            viscosity: float = 0.001,
                            num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
-                           mode: str = "2D_stacked", template: str = "in.grid_hopper_fill",
-                           geometry_vars: Dict[str, Any] = None):
+                           template: str = "in.grid_hopper_fill_resume",
+                           seed: int = 42):
         """
         Resumes a grid filling simulation from a restart file.
         """
         import json
         restart_p = Path(restart_path)
-        job_dir = restart_p.parent
-        metadata_path = job_dir / "grid_metadata.json"
+        # Search for metadata in restart folder or its parent
+        prev_job_dir = restart_p.parent
+        metadata_path = prev_job_dir / "grid_metadata.json"
+        if not metadata_path.exists():
+            prev_job_dir = prev_job_dir.parent
+            metadata_path = prev_job_dir / "grid_metadata.json"
         
         if not metadata_path.exists():
             raise FileNotFoundError(f"Metadata file not found at {metadata_path}. Cannot resume/split.")
@@ -206,7 +264,16 @@ class GridHopperManager:
                 "geometry_vars": v.get("geometry_vars")
             } for k, v in meta_raw["metadata"].items()}
 
-        run_name = f"Resume_{job_dir.name}"
+        # New Naming Strategy: Append the new seed to the original name
+        original_name = prev_job_dir.name
+        run_name = f"{original_name}_S{seed}"
+            
+        new_job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
+        new_job_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Metadata Inheritance: Copy metadata to the new directory so we can resume from here too
+        import shutil
+        shutil.copy(metadata_path, new_job_dir / "grid_metadata.json")
         
         config = SimulationConfig(
             template="in.grid_hopper_fill_resume",
@@ -216,8 +283,8 @@ class GridHopperManager:
             lepton_file=lepton_file,
             dump_file=dump_file,
             extra_vars={
-                "restart_path": str(restart_p),
-                "geometry_inc": geometry_inc,
+                "restart_path": str(restart_p).replace("\\", "/"),
+                "geometry_inc": geometry_inc.replace("\\", "/"),
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "viscosity": viscosity
@@ -228,64 +295,224 @@ class GridHopperManager:
         )
         
         print(f"--- Resuming Grid Hopper Filling from {restart_p.name} ---")
-        self.runner.run(config)
+        self.runner.run(config, clean_dir=False)
         
         final_grid_data = Path(config.output_dir) / "final_grid.data"
         if final_grid_data.exists():
-            self.split_grid_results(final_grid_data, metadata, output_dir, spacing=spacing)
+            split_dir = Path(config.output_dir) / "split_states"
+            self.split_grid_results(final_grid_data, metadata, str(split_dir), spacing=spacing)
 
-    def _generate_replicated_geometry(self, setup_path: Path, n_hoppers: int, spacing: float, job_dir: Path, normalized_geo_vars: List[Dict]):
-        import re
-        def resolve_includes(path: Path):
-            lines = []
-            with open(path, 'r') as f:
-                for line in f:
-                    if line.strip().startswith("include"):
-                        inc_path = Path(line.split()[1])
-                        if not inc_path.is_absolute():
-                            inc_path = path.parent / inc_path
-                        lines.extend(resolve_includes(inc_path))
-                    else:
-                        lines.append(line)
-            return lines
+    def run_grid_flow(self, source_dir: str, run_steps: int = 1000000,
+                      freq: Any = 10.0, amp: Any = 0.01, osc_dir: str = 'z',
+                      dt: float = 1e-6,
+                      output_dir: str = "chain_data/grid_flow",
+                      lepton_file: str = "simulation_templates/lepton.inc",
+                      dump_file: str = "simulation_templates/quiet_dump.inc",
+                      viscosity: float = 0.001,
+                      num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
+                      simulation: str = "Grid_Hopper_Flow",
+                      template: str = "in.grid_hopper_flow",
+                      seed: int = 12345):
+        """
+        Takes a filled grid state and starts the flow simulation (opens orifices + oscillation).
+        """
+        import json
+        source_p = Path(source_dir)
+        metadata_path = source_p / "grid_metadata.json"
+        if not metadata_path.exists():
+            raise FileNotFoundError(f"Metadata file not found at {metadata_path}. Cannot start flow.")
 
-        original_commands = resolve_includes(setup_path)
+        with open(metadata_path, 'r') as f:
+            meta_raw = json.load(f)
+            n_hoppers = len(meta_raw["metadata"])
+            spacing = meta_raw.get("spacing", 2.0)
+            geometry_vars = meta_raw.get("geometry_vars", [])
+            # Reconstruct metadata for splitting later
+            metadata_original = {int(k): {
+                "offset": np.array(v["offset"]),
+                "N": v.get("N"),
+                "n_fill": v.get("n_fill"),
+                "geometry_vars": v.get("geometry_vars")
+            } for k, v in meta_raw["metadata"].items()}
+
+        # 1. Normalize freq and amp
+        if isinstance(freq, (int, float)):
+            freq_list = [float(freq)] * n_hoppers
+        else:
+            freq_list = (list(freq) * (n_hoppers // len(freq) + 1))[:n_hoppers]
+            
+        if isinstance(amp, (int, float)):
+            amp_list = [float(amp)] * n_hoppers
+        else:
+            amp_list = (list(amp) * (n_hoppers // len(amp) + 1))[:n_hoppers]
+
+        # 2. Setup Flow Run Directory
+        run_name = f"Grid_Flow_{n_hoppers}H_S{seed}"
+        job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
+        job_dir.mkdir(parents=True, exist_ok=True)
+
+        # 3. Generate Flow Geometry (No lids, includes oscillation variables)
+        hopper_template = "simulation_geometries/2D_hopper_with_orifice_cover.inc"
         
-        # 1. Parse all variables into a Python dictionary for resolution
-        vars_dict = {"pi": math.pi}
-        for line in original_commands:
-            stripped = line.strip()
-            if stripped.startswith("variable"):
-                parts = stripped.split()
-                v_name = parts[1]
-                v_expr = " ".join(parts[3:])
-                # Remove comments
-                v_expr = v_expr.split("#")[0].strip()
-                # Simple substitution of already known variables
-                for k, v in vars_dict.items():
-                    v_expr = v_expr.replace(f"${{{k}}}", str(v))
-                
-                try:
-                    # Handle basic math (sin, cos, tan, etc.)
-                    safe_expr = v_expr.replace("sin(", "math.sin(").replace("cos(", "math.cos(").replace("tan(", "math.tan(")
-                    vars_dict[v_name] = eval(safe_expr, {"math": math, "__builtins__": None}, vars_dict)
-                except:
-                    # If it's a complex formula LAMMPS handles, we might fail here, but let's try
-                    pass
+        osc_params = [{"freq": freq_list[i], "amp": amp_list[i], "dir": osc_dir} for i in range(n_hoppers)]
+        
+        geometry_flow_inc, _ = self._generate_replicated_geometry(
+            Path(hopper_template), n_hoppers, spacing, job_dir, geometry_vars,
+            exclude_regions=["orifice_cover"],
+            oscillation_params=osc_params,
+            inc_name="replicated_geometry_flow.inc"
+        )
 
-        # 1b. Validation: Check if all user-provided variables exist in the .inc file
+        # 4. Save New Metadata
+        new_meta = meta_raw.copy()
+        new_meta["freq"] = freq_list
+        new_meta["amp"] = amp_list
+        new_meta["osc_dir"] = osc_dir
+        new_meta["source_dir"] = str(source_p).replace("\\", "/")
+        new_meta["source_run"] = source_p.name
+        new_meta["simulation"] = simulation
+        new_meta["geometry_inc"] = geometry_flow_inc
+        
+        with open(job_dir / "grid_metadata.json", 'w') as f:
+            json.dump(new_meta, f)
+
+        # 6. Configure & Run
+        restart_path = source_p / "restart" / "restart.final.bin"
+        if not restart_path.exists():
+            restarts = list((source_p / "restart").glob("restart.*.bin"))
+            if restarts:
+                restart_path = sorted(restarts, key=os.path.getmtime)[-1]
+            else:
+                raise FileNotFoundError(f"No restart file found in {source_p / 'restart'}")
+
+        config = SimulationConfig(
+            template=template,
+            simulation=simulation,
+            run=run_name,
+            data_file=None,
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            extra_vars={
+                "restart_path": str(restart_path).replace("\\", "/"),
+                "geometry_inc": geometry_flow_inc.replace("\\", "/"),
+                "run_steps": run_steps,
+                "dt": dt,
+                "viscosity": viscosity,
+                "seed": seed
+            },
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos
+        )
+
+        print(f"--- Starting Grid Hopper Flow: {n_hoppers} hoppers ---")
+        self.runner.run(config, clean_dir=False)
+
+        # 7. Split Results
+        final_grid_data = Path(config.output_dir) / "final_grid_flow.data"
+        if final_grid_data.exists():
+            split_dir = Path(config.output_dir) / "split_states"
+            self.split_grid_results(final_grid_data, metadata_original, str(split_dir), spacing=spacing)
+
+    def resume_grid_flow(self, restart_path: str, run_steps: int = 1000000,
+                         dt: float = 1e-6,
+                         lepton_file: str = "simulation_templates/lepton.inc",
+                         dump_file: str = "simulation_templates/quiet_dump.inc",
+                         viscosity: float = 0.001,
+                         num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
+                         template: str = "in.grid_hopper_flow_resume",
+                         seed: int = 42):
+        """
+        Resumes a grid flow simulation from a restart file.
+        """
+        import json
+        restart_p = Path(restart_path)
+        if restart_p.is_dir():
+            job_dir = restart_p
+            # Find latest restart in directory
+            r_file = job_dir / "restart" / "restart.final.bin"
+            if not r_file.exists():
+                restarts = list((job_dir / "restart").glob("restart.*.bin"))
+                if restarts:
+                    r_file = sorted(restarts, key=os.path.getmtime)[-1]
+                else:
+                    raise FileNotFoundError(f"No restart file found in {job_dir}")
+            restart_p = r_file
+        else:
+            job_dir = restart_p.parent
+            if job_dir.name == "restart":
+                job_dir = job_dir.parent
+            
+        metadata_path = job_dir / "grid_metadata.json"
+        if not metadata_path.exists():
+            metadata_path = job_dir.parent / "grid_metadata.json"
+        
+        if not metadata_path.exists():
+            raise FileNotFoundError(f"Metadata file not found for {restart_path}. Cannot resume flow.")
+
+        with open(metadata_path, 'r') as f:
+            meta_raw = json.load(f)
+            simulation = meta_raw.get("simulation", "Grid_Hopper_Flow")
+            geometry_inc = meta_raw.get("geometry_inc")
+            spacing = meta_raw.get("spacing", 2.0)
+            metadata_original = {int(k): {
+                "offset": np.array(v["offset"]),
+                "N": v.get("N"),
+                "n_fill": v.get("n_fill"),
+                "geometry_vars": v.get("geometry_vars")
+            } for k, v in meta_raw["metadata"].items()}
+
+        # Seed-Chain Naming
+        new_job_dir, run_name = self._generate_resume_path(job_dir, seed)
+        new_job_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Inherit Metadata
+        import shutil
+        shutil.copy(metadata_path, new_job_dir / "grid_metadata.json")
+
+        config = SimulationConfig(
+            template=template,
+            simulation=simulation,
+            run=run_name,
+            data_file=str(restart_p).replace("\\", "/"),
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            extra_vars={
+                "restart_path": str(restart_p).replace("\\", "/"),
+                "geometry_inc": geometry_inc.replace("\\", "/"),
+                "run_steps": run_steps,
+                "dt": dt,
+                "viscosity": viscosity
+            },
+            num_procs=num_procs,
+            num_threads=num_threads,
+            use_kokkos=use_kokkos
+        )
+
+        print(f"--- Resuming Grid Hopper Flow from {restart_p.name} ---")
+        self.runner.run(config, clean_dir=False)
+
+        final_grid_data = Path(config.output_dir) / "final_grid_flow.data"
+        if final_grid_data.exists():
+            split_dir = Path(config.output_dir) / "split_states"
+            self.split_grid_results(final_grid_data, metadata_original, str(split_dir), spacing=spacing)
+
+    def _generate_replicated_geometry(self, setup_path: Path, n_hoppers: int, spacing: float, job_dir: Path, 
+                                      normalized_geo_vars: List[Dict], exclude_regions: List[str] = None,
+                                      oscillation_params: List[Dict] = None, inc_name: str = "replicated_geometry.inc"):
+        original_commands = self._resolve_includes(setup_path)
+        vars_dict = self._evaluate_variables(original_commands)
+        
         if normalized_geo_vars:
             all_override_vars = set().union(*[g.keys() for g in normalized_geo_vars])
             missing_vars = all_override_vars - set(vars_dict.keys())
             if missing_vars:
                 raise ValueError(f"Error: The following geometry variables were not found in {setup_path}: {missing_vars}")
 
-        # Reserved words that should never be suffixed
-        reserved = {"side", "out", "in", "units", "move", "rotate", "open", "all"}
         # Extract all original region names to ensure we only suffix valid references
         original_region_names = {l.strip().split()[1] for l in original_commands if l.strip().startswith("region")}
         
-        grid_dim = math.ceil(n_hoppers**(1/3))
+        cols = math.ceil(math.sqrt(n_hoppers))
         replicated_lines = []
         
         # 2. Write global variables/comments once
@@ -296,64 +523,94 @@ class GridHopperManager:
         
         metadata = {}
         for i in range(n_hoppers):
-            ix, iy, iz = i % grid_dim, (i // grid_dim) % grid_dim, i // (grid_dim * grid_dim)
+            ix, iy, iz = i % cols, i // cols, 0
             offset = np.array([ix * spacing, iy * spacing, iz * spacing])
             metadata[i] = {"offset": offset}
             
             replicated_lines.append(f"\n# --- Replicated Hopper {i} at {offset} ---\n")
             
-            # Apply per-hopper variable overrides
-            current_vars = {**vars_dict, **normalized_geo_vars[i]}
+            # Apply per-hopper variable overrides and re-evaluate derived variables
+            current_vars = self._evaluate_variables(original_commands, normalized_geo_vars[i])
             
+            # 3. Define Oscillation Variables for this Hopper
+            if oscillation_params:
+                p = oscillation_params[i]
+                freq = p.get('freq', 0.0)
+                amp = p.get('amp', 0.0)
+                if amp > 0:
+                    replicated_lines.append(f"variable osc_{i} equal \"{amp}*sin(2*PI*{freq}*step*dt)\"\n")
+                else:
+                    replicated_lines.append(f"variable osc_{i} equal 0.0\n")
+
             for line in original_commands:
                 stripped = line.strip()
                 if not stripped or stripped.startswith("#") or stripped.startswith("variable"):
                     continue
                 
+                parts = stripped.split()
+                name = parts[1]
+                
+                # Check for region exclusion (e.g., skip orifice_cover for flow)
+                if exclude_regions and any(ex in name for ex in exclude_regions):
+                    continue
+
                 # Replicate Regions
                 if stripped.startswith("region"):
-                    parts = stripped.split()
-                    name = parts[1]
                     style = parts[2]
                     rest = parts[3:]
                     new_name = f"{name}_{i}"
                     
                     def resolve_val(val, off):
-                        # Try to resolve val using current_vars
                         expr = val
                         for k, v in current_vars.items():
                             expr = expr.replace(f"${{{k}}}", str(v))
                         try:
-                            # Handle leading minus
-                            clean_expr = expr.replace("math.", "") # in case it was already processed
+                            clean_expr = expr.replace("math.", "")
                             return float(eval(clean_expr, {"math": math, "__builtins__": None})) + off
                         except:
-                            return f"{val}+{off}" # Fallback if we can't resolve
+                            return f"{val}+{off}"
+
+                    move_str = ""
+                    if oscillation_params and style in ["block", "plane", "cylinder", "sphere", "prism"]:
+                        p = oscillation_params[i]
+                        amp = p.get('amp', 0.0)
+                        odir = p.get('dir', 'z').lower()
+                        if amp > 0:
+                            if odir == 'x': move_str = f" move v_osc_{i} NULL NULL"
+                            elif odir == 'y': move_str = f" move NULL v_osc_{i} NULL"
+                            else: move_str = f" move NULL NULL v_osc_{i}"
 
                     if style == "block":
                         coords = [str(resolve_val(c, offset[j//2])) for j, c in enumerate(rest[:6])]
                         final_rest = [f"{p}_{i}" if p in original_region_names else p for p in rest[6:]]
-                        new_line = f"region {new_name} block {' '.join(coords)} {' '.join(final_rest)}\n"
+                        new_line = f"region {new_name} block {' '.join(coords)} {' '.join(final_rest)}{move_str}\n"
                     elif style == "plane":
                         coords = [str(resolve_val(c, offset[j])) for j, c in enumerate(rest[:3])]
                         final_rest = [f"{p}_{i}" if p in original_region_names else p for p in rest[3:]]
-                        new_line = f"region {new_name} plane {' '.join(coords)} {' '.join(final_rest)}\n"
+                        new_line = f"region {new_name} plane {' '.join(coords)} {' '.join(final_rest)}{move_str}\n"
                     elif style in ["intersect", "union"]:
                         num = rest[0]
                         regs = [f"{r}_{i}" if r in original_region_names else r for r in rest[1:]]
-                        new_line = f"region {new_name} {style} {num} {' '.join(regs)}\n"
+                        new_line = f"region {new_name} {style} {num} {' '.join(regs)}{move_str}\n"
                     else:
-                        new_line = f"region {new_name} {style} {' '.join([f'{p}_{i}' if p in original_region_names else p for p in rest])}\n"
+                        new_line = f"region {new_name} {style} {' '.join([f'{p}_{i}' if p in original_region_names else p for p in rest])}{move_str}\n"
                     replicated_lines.append(new_line)
                 
                 # Replicate Fixes
                 elif stripped.startswith("fix"):
-                    parts = stripped.split()
                     f_id = parts[1]
-                    f_group = parts[2]
-                    f_style = parts[3]
                     new_id = f"{f_id}_{i}"
                     
+                    # Check if this fix references an excluded region
+                    skip_fix = False
+                    if exclude_regions:
+                        for p in parts:
+                            if any(ex in p for ex in exclude_regions):
+                                skip_fix = True
+                                break
+                    if skip_fix:
+                        continue
+
                     new_parts = []
                     for p in parts:
                         if p in original_region_names:
@@ -363,10 +620,49 @@ class GridHopperManager:
                     new_parts[1] = new_id
                     replicated_lines.append(f"{' '.join(new_parts)}\n")
                     
-        out_path = job_dir / "replicated_geometry.inc"
+        out_path = job_dir / inc_name
         with open(out_path, 'w') as f:
             f.writelines(replicated_lines)
         return str(out_path).replace("\\", "/"), metadata
+
+    def _evaluate_variables(self, commands: List[str], overrides: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Parses and evaluates LAMMPS-style variables from a list of command lines.
+        Supports basic math and variable substitution.
+        """
+        import math
+        vars_dict = {"pi": math.pi}
+        if overrides:
+            vars_dict.update(overrides)
+            
+        for line in commands:
+            stripped = line.strip()
+            if stripped.startswith("variable"):
+                parts = stripped.split()
+                if len(parts) < 4: continue
+                v_name = parts[1]
+                
+                # If this variable was explicitly overridden by the user, we skip the template definition
+                if overrides and v_name in overrides:
+                    continue
+                    
+                v_expr = " ".join(parts[3:])
+                v_expr = v_expr.split("#")[0].strip()
+                
+                # Substitute known variables
+                # Sort keys by length descending to prevent partial replacements (e.g., 'y_half' matching inside 'h_y_half')
+                for k in sorted(vars_dict.keys(), key=len, reverse=True):
+                    v = vars_dict[k]
+                    v_expr = v_expr.replace(f"${{{k}}}", str(v))
+                
+                try:
+                    # Map common LAMMPS math functions to Python's math module
+                    safe_expr = v_expr.replace("sin(", "math.sin(").replace("cos(", "math.cos(").replace("tan(", "math.tan(")
+                    vars_dict[v_name] = eval(safe_expr, {"math": math, "__builtins__": None}, vars_dict)
+                except:
+                    # Fallback for expressions we can't parse in Python
+                    pass
+        return vars_dict
 
     def _generate_grid_insertion_file(self, outdir: Path, n_hoppers: int, n_fill_list: List[int], 
                                       mol_ranges: Dict[int, Any], seed: int, N_list: List[int], 
@@ -473,7 +769,7 @@ class GridHopperManager:
             spatial_filter = spacing * 0.48 
             h_atoms = [a for a in all_atoms if abs(a['x'] - offset[0]) < spatial_filter and abs(a['y'] - offset[1]) < spatial_filter]
             
-            target_dir = Path(output_base_dir) / f"state_{h_idx}"
+            target_dir = Path(output_base_dir) / f"Hopper_{h_idx}"
             target_dir.mkdir(parents=True, exist_ok=True)
             out_path = target_dir / "final_hopper.data"
             
@@ -512,7 +808,8 @@ class GridHopperManager:
                     "N": n_val, 
                     "n_fill": fill_val, 
                     "offset": offset.tolist(),
-                    "geometry_overrides": meta.get('geometry_vars', {})
+                    "geometry_overrides": meta.get('geometry_vars', {}),
+                    "source_dir": meta.get('source_dir')
                 }, f)
         print("Splitting complete.")
 

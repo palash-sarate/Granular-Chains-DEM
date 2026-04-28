@@ -289,6 +289,21 @@ class SimulationData:
         self.timesteps = [self._get_step(f) for f in base_files]
         return self.timesteps
 
+    def get_available_cached_batches(self):
+        """Returns a list of batch indices that have valid caches on disk."""
+        available = []
+        batch_count = self.get_batch_count()
+        for i in range(batch_count):
+            start_idx = i * self.batch_size
+            end_idx = start_idx + self.batch_size
+            batch_files = self.atom_files[start_idx:end_idx] + \
+                          self.bond_files[start_idx:end_idx] + \
+                          self.angle_files[start_idx:end_idx]
+            if self._is_batch_cache_valid(i, batch_files):
+                available.append(i)
+        self.cached_batches = set(available)
+        return available
+
     def get_batch_count(self):
         return max(1, (len(self.timesteps) + self.batch_size - 1) // self.batch_size) if self.timesteps else 0
 

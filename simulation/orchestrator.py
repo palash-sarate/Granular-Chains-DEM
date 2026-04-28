@@ -381,13 +381,18 @@ class SimulationOrchestrator:
                                   viscosity: float = 0.001,
                                   num_procs: int = 1, num_threads: int = 1,
                                   use_kokkos: bool = True,
-                                  template: str = "in.grid_hopper_fill_resume"):
+                                  template: str = "in.grid_hopper_fill_resume",
+                                  seed: Optional[int] = None):
         """
         Resumes a grid hopper filling simulation from a restart file.
         """
         from simulation.grid_hopper_manager import GridHopperManager
         from simulation.runner import SimulationRunner
         
+        if seed is None:
+            import time
+            seed = int(time.time()) % 1000000
+            
         runner = SimulationRunner(lammps_executable=self.lammps_executable)
         grid_manager = GridHopperManager(runner)
         
@@ -402,10 +407,76 @@ class SimulationOrchestrator:
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos,
-            template=template
+            template=template,
+            seed=seed
         )
 
-    def run_hopper_flow(self, N: int = 4, run_steps: int = 200000, orifice_width: float = 0.05, dt: float = 1e-6):
-        """(Upcoming) Run a hopper discharge/flow simulation."""
-        print(f"Hopper Flow Simulation (N={N}) - Backend logic coming soon!")
-        # This will be implemented as a separate template logic
+    def run_grid_hopper_flow(self, source_dir: str, run_steps: int = 1000000,
+                             freq: Any = 10.0, amp: Any = 0.01, osc_dir: str = 'z',
+                             dt: float = 1e-6, output_dir: str = "chain_data/grid_flow",
+                             lepton_file: str = "simulation_templates/lepton.inc",
+                             dump_file: str = "simulation_templates/quiet_dump.inc",
+                             viscosity: float = 0.001,
+                             num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
+                             simulation: str = "Grid_Hopper_Flow",
+                             template: str = "in.grid_hopper_flow",
+                             seed: Optional[int] = None):
+        """
+        Transitions a filling simulation to a flow simulation with oscillation.
+        """
+        from simulation.grid_hopper_manager import GridHopperManager
+        from simulation.runner import SimulationRunner
+        
+        if seed is None:
+            import time
+            seed = int(time.time()) % 1000000
+            
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        grid_manager = GridHopperManager(runner)
+        
+        grid_manager.run_grid_flow(
+            source_dir=source_dir,
+            run_steps=run_steps,
+            freq=freq, amp=amp, osc_dir=osc_dir,
+            dt=dt, output_dir=output_dir,
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            viscosity=viscosity,
+            num_procs=num_procs, num_threads=num_threads, use_kokkos=use_kokkos,
+            simulation=simulation,
+            template=template,
+            seed=seed
+        )
+
+    def resume_grid_hopper_flow(self, restart_path: str, run_steps: int = 1000000,
+                                dt: float = 1e-6,
+                                lepton_file: str = "simulation_templates/lepton.inc",
+                                dump_file: str = "simulation_templates/quiet_dump.inc",
+                                viscosity: float = 0.001,
+                                num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
+                                template: str = "in.grid_hopper_flow_resume",
+                                seed: Optional[int] = None):
+        """
+        Resumes a grid hopper flow simulation.
+        """
+        from simulation.grid_hopper_manager import GridHopperManager
+        from simulation.runner import SimulationRunner
+        
+        if seed is None:
+            import time
+            seed = int(time.time()) % 1000000
+            
+        runner = SimulationRunner(lammps_executable=self.lammps_executable)
+        grid_manager = GridHopperManager(runner)
+        
+        grid_manager.resume_grid_flow(
+            restart_path=restart_path,
+            run_steps=run_steps,
+            dt=dt,
+            lepton_file=lepton_file,
+            dump_file=dump_file,
+            viscosity=viscosity,
+            num_procs=num_procs, num_threads=num_threads, use_kokkos=use_kokkos,
+            template=template,
+            seed=seed
+        )

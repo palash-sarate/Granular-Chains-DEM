@@ -112,6 +112,10 @@ class ViewerApp(BaseTk):
         super().__init__()
         self.title('Chains Simulation Viewer')
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+        
+        # UI State Persistence
+        self.config_path = os.path.join(os.path.dirname(__file__), "ui_config.json")
+        self.ui_state = self._load_ui_state()
 
         # 1. Base Controller & Data
         self.data_ctrl = SimDataController()
@@ -168,28 +172,60 @@ class ViewerApp(BaseTk):
         self.renderer.on_pick_cb = self._on_atom_picked
 
         # ── UI LAYOUT ───────────────────────────────────────────
-        ctrl = tk.Frame(self)
-        ctrl.pack(side=tk.LEFT, fill=tk.Y, padx=6, pady=6)
+        self.ctrl_panel = tk.Frame(self)
+        self.ctrl_panel.pack(side=tk.LEFT, fill=tk.Y, padx=6, pady=6)
 
-        col1 = tk.Frame(ctrl); col1.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
-        try:
-            import tkinter.ttk as ttk
-            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        except Exception:
-            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        col2 = tk.Frame(ctrl); col2.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
-        try:
-            import tkinter.ttk as ttk
-            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        except Exception:
-            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        col3 = tk.Frame(ctrl); col3.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
-        try:
-            import tkinter.ttk as ttk
-            ttk.Separator(ctrl, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        except Exception:
-            tk.Frame(ctrl, width=1, bg='gray').pack(side=tk.LEFT, fill=tk.Y, padx=4)
-        col4 = tk.Frame(ctrl); col4.pack(side=tk.LEFT, fill=tk.Y)
+        # Helper to create collapsible columns
+        def create_collapsible(parent, name, title_text):
+            is_visible = self.ui_state.get(f"{name}_visible", True)
+            
+            # Container for handle + content
+            container = tk.Frame(parent)
+            container.pack(side=tk.LEFT, fill=tk.Y)
+            
+            # Content frame
+            content = tk.Frame(container)
+            
+            # Toggle handle
+            handle_frame = tk.Frame(container, width=15, bg='#f0f0f0', relief=tk.FLAT)
+            handle_frame.pack(side=tk.LEFT, fill=tk.Y, padx=2)
+            
+            toggle_btn = tk.Button(handle_frame, text="«" if is_visible else "»", 
+                                  font=('Arial', 8), bg='#e0e0e0', relief=tk.FLAT, bd=0,
+                                  command=lambda: toggle())
+            toggle_btn.pack(side=tk.TOP, fill=tk.X)
+            
+            # Vertical title on handle (optional but nice)
+            tk.Label(handle_frame, text=title_text, font=('Arial', 7), bg='#f0f0f0', fg='#888').pack(side=tk.TOP, pady=10)
+
+            def toggle():
+                nonlocal is_visible
+                if is_visible:
+                    content.pack_forget()
+                    toggle_btn.config(text="»")
+                    is_visible = False
+                else:
+                    content.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+                    toggle_btn.config(text="«")
+                    is_visible = True
+                self.ui_state[f"{name}_visible"] = is_visible
+                self._save_ui_state()
+                self._autosize_and_center()
+
+            # Initial state
+            if is_visible:
+                content.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+            
+            return content
+
+        # Column 1 is always visible
+        col1 = tk.Frame(self.ctrl_panel)
+        col1.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 4))
+        
+        # Columns 2, 3, 4 are collapsible
+        col2 = create_collapsible(self.ctrl_panel, "col2", "EDIT")
+        col3 = create_collapsible(self.ctrl_panel, "col3", "LAUNCH")
+        col4 = create_collapsible(self.ctrl_panel, "col4", "EXPORT")
         
         # 4. Now we can fully init specialized controllers that need UI parents
         self.re_ctrl = RestartEditorController(col2, self.data_ctrl, self.loader_ctrl, self.renderer, on_re_close, self._sync_restart_selection)
@@ -589,12 +625,38 @@ class ViewerApp(BaseTk):
     def _autosize_and_center(self) -> None:
         try:
             self.update_idletasks()
-            w = max(self.winfo_reqwidth(), self.winfo_width())
-            h = max(self.winfo_reqheight(), self.winfo_height())
-            sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
-            x, y = max(0, int((sw - w) / 2)), max(0, int((sh - h) / 2))
-            self.geometry(f"{w}x{h}+{x}+{y}")
-            self.minsize(w, h)
+            # Use requested dimensions to allow shrinking when columns collapse
+            w = self.winfo_reqwidth()
+            h = self.winfo_reqheight()
+            
+            # Get current position to stay in the same place while resizing
+            geom = self.geometry().split('+')
+            if len(geom) == 3:
+                x, y = geom[1], geom[2]
+                self.geometry(f"{w}x{h}+{x}+{y}")
+            else:
+                sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
+                x, y = max(0, int((sw - w) / 2)), max(0, int((sh - h) / 2))
+                self.geometry(f"{w}x{h}+{x}+{y}")
+            
+            # Update minsize to allow the new smaller size
+            self.minsize(200, 200) 
+        except: pass
+
+    def _load_ui_state(self) -> dict:
+        import json
+        if os.path.exists(self.config_path):
+            try:
+                with open(self.config_path, 'r') as f:
+                    return json.load(f)
+            except: pass
+        return {}
+
+    def _save_ui_state(self):
+        import json
+        try:
+            with open(self.config_path, 'w') as f:
+                json.dump(self.ui_state, f)
         except: pass
 
     def _cleanup(self):

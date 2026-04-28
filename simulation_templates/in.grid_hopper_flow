@@ -1,5 +1,5 @@
-# LAMMPS Grid-Based Batch Hopper Filling Resume Template
-# Analytical Geometry Version
+# LAMMPS Grid-Based Batch Hopper Flow Template
+# Takes a completed hopper filling simulation and opens the orifices with oscillation.
 
 units       si
 atom_style hybrid sphere angle
@@ -8,26 +8,28 @@ boundary    f f f
 comm_modify vel yes cutoff 0.05
 special_bonds lj/coul 1.0 1.0 1.0
 
-# 1. Load State
+# 1. Load State from Filling Simulation
 read_restart ${restart_path}
 
-# 2. Re-establish Physics & Potential
+# 2. Physics & Potential (Re-apply after restart)
 fix 1 all gravity 9.81 vector 0 0 -1
 include ${lepton_inc}
 
-# 3. Load Analytical Geometry (MUST be re-included for restarts)
+# 3. Load Flow Geometry (Replicated Regions with Oscillation & No Lids)
+# We redefine the walls here. Since they were not re-specified after read_restart,
+# the old walls from the filling simulation are no longer active.
 include ${geometry_inc}
 
-# 4. Re-define Settings & Groups
+# 5. Settings
 neighbor 0.1 bin
-atom_modify sort 0 0.0
 neigh_modify delay 0 every 10 check yes
+atom_modify sort 0 0.0
 timestep ${dt}
 
 group chain_particles type 1
 group hopper_walls type 2
 
-# Re-apply integrations and constraints
+# Re-apply integrations
 fix 2 chain_particles viscous ${viscosity}
 fix 3 chain_particles nve/sphere
 fix 2D chain_particles setforce 0 NULL NULL
@@ -36,9 +38,9 @@ fix 2D chain_particles setforce 0 NULL NULL
 include ${dump_inc}
 restart 100000 ${outdir}/restart/restart.*.bin
 
-# 5. Continue Settling Phase
-run ${relax_steps}
+# 6. Flow Simulation
+run ${run_steps}
 
-# 6. Save Final Grid State
-write_data ${outdir}/final_grid.data
+# 7. Save Final State
+write_data ${outdir}/final_grid_flow.data
 write_restart ${outdir}/restart/restart.final.bin
