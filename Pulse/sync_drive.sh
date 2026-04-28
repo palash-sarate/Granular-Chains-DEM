@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Ensure we are in the project root
+cd "$(dirname "$0")/.." || exit 1
+
 # Configuration
-folders=("chain_data" "dumping_yard" "PBS_Output")
+folders=("chain_data" "dumping_yard")
 ZIP_DIR="Zips_dir"
 mkdir -p "$ZIP_DIR"
 
@@ -20,13 +23,15 @@ for folder in "${folders[@]}"; do
                 ZIP_NAME=$(echo "$sub" | tr '/' '_').tar.gz
                 ZIP_PATH="$ZIP_DIR/$folder/$ZIP_NAME"
                 
-                if [ ! -f "$ZIP_PATH" ]; then
+                # Compress if zip doesn't exist OR if any file in folder is newer than zip
+                if [ ! -f "$ZIP_PATH" ] || [ "$(find "$sub" -newer "$ZIP_PATH" | wc -l)" -gt 0 ]; then
                     echo "Compressing $sub -> $ZIP_NAME"
                     tar -czf "$ZIP_PATH" "$sub"
                 fi
             done
             
             echo "Syncing compressed archives to Google Drive..."
+            # rclone copy only adds/updates files (does NOT delete anything on remote)
             rclone copy "$ZIP_DIR/$folder" "gdrive:Granular-Chains-DEM/dumping_yard_zips" \
                 --progress \
                 --transfers 16 \
@@ -35,6 +40,7 @@ for folder in "${folders[@]}"; do
         else
             # Standard high-parallelism sync for other folders (like chain_data)
             echo "Syncing $folder directly..."
+            # rclone copy only adds/updates files (does NOT delete anything on remote)
             rclone copy "$folder" "gdrive:Granular-Chains-DEM/$folder" \
                 --progress \
                 --transfers 32 \
