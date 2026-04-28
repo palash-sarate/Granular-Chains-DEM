@@ -29,7 +29,8 @@ class GridHopperManager:
                          use_kokkos: bool = True,
                          mode: str = "2D_stacked",
                          simulation: str = "Grid_Hopper_Filling",
-                         template: str = "in.grid_hopper_fill"):
+                         template: str = "in.grid_hopper_fill",
+                         geometry_vars: dict = None):
         import time
         t_start = time.time()
         # 1. Normalize N and n_fill into lists

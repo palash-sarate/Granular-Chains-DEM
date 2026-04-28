@@ -31,18 +31,18 @@ echo "Starting Batch Grid Hopper Filling at: $(date)"
 # Launch grid filling for multiple hoppers simultaneously.
 # Full list of available parameters:
 python -u main.py run_grid_hopper_filling \
-    --n_hoppers 4 \
-    --n_fill 6000,4000,6000,4000 \
-    --N 4,8,4,8 \
+    --n_hoppers 5 \
+    --n_fill 48,16,8,4 \
+    --N 4,12,24,48 \
     --spacing 2.0 \
-    --relax_steps 100001 \
+    --relax_steps 1000 \
     --dt 1e-6 \
     --viscosity 0.001 \
     --hopper_template_data "simulation_geometries/2D_hopper.inc" \
-    --dump_file "simulation_templates/quiet_dump.inc" \
+    --dump_file "simulation_templates/default_dump.inc" \
     --simulation "Grid_Hopper_Filling_Mixed" \
-    --geometry_vars '{"y_half": [0.155, 0.25], "orifice_half": [0.05, 0.08, 0.1]}' \
-    --num_procs 16 \
+    --geometry_vars '{"orifice_half": [0.05, 0.05, 0.05, 0.05, 0.025]}' \
+    --num_procs 8 \
     --num_threads 1 \
     --mode 2D_stacked
 
