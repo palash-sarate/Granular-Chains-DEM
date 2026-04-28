@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -N Grid_Hopper_Resume
+#PBS -q workq
+#PBS -l walltime=48:00:00
+#PBS -l nodes=master:ppn=64
+#PBS -l mem=128gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/grid_hopper_resume.log
+# Standard error file
+#PBS -e PBS_Output/grid_hopper_resume_err.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# PBS Script for Resuming Batch Hopper Filling
+# Use this to add more relaxation time or continue a crashed run.
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate environment
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+# 3. Path to the restart file (Adjust this to your latest restart.bin)
+# Example: dumping_yard/Grid_Hopper_Filling/Grid_Fill_4H_MixedN_S12345/restart/restart.500000.bin
+RESTART_FILE="REPLACE_WITH_ACTUAL_RESTART_PATH"
+
+echo "Resuming Batch Grid Hopper Filling at: $(date)"
+
+python -u main.py resume_grid_hopper_filling \
+    --restart_path "$RESTART_FILE" \
+    --relax_steps 200000 \
+    --dt 1e-6 \
+    --viscosity 0.001 \
+    --num_procs 16 \
+    --num_threads 1
+
+echo "=============================================================================="
+echo "Resume and splitting complete at: $(date)"
+echo "=============================================================================="
