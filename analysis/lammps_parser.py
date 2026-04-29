@@ -48,6 +48,12 @@ class LammpsParser:
                 self.boundary = parts[1:4]
             elif command == 'timestep':
                 self._parse_timestep(parts)
+            elif command == 'variable':
+                self._parse_variable(parts)
+            elif command == 'include':
+                target = self._resolve_include_target(parts[1:], including_dir)
+                if target:
+                    self._parse_file(target, visited)
 
     def _resolve_include_target(self, include_tokens, including_dir: str) -> Optional[str]:
         """Resolve `include` path tokens to a concrete file path.

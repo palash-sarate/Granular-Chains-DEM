@@ -131,7 +131,15 @@ class GeometryExtractor:
 
 def main():
     parser = argparse.ArgumentParser(description="Convert LAMMPS .inc geometry to mesh using OVITO")
-    # ... (existing arguments)
+    parser.add_argument("--inc", type=str, required=True, help="Input .inc file")
+    parser.add_argument("--outdir", type=str, required=True, help="Output directory")
+    parser.add_argument("--spacing", type=float, default=0.001, help="Lattice sampling spacing")
+    parser.add_argument("--radius", type=float, default=None, help="Surface reconstruction radius")
+    parser.add_argument("--regions", type=str, nargs="+", default=None, help="Specific regions to extract")
+    parser.add_argument("--auto_vis", action="store_true", help="Auto-detect visualization regions")
+    parser.add_argument("--combined", action="store_true", help="Combine all regions into one mesh")
+    parser.add_argument("--bounds", type=float, nargs=6, default=None, help="Bounding box (xlo xhi ylo yhi zlo zhi)")
+    parser.add_argument("--lammps_cmd", type=str, default="lmp", help="LAMMPS executable command")
 
     args = parser.parse_args()
     

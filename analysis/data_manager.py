@@ -11,6 +11,148 @@ from concurrent.futures import ProcessPoolExecutor
 from analysis.lammps_parser import LammpsParser
 
 
+def find_simulation_lineage(sim_dir: str) -> list:
+    """Finds the full lineage (ancestors and descendants) for a simulation."""
+    # 1. Walk backward to find the root
+    ancestors = []
+    curr = os.path.abspath(sim_dir)
+    visited = set()
+    while curr and os.path.isdir(curr) and curr not in visited:
+        ancestors.append(curr)
+        visited.add(curr)
+        
+        # Try to find metadata (prioritize unified name)
+        meta_names = ["metadata.json", "grid_metadata.json", "sim_metadata.json"]
+        metadata_path = None
+        for name in meta_names:
+            p = os.path.join(curr, name)
+            if os.path.exists(p):
+                metadata_path = p
+                break
+            
+        if not metadata_path:
+            break
+            
+        try:
+            with open(metadata_path, 'r') as f:
+                meta = json.load(f)
+            
+            parent = meta.get("source_dir") or meta.get("parent_run")
+            if not parent and "restart_path" in meta:
+                from pathlib import Path
+                restart_p = Path(meta["restart_path"])
+                # If it's a file path, we want the folder containing it
+                if os.path.isfile(str(restart_p)):
+                    parent = str(restart_p.parent)
+                else:
+                    # If it's a folder, it's the parent
+                    parent = str(restart_p)
+                    
+            if parent:
+                parent_abs = os.path.abspath(parent)
+                # If it points to the 'chain' subfolder, go up one
+                if os.path.basename(parent_abs) == 'chain':
+                    parent_abs = os.path.dirname(parent_abs)
+                    
+                if os.path.isdir(parent_abs) and parent_abs not in visited:
+                    curr = parent_abs
+                else:
+                    break
+            else:
+                break
+        except:
+            break
+            
+    # ancestors is currently [current, parent, grandparent...]
+    # root is the last one
+    root = ancestors[-1]
+    all_related = set(ancestors)
+    
+    # 2. Walk forward to find descendants.
+    # We check the siblings of the root AND scan dumping_yard subdirectories.
+    search_dirs = []
+    root_parent = os.path.dirname(root)
+    if os.path.isdir(root_parent):
+        search_dirs.append(root_parent)
+    
+    dy = os.path.abspath("dumping_yard")
+    if os.path.isdir(dy) and dy != root_parent:
+        search_dirs.append(dy)
+
+    # Collect all potential candidate folders
+    candidates = []
+    for s_dir in search_dirs:
+        try:
+            for entry in os.scandir(s_dir):
+                if entry.is_dir():
+                    candidates.append(entry.path)
+                    # Also check one level deep (e.g. dumping_yard/SimName/RunName)
+                    try:
+                        for sub in os.scandir(entry.path):
+                            if sub.is_dir():
+                                candidates.append(sub.path)
+                    except: pass
+        except: pass
+
+    # Iteratively find children using a work-queue
+    found_new = True
+    processed_candidates = set()
+    while found_new:
+        found_new = False
+        for cand in candidates:
+            if cand in all_related or cand in processed_candidates: continue
+            
+            meta_names = ["metadata.json", "grid_metadata.json", "sim_metadata.json"]
+            meta_path = None
+            for name in meta_names:
+                p = os.path.join(cand, name)
+                if os.path.exists(p):
+                    meta_path = p
+                    break
+                    
+            if meta_path:
+                try:
+                    with open(meta_path, 'r') as f:
+                        meta = json.load(f)
+                    src = meta.get("source_dir") or meta.get("parent_run")
+                    if src:
+                        src_abs = os.path.abspath(src)
+                        # Normalize common restart directory patterns
+                        if os.path.basename(src_abs) == 'chain':
+                            src_abs = os.path.dirname(src_abs)
+                            
+                        if src_abs in all_related:
+                            all_related.add(os.path.abspath(cand))
+                            found_new = True
+                except:
+                    pass
+            processed_candidates.add(cand)
+
+    # Sort chronologically by creation time
+    lineage = sorted(list(all_related), key=lambda x: os.path.getctime(x))
+    return lineage
+
+def aggregate_lifecycle_metadata(lineage: list) -> dict:
+    """Merges metadata from all runs in the lineage, oldest to newest."""
+    aggregated = {}
+    for d in lineage:
+        meta_names = ["metadata.json", "grid_metadata.json", "sim_metadata.json"]
+        metadata_path = None
+        for name in meta_names:
+            p = os.path.join(d, name)
+            if os.path.exists(p):
+                metadata_path = p
+                break
+        
+        if metadata_path:
+            try:
+                with open(metadata_path, 'r') as f:
+                    meta = json.load(f)
+                aggregated.update(meta)
+            except:
+                pass
+    return aggregated
+
 def detect_lammps_input_script(sim_dir: str) -> Optional[str]:
     """Auto-detect a likely LAMMPS input script in a simulation folder."""
     if not sim_dir or not os.path.isdir(sim_dir):
@@ -207,21 +349,29 @@ def _parse_single_dump_fast(filepath):
 
 class SimulationMetadata:
     """Manages persistent metadata for a simulation folder."""
-    def __init__(self, data_dir: str, filename: str = "sim_metadata.json"):
+    def __init__(self, data_dir: str, filename: str = "metadata.json"):
+        self.data_dir = data_dir
         self.path = os.path.join(data_dir, filename)
         self._data: Dict[str, Any] = {}
         self.load()
 
     def load(self):
-        if os.path.exists(self.path):
-            try:
-                with open(self.path, 'r') as f:
-                    self._data = json.load(f)
-            except Exception as e:
-                print(f"Failed to load metadata from {self.path}: {e}")
-                self._data = {}
-        else:
-            self._data = {}
+        """Loads and merges metadata, supporting migration from legacy filenames."""
+        merged = {}
+        # Order of priority: primary file > grid_metadata > sim_metadata
+        legacy_names = ["metadata.json", "grid_metadata.json", "sim_metadata.json"]
+        
+        for name in reversed(legacy_names):
+            p = os.path.join(self.data_dir, name)
+            if os.path.exists(p):
+                try:
+                    with open(p, 'r') as f:
+                        data = json.load(f)
+                    merged.update(data)
+                except Exception as e:
+                    print(f"Failed to load metadata from {p}: {e}")
+        
+        self._data = merged
 
     def save(self):
         try:
@@ -249,12 +399,25 @@ class SimulationMetadata:
         self.set(key, value)
 
 class SimulationData:
-    def __init__(self, data_dir, cache_name="sim_cache", batch_size=100):
-        self.data_dir = data_dir
-        self.chain_dump_dir = os.path.join(data_dir, "chain")
-        self.bond_dump_dir = os.path.join(data_dir, "bond")
-        self.angle_dump_dir = os.path.join(data_dir, "angle")
-        self.cache_dir = os.path.join(data_dir, cache_name)
+    def __init__(self, data_dirs, cache_name="sim_cache", batch_size=100):
+        if isinstance(data_dirs, (str, bytes)):
+            data_dirs = [data_dirs]
+        self.data_dirs = [os.path.abspath(d) for d in data_dirs]
+        self.data_dir = self.data_dirs[-1] # Primary directory for writing/active metadata
+        
+        self.lineage = find_simulation_lineage(self.data_dir)
+        self.full_metadata = aggregate_lifecycle_metadata(self.lineage)
+        
+        # Determine cache location
+        if len(self.data_dirs) > 1:
+            import hashlib
+            paths_str = "|".join(sorted(self.data_dirs))
+            h = hashlib.md5(paths_str.encode()).hexdigest()[:12]
+            # Place composite cache in a sibling directory to the root of the lineage
+            self.cache_dir = os.path.join(os.path.dirname(self.data_dirs[0]), ".composite_cache", h)
+        else:
+            self.cache_dir = os.path.join(self.data_dir, cache_name)
+            
         self.batch_size = batch_size
         
         if os.path.isdir(self.data_dir):
@@ -278,15 +441,38 @@ class SimulationData:
         return os.path.join(self.cache_dir, f"batch_{batch_idx}.pkl")
 
     def load_metadata(self):
-        if os.path.isdir(self.chain_dump_dir):
-            self.atom_files = sorted(glob.glob(os.path.join(self.chain_dump_dir, "*.dump")), key=self._get_step)
-        if os.path.isdir(self.bond_dump_dir):
-            self.bond_files = sorted(glob.glob(os.path.join(self.bond_dump_dir, "*.dump")), key=self._get_step)
-        if os.path.isdir(self.angle_dump_dir):
-            self.angle_files = sorted(glob.glob(os.path.join(self.angle_dump_dir, "*.dump")), key=self._get_step)
-
-        base_files = self.atom_files or self.bond_files or self.angle_files
-        self.timesteps = [self._get_step(f) for f in base_files]
+        """Builds a unified timestep list by merging all directories (latest wins on overlap)."""
+        step_to_atom = {}
+        step_to_bond = {}
+        step_to_angle = {}
+        
+        # Process chronologically - later directories in list overwrite earlier ones for same timestep
+        for d in self.data_dirs:
+            # Atom dumps
+            ad = os.path.join(d, "chain")
+            if os.path.isdir(ad):
+                files = glob.glob(os.path.join(ad, "*.dump"))
+                for f in files:
+                    step_to_atom[self._get_step(f)] = f
+            # Bond dumps
+            bd = os.path.join(d, "bond")
+            if os.path.isdir(bd):
+                files = glob.glob(os.path.join(bd, "*.dump"))
+                for f in files:
+                    step_to_bond[self._get_step(f)] = f
+            # Angle dumps
+            andir = os.path.join(d, "angle")
+            if os.path.isdir(andir):
+                files = glob.glob(os.path.join(andir, "*.dump"))
+                for f in files:
+                    step_to_angle[self._get_step(f)] = f
+                    
+        # Synchronize timesteps (usually they align, but we take atoms as the master clock)
+        self.timesteps = sorted(step_to_atom.keys())
+        self.atom_files = [step_to_atom[ts] for ts in self.timesteps]
+        self.bond_files = [step_to_bond.get(ts) for ts in self.timesteps]
+        self.angle_files = [step_to_angle.get(ts) for ts in self.timesteps]
+        
         return self.timesteps
 
     def get_available_cached_batches(self):
@@ -371,8 +557,9 @@ class SimulationData:
 
     def _is_batch_cache_valid(self, batch_idx, batch_files):
         cache_file = self._get_cache_file(batch_idx)
-        if not os.path.exists(cache_file) or not batch_files: return False
-        latest_dump_mtime = max((os.path.getmtime(f) for f in batch_files if os.path.exists(f)), default=0)
+        valid_files = [f for f in batch_files if f and os.path.exists(f)]
+        if not os.path.exists(cache_file) or not valid_files: return False
+        latest_dump_mtime = max((os.path.getmtime(f) for f in valid_files), default=0)
         return os.path.getmtime(cache_file) > latest_dump_mtime
 
     def _get_step(self, filename):
@@ -380,9 +567,10 @@ class SimulationData:
         return int(match.group(1)) if match else 0
     
     def _parse_dump_list(self, dump_files):
-        if not dump_files: return pd.DataFrame()
+        valid_files = [f for f in dump_files if f]
+        if not valid_files: return pd.DataFrame()
         with ProcessPoolExecutor() as executor:
-            all_frames = list(executor.map(_parse_single_dump_fast, dump_files))
+            all_frames = list(executor.map(_parse_single_dump_fast, valid_files))
         all_frames = [f for f in all_frames if f is not None and not f.empty]
         if not all_frames: return pd.DataFrame()
         try:

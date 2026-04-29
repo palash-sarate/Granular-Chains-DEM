@@ -291,6 +291,13 @@ class ViewerApp(BaseTk):
         tk.Button(view_btns, text='Fit View', command=self.renderer.fit_view).pack(side=tk.LEFT, fill=tk.X, expand=True)
         tk.Button(view_btns, text='Reset View', command=self.renderer.reset_view).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
 
+        # ── Column 1 : Lifecycle History ──────────────────────────
+        tk.Label(col1, text='Simulation Lifecycle:', fg='#555').pack(anchor='w', pady=(12, 0))
+        self.history_listbox = tk.Listbox(col1, width=22, height=4, selectmode=tk.MULTIPLE, exportselection=False, font=('Arial', 8), bg='#fafafa')
+        self.history_listbox.pack(fill=tk.Y)
+        self.history_listbox.bind('<Double-Button-1>', self._on_history_double_click_ui)
+        tk.Button(col1, text='Load Selected Lifecycle', command=self._on_load_lifecycle_selection_ui, font=('Arial', 8)).pack(fill=tk.X, pady=(2, 0))
+
         # ── Column 2: Mesh & Utilities ──────────────────────────
         tk.Label(col2, text='VTK Meshes / Geometry:').pack(anchor='w', pady=(4, 0))
         vtk_frame = tk.Frame(col2); vtk_frame.pack(fill=tk.BOTH, expand=True)
@@ -445,9 +452,35 @@ class ViewerApp(BaseTk):
             
         # NEW: Restore metadata-driven state from simulation folder
         if self.data_ctrl.metadata:
-            # 1. Restore VTK mesh overlays
-            # This also links the controller to the metadata for future additions
+            # NEW: Restore from full history, but save only to current run
             self.vtk_ctrl.restore_from_metadata(self.data_ctrl.metadata)
+            self.vtk_ctrl.metadata = self.data_ctrl.writable_metadata
+            
+        # 2. Update Lifecycle History
+        self.history_listbox.delete(0, tk.END)
+        if hasattr(self.data_ctrl.sim_source, 'lineage'):
+            lineage = self.data_ctrl.sim_source.lineage
+            # Determine which folders are currently part of the active view
+            active_paths = []
+            if hasattr(self.data_ctrl.sim_source, 'data_dirs'):
+                active_paths = [os.path.abspath(p) for p in self.data_ctrl.sim_source.data_dirs]
+            else:
+                active_paths = [os.path.abspath(self.data_ctrl.current_sim_folder)]
+
+            for i, d in enumerate(lineage):
+                name = os.path.basename(d)
+                is_primary = os.path.abspath(d) == os.path.abspath(self.data_ctrl.current_sim_folder)
+                
+                if is_primary:
+                    name = f"➤ {name}"
+                
+                self.history_listbox.insert(tk.END, name)
+                
+                # Restore selection for all folders in the active composite set
+                if os.path.abspath(d) in active_paths:
+                    self.history_listbox.selection_set(i)
+                    if is_primary:
+                        self.history_listbox.see(i)
             
             # 2. Sync the VTK listbox in UI with the restored meshes and visibility
             self.vtk_listbox.delete(0, tk.END)
@@ -606,6 +639,36 @@ class ViewerApp(BaseTk):
             # Traditional behavior: just log and copy
             self.clipboard_clear()
             self.clipboard_append(str(info['mol']))
+
+    def _on_history_double_click_ui(self, event):
+        idx = self.history_listbox.curselection()
+        if not idx: return
+        
+        # Resolve the directory from the index
+        if hasattr(self.data_ctrl.sim_source, 'lineage'):
+            target_dir = self.data_ctrl.sim_source.lineage[idx[0]]
+            if os.path.isdir(target_dir):
+                self.loader_ctrl.load_simulation_folder(target_dir)
+            else:
+                messagebox.showerror("Error", f"Folder no longer exists: {target_dir}")
+
+    def _on_load_lifecycle_selection_ui(self):
+        """Loads multiple selected folders as a single composite simulation."""
+        indices = self.history_listbox.curselection()
+        if not indices: return
+        
+        if hasattr(self.data_ctrl.sim_source, 'lineage'):
+            lineage = self.data_ctrl.sim_source.lineage
+            # Get all selected paths in chronological order (by lineage index)
+            target_dirs = [lineage[i] for i in sorted(indices)]
+            
+            # Filter valid directories
+            valid_dirs = [d for d in target_dirs if os.path.isdir(d)]
+            if not valid_dirs:
+                messagebox.showerror("Error", "None of the selected folders exist.")
+                return
+                
+            self.loader_ctrl.load_simulation_folder(valid_dirs)
 
     def _on_restart_editor_open(self, path: str):
         """Callback when a restart file is loaded for editing."""

@@ -36,6 +36,9 @@ atom_modify sort 0 0.0
 neigh_modify delay 0 every 10 check yes
 timestep ${dt}
 
+# 6. Massive Multi-Hopper Insertion
+include ${insertion_file}
+
 group chain_particles type 1
 group hopper_walls type 2
 
@@ -47,9 +50,6 @@ fix 2D chain_particles setforce 0 NULL NULL
 # Include the external dump settings
 include ${dump_inc}
 restart 100000 ${outdir}/restart/restart.*.bin
-
-# 6. Massive Multi-Hopper Insertion
-include ${insertion_file}
 
 # 7. Settling Phase
 run ${relax_steps}

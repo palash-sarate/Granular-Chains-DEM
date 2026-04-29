@@ -65,7 +65,14 @@ class SimDataController:
 
     @property
     def metadata(self):
-        """Persistent metadata for the current simulation."""
+        """Aggregated read-only metadata for the entire simulation history."""
+        if self.sim_source:
+            return self.sim_source.full_metadata
+        return None
+
+    @property
+    def writable_metadata(self):
+        """The writable SimulationMetadata object for the current folder."""
         if self.sim_source:
             return self.sim_source.metadata
         return None
@@ -112,9 +119,10 @@ class SimDataController:
                 break
         self.loading_batches.clear()
 
-    def load_folder(self, folder: str, force_reload: bool = False, enable_preloading: bool = True):
+    def load_folder(self, folder, force_reload: bool = False, enable_preloading: bool = True):
         self._stop_flag = False
         try:
+            primary_folder = folder[-1] if isinstance(folder, list) else folder
             new_source = SimulationData(folder)
             data_dict = new_source.load_data(force_reload=force_reload)
             df_atoms = data_dict['atoms']
@@ -122,10 +130,18 @@ class SimDataController:
             if df_atoms is None or df_atoms.empty:
                 return False, "No dump files found or parsing failed.", 0
             
-            # Commit changes only after success
             self.sim_source = new_source
-            self.current_sim_folder = folder
-            self.geometry_data, self.geometry_script_path = load_lammps_geometry(folder)
+            self.current_sim_folder = primary_folder
+            
+            # Load geometry with lineage fallback
+            self.geometry_data, self.geometry_script_path = load_lammps_geometry(primary_folder)
+            if not self.geometry_data and hasattr(self.sim_source, 'lineage'):
+                for ancestor in reversed(self.sim_source.lineage[:-1]):
+                    g_data, g_path = load_lammps_geometry(ancestor)
+                    if g_data:
+                        self.geometry_data, self.geometry_script_path = g_data, g_path
+                        print(f"DEBUG: Resolved geometry from ancestor run: {os.path.basename(ancestor)}")
+                        break
             
             # Metadata: Store ALL timesteps even if data isn't loaded yet
             self.timesteps = self.sim_source.timesteps

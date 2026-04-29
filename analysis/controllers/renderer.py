@@ -49,7 +49,7 @@ class SimulationRenderer:
             'up': list(cam.GetViewUp()),
             'scale': cam.GetParallelScale()
         }
-        self.data_ctrl.metadata.set("camera_state", state)
+        self.data_ctrl.writable_metadata.set("camera_state", state)
 
     def restore_camera_state(self):
         """Restore camera parameters from simulation metadata."""

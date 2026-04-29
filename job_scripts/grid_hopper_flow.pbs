@@ -35,14 +35,16 @@ echo "Starting Grid Hopper Flow Simulation at: $(date)"
 # Orifices will be opened and walls will begin oscillating.
 python -u main.py run_grid_hopper_flow \
     --source_dir "$SOURCE_DIR" \
-    --run_steps 1000000 \
+    --run_steps 10000 \
+    --viscosity 0.005 \
     --freq 2,4,8,10 \
     --amp 0.01,0.02,0.01,0.03 \
     --osc_dir z \
     --dt 1e-6 \
     --num_procs 16 \
     --num_threads 1 \
-    --simulation "Grid_Hopper_Flow"
+    --simulation "Grid_Hopper_Flow" \
+    --dump_file "simulation_templates/default_dump.inc"
 
 echo "=============================================================================="
 echo "Flow simulation and splitting complete at: $(date)"

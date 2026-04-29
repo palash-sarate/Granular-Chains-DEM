@@ -132,7 +132,8 @@ class GridHopperManager:
             f.write("\n".join(combined_inc_lines))
         
         # 3. Setup Grid Geometry (Analytical Regions)
-        run_name = f"Grid_Fill_{n_hoppers}H_MixedN_S{seed}"
+        mixed_tag = "_MixedN" if len(unique_Ns) > 1 else ""
+        run_name = f"Grid_Fill_{n_hoppers}H{mixed_tag}_S{seed}"
         job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         job_dir.mkdir(parents=True, exist_ok=True)
         
@@ -158,7 +159,7 @@ class GridHopperManager:
                 auto_vis=True,
                 combined=False,
                 bounds=vtk_bounds,
-                spacing=0.005 # Faster sampling for large grids
+                spacing=0.0005 # Finer sampling to resolve small features (e.g. 2.5mm gaps)
             )
         except Exception as e:
             print(f"[WARNING] Could not generate VTK mesh: {e}")
@@ -200,7 +201,7 @@ class GridHopperManager:
         print(f"--- Starting Analytical Grid Hopper Filling: {n_hoppers} hoppers ---")
         # Save metadata for later splitting or resuming
         import json
-        with open(job_dir / "grid_metadata.json", 'w') as f:
+        with open(job_dir / "metadata.json", 'w') as f:
             json.dump({
                 "metadata": {str(k): {"offset": v["offset"].tolist(), "N": N_list[k], "n_fill": n_fill_list[k], "geometry_vars": normalized_geo_vars[k]} for k, v in metadata.items()}, 
                 "N": N_list,
@@ -242,13 +243,40 @@ class GridHopperManager:
         """
         import json
         restart_p = Path(restart_path)
-        # Search for metadata in restart folder or its parent
-        prev_job_dir = restart_p.parent
-        metadata_path = prev_job_dir / "grid_metadata.json"
+        if restart_p.is_dir():
+            prev_job_dir = restart_p
+            # Find latest restart in directory
+            r_file = restart_p / "restart" / "restart.final.bin"
+            if not r_file.exists():
+                restarts = list((restart_p / "restart").glob("restart.*.bin"))
+                if restarts:
+                    # Sort by step number in restart.STEP.bin
+                    try:
+                        r_file = max(restarts, key=lambda p: int(p.stem.split('.')[-1]) if '.' in p.stem else 0)
+                    except:
+                        r_file = restarts[-1]
+                else:
+                    raise FileNotFoundError(f"No restart files found in {restart_p}/restart")
+            restart_p = r_file
+        else:
+            prev_job_dir = restart_p.parent
+            
+        metadata_path = prev_job_dir / "metadata.json"
         if not metadata_path.exists():
-            prev_job_dir = prev_job_dir.parent
-            metadata_path = prev_job_dir / "grid_metadata.json"
+            # Try one level up if we were inside a 'restart' or 'results' subfolder
+            metadata_path = prev_job_dir.parent / "metadata.json"
+            if metadata_path.exists():
+                prev_job_dir = prev_job_dir.parent
         
+        # Backward compatibility check for legacy naming
+        if not metadata_path.exists():
+            legacy_names = ["grid_metadata.json", "sim_metadata.json"]
+            for name in legacy_names:
+                p = prev_job_dir / name
+                if p.exists():
+                    metadata_path = p
+                    break
+                    
         if not metadata_path.exists():
             raise FileNotFoundError(f"Metadata file not found at {metadata_path}. Cannot resume/split.")
             
@@ -271,9 +299,13 @@ class GridHopperManager:
         new_job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         new_job_dir.mkdir(parents=True, exist_ok=True)
         
-        # Metadata Inheritance: Copy metadata to the new directory so we can resume from here too
-        import shutil
-        shutil.copy(metadata_path, new_job_dir / "grid_metadata.json")
+        # Metadata Inheritance: Copy and Update with Lineage
+        new_meta = meta_raw.copy()
+        new_meta["source_dir"] = str(prev_job_dir.absolute()).replace("\\", "/")
+        new_meta["run_name"] = run_name
+        
+        with open(new_job_dir / "grid_metadata.json", 'w') as f:
+            json.dump(new_meta, f)
         
         config = SimulationConfig(
             template="in.grid_hopper_fill_resume",
@@ -318,7 +350,10 @@ class GridHopperManager:
         """
         import json
         source_p = Path(source_dir)
-        metadata_path = source_p / "grid_metadata.json"
+        metadata_path = source_p / "metadata.json"
+        if not metadata_path.exists():
+            metadata_path = source_p / "grid_metadata.json" # Legacy fallback
+            
         if not metadata_path.exists():
             raise FileNotFoundError(f"Metadata file not found at {metadata_path}. Cannot start flow.")
 
@@ -347,7 +382,8 @@ class GridHopperManager:
             amp_list = (list(amp) * (n_hoppers // len(amp) + 1))[:n_hoppers]
 
         # 2. Setup Flow Run Directory
-        run_name = f"Grid_Flow_{n_hoppers}H_S{seed}"
+        is_mixed = "_MixedN" in source_p.name
+        run_name = f"Grid_Flow_{n_hoppers}H{'_MixedN' if is_mixed else ''}_S{seed}"
         job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         job_dir.mkdir(parents=True, exist_ok=True)
 
@@ -373,7 +409,7 @@ class GridHopperManager:
         new_meta["simulation"] = simulation
         new_meta["geometry_inc"] = geometry_flow_inc
         
-        with open(job_dir / "grid_metadata.json", 'w') as f:
+        with open(job_dir / "metadata.json", 'w') as f:
             json.dump(new_meta, f)
 
         # 6. Configure & Run
@@ -466,9 +502,13 @@ class GridHopperManager:
         new_job_dir, run_name = self._generate_resume_path(job_dir, seed)
         new_job_dir.mkdir(parents=True, exist_ok=True)
         
-        # Inherit Metadata
-        import shutil
-        shutil.copy(metadata_path, new_job_dir / "grid_metadata.json")
+        # Inherit Metadata and Update Lineage
+        new_meta = meta_raw.copy()
+        new_meta["source_dir"] = str(job_dir.absolute()).replace("\\", "/")
+        new_meta["run_name"] = run_name
+        
+        with open(new_job_dir / "grid_metadata.json", 'w') as f:
+            json.dump(new_meta, f)
 
         config = SimulationConfig(
             template=template,

@@ -23,7 +23,7 @@ class SimulationLoader:
         if not folder: return
         self.load_simulation_folder(folder)
 
-    def load_simulation_folder(self, folder: str, force_reload: bool = False):
+    def load_simulation_folder(self, folder, force_reload: bool = False):
         if not folder: return
         self.playback_ctrl.pause()
         pref = self.ui_callbacks.get('enable_preloading', True)
