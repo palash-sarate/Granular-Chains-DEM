@@ -31,11 +31,20 @@ class SimulationLoader:
             pref = pref.get()
             
         ok, err, num_queued = self.data_ctrl.load_folder(folder, force_reload=force_reload, enable_preloading=pref)
-        if not ok:
-            # If it failed to load as a LAMMPS sim, check if it's a folder of VTKs
+        
+        # Always check for VTKs in the folder(s)
+        vtks = []
+        if isinstance(folder, list):
+            for f in folder:
+                vtks.extend(glob.glob(os.path.join(f, "*.vtk")))
+        else:
             vtks = glob.glob(os.path.join(folder, "*.vtk"))
+        vtks = sorted(list(set(vtks)))
+
+        if not ok:
+            # If it failed to load as a LAMMPS sim, load VTKs if present
             if vtks:
-                for v in sorted(vtks):
+                for v in vtks:
                     self.ui_callbacks['add_vtk'](v)
                 return
             messagebox.showerror('Error', err)
@@ -44,6 +53,10 @@ class SimulationLoader:
         self.renderer_ctrl.clear()
         self.renderer_ctrl.update_persistent_bounds()
         self.ui_callbacks['on_load_success'](num_queued)
+        
+        # Also load any VTKs found in the simulation folder
+        for v in vtks:
+            self.ui_callbacks['add_vtk'](v)
 
     def open_dump_files(self):
         files = filedialog.askopenfilenames(title='Select dump files', filetypes=[('Dump files', 'dump*'), ('All', '*.*')])
@@ -82,17 +95,37 @@ class SimulationLoader:
     def handle_dropped_files(self, filenames: list):
         if not filenames: return
         
-        vtks = [f for f in filenames if f.lower().endswith('.vtk')]
-        others = [f for f in filenames if not f.lower().endswith('.vtk')]
+        # Normalize paths (handles some tkinter-specific quirks like {} around spaces)
+        paths = [self.data_ctrl.normalize_dropped_path(f) for f in filenames]
         
-        if len(filenames) == 1 and os.path.isdir(filenames[0]):
-            self.load_simulation_folder(filenames[0])
-            return
+        folders = [p for p in paths if os.path.isdir(p)]
+        files = [p for p in paths if os.path.isfile(p)]
+        
+        # 1. Collect VTKs from direct files AND any folders dropped
+        vtks_to_load = [f for f in files if f.lower().endswith('.vtk')]
+        for d in folders:
+            # Check for VTKs directly inside the folder
+            inside_vtks = glob.glob(os.path.join(d, "*.vtk"))
+            vtks_to_load.extend(inside_vtks)
+            
+        # 2. Handle Simulation Loading
+        # If we have any folder that looks like a simulation root, try loading it
+        sim_folders = [d for d in folders if self.data_ctrl.resolve_sim_root(d)]
+        
+        if sim_folders:
+            # Load the first one (or all if we want composite, but let's stick to first for now)
+            self.load_simulation_folder(sim_folders[0])
+        elif len(folders) == 1 and not vtks_to_load:
+            # Fallback: single folder with no VTKs, try as sim anyway
+            self.load_simulation_folder(folders[0])
 
+        # 3. Handle Other Files (dumps, data)
+        # Filter out VTKs and Restarts already handled
+        others = [f for f in files if not f.lower().endswith('.vtk') and not f.lower().endswith('.bin')]
         if others:
             if len(others) == 1 and others[0].endswith('.data'):
                 self.open_data_file_path(others[0])
-            else:
+            elif all(os.path.basename(f).startswith('dump') or f.endswith('.dump') for f in others):
                 self.playback_ctrl.pause()
                 ok, err, num_queued = self.data_ctrl.load_dump_files(others)
                 if not ok: messagebox.showerror('Error', err)
@@ -101,12 +134,20 @@ class SimulationLoader:
                     self.renderer_ctrl.update_persistent_bounds()
                     self.ui_callbacks['on_load_success'](num_queued, clear_vtk=False)
         
-        for v in vtks:
-            self.ui_callbacks['add_vtk'](v)
-            
-        restarts = [f for f in filenames if f.lower().endswith('.bin')]
+        # 4. Handle Restarts
+        restarts = [f for f in files if f.lower().endswith('.bin')]
         if restarts:
             self.open_restart_editor(restarts[0])
+
+        # 5. Load VTKs last
+        # We skip VTKs that are in the sim_folder as load_simulation_folder already handled them
+        loaded_via_sim = []
+        if sim_folders:
+            loaded_via_sim = [os.path.abspath(v) for v in glob.glob(os.path.join(sim_folders[0], "*.vtk"))]
+            
+        for v in sorted(list(set(vtks_to_load))):
+            if os.path.abspath(v) not in loaded_via_sim:
+                self.ui_callbacks['add_vtk'](v)
 
     def open_restart_editor(self, path: str):
         """UI entry point for the Restart Editor."""

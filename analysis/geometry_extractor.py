@@ -55,7 +55,8 @@ class GeometryExtractor:
 
     def extract(self, inc_file: Path, outdir: Path, spacing: float = 0.001, 
                 radius: float = None, regions: list = None, auto_vis: bool = True, 
-                combined: bool = True, bounds: list = None):
+                combined: bool = True, bounds: list = None,
+                num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = False):
         
         inc_file = Path(inc_file).resolve()
         outdir = Path(outdir)
@@ -102,9 +103,41 @@ class GeometryExtractor:
             with open(input_file, "w") as f:
                 f.write(lmp_script)
 
-            print(f"[{label}] Running LAMMPS sampling for {len(batch)} regions...")
+            print(f"[{label}] Running LAMMPS sampling for {len(batch)} regions (nprocs={num_procs}, threads={num_threads})...")
+            
+            cmd = [self.lammps_cmd, "-in", str(input_file)]
+            
+            # 2. Prepare environment (consistent with runner.py)
+            env = os.environ.copy()
+            env["OMP_NUM_THREADS"] = str(num_threads)
+            env["OMP_PROC_BIND"] = "spread"
+            env["OMP_PLACES"] = "cores"
+
+            # Apply KOKKOS/Acceleration if requested (exact match with runner.py logic)
+            if use_kokkos:
+                # We assume GPU availability matches main sim preference
+                cmd.extend([
+                    "-k", "on", "t", str(num_threads), 
+                    "-sf", "kk", 
+                    "-pk", "kokkos", "newton", "on", "neigh", "half"
+                ])
+            elif num_threads > 1:
+                cmd.extend(["-sf", "omp", "-pk", "omp", str(num_threads)])
+
+            # Wrap in mpiexec
+            if num_procs > 1:
+                import sys
+                if sys.platform == "win32":
+                    cmd = ["mpiexec", "-n", str(num_procs)] + cmd
+                else:
+                    # Linux/macOS bind-to logic
+                    if num_threads > 1:
+                        cmd = ["mpiexec", "-n", str(num_procs), "--map-by", f"socket:PE={num_threads}", "--bind-to", "core"] + cmd
+                    else:
+                        cmd = ["mpiexec", "-n", str(num_procs), "--bind-to", "core"] + cmd
+
             try:
-                subprocess.run([self.lammps_cmd, "-in", str(input_file)], check=True, capture_output=True)
+                subprocess.run(cmd, check=True, capture_output=True, env=env)
             except subprocess.CalledProcessError as e:
                 print(f"Error running LAMMPS: {e.stderr.decode()}")
                 return []

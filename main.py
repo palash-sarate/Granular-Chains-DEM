@@ -146,9 +146,12 @@ def main():
     p_grid_h.add_argument("--num_procs", type=int, default=1)
     p_grid_h.add_argument("--num_threads", type=int, default=1)
     p_grid_h.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
-    p_grid_h.add_argument("--mode", choices=["2D_stacked", "3D_grid"], default="2D_stacked")
+    p_grid_h.add_argument("--mode", type=str, default="2D_stacked", choices=["2D_stacked", "2D_worst_case", "3D_grid"],
+                            help="Pouring mode: 2D_stacked (smart bbox), 2D_worst_case (linear spacing), or 3D_grid")
     p_grid_h.add_argument("--simulation", default="Grid_Hopper_Filling")
     p_grid_h.add_argument("--template", default="in.grid_hopper_fill")
+    p_grid_h.add_argument("--no-vtk", action="store_false", dest="generate_vtk", help="Skip VTK mesh generation")
+    p_grid_h.set_defaults(generate_vtk=True)
     p_grid_h.add_argument("--geometry_vars", type=str, help="JSON string for per-hopper geometry variables")
 
     # 10. resume_grid_hopper_filling

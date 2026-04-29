@@ -5,6 +5,8 @@ import random
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 import numpy as np
+import time
+import json
 
 from .runner import SimulationRunner
 from .config import SimulationConfig
@@ -59,9 +61,10 @@ class GridHopperManager:
                          mode: str = "2D_stacked",
                          simulation: str = "Grid_Hopper_Filling",
                          template: str = "in.grid_hopper_fill",
-                         geometry_vars: dict = None):
-        import time
+                         generate_vtk: bool = True,
+                         geometry_vars: Dict[str, Any] = None):
         t_start = time.time()
+        print(f"[INFO] Grid filling simulation started. VTK Generation: {generate_vtk}")
         # 1. Normalize N and n_fill into lists
         if isinstance(N, (int, float)):
             N_list = [int(N)] * n_hoppers
@@ -100,6 +103,7 @@ class GridHopperManager:
         unique_Ns = sorted(list(set(N_list)))
         relaxed_sources = {} # N -> source_path
         mol_ranges = {} # N -> { 'start': int, 'count': int }
+        mol_bboxes = {} # mol_id -> bbox
         combined_inc_lines = []
         current_id_offset = 0
         
@@ -121,7 +125,8 @@ class GridHopperManager:
                 mol_id = current_id_offset + i + 1
                 mol_filename = f"mol_{mol_id}.mol"
                 output_mol = mol_dir / mol_filename
-                convert_data_to_molecule(str(data_file), str(output_mol))
+                bbox = convert_data_to_molecule(str(data_file), str(output_mol))
+                mol_bboxes[mol_id] = bbox
                 mol_rel_path = f"chain_data/molecules_temp/{mol_filename}".replace("\\", "/")
                 combined_inc_lines.append(f"molecule m{mol_id} {mol_rel_path}")
             
@@ -137,37 +142,40 @@ class GridHopperManager:
         job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         job_dir.mkdir(parents=True, exist_ok=True)
         
-        geometry_inc, metadata = self._generate_replicated_geometry(
+        geometry_inc, envelope = self._generate_replicated_geometry(
             Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars
         )
 
-        # 3b. Generate VTK files for UI visualization
-        try:
-            from analysis.geometry_extractor import GeometryExtractor
-            print(f"--- Generating VTK Mesh for UI Visualization ---")
-            extractor = GeometryExtractor(lammps_cmd=self.runner.lammps_exe)
-            # Calculate bounds based on grid size to ensure we capture all hoppers
-            cols = math.ceil(math.sqrt(n_hoppers))
-            rows = math.ceil(n_hoppers / cols)
-            max_x = cols * spacing
-            max_y = rows * spacing
-            vtk_bounds = [-spacing, max_x, -spacing, max_y, -0.1, 1.0]
-            
-            extractor.extract(
-                inc_file=geometry_inc,
-                outdir=job_dir / "Geometry_vtk",
-                auto_vis=True,
-                combined=False,
-                bounds=vtk_bounds,
-                spacing=0.0005 # Finer sampling to resolve small features (e.g. 2.5mm gaps)
-            )
-        except Exception as e:
-            print(f"[WARNING] Could not generate VTK mesh: {e}")
-            print("You can generate it manually later using analysis/geometry_extractor.py")
+        # 3.2 Optional: Generate VTK meshes for UI visualization
+        if generate_vtk:
+            print("--- Generating VTK Mesh for UI Visualization ---")
+            try:
+                from analysis.geometry_extractor import GeometryExtractor
+                extractor = GeometryExtractor(self.runner.lammps_exe)
+                
+                vtk_bounds = [envelope['total_bounds']['x'][0], envelope['total_bounds']['x'][1],
+                              envelope['total_bounds']['y'][0], envelope['total_bounds']['y'][1],
+                              envelope['total_bounds']['z'][0], envelope['total_bounds']['z'][1]]
+                
+                extractor.extract(
+                    inc_file=geometry_inc,
+                    outdir=job_dir / "Geometry_vtk",
+                    auto_vis=True,
+                    combined=False,
+                    bounds=vtk_bounds,
+                    spacing=0.005, # Finer sampling to resolve small features (e.g. 2.5mm gaps)
+                    num_procs=num_procs,
+                    num_threads=num_threads,
+                    use_kokkos=use_kokkos
+                )
+            except Exception as e:
+                print(f"[WARNING] Could not generate VTK mesh: {e}")
+                print("You can generate it manually later using analysis/geometry_extractor.py")
         
         # 4. Create Consolidated Insertion File (The Chains)
         insertion_file, z_max = self._generate_grid_insertion_file(
-            job_dir, n_hoppers, n_fill_list, mol_ranges, seed, N_list, spacing, metadata, mode=mode
+            job_dir, n_hoppers, n_fill_list, mol_ranges, seed, N_list, spacing, envelope['hoppers'], 
+            mol_bboxes=mol_bboxes, mode=mode
         )
 
         setup_duration = time.time() - t_start
@@ -200,10 +208,13 @@ class GridHopperManager:
         
         print(f"--- Starting Analytical Grid Hopper Filling: {n_hoppers} hoppers ---")
         # Save metadata for later splitting or resuming
+        metadata = {str(k): {"offset": v["offset"].tolist(), "N": N_list[k], "n_fill": n_fill_list[k], "geometry_vars": normalized_geo_vars[k]} for k, v in envelope['hoppers'].items()}
+        
         import json
         with open(job_dir / "metadata.json", 'w') as f:
             json.dump({
-                "metadata": {str(k): {"offset": v["offset"].tolist(), "N": N_list[k], "n_fill": n_fill_list[k], "geometry_vars": normalized_geo_vars[k]} for k, v in metadata.items()}, 
+                "metadata": metadata, 
+                "total_bounds": envelope['total_bounds'],
                 "N": N_list,
                 "n_fill": n_fill_list,
                 "spacing": spacing,
@@ -216,10 +227,11 @@ class GridHopperManager:
         self.runner.run(config, clean_dir=False)
         
         # 5. Split Results
-        for k in metadata:
-            metadata[k]['N'] = N_list[k]
-            metadata[k]['n_fill'] = n_fill_list[k]
-            metadata[k]['source_dir'] = relaxed_sources.get(N_list[k])
+        for k_str in metadata:
+            k = int(k_str)
+            metadata[k_str]['N'] = N_list[k]
+            metadata[k_str]['n_fill'] = n_fill_list[k]
+            metadata[k_str]['source_dir'] = relaxed_sources.get(N_list[k])
 
         final_grid_data = Path(config.output_dir) / "final_grid.data"
         if final_grid_data.exists():
@@ -660,10 +672,22 @@ class GridHopperManager:
                     new_parts[1] = new_id
                     replicated_lines.append(f"{' '.join(new_parts)}\n")
                     
+        rows = math.ceil(n_hoppers / cols)
+        total_bounds = {
+            'x': [-spacing, cols * spacing],
+            'y': [-spacing, rows * spacing],
+            'z': [-0.1, 1.0]  # Default Z bounds
+        }
+        
+        envelope = {
+            "total_bounds": total_bounds,
+            "hoppers": metadata
+        }
+        
         out_path = job_dir / inc_name
         with open(out_path, 'w') as f:
             f.writelines(replicated_lines)
-        return str(out_path).replace("\\", "/"), metadata
+        return str(out_path).replace("\\", "/"), envelope
 
     def _evaluate_variables(self, commands: List[str], overrides: Dict[str, Any] = None) -> Dict[str, Any]:
         """
@@ -707,6 +731,7 @@ class GridHopperManager:
     def _generate_grid_insertion_file(self, outdir: Path, n_hoppers: int, n_fill_list: List[int], 
                                       mol_ranges: Dict[int, Any], seed: int, N_list: List[int], 
                                       spacing: float, metadata: Dict[int, Any],
+                                      mol_bboxes: Dict[int, Any] = None,
                                       mode: str = "2D_stacked"):
         rng = random.Random(seed)
         insertion_lines = []
@@ -733,18 +758,18 @@ class GridHopperManager:
             m_count = m_range['count']
 
             # Hopper-specific geometry based on N
-            bead_diam = 0.003
-            safe_buffer = max(0.005, (N * bead_diam / 2.0) + 0.002)
-            
-            y_max = hopper_y_half - safe_buffer
-            y_min = -hopper_y_half + safe_buffer
-            if y_max <= y_min:
-                y_max, y_min = 0.001, -0.001
-            y_width = y_max - y_min
-            
+            bead_diam = 0.003            
             count = 0
             
-            if mode == "2D_stacked":
+            if mode == "2D_worst_case":
+                safe_buffer = max(0.005, (N * bead_diam / 2.0) + 0.002)
+            
+                y_max = hopper_y_half - safe_buffer
+                y_min = -hopper_y_half + safe_buffer
+                if y_max <= y_min:
+                    y_max, y_min = 0.001, -0.001
+                y_width = y_max - y_min
+
                 dy_gap = N * 0.003 
                 dz_gap = N * 0.003
                 ny = max(1, int(y_width / dy_gap))
@@ -762,7 +787,64 @@ class GridHopperManager:
                         insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz+offset[2]:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
                         count += 1
                         total_inserted += 1
+            elif mode == "2D_stacked":
+                safe_buffer = bead_diam
+            
+                y_max = hopper_y_half - safe_buffer
+                y_min = -hopper_y_half + safe_buffer
+                if y_max <= y_min:
+                    y_max, y_min = 0.001, -0.001
+                y_width = y_max - y_min
+
+                # Smart packing using actual molecule bounding boxes
+                current_z = z_start
+                buffer = 0.002 # 2mm safety gap between bounding boxes
+                
+                while count < n_fill:
+                    current_y = y_min
+                    max_h_in_row = 0
+                    row_empty = True
+                    
+                    while count < n_fill:
+                        # We need to peek at the next molecule's bbox
+                        # To keep it simple, we'll pick the molecule first
+                        mol_id = m_start + rng.randint(0, m_count - 1)
+                        bbox = mol_bboxes[mol_id]
+                        m_w = bbox['width'] + buffer
+                        m_h = bbox['height'] + buffer
+                        
+                        # Check if it fits in current row
+                        if current_y + m_w > y_max:
+                            if row_empty:
+                                # Even a single molecule doesn't fit? 
+                                # This happens if safe_buffer is too large or hopper too narrow.
+                                # Force it into center and move to next row.
+                                py = offset[1]
+                                pz = current_z + bbox['height']/2 + offset[2]
+                                insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                                current_z += m_h
+                                count += 1
+                                total_inserted += 1
+                                break
+                            else:
+                                # Row is full, move to next Z level
+                                current_z += max_h_in_row
+                                break # Exit inner loop to start new row
+                        
+                        # Place at current_y (centered in its allocated slot)
+                        py = current_y + bbox['width']/2 + offset[1]
+                        pz = current_z + bbox['height']/2 + offset[2]
+                        insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                        
+                        current_y += m_w
+                        max_h_in_row = max(max_h_in_row, m_h)
+                        row_empty = False
+                        count += 1
+                        total_inserted += 1
+                    
+                    z_max_global = max(z_max_global, current_z)
             else:
+                # Default 3D grid-like pouring
                 x_min, x_max = -0.08, 0.08
                 x_width = x_max - x_min
                 ex_diam = 3 * N * 0.001
@@ -847,7 +929,7 @@ class GridHopperManager:
                 json.dump({
                     "N": n_val, 
                     "n_fill": fill_val, 
-                    "offset": offset.tolist(),
+                    "offset": offset,
                     "geometry_overrides": meta.get('geometry_vars', {}),
                     "source_dir": meta.get('source_dir')
                 }, f)

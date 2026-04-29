@@ -27,7 +27,7 @@ cmd = [
     "--bounds"
 ] + bounds + [
     "--combined",       # Combine all hoppers into a single mesh for easier viewing
-    "--spacing", "0.005" # 5mm resolution for good detail
+    "--spacing", "0.01" # 5mm resolution for good detail
 ]
 
 print("Launching Geometry Extractor...")

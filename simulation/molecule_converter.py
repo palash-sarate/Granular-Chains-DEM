@@ -115,6 +115,23 @@ def write_molecule_file(data, output_file):
     cx = sum(xs) / len(xs)
     cy = sum(ys) / len(ys)
     cz = sum(zs) / len(zs)
+
+    # Calculate Bounding Box of centered molecule
+    # Radius must be included
+    xmin = min([a['x'] - cx - a['diameter']/2.0 for a in atoms])
+    xmax = max([a['x'] - cx + a['diameter']/2.0 for a in atoms])
+    ymin = min([a['y'] - cy - a['diameter']/2.0 for a in atoms])
+    ymax = max([a['y'] - cy + a['diameter']/2.0 for a in atoms])
+    zmin = min([a['z'] - cz - a['diameter']/2.0 for a in atoms])
+    zmax = max([a['z'] - cz + a['diameter']/2.0 for a in atoms])
+    bbox = {
+        'x': (xmin, xmax),
+        'y': (ymin, ymax),
+        'z': (zmin, zmax),
+        'width': ymax - ymin,
+        'height': zmax - zmin,
+        'thickness': xmax - xmin
+    }
     
     with open(output_file, 'w') as f:
         f.write(f"# Molecule file generated from relaxed chain\n\n")
@@ -166,10 +183,11 @@ def write_molecule_file(data, output_file):
             f.write("\n")
 
     print(f"Converted to molecule: {output_file}")
+    return bbox
 
 def convert_data_to_molecule(data_file, output_mol_file):
     data = parse_lammps_data(data_file)
-    write_molecule_file(data, output_mol_file)
+    return write_molecule_file(data, output_mol_file)
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:

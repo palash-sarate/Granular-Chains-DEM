@@ -337,6 +337,7 @@ class SimulationOrchestrator:
                                 mode: str = "2D_stacked",
                                 simulation: str = "Grid_Hopper_Filling",
                                 template: str = "in.grid_hopper_fill",
+                                generate_vtk: bool = True,
                                 geometry_vars: Dict[str, Any] = None):
         """
         Main entry point for grid-based batch hopper filling.
@@ -371,6 +372,7 @@ class SimulationOrchestrator:
             mode=mode,
             simulation=simulation,
             template=template,
+            generate_vtk=generate_vtk,
             geometry_vars=geometry_vars
         )
 

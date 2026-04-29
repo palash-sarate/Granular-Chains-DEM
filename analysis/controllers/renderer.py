@@ -71,37 +71,51 @@ class SimulationRenderer:
         # Standard backgrounds
         bg = ("#f0f0f0", "#333333") # (off-white, dark gray)
         
+        # We place 7 buttons across the top right
+        # Spacing: 0.06
+        start_x = 0.58
+        
         # ISO View
         self.plotter.add_button(
             lambda *args: self._set_camera_view("iso"),
-            states=["Iso"],
-            font="Arial", size=18,
-            pos=(0.70, 0.05),
-            bc=bg
+            states=["Iso"], font="Arial", size=18,
+            pos=(start_x, 0.95), bc=bg
         )
-        # X View (Front/YZ)
+        
+        # X / -X
         self.plotter.add_button(
             lambda *args: self._set_camera_view("x"),
-            states=["X"],
-            font="Arial", size=18,
-            pos=(0.77, 0.05),
-            bc=bg
+            states=["X"], font="Arial", size=18,
+            pos=(start_x + 0.06, 0.95), bc=bg
         )
-        # Y View (Side/XZ)
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("-x"),
+            states=["-X"], font="Arial", size=18,
+            pos=(start_x + 0.12, 0.95), bc=bg
+        )
+        
+        # Y / -Y
         self.plotter.add_button(
             lambda *args: self._set_camera_view("y"),
-            states=["Y"],
-            font="Arial", size=18,
-            pos=(0.84, 0.05),
-            bc=bg
+            states=["Y"], font="Arial", size=18,
+            pos=(start_x + 0.18, 0.95), bc=bg
         )
-        # Z View (Top/XY)
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("-y"),
+            states=["-Y"], font="Arial", size=18,
+            pos=(start_x + 0.24, 0.95), bc=bg
+        )
+        
+        # Z / -Z
         self.plotter.add_button(
             lambda *args: self._set_camera_view("z"),
-            states=["Z"],
-            font="Arial", size=18,
-            pos=(0.91, 0.05),
-            bc=bg
+            states=["Z"], font="Arial", size=18,
+            pos=(start_x + 0.30, 0.95), bc=bg
+        )
+        self.plotter.add_button(
+            lambda *args: self._set_camera_view("-z"),
+            states=["-Z"], font="Arial", size=18,
+            pos=(start_x + 0.36, 0.95), bc=bg
         )
 
     def _set_camera_view(self, axis: str):
@@ -122,11 +136,20 @@ class SimulationRenderer:
         if axis == "x":
             new_pos = fp + np.array([dist, 0, 0])
             up = (0, 0, 1)
+        elif axis == "-x":
+            new_pos = fp + np.array([-dist, 0, 0])
+            up = (0, 0, 1)
         elif axis == "y":
             new_pos = fp + np.array([0, dist, 0])
             up = (0, 0, 1)
+        elif axis == "-y":
+            new_pos = fp + np.array([0, -dist, 0])
+            up = (0, 0, 1)
         elif axis == "z":
             new_pos = fp + np.array([0, 0, dist])
+            up = (0, 1, 0)
+        elif axis == "-z":
+            new_pos = fp + np.array([0, 0, -dist])
             up = (0, 1, 0)
         elif axis == "iso":
             # 45 deg view
