@@ -1,0 +1,2768 @@
+Executing command: run_grid_hopper_filling
+[INFO] Grid filling simulation started. VTK Generation: True
+Converted to molecule: chain_data\molecules_temp\mol_1.mol
+Converted to molecule: chain_data\molecules_temp\mol_2.mol
+Converted to molecule: chain_data\molecules_temp\mol_3.mol
+Converted to molecule: chain_data\molecules_temp\mol_4.mol
+Converted to molecule: chain_data\molecules_temp\mol_5.mol
+Converted to molecule: chain_data\molecules_temp\mol_6.mol
+Converted to molecule: chain_data\molecules_temp\mol_7.mol
+Converted to molecule: chain_data\molecules_temp\mol_8.mol
+Converted to molecule: chain_data\molecules_temp\mol_9.mol
+Converted to molecule: chain_data\molecules_temp\mol_10.mol
+Converted to molecule: chain_data\molecules_temp\mol_11.mol
+Converted to molecule: chain_data\molecules_temp\mol_12.mol
+Converted to molecule: chain_data\molecules_temp\mol_13.mol
+Converted to molecule: chain_data\molecules_temp\mol_14.mol
+Converted to molecule: chain_data\molecules_temp\mol_15.mol
+Converted to molecule: chain_data\molecules_temp\mol_16.mol
+Converted to molecule: chain_data\molecules_temp\mol_17.mol
+Converted to molecule: chain_data\molecules_temp\mol_18.mol
+Converted to molecule: chain_data\molecules_temp\mol_19.mol
+Converted to molecule: chain_data\molecules_temp\mol_20.mol
+Converted to molecule: chain_data\molecules_temp\mol_21.mol
+Converted to molecule: chain_data\molecules_temp\mol_22.mol
+Converted to molecule: chain_data\molecules_temp\mol_23.mol
+Converted to molecule: chain_data\molecules_temp\mol_24.mol
+Converted to molecule: chain_data\molecules_temp\mol_25.mol
+Converted to molecule: chain_data\molecules_temp\mol_26.mol
+Converted to molecule: chain_data\molecules_temp\mol_27.mol
+Converted to molecule: chain_data\molecules_temp\mol_28.mol
+Converted to molecule: chain_data\molecules_temp\mol_29.mol
+Converted to molecule: chain_data\molecules_temp\mol_30.mol
+Converted to molecule: chain_data\molecules_temp\mol_31.mol
+Converted to molecule: chain_data\molecules_temp\mol_32.mol
+Converted to molecule: chain_data\molecules_temp\mol_33.mol
+Converted to molecule: chain_data\molecules_temp\mol_34.mol
+Converted to molecule: chain_data\molecules_temp\mol_35.mol
+Converted to molecule: chain_data\molecules_temp\mol_36.mol
+Converted to molecule: chain_data\molecules_temp\mol_37.mol
+Converted to molecule: chain_data\molecules_temp\mol_38.mol
+Converted to molecule: chain_data\molecules_temp\mol_39.mol
+Converted to molecule: chain_data\molecules_temp\mol_40.mol
+Converted to molecule: chain_data\molecules_temp\mol_41.mol
+Converted to molecule: chain_data\molecules_temp\mol_42.mol
+Converted to molecule: chain_data\molecules_temp\mol_43.mol
+Converted to molecule: chain_data\molecules_temp\mol_44.mol
+Converted to molecule: chain_data\molecules_temp\mol_45.mol
+Converted to molecule: chain_data\molecules_temp\mol_46.mol
+Converted to molecule: chain_data\molecules_temp\mol_47.mol
+Converted to molecule: chain_data\molecules_temp\mol_48.mol
+Converted to molecule: chain_data\molecules_temp\mol_49.mol
+Converted to molecule: chain_data\molecules_temp\mol_50.mol
+Converted to molecule: chain_data\molecules_temp\mol_51.mol
+Converted to molecule: chain_data\molecules_temp\mol_52.mol
+Converted to molecule: chain_data\molecules_temp\mol_53.mol
+Converted to molecule: chain_data\molecules_temp\mol_54.mol
+Converted to molecule: chain_data\molecules_temp\mol_55.mol
+Converted to molecule: chain_data\molecules_temp\mol_56.mol
+Converted to molecule: chain_data\molecules_temp\mol_57.mol
+Converted to molecule: chain_data\molecules_temp\mol_58.mol
+Converted to molecule: chain_data\molecules_temp\mol_59.mol
+Converted to molecule: chain_data\molecules_temp\mol_60.mol
+Converted to molecule: chain_data\molecules_temp\mol_61.mol
+Converted to molecule: chain_data\molecules_temp\mol_62.mol
+Converted to molecule: chain_data\molecules_temp\mol_63.mol
+Converted to molecule: chain_data\molecules_temp\mol_64.mol
+Converted to molecule: chain_data\molecules_temp\mol_65.mol
+Converted to molecule: chain_data\molecules_temp\mol_66.mol
+Converted to molecule: chain_data\molecules_temp\mol_67.mol
+Converted to molecule: chain_data\molecules_temp\mol_68.mol
+Converted to molecule: chain_data\molecules_temp\mol_69.mol
+Converted to molecule: chain_data\molecules_temp\mol_70.mol
+Converted to molecule: chain_data\molecules_temp\mol_71.mol
+Converted to molecule: chain_data\molecules_temp\mol_72.mol
+Converted to molecule: chain_data\molecules_temp\mol_73.mol
+Converted to molecule: chain_data\molecules_temp\mol_74.mol
+Converted to molecule: chain_data\molecules_temp\mol_75.mol
+Converted to molecule: chain_data\molecules_temp\mol_76.mol
+Converted to molecule: chain_data\molecules_temp\mol_77.mol
+Converted to molecule: chain_data\molecules_temp\mol_78.mol
+Converted to molecule: chain_data\molecules_temp\mol_79.mol
+Converted to molecule: chain_data\molecules_temp\mol_80.mol
+Converted to molecule: chain_data\molecules_temp\mol_81.mol
+Converted to molecule: chain_data\molecules_temp\mol_82.mol
+Converted to molecule: chain_data\molecules_temp\mol_83.mol
+Converted to molecule: chain_data\molecules_temp\mol_84.mol
+Converted to molecule: chain_data\molecules_temp\mol_85.mol
+Converted to molecule: chain_data\molecules_temp\mol_86.mol
+Converted to molecule: chain_data\molecules_temp\mol_87.mol
+Converted to molecule: chain_data\molecules_temp\mol_88.mol
+Converted to molecule: chain_data\molecules_temp\mol_89.mol
+Converted to molecule: chain_data\molecules_temp\mol_90.mol
+Converted to molecule: chain_data\molecules_temp\mol_91.mol
+Converted to molecule: chain_data\molecules_temp\mol_92.mol
+Converted to molecule: chain_data\molecules_temp\mol_93.mol
+Converted to molecule: chain_data\molecules_temp\mol_94.mol
+Converted to molecule: chain_data\molecules_temp\mol_95.mol
+Converted to molecule: chain_data\molecules_temp\mol_96.mol
+Converted to molecule: chain_data\molecules_temp\mol_97.mol
+Converted to molecule: chain_data\molecules_temp\mol_98.mol
+Converted to molecule: chain_data\molecules_temp\mol_99.mol
+Converted to molecule: chain_data\molecules_temp\mol_100.mol
+Converted to molecule: chain_data\molecules_temp\mol_101.mol
+Converted to molecule: chain_data\molecules_temp\mol_102.mol
+Converted to molecule: chain_data\molecules_temp\mol_103.mol
+Converted to molecule: chain_data\molecules_temp\mol_104.mol
+Converted to molecule: chain_data\molecules_temp\mol_105.mol
+Converted to molecule: chain_data\molecules_temp\mol_106.mol
+Converted to molecule: chain_data\molecules_temp\mol_107.mol
+Converted to molecule: chain_data\molecules_temp\mol_108.mol
+Converted to molecule: chain_data\molecules_temp\mol_109.mol
+Converted to molecule: chain_data\molecules_temp\mol_110.mol
+Converted to molecule: chain_data\molecules_temp\mol_111.mol
+Converted to molecule: chain_data\molecules_temp\mol_112.mol
+Converted to molecule: chain_data\molecules_temp\mol_113.mol
+Converted to molecule: chain_data\molecules_temp\mol_114.mol
+Converted to molecule: chain_data\molecules_temp\mol_115.mol
+Converted to molecule: chain_data\molecules_temp\mol_116.mol
+Converted to molecule: chain_data\molecules_temp\mol_117.mol
+Converted to molecule: chain_data\molecules_temp\mol_118.mol
+Converted to molecule: chain_data\molecules_temp\mol_119.mol
+Converted to molecule: chain_data\molecules_temp\mol_120.mol
+Converted to molecule: chain_data\molecules_temp\mol_121.mol
+Converted to molecule: chain_data\molecules_temp\mol_122.mol
+Converted to molecule: chain_data\molecules_temp\mol_123.mol
+Converted to molecule: chain_data\molecules_temp\mol_124.mol
+Converted to molecule: chain_data\molecules_temp\mol_125.mol
+Converted to molecule: chain_data\molecules_temp\mol_126.mol
+Converted to molecule: chain_data\molecules_temp\mol_127.mol
+Converted to molecule: chain_data\molecules_temp\mol_128.mol
+Converted to molecule: chain_data\molecules_temp\mol_129.mol
+Converted to molecule: chain_data\molecules_temp\mol_130.mol
+Converted to molecule: chain_data\molecules_temp\mol_131.mol
+Converted to molecule: chain_data\molecules_temp\mol_132.mol
+Converted to molecule: chain_data\molecules_temp\mol_133.mol
+Converted to molecule: chain_data\molecules_temp\mol_134.mol
+Converted to molecule: chain_data\molecules_temp\mol_135.mol
+Converted to molecule: chain_data\molecules_temp\mol_136.mol
+Converted to molecule: chain_data\molecules_temp\mol_137.mol
+Converted to molecule: chain_data\molecules_temp\mol_138.mol
+Converted to molecule: chain_data\molecules_temp\mol_139.mol
+Converted to molecule: chain_data\molecules_temp\mol_140.mol
+Converted to molecule: chain_data\molecules_temp\mol_141.mol
+Converted to molecule: chain_data\molecules_temp\mol_142.mol
+Converted to molecule: chain_data\molecules_temp\mol_143.mol
+Converted to molecule: chain_data\molecules_temp\mol_144.mol
+Converted to molecule: chain_data\molecules_temp\mol_145.mol
+Converted to molecule: chain_data\molecules_temp\mol_146.mol
+Converted to molecule: chain_data\molecules_temp\mol_147.mol
+Converted to molecule: chain_data\molecules_temp\mol_148.mol
+Converted to molecule: chain_data\molecules_temp\mol_149.mol
+Converted to molecule: chain_data\molecules_temp\mol_150.mol
+Converted to molecule: chain_data\molecules_temp\mol_151.mol
+Converted to molecule: chain_data\molecules_temp\mol_152.mol
+Converted to molecule: chain_data\molecules_temp\mol_153.mol
+Converted to molecule: chain_data\molecules_temp\mol_154.mol
+Converted to molecule: chain_data\molecules_temp\mol_155.mol
+Converted to molecule: chain_data\molecules_temp\mol_156.mol
+Converted to molecule: chain_data\molecules_temp\mol_157.mol
+Converted to molecule: chain_data\molecules_temp\mol_158.mol
+Converted to molecule: chain_data\molecules_temp\mol_159.mol
+Converted to molecule: chain_data\molecules_temp\mol_160.mol
+Converted to molecule: chain_data\molecules_temp\mol_161.mol
+Converted to molecule: chain_data\molecules_temp\mol_162.mol
+Converted to molecule: chain_data\molecules_temp\mol_163.mol
+Converted to molecule: chain_data\molecules_temp\mol_164.mol
+Converted to molecule: chain_data\molecules_temp\mol_165.mol
+Converted to molecule: chain_data\molecules_temp\mol_166.mol
+Converted to molecule: chain_data\molecules_temp\mol_167.mol
+Converted to molecule: chain_data\molecules_temp\mol_168.mol
+Converted to molecule: chain_data\molecules_temp\mol_169.mol
+Converted to molecule: chain_data\molecules_temp\mol_170.mol
+Converted to molecule: chain_data\molecules_temp\mol_171.mol
+Converted to molecule: chain_data\molecules_temp\mol_172.mol
+Converted to molecule: chain_data\molecules_temp\mol_173.mol
+Converted to molecule: chain_data\molecules_temp\mol_174.mol
+Converted to molecule: chain_data\molecules_temp\mol_175.mol
+Converted to molecule: chain_data\molecules_temp\mol_176.mol
+Converted to molecule: chain_data\molecules_temp\mol_177.mol
+Converted to molecule: chain_data\molecules_temp\mol_178.mol
+Converted to molecule: chain_data\molecules_temp\mol_179.mol
+Converted to molecule: chain_data\molecules_temp\mol_180.mol
+Converted to molecule: chain_data\molecules_temp\mol_181.mol
+Converted to molecule: chain_data\molecules_temp\mol_182.mol
+Converted to molecule: chain_data\molecules_temp\mol_183.mol
+Converted to molecule: chain_data\molecules_temp\mol_184.mol
+Converted to molecule: chain_data\molecules_temp\mol_185.mol
+Converted to molecule: chain_data\molecules_temp\mol_186.mol
+Converted to molecule: chain_data\molecules_temp\mol_187.mol
+Converted to molecule: chain_data\molecules_temp\mol_188.mol
+Converted to molecule: chain_data\molecules_temp\mol_189.mol
+Converted to molecule: chain_data\molecules_temp\mol_190.mol
+Converted to molecule: chain_data\molecules_temp\mol_191.mol
+Converted to molecule: chain_data\molecules_temp\mol_192.mol
+Converted to molecule: chain_data\molecules_temp\mol_193.mol
+Converted to molecule: chain_data\molecules_temp\mol_194.mol
+Converted to molecule: chain_data\molecules_temp\mol_195.mol
+Converted to molecule: chain_data\molecules_temp\mol_196.mol
+Converted to molecule: chain_data\molecules_temp\mol_197.mol
+Converted to molecule: chain_data\molecules_temp\mol_198.mol
+Converted to molecule: chain_data\molecules_temp\mol_199.mol
+Converted to molecule: chain_data\molecules_temp\mol_200.mol
+--- Generating VTK Mesh for UI Visualization ---
+[INFO] Auto-detected 35 visualization regions.
+[hopper_pos_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_pos_vis_0] Constructing surface with OVITO...
+[hopper_neg_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_neg_vis_0] Constructing surface with OVITO...
+[hopper_front_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_front_vis_0] Constructing surface with OVITO...
+[hopper_back_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_back_vis_0] Constructing surface with OVITO...
+[exit_neg_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_neg_vis_0] Constructing surface with OVITO...
+[exit_pos_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_pos_vis_0] Constructing surface with OVITO...
+[orifice_cover_vis_0] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[orifice_cover_vis_0] Constructing surface with OVITO...
+[hopper_pos_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_pos_vis_1] Constructing surface with OVITO...
+[hopper_neg_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_neg_vis_1] Constructing surface with OVITO...
+[hopper_front_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_front_vis_1] Constructing surface with OVITO...
+[hopper_back_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_back_vis_1] Constructing surface with OVITO...
+[exit_neg_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_neg_vis_1] Constructing surface with OVITO...
+[exit_pos_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_pos_vis_1] Constructing surface with OVITO...
+[orifice_cover_vis_1] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[orifice_cover_vis_1] Constructing surface with OVITO...
+[hopper_pos_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_pos_vis_2] Constructing surface with OVITO...
+[hopper_neg_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_neg_vis_2] Constructing surface with OVITO...
+[hopper_front_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_front_vis_2] Constructing surface with OVITO...
+[hopper_back_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_back_vis_2] Constructing surface with OVITO...
+[exit_neg_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_neg_vis_2] Constructing surface with OVITO...
+[exit_pos_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_pos_vis_2] Constructing surface with OVITO...
+[orifice_cover_vis_2] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[orifice_cover_vis_2] Constructing surface with OVITO...
+[hopper_pos_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_pos_vis_3] Constructing surface with OVITO...
+[hopper_neg_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_neg_vis_3] Constructing surface with OVITO...
+[hopper_front_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_front_vis_3] Constructing surface with OVITO...
+[hopper_back_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_back_vis_3] Constructing surface with OVITO...
+[exit_neg_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_neg_vis_3] Constructing surface with OVITO...
+[exit_pos_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_pos_vis_3] Constructing surface with OVITO...
+[orifice_cover_vis_3] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[orifice_cover_vis_3] Constructing surface with OVITO...
+[hopper_pos_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_pos_vis_4] Constructing surface with OVITO...
+[hopper_neg_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_neg_vis_4] Constructing surface with OVITO...
+[hopper_front_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_front_vis_4] Constructing surface with OVITO...
+[hopper_back_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[hopper_back_vis_4] Constructing surface with OVITO...
+[exit_neg_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_neg_vis_4] Constructing surface with OVITO...
+[exit_pos_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[exit_pos_vis_4] Constructing surface with OVITO...
+[orifice_cover_vis_4] Running LAMMPS sampling for 1 regions (nprocs=8, threads=1)...
+[orifice_cover_vis_4] Constructing surface with OVITO...
+--- Starting Analytical Grid Hopper Filling: 5 hoppers ---
+Prepared output directories in: dumping_yard/Grid_Hopper_Filling_test/Grid_Fill_5H_MixedN_S498425
+Generated input script: dumping_yard/Grid_Hopper_Filling_test/Grid_Fill_5H_MixedN_S498425/in.Grid_Hopper_Filling_test
+Standard execution (no acceleration) with 1 threads.
+Executing: mpiexec -n 8 lmp -in dumping_yard/Grid_Hopper_Filling_test/Grid_Fill_5H_MixedN_S498425/in.Grid_Hopper_Filling_test -log dumping_yard/Grid_Hopper_Filling_test/Grid_Fill_5H_MixedN_S498425/lammps.log
+LAMMPS (22 Jul 2025 - Update 4)
+  using 1 OpenMP thread(s) per MPI task
+Open of file C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins\helloplugin.so failed: 
+Loaded 0 plugins from C:\Users\Palash\AppData\Local\LAMMPS 64-bit 22Jul2025-MSMPI with Python\plugins
+WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\atom_vec_hybrid.cpp:132)
+Created orthogonal box = (-2 -2 -2) to (5 4 3)
+  2 by 2 by 2 MPI processor grid
+Read molecule template m1:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m2:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m3:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m4:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m5:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m6:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m7:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m8:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m9:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m10:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m11:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m12:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m13:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m14:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m15:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m16:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m17:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m18:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m19:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m20:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m21:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m22:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m23:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m24:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m25:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m26:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m27:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m28:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m29:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m30:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m31:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m32:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m33:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m34:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m35:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m36:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m37:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m38:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m39:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m40:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m41:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m42:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m43:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m44:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m45:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m46:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m47:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m48:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m49:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m50:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  4 atoms with max type 1
+  3 bonds with max type 1
+  2 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m51:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m52:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m53:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m54:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m55:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m56:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m57:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m58:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m59:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m60:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m61:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m62:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m63:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m64:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m65:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m66:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m67:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m68:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m69:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m70:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m71:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m72:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m73:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m74:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m75:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m76:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m77:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m78:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m79:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m80:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m81:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m82:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m83:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m84:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m85:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m86:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m87:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m88:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m89:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m90:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m91:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m92:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m93:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m94:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m95:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m96:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m97:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m98:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m99:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m100:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  12 atoms with max type 1
+  11 bonds with max type 1
+  10 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m101:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m102:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m103:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m104:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m105:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m106:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m107:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m108:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m109:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m110:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m111:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m112:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m113:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m114:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m115:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m116:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m117:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m118:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m119:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m120:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m121:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m122:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m123:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m124:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m125:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m126:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m127:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m128:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m129:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m130:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m131:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m132:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m133:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m134:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m135:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m136:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m137:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m138:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m139:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m140:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m141:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m142:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m143:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m144:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m145:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m146:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m147:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m148:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m149:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m150:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  24 atoms with max type 1
+  23 bonds with max type 1
+  22 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m151:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m152:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m153:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m154:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m155:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m156:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m157:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m158:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m159:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m160:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m161:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m162:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m163:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m164:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m165:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m166:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m167:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m168:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m169:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m170:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m171:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m172:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m173:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m174:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m175:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m176:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m177:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m178:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m179:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m180:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m181:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m182:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m183:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m184:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m185:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m186:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m187:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m188:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m189:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m190:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m191:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m192:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m193:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m194:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m195:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m196:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m197:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m198:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m199:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Read molecule template m200:
+# Molecule file generated from relaxed chain
+  1 molecules
+  0 fragments
+  0 bodies
+  48 atoms with max type 1
+  47 bonds with max type 1
+  46 angles with max type 1
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.126 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.123 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.134 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.103 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.160 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.228 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.268 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.121 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.213 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.171 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.130 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.098 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.166 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.158 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.109 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.134 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.124 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.142 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.135 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.126 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.129 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.138 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.114 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.130 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.156 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.127 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.128 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.153 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.141 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.118 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.166 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.166 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.134 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.149 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.133 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.187 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.217 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.218 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.175 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.122 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.256 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.094 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.102 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.114 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.085 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.081 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.139 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.180 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.088 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.091 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.079 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.101 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.110 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.151 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.133 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.092 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.102 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.115 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.172 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.119 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.121 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.125 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.154 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.097 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.089 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.151 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.141 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.137 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.125 seconds
+Created 12 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.130 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.192 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.121 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.112 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.109 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.096 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.120 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.121 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.102 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.100 seconds
+Created 24 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.133 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.140 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.116 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.131 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.133 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.311 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.161 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.133 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.194 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.146 seconds
+Created 48 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.107 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.130 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.146 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.120 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.117 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.113 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.225 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.177 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.161 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.115 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.124 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.177 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.221 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.226 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.253 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.200 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.148 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.241 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.152 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.142 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.152 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.108 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.135 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.093 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.092 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.083 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.097 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.175 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.161 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.149 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.135 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.095 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.111 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.131 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.268 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.148 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.149 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.128 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.124 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.108 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.092 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.124 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.097 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.117 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.105 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.116 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.128 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.102 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.119 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.109 seconds
+Created 4 atoms
+  using lattice units in orthogonal box = (-2 -2 -2) to (5 4 3)
+  create_atoms CPU = 0.108 seconds
+1360 atoms in group chain_particles
+0 atoms in group hopper_walls
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Communication cutoff 0.10200000000000001 is shorter than a bond length based estimate of 0.10450000000000001. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\comm.cpp:743)
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 0.102
+  ghost atom cutoff = 0.102
+  binsize = 0.051, bins = 138 118 99
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair granular, perpetual
+      attributes: half, newton on, size, history
+      pair build: half/size/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : si
+  Current step  : 0
+  Time step     : 1e-06
+WARNING: Communication cutoff 0.10200000000000001 is shorter than a bond length based estimate of 0.10450000000000001. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\comm.cpp:743)
+WARNING: Communication cutoff adjusted to 0.10200000000000001 (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\comm.cpp:752)
+Per MPI rank memory allocation (min/avg/max) = 15.98 | 37.58 | 45.41 Mbytes
+   Step         PotEng         KinEng         E_bond        E_angle         TotEng         E_coul         E_mol         E_dihed         E_pair         E_vdwl    
+         0   3.5217723e-07  0              3.5217723e-07  5.0594973e-15  3.5217723e-07  0              3.5217723e-07  0              0              0            
+      5000   0.0037561705   0.035593554    0.0037169407   3.922984e-05   0.039349724    0              0.0037561705   0              0              0            
+Loop time of 98.1065 on 8 procs for 5000 steps with 1360 atoms
+
+40.8% CPU use with 8 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.0040415  | 4.2437     | 23.935     | 375.6 |  4.33
+Bond    | 14.843     | 16.471     | 17.651     |  24.6 | 16.79
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.014932   | 34.686     | 71.967     | 482.2 | 35.36
+Output  | 7.3651     | 7.4622     | 7.5369     |   1.9 |  7.61
+Modify  | 0.050664   | 2.9402     | 14.69      | 278.5 |  3.00
+Other   |            | 32.3       |            |       | 32.93
+
+Nlocal:            170 ave         896 max           0 min
+Histogram: 5 0 2 0 0 0 0 0 0 1
+Nghost:         291.75 ave        1098 max           0 min
+Histogram: 3 1 2 0 1 0 0 0 0 1
+Neighs:        17040.5 ave       97391 max           0 min
+Histogram: 5 1 1 0 0 0 0 0 0 1
+
+Total # of neighbors = 136324
+Ave neighs/atom = 100.23824
+Ave special neighs/atom = 4.7647059
+Neighbor list builds = 0
+Dangerous builds = 0
+System init for write_data ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Communication cutoff 0.10200000000000001 is shorter than a bond length based estimate of 0.10450000000000001. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\comm.cpp:743)
+System init for write_restart ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Communication cutoff 0.10200000000000001 is shorter than a bond length based estimate of 0.10450000000000001. This may lead to errors. (C:\Users\runneradmin\AppData\Local\Temp\tmpr04lorxi\build\_deps\lammps-src\src\comm.cpp:743)
+Total wall time: 0:02:05
+Splitting grid filled results into 5 hoppers...
+Splitting complete.
