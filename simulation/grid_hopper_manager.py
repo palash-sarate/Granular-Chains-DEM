@@ -94,13 +94,20 @@ class GridHopperManager:
                     for i in range(n_hoppers):
                         normalized_geo_vars[i][var_name] = values
 
-        # 2. Prepare molecules from multiple N sources
+        unique_Ns = sorted(list(set(N_list)))
+
+        # 2. Setup Run Name and Job Directory (Moved up to ensure unique molecule directory)
+        mixed_tag = "_MixedN" if len(unique_Ns) > 1 else ""
+        run_name = f"Grid_Fill_{n_hoppers}H{mixed_tag}_S{seed}"
+        job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
+        job_dir.mkdir(parents=True, exist_ok=True)
+
+        # 3. Prepare molecules from multiple N sources in a job-specific directory
         from .hopper_manager import HopperManager
         from .molecule_converter import convert_data_to_molecule
-        mol_dir = Path("chain_data/molecules_temp")
+        mol_dir = job_dir / "molecules"
         mol_dir.mkdir(parents=True, exist_ok=True)
         
-        unique_Ns = sorted(list(set(N_list)))
         relaxed_sources = {} # N -> source_path
         mol_ranges = {} # N -> { 'start': int, 'count': int }
         mol_bboxes = {} # mol_id -> bbox
@@ -127,7 +134,8 @@ class GridHopperManager:
                 output_mol = mol_dir / mol_filename
                 bbox = convert_data_to_molecule(str(data_file), str(output_mol))
                 mol_bboxes[mol_id] = bbox
-                mol_rel_path = f"chain_data/molecules_temp/{mol_filename}".replace("\\", "/")
+                # Use path relative to project root for LAMMPS
+                mol_rel_path = str(output_mol).replace("\\", "/")
                 combined_inc_lines.append(f"molecule m{mol_id} {mol_rel_path}")
             
             current_id_offset += len(data_files)
@@ -136,11 +144,10 @@ class GridHopperManager:
         with open(inc_file, 'w') as f:
             f.write("\n".join(combined_inc_lines))
         
-        # 3. Setup Grid Geometry (Analytical Regions)
-        mixed_tag = "_MixedN" if len(unique_Ns) > 1 else ""
-        run_name = f"Grid_Fill_{n_hoppers}H{mixed_tag}_S{seed}"
-        job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
-        job_dir.mkdir(parents=True, exist_ok=True)
+        # 4. Setup Grid Geometry (Analytical Regions)
+        geometry_inc, envelope = self._generate_replicated_geometry(
+            Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars
+        )
         
         geometry_inc, envelope = self._generate_replicated_geometry(
             Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars

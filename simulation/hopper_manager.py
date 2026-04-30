@@ -1,6 +1,7 @@
 import os
 import glob
 from pathlib import Path
+from typing import Optional, Any
 from .molecule_converter import convert_data_to_molecule
 from .runner import SimulationRunner
 from .config import SimulationConfig
@@ -25,7 +26,7 @@ class HopperManager:
             
         inc_lines = []
         
-        print(f"Converting {len(data_files)} chains from {source_dir} to molecules...")
+        print(f"Converting {len(data_files)} chains from {source_dir} to molecules in {mol_dir}...")
         
         for i, data_file in enumerate(data_files):
             mol_id = i + 1
@@ -36,8 +37,8 @@ class HopperManager:
             convert_data_to_molecule(str(data_file), str(output_mol))
             
             # Add to include file
-            # Use forward slashes for LAMMPS
-            mol_rel_path = f"{mol_dir}/{mol_filename}".replace("\\", "/")
+            # Use forward slashes for LAMMPS and relative path from project root
+            mol_rel_path = str(output_mol).replace("\\", "/")
             inc_lines.append(f"molecule m{mol_id} {mol_rel_path}")
             
         inc_file = mol_path / "molecules.inc"
@@ -101,7 +102,7 @@ class HopperManager:
 
     def generate_filled_state(self, source_dir: str, n_fill: int, relax_steps: int,
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
-                              mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
+                              mol_dir: Optional[str] = None, setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
                               viscosity: float = 0.001, N: int = 4, fill_template: str = "in.hopper_fill",
                               outdir: str = None, num_procs: int = None, num_threads: int = 1,
@@ -113,6 +114,13 @@ class HopperManager:
         """
         if run_name is None:
             run_name = f"filled_N{n_fill}_s{seed}"
+
+        # 1. Resolve output directory early to place molecules inside
+        from .config import SimulationConfig
+        actual_outdir = outdir if outdir else SimulationConfig.compute_output_dir("Hopper_Fill", run_name)
+        
+        if mol_dir is None or mol_dir == "chain_data/molecules_temp":
+            mol_dir = os.path.join(actual_outdir, "molecules")
 
         # Prepare molecules and include file
         inc_file = self.prepare_molecules(source_dir, mol_dir)
@@ -165,7 +173,7 @@ class HopperManager:
 
     def resume_filled_state(self, run_name: str, source_dir: str, n_fill: int, relax_steps: int,
                             dt: float = 1e-6, restart_path: str = None, seed: int = 12345,
-                            mol_dir: str = "chain_data/molecules_temp", setup_inc: str = "",
+                            mol_dir: Optional[str] = None, setup_inc: str = "",
                             dump_inc: str = "simulation_templates/default_dump.inc", 
                             viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
                             N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1,
@@ -205,6 +213,13 @@ class HopperManager:
                 
             if not found_restart:
                  raise FileNotFoundError(f"Could not find any restart files (.bin) in searched locations: {search_dirs}")
+
+        # Ensure unique mol_dir for resumption too
+        if mol_dir is None or mol_dir == "chain_data/molecules_temp":
+            # outdir is handled in SimulationConfig compute_output_dir if not provided
+            from .config import SimulationConfig
+            actual_outdir = outdir if outdir else SimulationConfig.compute_output_dir("Hopper_Fill", run_name)
+            mol_dir = os.path.join(actual_outdir, "molecules")
 
         # Prepare molecules (ensure we have the .mol files for create_atoms)
         inc_file = self.prepare_molecules(source_dir, mol_dir)
