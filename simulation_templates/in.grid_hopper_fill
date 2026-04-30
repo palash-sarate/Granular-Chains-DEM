@@ -15,7 +15,7 @@ variable grid_nx equal ceil(sqrt(${n_hoppers}))
 variable grid_ny equal ceil(${n_hoppers}/${grid_nx})
 variable box_x equal (${grid_nx}*${spacing}+${pad})
 variable box_y equal (${grid_ny}*${spacing}+${pad})
-variable box_z equal (1.0*${spacing}+${pad})
+variable box_z equal (${z_max}+${pad})
 
 region sim_box block -${pad} ${box_x} -${pad} ${box_y} -${pad} ${box_z}
 create_box 2 sim_box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 1 extra/special/per/atom 10

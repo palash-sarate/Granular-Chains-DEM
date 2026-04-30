@@ -829,6 +829,7 @@ class GridHopperManager:
                                 py = offset[1]
                                 pz = current_z + bbox['height']/2 + offset[2]
                                 insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                                z_max_global = max(z_max_global, pz + bbox['height']/2)
                                 current_z += m_h
                                 count += 1
                                 total_inserted += 1
@@ -842,14 +843,13 @@ class GridHopperManager:
                         py = current_y + bbox['width']/2 + offset[1]
                         pz = current_z + bbox['height']/2 + offset[2]
                         insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                        z_max_global = max(z_max_global, pz + bbox['height']/2)
                         
                         current_y += m_w
                         max_h_in_row = max(max_h_in_row, m_h)
                         row_empty = False
                         count += 1
                         total_inserted += 1
-                    
-                    z_max_global = max(z_max_global, current_z)
             else:
                 # Default 3D grid-like pouring
                 x_min, x_max = -0.08, 0.08
