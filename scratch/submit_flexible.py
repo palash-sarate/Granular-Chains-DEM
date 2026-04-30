@@ -40,16 +40,6 @@ DEFAULTS = {
     "walltime": "24:00:00",
     "ppn": 16,
     "mem": "16gb",
-    "num_procs": 8,
-    "num_threads": 1,
-    "dt": 1e-06,
-    "viscosity": 0.001,
-    "dump_file": "simulation_templates/default_dump.inc",
-    "no-vtk": True,
-    "spacing": 0.5,
-    "mode": "2D_stacked",
-    "source_dir": "chain_data/relaxed_2D_x",
-    "hopper_template_data": "simulation_geometries/2D_hopper_with_orifice_cover.inc"
 }
 
 # --- 2. DEFINE YOUR STUDY HERE ---
@@ -79,51 +69,56 @@ def get_job_list():
     }
 
     for n in Ns:
-        n_fill = n_atoms // n
+        # n_fill = n_atoms // n
         
         # ----------------------------------------------------------------------
         # TYPE 1: FILL (New Hopper Filling Run)
         # ----------------------------------------------------------------------
-        jobs.append({
-            "name": f"Fill_N{n}",
-            "type": "fill",
-            "walltime": "12:00:00",
-            "ppn": 16,
-            "mem": "16gb",
-            "num_procs": 8,
-            "num_threads": 1,
-            "params": {
-                "N": n,
-                "seed": random.randint(100000, 999999),
-                "n_fill": n_fill,
-                "n_hoppers": 1,
-                "relax_steps": 1000000,
-                "simulation": "Hopper_Fill",
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "dump_file": "simulation_templates/default_dump.inc",
-                "no-vtk": True,
-                "spacing": 0.5,
-                "mode": "2D_stacked",
-                "source_dir": "chain_data/relaxed_2D_x",
-                "hopper_template_data": "simulation_geometries/2D_hopper_with_orifice_cover.inc"
-            }
-        })
+        # jobs.append({
+        #     "name": f"Fill_N{n}",
+        #     "type": "fill",
+        #     "walltime": "12:00:00",
+        #     "ppn": 16,
+        #     "mem": "16gb",
+        #     "num_procs": 8,
+        #     "num_threads": 1,
+        #     "params": {
+        #         "N": n,
+        #         "seed": random.randint(100000, 999999),
+        #         "n_fill": n_fill,
+        #         "n_hoppers": 1,
+        #         "relax_steps": 1000000,
+        #         "simulation": "Hopper_Fill",
+        #         "dt": 1e-06,
+        #         "viscosity": 0.001,
+        #         "dump_file": "simulation_templates/default_dump.inc",
+        #         "no-vtk": True,
+        #         "spacing": 0.5,
+        #         "mode": "2D_stacked",
+        #         "source_dir": "chain_data/relaxed_2D_x",
+        #         "hopper_template_data": "simulation_geometries/2D_hopper_with_orifice_cover.inc"
+        #     }
+        # })
 
         # ----------------------------------------------------------------------
         # TYPE 2: FILL_RESUME (Continue or add relaxation to a filling run)
         # ----------------------------------------------------------------------
-        # jobs.append({
-        #     "name": f"ResFill_N{n}",
-        #     "type": "fill_resume",
-        #     "walltime": "12:00:00",
-        #     "params": {
-        #         "restart_path": f"{resume_source_dirs[n]}",
-        #         "seed": random.randint(100000, 999999),
-        #         "relax_steps": 1000000,
-        #         "simulation": f"Hopper_Fill_Resume{n}"
-        #     }
-        # })
+        jobs.append({
+            "name": f"Resume_Fill_N{n}",
+            "type": "fill_resume",
+            "walltime": "12:00:00",
+            "params": {
+                "num_procs": 8,
+                "num_threads": 1,
+                "restart_path": f"{resume_source_dirs[n]}",
+                "relax_steps": 1000000,
+                "simulation": f"Hopper_Fill",
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "dump_file": "simulation_templates/default_dump.inc",
+                "seed": random.randint(100000, 999999),
+            }
+        })
 
         # ----------------------------------------------------------------------
         # TYPE 3: FLOW (Transition filled hoppers to oscillatory flow)
