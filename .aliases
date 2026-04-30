@@ -7,10 +7,6 @@ alias pkill_lmp='pkill -u $USER -f lmp'
 alias qs='watch -n 1 qstat -u $USER'
 alias qdel_all='qdel -u $USER'
 
-# Simulation Runs
-alias run_bench='python benchmark_grid_filling.py'
-alias run_main='python main.py'
-
 # Quick analysis
 alias extract_geo='python analysis/geometry_extractor.py'
 

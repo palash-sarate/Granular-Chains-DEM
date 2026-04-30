@@ -82,9 +82,9 @@ def get_job_list(mode):
                     "walltime": "12:00:00",
                     "ppn": 16,
                     "mem": "16gb",
-                    "num_procs": 8,
-                    "num_threads": 1,
                     "params": {
+                        "num_procs": 8,
+                        "num_threads": 1,
                         "N": n,
                         "seed": random.randint(100000, 999999),
                         "n_fill": n_fill,
