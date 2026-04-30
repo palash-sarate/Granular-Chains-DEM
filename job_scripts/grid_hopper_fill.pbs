@@ -7,9 +7,9 @@
 #PBS -m aeb
 #PBS -M palashsarate@iisc.ac.in
 # Standard output file
-#PBS -o PBS_Output/grid_hopper_fill_N12.log
+#PBS -o PBS_Output/grid_hopper_fill_N4.log
 # Standard error file
-#PBS -e PBS_Output/grid_hopper_fill_err_N12.log
+#PBS -e PBS_Output/grid_hopper_fill_err_N4.log
 
 ## Specify the shell to be bash
 #PBS -S /bin/bash
@@ -34,8 +34,8 @@ echo "Starting Batch Grid Hopper Filling at: $(date)"
 # --N 4,12,24,48 \
 python -u main.py run_grid_hopper_filling \
     --n_hoppers 1 \
-    --n_fill 1200 \
-    --N 12 \
+    --n_fill 3600 \
+    --N 4 \
     --source_dir "chain_data/relaxed_2D_x" \
     --spacing 0.5 \
     --relax_steps 10000 \
@@ -43,8 +43,8 @@ python -u main.py run_grid_hopper_filling \
     --viscosity 0.001 \
     --hopper_template_data "simulation_geometries/2D_hopper_with_orifice_cover.inc" \
     --dump_file "simulation_templates/fill_dump.inc" \
-    --simulation "Grid_Hopper_Filling_P16" \
-    --num_procs 16 \
+    --simulation "Grid_Hopper_Filling_P8" \
+    --num_procs 8 \
     --num_threads 1 \
     --no-vtk \
     --mode 2D_stacked

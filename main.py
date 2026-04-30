@@ -153,6 +153,7 @@ def main():
     p_grid_h.add_argument("--no-vtk", action="store_false", dest="generate_vtk", help="Skip VTK mesh generation")
     p_grid_h.set_defaults(generate_vtk=True)
     p_grid_h.add_argument("--geometry_vars", type=str, help="JSON string for per-hopper geometry variables")
+    p_grid_h.add_argument("--seed", type=int, default=None)
 
     # 10. resume_grid_hopper_filling
     p_res_grid = subparsers.add_parser("resume_grid_hopper_filling", help="Resume a super-simulation for batch hopper filling")
