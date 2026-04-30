@@ -795,8 +795,8 @@ class GridHopperManager:
                         count += 1
                         total_inserted += 1
             elif mode == "2D_stacked":
-                safe_buffer = bead_diam
-            
+                safe_buffer = bead_diam 
+                # safe width to pour in
                 y_max = hopper_y_half - safe_buffer
                 y_min = -hopper_y_half + safe_buffer
                 if y_max <= y_min:
@@ -826,10 +826,11 @@ class GridHopperManager:
                                 # Even a single molecule doesn't fit? 
                                 # This happens if safe_buffer is too large or hopper too narrow.
                                 # Force it into center and move to next row.
-                                py = offset[1]
-                                pz = current_z + bbox['height']/2 + offset[2]
-                                insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
-                                z_max_global = max(z_max_global, pz + bbox['height']/2)
+                                px = offset[0] - (bbox['x'][0] + bbox['x'][1])/2
+                                py = offset[1] - (bbox['y'][0] + bbox['y'][1])/2
+                                pz = current_z + buffer/2 - bbox['z'][0] + offset[2]
+                                insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                                z_max_global = max(z_max_global, pz + bbox['z'][1])
                                 current_z += m_h
                                 count += 1
                                 total_inserted += 1
@@ -840,10 +841,11 @@ class GridHopperManager:
                                 break # Exit inner loop to start new row
                         
                         # Place at current_y (centered in its allocated slot)
-                        py = current_y + bbox['width']/2 + offset[1]
-                        pz = current_z + bbox['height']/2 + offset[2]
-                        insertion_lines.append(f"create_atoms 0 single {offset[0]:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
-                        z_max_global = max(z_max_global, pz + bbox['height']/2)
+                        px = offset[0] - (bbox['x'][0] + bbox['x'][1])/2
+                        py = current_y + buffer/2 - bbox['y'][0] + offset[1]
+                        pz = current_z + buffer/2 - bbox['z'][0] + offset[2]
+                        insertion_lines.append(f"create_atoms 0 single {px:.6f} {py:.6f} {pz:.6f} mol m{mol_id} 12345 rotate 0.0 0.0 0.0 1.0")
+                        z_max_global = max(z_max_global, pz + bbox['z'][1])
                         
                         current_y += m_w
                         max_h_in_row = max(max_h_in_row, m_h)

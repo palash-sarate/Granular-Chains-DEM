@@ -79,7 +79,7 @@ def get_job_list(mode):
                 jobs.append({
                     "name": f"Fill_N{n}",
                     "type": "fill",
-                    "walltime": "12:00:00",
+                    "walltime": "48:00:00",
                     "ppn": 16,
                     "mem": "16gb",
                     "params": {
