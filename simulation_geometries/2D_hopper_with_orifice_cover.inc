@@ -1,5 +1,5 @@
 # --- Geometric Variables ---
-variable x_half      equal 0.00125      # 1.25 mm (Half of 2.5 mm gap)
+variable x_half      equal 0.00105     # 1.05 mm (Half of 2.1 mm gap)
 variable y_half      equal 0.155        # 15.5 cm (Half of 31 cm width)
 variable orifice_half equal 0.05        # 5 cm (Half of 10 cm)
 variable z_bin_top   equal 0.4          # Height where entry funnel starts

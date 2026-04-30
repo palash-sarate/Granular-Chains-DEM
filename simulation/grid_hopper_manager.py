@@ -166,7 +166,7 @@ class GridHopperManager:
                     spacing=0.005, # Finer sampling to resolve small features (e.g. 2.5mm gaps)
                     num_procs=num_procs,
                     num_threads=num_threads,
-                    use_kokkos=use_kokkos
+                    use_kokkos=False # Permanent -no-kokkos for extraction as it often conflicts with OVITO/sampling
                 )
             except Exception as e:
                 print(f"[WARNING] Could not generate VTK mesh: {e}")

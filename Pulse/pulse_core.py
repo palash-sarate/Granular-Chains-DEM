@@ -415,21 +415,26 @@ class SimulationMonitor:
         # Real world time
         completion_dt = datetime.fromtimestamp(estimated_completion_time)
         
-        # Performance trend (Seconds per 10k steps)
-        # We look at the derivative of the polynomial at the current timestep
-        # poly'(x) = 2ax + b
+        # Performance trend
         deriv = np.polyder(poly)
         current_cost_per_step = deriv(current_timestep)
         
+        # Detect actual dump interval from the last two discovered files
+        step_interval = 1000 # Default fallback
+        if len(files) >= 2:
+            step_interval = files[-1][0] - files[-2][0]
+
         return {
             "status": "Active",
             "current_timestep": current_timestep,
             "target_timestep": target_timestep,
+            "step_interval": step_interval,
             "progress_percent": (current_timestep / target_timestep) * 100,
             "time_remaining_hr": time_remaining_hr,
             "time_elapsed_hr": time_elapsed_hr,
             "completion_time": completion_dt.strftime("%Y-%m-%d %H:%M:%S"),
             "cost_per_10k_steps": current_cost_per_step * 10000 / 60.0, # in minutes
+            "cost_per_dump": (current_cost_per_step * step_interval) / 60.0, # in minutes
             "cost_history": (deriv(x) * 10000 / 60.0).tolist(), # Convert numpy array to list for JSON/session_state
             "data_points": len(sampled_files),
             "last_updated": datetime.now().strftime("%H:%M:%S")

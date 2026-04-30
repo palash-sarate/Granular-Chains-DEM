@@ -291,14 +291,16 @@ with tab3:
             s1, s2, s3 = st.columns(3)
             s1.metric("Steps Remaining", f"{target_ts - eta_data['current_timestep']:,}")
             
-            # Format Cost per 10k steps
-            cost_m = eta_data['cost_per_10k_steps']
+            # Format Cost per Dump (using dynamic interval)
+            interval = eta_data.get('step_interval', 1000)
+            cost_m = eta_data.get('cost_per_dump', 0)
+            
             if cost_m >= 1:
                 cost_str = f"{int(cost_m)}m"
             else:
                 cost_str = f"{int(cost_m * 60)}s"
             
-            s2.markdown("**Cost per 10k steps**")
+            s2.markdown(f"**Cost per {interval:,} steps**")
             sc1, sc2, sc3 = s2.columns([1, 1.5, 0.5], vertical_alignment="bottom")
             sc1.metric("Speed", cost_str, label_visibility="collapsed")
             if eta_data.get("cost_history"):

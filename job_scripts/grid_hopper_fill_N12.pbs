@@ -1,15 +1,15 @@
 #!/bin/bash
 #PBS -N Grid_Hopper_Mixed
 #PBS -q workq
-#PBS -l walltime=48:00:00
-#PBS -l nodes=master:ppn=64
-#PBS -l mem=128gb
+#PBS -l walltime=4:00:00
+#PBS -l nodes=master:ppn=32
+#PBS -l mem=16gb
 #PBS -m aeb
 #PBS -M palashsarate@iisc.ac.in
 # Standard output file
-#PBS -o PBS_Output/grid_hopper_fill.log
+#PBS -o PBS_Output/grid_hopper_fill_N12.log
 # Standard error file
-#PBS -e PBS_Output/grid_hopper_fill_err.log
+#PBS -e PBS_Output/grid_hopper_fill_err_N12.log
 
 ## Specify the shell to be bash
 #PBS -S /bin/bash
@@ -30,23 +30,28 @@ echo "Starting Batch Grid Hopper Filling at: $(date)"
 
 # Launch grid filling for multiple hoppers simultaneously.
 # Full list of available parameters:
+# --n_fill 3600,1200,600,300 \
+# --N 4,12,24,48 \
 python -u main.py run_grid_hopper_filling \
-    --n_hoppers 5 \
-    --n_fill 6000,2000,1000,500 \
-    --N 4,12,24,48 \
+    --n_hoppers 1 \
+    --n_fill 1200 \
+    --N 12 \
     --source_dir "chain_data/relaxed_2D_x" \
-    --spacing 1.0 \
-    --relax_steps 2000000 \
+    --spacing 0.5 \
+    --relax_steps 10000 \
     --dt 1e-06 \
     --viscosity 0.001 \
     --hopper_template_data "simulation_geometries/2D_hopper_with_orifice_cover.inc" \
-    --dump_file "simulation_templates/default_dump.inc" \
-    --simulation "Grid_Hopper_Filling" \
-    --geometry_vars '{"orifice_half": [0.05, 0.05, 0.05, 0.05, 0.025], "x_half":0.00105}' \
-    --num_procs 8 \
+    --dump_file "simulation_templates/fill_dump.inc" \
+    --simulation "Grid_Hopper_Filling_P16" \
+    --num_procs 16 \
     --num_threads 1 \
+    --no-vtk \
     --mode 2D_stacked
+    # --no-kokkos \
+    # --geometry_vars '{"orifice_half": [0.05, 0.05, 0.05, 0.05]}' \
 
 echo "=============================================================================="
 echo "Batch filling and splitting complete at: $(date)"
 echo "=============================================================================="
+# can  try 4p4t and lower spacing

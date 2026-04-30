@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import math
 
 # Add project root to sys.path if running as script to support absolute imports
 if __name__ == '__main__':
@@ -95,6 +96,90 @@ class ColumnMapDialog(tk.Toplevel):
             self.destroy()
         except ValueError:
             messagebox.showerror("Error", "Column indices must be integers.")
+
+class HopperCalculatorController:
+    def __init__(self, parent):
+        self.parent = parent
+        frame = tk.LabelFrame(parent, text="Hopper Fill Calculator", padx=5, pady=5)
+        frame.pack(fill=tk.X, pady=5)
+
+        # Inputs
+        self.vars = {
+            'orifice': tk.DoubleVar(value=10.0),
+            'width': tk.DoubleVar(value=31.0),
+            'angle': tk.DoubleVar(value=60.0),
+            'height': tk.DoubleVar(value=40.0),
+            'fill': tk.DoubleVar(value=80.0),
+            'bead_d': tk.DoubleVar(value=2.0),
+            'n_hoppers': tk.IntVar(value=5)
+        }
+
+        fields = [
+            ('Orifice (cm)', 'orifice'),
+            ('Width (cm)', 'width'),
+            ('Angle (°)', 'angle'),
+            ('Total H (cm)', 'height'),
+            ('Fill %', 'fill'),
+            ('Bead D (mm)', 'bead_d'),
+            ('N Hoppers', 'n_hoppers')
+        ]
+
+        for i, (label, var_name) in enumerate(fields):
+            row = tk.Frame(frame)
+            row.pack(fill=tk.X, pady=1)
+            tk.Label(row, text=label, width=12, anchor='w', font=('Arial', 8)).pack(side=tk.LEFT)
+            tk.Entry(row, textvariable=self.vars[var_name], width=8, font=('Arial', 8)).pack(side=tk.RIGHT)
+
+        tk.Button(frame, text="Calculate Counts", command=self.calculate, bg='#2196F3', fg='white', font=('Arial', 9, 'bold')).pack(fill=tk.X, pady=10)
+
+        self.result_text = tk.Text(frame, height=10, width=28, font=('Courier', 9), bg='#f8f8f8')
+        self.result_text.pack(fill=tk.X)
+
+    def calculate(self):
+        try:
+            o_w = self.vars['orifice'].get()
+            h_w = self.vars['width'].get()
+            ang = self.vars['angle'].get()
+            h_tot = self.vars['height'].get()
+            f_pct = self.vars['fill'].get()
+            b_d = self.vars['bead_d'].get()
+            n_h = self.vars['n_hoppers'].get()
+
+            # Area fractions from graph
+            phi_values = {4: 0.755, 12: 0.58, 24: 0.56, 48: 0.50}
+            b_r_cm = (b_d / 10.0) / 2.0
+            b_area = math.pi * (b_r_cm**2)
+            ang_rad = math.radians(ang)
+            h_conv = math.tan(ang_rad) * (h_w - o_w) / 2.0
+            t_h = (f_pct / 100.0) * h_tot
+
+            if t_h <= h_conv:
+                w_at_h = o_w + (2.0 * t_h / math.tan(ang_rad))
+                area = (o_w + w_at_h) / 2.0 * t_h
+            else:
+                area_conv = (o_w + h_w) / 2.0 * h_conv
+                area_str = h_w * (t_h - h_conv)
+                area = area_conv + area_str
+
+            self.result_text.delete('1.0', tk.END)
+            self.result_text.insert(tk.END, f"Target Area: {area:.1f} cm2\n")
+            self.result_text.insert(tk.END, f"{'N':<4} | {'Chains (per)':<12}\n")
+            self.result_text.insert(tk.END, "-" * 20 + "\n")
+            
+            counts = []
+            for N in sorted(phi_values.keys()):
+                phi = phi_values[N]
+                total_beads = (area * phi) / b_area
+                chains = round(total_beads / N)
+                counts.append(chains * n_h)
+                self.result_text.insert(tk.END, f"{N:<4} | {chains:<12}\n")
+            
+            self.result_text.insert(tk.END, f"\nTotal for {n_h} hoppers:\n")
+            self.result_text.insert(tk.END, ",".join(map(str, counts)) + "\n")
+            self.result_text.insert(tk.END, "\n(Copy to --n_fill)")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Calculation failed: {e}")
 
 # Optional drag-and-drop support via tkinterdnd2. If not available,
 # the UI will show an instruction and Open buttons remain functional.
@@ -226,11 +311,13 @@ class ViewerApp(BaseTk):
         col2 = create_collapsible(self.ctrl_panel, "col2", "EDIT")
         col3 = create_collapsible(self.ctrl_panel, "col3", "LAUNCH")
         col4 = create_collapsible(self.ctrl_panel, "col4", "EXPORT")
+        col5 = create_collapsible(self.ctrl_panel, "col5", "CALC")
         
         # 4. Now we can fully init specialized controllers that need UI parents
         self.re_ctrl = RestartEditorController(col2, self.data_ctrl, self.loader_ctrl, self.renderer, on_re_close, self._sync_restart_selection)
         self.sim_launcher = SimulationLauncherController(col3, self.orchestrator, on_simulation_started=lambda: self.refresh_button.invoke())
         self.movie_exporter = MovieExporterController(col4, self.data_ctrl, self.renderer, self.plotter)
+        self.hopper_calc = HopperCalculatorController(col5)
 
         # ── Column 1 : File & Playback ──────────────────────────
         open_row1 = tk.Frame(col1)

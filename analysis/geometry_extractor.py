@@ -173,6 +173,7 @@ def main():
     parser.add_argument("--combined", action="store_true", help="Combine all regions into one mesh")
     parser.add_argument("--bounds", type=float, nargs=6, default=None, help="Bounding box (xlo xhi ylo yhi zlo zhi)")
     parser.add_argument("--lammps_cmd", type=str, default="lmp", help="LAMMPS executable command")
+    parser.add_argument("--use_kokkos", action="store_true", help="Use KOKKOS acceleration (default: False)")
 
     args = parser.parse_args()
     
@@ -185,7 +186,8 @@ def main():
         regions=args.regions,
         auto_vis=args.auto_vis,
         combined=args.combined,
-        bounds=args.bounds
+        bounds=args.bounds,
+        use_kokkos=args.use_kokkos
     )
 
     if not os.environ.get("DISPLAY"):

@@ -1,0 +1,57 @@
+#!/bin/bash
+#PBS -N Grid_Hopper_Mixed
+#PBS -q workq
+#PBS -l walltime=4:00:00
+#PBS -l nodes=master:ppn=32
+#PBS -l mem=16gb
+#PBS -m aeb
+#PBS -M palashsarate@iisc.ac.in
+# Standard output file
+#PBS -o PBS_Output/grid_hopper_fill_N4.log
+# Standard error file
+#PBS -e PBS_Output/grid_hopper_fill_err_N4.log
+
+## Specify the shell to be bash
+#PBS -S /bin/bash
+
+# ==============================================================================
+# PBS Script for Batch Hopper Filling (Super-Simulation)
+# ==============================================================================
+
+# 1. Set working directory to the project root
+cd $PBS_O_WORKDIR
+
+# 2. Activate environment
+source /home/guest/miniconda3/etc/profile.d/conda.sh
+conda activate gchain
+
+# 3. Launch Simulation
+echo "Starting Batch Grid Hopper Filling at: $(date)"
+
+# Launch grid filling for multiple hoppers simultaneously.
+# Full list of available parameters:
+# --n_fill 3600,1200,600,300 \
+# --N 4,12,24,48 \
+python -u main.py run_grid_hopper_filling \
+    --n_hoppers 1 \
+    --n_fill 3600 \
+    --N 4 \
+    --source_dir "chain_data/relaxed_2D_x" \
+    --spacing 0.5 \
+    --relax_steps 10000 \
+    --dt 1e-06 \
+    --viscosity 0.001 \
+    --hopper_template_data "simulation_geometries/2D_hopper_with_orifice_cover.inc" \
+    --dump_file "simulation_templates/fill_dump.inc" \
+    --simulation "Grid_Hopper_Filling_P16" \
+    --num_procs 16 \
+    --num_threads 1 \
+    --no-vtk \
+    --mode 2D_stacked
+    # --no-kokkos \
+    # --geometry_vars '{"orifice_half": [0.05, 0.05, 0.05, 0.05]}' \
+
+echo "=============================================================================="
+echo "Batch filling and splitting complete at: $(date)"
+echo "=============================================================================="
+# can  try 4p4t and lower spacing
