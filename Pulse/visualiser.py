@@ -159,11 +159,20 @@ def render_visualiser():
         selected_dump = None
         if dump_files and show_particles:
             dump_names = [os.path.basename(d) for d in dump_files]
-            # Use select_slider for a scrollbar-like scrubbing experience
+            
+            # Reset index to latest only if directory changed or not initialized
+            viz_idx_key = f"scrub_idx_{st.session_state.viz_run_dir}"
+            if viz_idx_key not in st.session_state:
+                st.session_state[viz_idx_key] = len(dump_names) - 1
+            
+            # Ensure index is still valid (in case files were deleted)
+            if st.session_state[viz_idx_key] >= len(dump_names):
+                st.session_state[viz_idx_key] = len(dump_names) - 1
+                
             selected_idx = st.select_slider(
                 "Timestep Scrub", 
                 options=range(len(dump_names)), 
-                value=len(dump_names)-1,
+                key=viz_idx_key,
                 format_func=lambda i: dump_names[i]
             )
             selected_dump = os.path.join(chain_dir, dump_names[selected_idx])
