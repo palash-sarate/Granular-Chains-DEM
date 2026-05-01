@@ -26,6 +26,7 @@ def save_config(config):
             json.dump(config, f)
     except: pass
 
+@st.cache_data(show_spinner=False)
 def parse_lammps_dump(dump_path):
     """Parses a LAMMPS dump file and returns a pandas DataFrame."""
     skip = 0
@@ -45,6 +46,11 @@ def parse_lammps_dump(dump_path):
     except Exception as e:
         st.error(f"Error parsing dump file: {e}")
         return None
+
+@st.cache_resource(show_spinner=False)
+def load_vtk_geometry(file_path):
+    """Loads a VTK geometry file with caching."""
+    return pv.read(file_path)
 
 def st_directory_picker(label, key, base_path):
     """A simple directory picker for Streamlit."""
@@ -220,10 +226,9 @@ def render_visualiser():
                     
                     # Add Geometry
                     if show_geom and vtk_files:
-                        # Pleasant color palette for cycling
                         COLORS = ["#ADD8E6", "#90EE90", "#FFB6C1", "#FFFFE0", "#E6E6FA", "#F08080", "#AFEEEE", "#FFE4E1"]
                         for i, vtk_file in enumerate(vtk_files):
-                            mesh = pv.read(vtk_file)
+                            mesh = load_vtk_geometry(vtk_file)
                             color = COLORS[i % len(COLORS)]
                             plotter.add_mesh(mesh, color=color, opacity=geom_alpha, show_edges=False)
                             
