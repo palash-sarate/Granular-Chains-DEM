@@ -38,10 +38,9 @@ def parse_lammps_dump(dump_path):
                     skip = i + 1
                     break
         
-        if not cols:
-            return None
-            
-        df = pd.read_csv(dump_path, skiprows=skip, sep=r'\s+', names=cols)
+        # Optimization: Only load the columns we actually need for visualization
+        needed_cols = [c for c in cols if c in ['x', 'y', 'z', 'mol', 'diameter']]
+        df = pd.read_csv(dump_path, skiprows=skip, sep=r'\s+', names=cols, usecols=needed_cols, engine='c')
         return df
     except Exception as e:
         st.error(f"Error parsing dump file: {e}")
@@ -232,36 +231,44 @@ def render_visualiser():
                     if show_particles and selected_dump:
                         df = parse_lammps_dump(selected_dump)
                         if df is not None and not df.empty:
-                            # Use a separate palette for particles to distinguish from geometry
                             P_COLORS = ["#FF5733", "#33FF57", "#3357FF", "#F333FF", "#FF33A8", "#33FFF3", "#F3FF33", "#FF8C00"]
                             
                             if all(k in df.columns for k in ['x', 'y', 'z']):
-                                # Check if we can group by 'mol' (molecule ID / chain)
-                                if 'mol' in df.columns:
-                                    mols = df['mol'].unique()
-                                    for i, m_id in enumerate(mols):
-                                        m_df = df[df['mol'] == m_id]
-                                        points = m_df[['x', 'y', 'z']].values
-                                        pdata = pv.PolyData(points)
-                                        
-                                        if 'diameter' in m_df.columns:
-                                            pdata['radius'] = m_df['diameter'].values / 2.0
-                                        else:
-                                            pdata['radius'] = [0.001] * len(points)
-                                            
-                                        sphere = pv.Sphere(radius=1.0, theta_resolution=8, phi_resolution=8)
-                                        particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
-                                        
-                                        color = P_COLORS[i % len(P_COLORS)]
-                                        plotter.add_mesh(particles, color=color, smooth_shading=True)
+                                points = df[['x', 'y', 'z']].values
+                                pdata = pv.PolyData(points)
+                                
+                                # Set radius
+                                if 'diameter' in df.columns:
+                                    pdata['radius'] = df['diameter'].values / 2.0
                                 else:
-                                    # Fallback to single group if no 'mol' column
-                                    points = df[['x', 'y', 'z']].values
-                                    pdata = pv.PolyData(points)
-                                    if 'diameter' in df.columns:
-                                        pdata['radius'] = df['diameter'].values / 2.0
-                                    else:
-                                        pdata['radius'] = [0.001] * len(points)
+                                    pdata['radius'] = [0.001] * len(points)
+                                
+                                # Fast Batched Rendering: One glyph call for all particles
+                                # Color by molecule ID if present
+                                if 'mol' in df.columns:
+                                    # Map molecule IDs to color indices
+                                    m_ids = df['mol'].values
+                                    # Use a simple mapping: mol_id % num_colors
+                                    pdata['color_idx'] = m_ids % len(P_COLORS)
+                                    
+                                    # Create the glyphs
+                                    sphere = pv.Sphere(radius=1.0, theta_resolution=8, phi_resolution=8)
+                                    particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
+                                    
+                                    # Add all particles in a single mesh call with a custom colormap
+                                    from matplotlib.colors import ListedColormap
+                                    my_cmap = ListedColormap(P_COLORS)
+                                    
+                                    plotter.add_mesh(
+                                        particles, 
+                                        scalars="color_idx", 
+                                        cmap=my_cmap, 
+                                        smooth_shading=True,
+                                        show_scalar_bar=False,
+                                        categories=True
+                                    )
+                                else:
+                                    # Fallback for single color
                                     sphere = pv.Sphere(radius=1.0, theta_resolution=8, phi_resolution=8)
                                     particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
                                     plotter.add_mesh(particles, color="#FF5733", smooth_shading=True)
