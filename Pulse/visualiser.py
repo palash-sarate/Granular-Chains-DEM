@@ -169,7 +169,9 @@ def render_visualiser():
             selected_dump = os.path.join(chain_dir, dump_names[selected_idx])
             
         st.divider()
-        show_axes = st.checkbox("Show Axes", value=True)
+        c1, c2 = st.columns(2)
+        show_axes = c1.checkbox("Show Corner Axes", value=True)
+        show_grid = c2.checkbox("Show 3D Grid", value=False)
         
         st.divider()
         st.markdown("### 📷 Camera Presets")
@@ -255,7 +257,15 @@ def render_visualiser():
                                     particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
                                     plotter.add_mesh(particles, color="#FF5733", smooth_shading=True)
                     
-                    # Camera logic: 
+                    # (Camera application moved below axes/grid)
+                        
+                    if show_axes:
+                        plotter.add_axes()
+                        
+                    if show_grid:
+                        plotter.show_grid(color='gray', font_size=10)
+
+                    # Camera logic: Apply after all meshes/axes are added to prevent VTK auto-reset
                     # 1. Apply preset if requested
                     if st.session_state.get("apply_cam_preset"):
                         cam = st.session_state.cam_pos
@@ -265,18 +275,14 @@ def render_visualiser():
                             plotter.reset_camera()
                         else:
                             plotter.camera_position = cam
-                        # Reset the flag so we don't keep applying the preset (overriding manual moves)
                         st.session_state.apply_cam_preset = False
-                        st.session_state.cam_pos = "last" # Mark that we are now in 'manual/last' mode
+                        st.session_state.cam_pos = "last"
                     
                     # 2. Otherwise apply the last known camera position if it exists
                     elif "last_cam_pos" in st.session_state and st.session_state.last_cam_pos:
                         try:
                             plotter.camera_position = st.session_state.last_cam_pos
                         except: pass
-                        
-                    if show_axes:
-                        plotter.add_axes()
                         
                     # Render using patched stpyvista
                     # We use a unique key to keep the component state
