@@ -298,6 +298,7 @@ def render_visualiser():
                             plotter.camera_position = cam
                         st.session_state.apply_cam_preset = False
                         st.session_state.cam_pos = "last"
+                        st.session_state.last_cam_pos = plotter.camera_position
                     
                     # 2. Otherwise apply the last known camera position if it exists
                     elif "last_cam_pos" in st.session_state and st.session_state.last_cam_pos:
