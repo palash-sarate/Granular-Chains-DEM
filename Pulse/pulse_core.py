@@ -89,8 +89,8 @@ class PBSManager:
                     key, value = match.groups()
                     job_data[key] = value
                     last_key = key
-                elif last_key and line.startswith("    "):
-                    # Continuation line
+                elif last_key and (line.startswith("    ") or line.startswith("\t")):
+                    # Continuation line (handles both spaces and tabs)
                     job_data[last_key] += line.strip()
             
             # Post-process memory fields
@@ -261,6 +261,17 @@ class PBSManager:
             PBSManager.save_metadata(cache)
 
     @staticmethod
+    def load_lineage() -> Dict:
+        """Loads the simulation lineage data."""
+        if os.path.exists("Pulse/lineage.json"):
+            try:
+                with open("Pulse/lineage.json", 'r') as f:
+                    return json.load(f)
+            except Exception:
+                return {}
+        return {}
+
+    @staticmethod
     def get_node_temperatures() -> Dict[str, float]:
         """Fetches CPU and GPU temperatures from the system."""
         temps = {}
@@ -363,20 +374,26 @@ class SimulationMonitor:
                 "time_elapsed_hr": (files_rel[-1][1] - files_rel[0][1]) / 3600.0,
                 "completion_time": datetime.fromtimestamp(files_rel[-1][1]).strftime("%Y-%m-%d %H:%M:%S"),
                 "cost_per_10k_steps": 0.0,
+                "total_files": len(files_rel),
                 "data_points": len(files_rel),
                 "last_updated": datetime.now().strftime("%H:%M:%S"),
                 "message": f"Reached target relative duration: {target_relative_steps:,}"
             }
 
         # 4. Sampling & Quadratic Extrapolation
-        sampled_rel = files_rel[::10]
+        total_files = len(files_rel)
+        if total_files > 100:
+            step = total_files // 50 # Aim for ~50-100 points
+            sampled_rel = files_rel[::step]
+        else:
+            sampled_rel = files_rel
+            
         if files_rel[-1] not in sampled_rel:
             sampled_rel.append(files_rel[-1])
             sampled_rel.sort()
 
         if len(sampled_rel) < 2:
-            if len(files_rel) >= 2: sampled_rel = files_rel
-            else: return {"error": "Insufficient data: Need at least 2 dump files."}
+            return {"error": "Insufficient data: Need at least 2 dump files."}
 
         x_arr = np.array([f[0] for f in sampled_rel])
         y_arr = np.array([f[1] for f in sampled_rel])
@@ -417,6 +434,7 @@ class SimulationMonitor:
             "cost_per_10k_steps": current_cost_per_step * 10000 / 60.0,
             "cost_per_dump": (current_cost_per_step * step_interval) / 60.0,
             "cost_history": (deriv(x_arr) * 10000 / 60.0).tolist(),
+            "total_files": total_files,
             "data_points": len(sampled_rel),
             "last_updated": datetime.now().strftime("%H:%M:%S")
         }

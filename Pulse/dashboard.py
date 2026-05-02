@@ -13,6 +13,7 @@ if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
 from pulse_core import PBSManager, SimulationMonitor
+import streamlit.components.v1 as components
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
 from analysis.controllers.highlighter import HighlightController
@@ -67,8 +68,8 @@ if st.runtime.exists():
     if st.sidebar.button("Refresh Now", use_container_width=False):
         st.rerun()
 
-    # Create Tabs for Active vs History vs ETA vs Visualizer
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Active Queue", "🕰️ Job History", "⏱️ Simulation ETA", "🎥 Visualizer"])
+    # Create Tabs for Active vs History vs ETA vs Visualizer vs Lineage
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Active Queue", "🕰️ Job History", "⏱️ Simulation ETA", "🎥 Visualizer", "🧬 Lineage"])
 
     with tab1:
         @st.fragment(run_every=refresh_rate)
@@ -107,7 +108,7 @@ if st.runtime.exists():
                         "CPU %": job.get("resources_used.cpupercent", "0"),
                         "RAM": job.get("resources_used.mem", "0kb"),
                         "Node": job.get("exec_vnode", "N/A"),
-                        "Comment": job.get("comment", "")
+                        "Comment": job.get("comment") or job.get("Comment") or job.get("depend", "")
                     })
                 
                 df = pd.DataFrame(display_data)
@@ -129,7 +130,10 @@ if st.runtime.exists():
                     st.warning(f"Found {len(held_jobs)} jobs in HOLD state.")
                     for hj in held_jobs:
                         with st.expander(f"Hold Details: {hj.get('id')} ({hj.get('Job_Name')})"):
-                            st.error(f"Reason: {hj.get('comment')}")
+                            reason = hj.get('comment') or hj.get('Comment')
+                            if not reason and hj.get('depend'):
+                                reason = f"Dependency: {hj.get('depend')}"
+                            st.error(f"Reason: {reason or 'None'}")
                             st.code(f"Error Path: {hj.get('Error_Path')}")
 
             # Metrics summary
@@ -327,7 +331,8 @@ if st.runtime.exists():
                         p_col1, p_col2 = st.columns(2)
                         p_col1.write(f"**Absolute Timestep:** {eta_data['current_timestep']:,}")
                         p_col1.write(f"**Steps in this Job:** {eta_data['current_relative_step']:,}")
-                        p_col1.write(f"**Data points sampled:** {eta_data['data_points']}")
+                        p_col1.write(f"**Total Files Found:** {eta_data.get('total_files', 'N/A')}")
+                        p_col2.write(f"**Fitted Points:** {eta_data['data_points']}")
                         p_col2.write(f"**Current Speed:** {eta_data['cost_per_10k_steps']:.1f} min / 10k steps")
                         p_col2.write(f"**Last File Sync:** {eta_data['last_updated']}")
                         
@@ -338,6 +343,80 @@ if st.runtime.exists():
     with tab4:
         from visualiser import render_visualiser
         render_visualiser()
+
+    with tab5:
+        st.subheader("🧬 Simulation Genealogy & Lineage")
+        st.markdown("Persistent history of all simulation runs and their parent-child relationships.")
+        
+        c1, c2 = st.columns([1, 4])
+        if c1.button("🔄 Sync from Disk", use_container_width=True):
+            with st.spinner("Scanning dumping_yard..."):
+                subprocess.run(["python", "Pulse/lineage_tracker.py"])
+                st.rerun()
+        
+        lineage = PBSManager.load_lineage()
+        if not lineage:
+            st.info("No lineage data found. Click 'Sync from Disk' to scan your simulations.")
+        else:
+            # 1. Prepare Mermaid Diagram
+            mermaid_code = "graph LR\n"
+            # Define nodes with styles
+            for run_id, info in lineage.items():
+                short_id = info['name'].replace('-', '_')
+                node_label = f"{info['name']}<br/>(N={info['N']}, {info['steps']:,} steps)"
+                
+                # Style based on type
+                style = ""
+                if info["status"] == "Archived":
+                    style = ":::archived"
+                elif "Flow" in info["simulation"]:
+                    style = ":::flow"
+                else:
+                    style = ":::active"
+                
+                mermaid_code += f'    {short_id}["{node_label}"]{style}\n'
+            
+            # Define relationships
+            for run_id, info in lineage.items():
+                if info["parent"] and info["parent"] in lineage:
+                    parent_name = lineage[info["parent"]]['name'].replace('-', '_')
+                    child_name = info['name'].replace('-', '_')
+                    mermaid_code += f"    {parent_name} --> {child_name}\n"
+            
+            # Define styles
+            mermaid_code += "    classDef active fill:#e1f5fe,stroke:#01579b,stroke-width:2px;\n"
+            mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
+            mermaid_code += "    classDef flow fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;\n"
+
+            # Render Mermaid
+            components.html(
+                f"""
+                <div class="mermaid" style="background-color: white; padding: 20px; border-radius: 10px;">
+                    {mermaid_code}
+                </div>
+                <script type="module">
+                    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                    mermaid.initialize({{ startOnLoad: true, theme: 'neutral' }});
+                </script>
+                """,
+                height=600,
+                scrolling=True
+            )
+            
+            # 2. Detailed Data View
+            with st.expander("📄 View Detailed Parameters"):
+                # Clean up for display
+                display_lineage = []
+                for rid, info in lineage.items():
+                    display_lineage.append({
+                        "Name": info["name"],
+                        "Type": info["simulation"],
+                        "N": info["N"],
+                        "Steps": info["steps"],
+                        "Status": info["status"],
+                        "Path": rid
+                    })
+                st.dataframe(pd.DataFrame(display_lineage), width="stretch", hide_index=True)
 
     # 5. System Status (Master Node only)
     if "master" in subprocess.getoutput("hostname"):

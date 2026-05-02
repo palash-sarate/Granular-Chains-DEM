@@ -66,7 +66,7 @@ def get_job_list(mode):
     # Map N to the directory containing the results you want to resume or flow from
     # Replace these paths with actual simulation output directories
     # ----------------------------------------------------------------------
-    # Currently resumed
+    # Currently running resumes
     # ----------------------------------------------------------------------
     # resume_source_dirs = {
     #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
@@ -75,15 +75,27 @@ def get_job_list(mode):
     #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513"
     # }
     # ----------------------------------------------------------------------
+    # On Hold resumes
+    # ----------------------------------------------------------------------
+    # resume_source_dirs = {
+    #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+    #     12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+    #     24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+    #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
+    #     48: "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S404527",
+    #     24: "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S180256",
+    #     12: "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S956135",
+    #     4:  "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S234775" 
+    # }
+    # ----------------------------------------------------------------------
     # Next to resume
     # ----------------------------------------------------------------------
     resume_source_dirs = {
-        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
-        12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
-        24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
-        48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
+        48: "",
+        24: "",
+        12: "",
+        4:  ""        
     }
-
     for n in Ns:
         n_fill = n_atoms // n
         
@@ -218,19 +230,50 @@ def generate_command(config):
                 cmd_parts.append(f"--{key} {val}")
     
     return " \\\n    ".join(cmd_parts)
+    
+def get_active_job_ids(user):
+    """
+    Fetch current active job IDs for the user.
+    """
+    try:
+        result = subprocess.run(["qstat", "-u", user], capture_output=True, text=True)
+        if result.returncode != 0:
+            return []
+        lines = result.stdout.splitlines()
+        ids = []
+        for line in lines:
+            parts = line.split()
+            # Expecting ID in the first column, usually like '3281.master'
+            if len(parts) > 0 and "." in parts[0] and user in line:
+                ids.append(parts[0])
+        return ids
+    except Exception as e:
+        print(f"Warning: Could not fetch active jobs: {e}")
+        return []
 
 def main():
     parser = argparse.ArgumentParser(description="Flexible PBS Job Submitter")
     parser.add_argument("--mode", choices=["fill", "fill_resume", "flow", "flow_resume"], required=True, help="Mode of simulation study")
     parser.add_argument("--submit", action="store_true", help="Submit jobs to the queue (otherwise only generates files)")
+    parser.add_argument("--max-concurrent", type=int, default=4, help="Max number of concurrent jobs allowed (default: 4)")
+    parser.add_argument("--user", default="guest", help="User to check for active jobs (default: guest)")
     args = parser.parse_args()
 
     jobs = get_job_list(args.mode)
     
+    # Initialize tails list for concurrency management
+    tails = []
+    if args.submit:
+        tails = get_active_job_ids(args.user)
+        # Limit to the most recent max_concurrent jobs if there are already many
+        if len(tails) > args.max_concurrent:
+            tails = tails[-args.max_concurrent:]
+        print(f"Current active jobs detected: {len(tails)}. Limit: {args.max_concurrent}")
+
     if not os.path.exists("PBS_Output"): os.makedirs("PBS_Output")
     if not os.path.exists("temp/temp_pbs"): os.makedirs("temp/temp_pbs")
 
-    for job in jobs:
+    for i, job in enumerate(jobs):
         name = job.get("name", "Job_" + datetime.now().strftime("%H%M%S"))
         walltime = job.get("walltime", DEFAULTS["walltime"])
         ppn = job.get("ppn", DEFAULTS["ppn"])
@@ -251,8 +294,29 @@ def main():
                 f.write(pbs_content)
             
             if args.submit:
-                print(f"Submitting: {name}")
-                subprocess.run(["qsub", pbs_file])
+                dep_id = None
+                if len(tails) >= args.max_concurrent:
+                    # Pick a tail to depend on (round-robin)
+                    dep_id = tails[i % args.max_concurrent]
+                
+                cmd = ["qsub"]
+                if dep_id:
+                    cmd.extend(["-W", f"depend=afterany:{dep_id}"])
+                cmd.append(pbs_file)
+                
+                msg = f"Submitting: {name}"
+                if dep_id: msg += f" (depends on {dep_id})"
+                print(msg)
+                
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode == 0:
+                    new_id = res.stdout.strip()
+                    if len(tails) < args.max_concurrent:
+                        tails.append(new_id)
+                    else:
+                        tails[i % args.max_concurrent] = new_id
+                else:
+                    print(f"Error submitting {name}: {res.stderr.strip()}")
             else:
                 print(f"Generated: {pbs_file}")
         except Exception as e:
