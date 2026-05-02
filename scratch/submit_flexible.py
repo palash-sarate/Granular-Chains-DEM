@@ -3,6 +3,7 @@ import json
 import subprocess
 import argparse
 import random
+import re
 from datetime import datetime
 
 # --- 1. CONFIGURATION & TEMPLATE ---
@@ -91,10 +92,10 @@ def get_job_list(mode):
     # Next to resume
     # ----------------------------------------------------------------------
     resume_source_dirs = {
-        48: "",
-        24: "",
-        12: "",
-        4:  ""        
+        # 48: "",
+        # 24: "",
+        # 12: "",
+        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952"        
     }
     for n in Ns:
         n_fill = n_atoms // n
@@ -104,8 +105,9 @@ def get_job_list(mode):
                 # ----------------------------------------------------------------------
                 # TYPE 1: FILL (New Hopper Filling Run)
                 # ----------------------------------------------------------------------
+                child_seed = random.randint(100000, 999999)
                 jobs.append({
-                    "name": f"Fill_N{n}",
+                    "name": f"S000000_{child_seed}",
                     "type": "fill",
                     "walltime": "48:00:00",
                     "ppn": 16,
@@ -114,7 +116,7 @@ def get_job_list(mode):
                         "num_procs": 8,
                         "num_threads": 1,
                         "N": n,
-                        "seed": random.randint(100000, 999999),
+                        "seed": child_seed,
                         "n_fill": n_fill,
                         "n_hoppers": 1,
                         "relax_steps": 1000000,
@@ -135,8 +137,11 @@ def get_job_list(mode):
                 # TYPE 2: FILL_RESUME (Continue or add relaxation to a filling run)
                 # ----------------------------------------------------------------------
                 if n in resume_source_dirs and os.path.exists(resume_source_dirs[n]):
+                    match = re.search(r'S(\d+)', resume_source_dirs[n])
+                    parent_seed = match.group(1)[-6:] if match else "000000"
+                    child_seed = random.randint(100000, 999999)
                     jobs.append({
-                        "name": f"Resume_Fill_N{n}",
+                        "name": f"R{parent_seed}_{child_seed}",
                         "type": "fill_resume",
                         "walltime": "48:00:00",
                         "params": {
@@ -148,21 +153,24 @@ def get_job_list(mode):
                             "dt": 1e-06,
                             "viscosity": 0.001,
                             "dump_file": "simulation_templates/default_dump.inc",
-                            "seed": random.randint(100000, 999999),
+                            "seed": child_seed,
                         }
                     })
 
             case "flow":
                 if n in resume_source_dirs and os.path.exists(resume_source_dirs[n]):
+                    match = re.search(r'S(\d+)', resume_source_dirs[n])
+                    parent_seed = match.group(1)[-6:] if match else "000000"
                     for f in freqs:
                         for a in amps:
+                            child_seed = random.randint(100000, 999999)
                             jobs.append({
-                                "name": f"Flow_N{n}_F{f}_A{a}",
+                                "name": f"F{parent_seed}_{child_seed}",
                                 "type": "flow",
                                 "walltime": "48:00:00",
                                 "params": {
                                     "source_dir": resume_source_dirs[n],
-                                    "seed": random.randint(100000, 999999),
+                                    "seed": child_seed,
                                     "freq": f,
                                     "amp": a,
                                     "run_steps": 2000000,
@@ -173,17 +181,20 @@ def get_job_list(mode):
             
             case "flow_resume":
                 if n in resume_source_dirs and os.path.exists(resume_source_dirs[n]):
+                    match = re.search(r'S(\d+)', resume_source_dirs[n])
+                    parent_seed = match.group(1)[-6:] if match else "000000"
                     for f in freqs:
                         for a in amps:
+                            child_seed = random.randint(100000, 999999)
                             jobs.append({
-                                "name": f"Res_Flow_N{n}_F{f}_A{a}",
+                                "name": f"FR{parent_seed}_{child_seed}",
                                 "type": "flow_resume",
                                 "walltime": "24:00:00",
                                 "params": {
                                     "restart_path": resume_source_dirs[n],
                                     "run_steps": 1000000,
                                     "dt": 1e-06,
-                                    "seed": random.randint(100000, 999999),
+                                    "seed": child_seed,
                                 }
                             })
 

@@ -375,16 +375,55 @@ if st.runtime.exists():
         if not lineage:
             st.info("No lineage data found. Click 'Sync from Disk' to scan your simulations.")
         else:
+            # Parse PBS Jobs for Status Overlay
+            import re
+            pbs_manager = PBSManager()
+            try:
+                active_jobs = pbs_manager.get_jobs()
+            except Exception:
+                active_jobs = []
+                
+            running_seeds = set()
+            queued_ghosts = []
+            
+            # Map of seed -> parent_short_id
+            seed_to_shortid = {}
+            for run_id, info in lineage.items():
+                short_id = info['name'].replace('-', '_').replace('.', '_')
+                seed = str(info.get('params', {}).get('seed', ''))
+                if seed:
+                    seed_to_shortid[seed] = short_id
+                    
+            for job in active_jobs:
+                job_name = job.get('Job_Name', '')
+                state = job.get('job_state', '')
+                
+                # Match convention: [Prefix][ParentSeed]_[ChildSeed]
+                match = re.match(r"^[A-Z]+(\d{3,6})_(\d{3,6})$", job_name)
+                if match:
+                    parent_seed, child_seed = match.groups()
+                    if state == 'R':
+                        running_seeds.add(child_seed)
+                    elif state in ['Q', 'H', 'W', 'S']:
+                        if parent_seed in seed_to_shortid:
+                            parent_short_id = seed_to_shortid[parent_seed]
+                            ghost_id = f"Ghost_{child_seed}"
+                            ghost_label = f"{job_name}<br/>(Queued/Hold)"
+                            queued_ghosts.append((ghost_id, ghost_label, parent_short_id))
+
             # 1. Prepare Mermaid Diagram
             mermaid_code = "graph LR\n"
             # Define nodes with styles
             for run_id, info in lineage.items():
                 short_id = info['name'].replace('-', '_').replace('.', '_')
                 node_label = f"{info['name']}<br/>(N={info['N']}, {info['steps']:,} steps)"
+                seed = str(info.get('params', {}).get('seed', ''))
                 
                 # Style based on type
                 style = ""
-                if info["status"] == "Archived":
+                if seed in running_seeds:
+                    style = ":::running"
+                elif info["status"] == "Archived":
                     style = ":::archived"
                 elif "Flow" in info["simulation"]:
                     style = ":::flow"
@@ -400,11 +439,18 @@ if st.runtime.exists():
                     parent_name = lineage[info["parent"]]['name'].replace('-', '_').replace('.', '_')
                     child_name = info['name'].replace('-', '_').replace('.', '_')
                     mermaid_code += f"    {parent_name} --> {child_name}\n"
+                    
+            # Inject Queued Ghost Nodes
+            for ghost_id, ghost_label, parent_short_id in queued_ghosts:
+                mermaid_code += f'    {ghost_id}["{ghost_label}"]:::queued\n'
+                mermaid_code += f"    {parent_short_id} --> {ghost_id}\n"
             
             # Define styles
             mermaid_code += "    classDef active fill:#e1f5fe,stroke:#01579b,stroke-width:2px;\n"
             mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef flow fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;\n"
+            mermaid_code += "    classDef running fill:#c8e6c9,stroke:#388e3c,stroke-width:3px;\n"
+            mermaid_code += "    classDef queued fill:#ffccbc,stroke:#d32f2f,stroke-dasharray: 5 5;\n"
 
             # Render Mermaid using custom component
             mermaid_click_component = components.declare_component(
@@ -519,9 +565,24 @@ if st.runtime.exists():
                     submit_btn = st.form_submit_button("🚀 Submit to PBS")
                     
                     if submit_btn:
-                        job_name = f"{selected_mode.capitalize()}_{random.randint(100, 999)}"
-                        if "N" in parent_info:
-                            job_name += f"_N{parent_info['N']}"
+                        parent_seed = str(parent_info.get("params", {}).get("seed", "000000"))[-6:]
+                        new_seed = str(seed)[-6:]
+                        
+                        # Set prefix based on mode
+                        if selected_mode == "fill_resume":
+                            prefix = "R"
+                        elif selected_mode == "flow":
+                            prefix = "F"
+                        elif selected_mode == "flow_resume":
+                            prefix = "FR"
+                        else:
+                            prefix = "S"
+                            
+                        # Format: [Prefix][parent]_[child] 
+                        # Example: R481365_956135 (14 chars) or FR481365_956135 (15 chars)
+                        # This precisely fits typical PBS 15-character limits while 
+                        # instantly identifying both the job and its lineage parent.
+                        job_name = f"{prefix}{parent_seed}_{new_seed}"
                             
                         job = {
                             "name": job_name,
