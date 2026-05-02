@@ -137,7 +137,6 @@ def main():
     p_grid_h.add_argument("--spacing", type=float, default=2.0)
     p_grid_h.add_argument("--relax_steps", type=int, default=500000)
     p_grid_h.add_argument("--dt", type=float, default=1e-6)
-    p_grid_h.add_argument("--output_dir", default="chain_data/grid_filled")
     p_grid_h.add_argument("--source_dir", help="Directory containing relaxed chains")
     p_grid_h.add_argument("--hopper_template_data", default="simulation_geometries/2D_hopper.inc")
     p_grid_h.add_argument("--lepton_file", default="simulation_templates/lepton.inc")
@@ -160,7 +159,6 @@ def main():
     p_res_grid.add_argument("--restart_path", required=True)
     p_res_grid.add_argument("--relax_steps", type=int, default=500000)
     p_res_grid.add_argument("--dt", type=float, default=1e-6)
-    p_res_grid.add_argument("--output_dir", default="chain_data/grid_filled")
     p_res_grid.add_argument("--lepton_file", default="simulation_templates/lepton.inc")
     p_res_grid.add_argument("--dump_file", default="simulation_templates/quiet_dump.inc")
     p_res_grid.add_argument("--viscosity", type=float, default=0.001)
@@ -168,6 +166,7 @@ def main():
     p_res_grid.add_argument("--num_threads", type=int, default=1)
     p_res_grid.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
     p_res_grid.add_argument("--template", default="in.grid_hopper_fill_resume")
+    p_res_grid.add_argument("--simulation", default="Grid_Hopper_Filling")
     p_res_grid.add_argument("--seed", type=int, default=None)
 
     # 11. run_grid_hopper_flow
@@ -178,7 +177,6 @@ def main():
     p_flow.add_argument("--amp", type=str, default="0.01", help="Amp (single float or JSON list)")
     p_flow.add_argument("--osc_dir", choices=['x','y','z'], default='z')
     p_flow.add_argument("--dt", type=float, default=1e-6)
-    p_flow.add_argument("--output_dir", default="chain_data/grid_flow")
     p_flow.add_argument("--num_procs", type=int, default=1)
     p_flow.add_argument("--num_threads", type=int, default=1)
     p_flow.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
@@ -201,6 +199,7 @@ def main():
     p_res_flow.add_argument("--dump_file", default="simulation_templates/quiet_dump.inc")
     p_res_flow.add_argument("--viscosity", type=float, default=0.001)
     p_res_flow.add_argument("--template", default="in.grid_hopper_flow_resume")
+    p_res_flow.add_argument("--simulation", default="Grid_Hopper_Flow")
     p_res_flow.add_argument("--seed", type=int, default=None)
 
     args = parser.parse_args()

@@ -13,6 +13,8 @@ if "${restart_file}" != "" then "read_restart ${restart_file}"
 if "${restart_file}" == "" then "read_data ${data_file}" 
 
 include ${lepton_inc}
+# Dynamic timestep based on Lepton smoothing width 'w'
+fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 
 group chain_particles type 1
 fix 1 chain_particles viscous ${viscosity}

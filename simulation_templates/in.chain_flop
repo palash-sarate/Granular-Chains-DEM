@@ -21,6 +21,8 @@ velocity anchors set 0.0 0.0 0.0
 set group anchors omega 0.0 0.0 0.0
 
 include ${lepton_inc}
+# Dynamic timestep based on Lepton smoothing width 'w'
+fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 # Apply gravity in the standard downward (−z) direction
 fix grav mobile gravity 9.81 vector 0 0 -1
 

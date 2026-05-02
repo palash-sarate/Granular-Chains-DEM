@@ -13,6 +13,8 @@ read_restart ${resume_file}
 # 2. POTENTIALS
 # Re-declare the pair/bond/angle styles used in the simulation
 include ${lepton_inc}
+# Dynamic timestep based on Lepton smoothing width 'w'
+fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 
 # 3. GEOMETRY & WALLS
 # Re-declare regions and fix wall/gran/region (not saved in restart)

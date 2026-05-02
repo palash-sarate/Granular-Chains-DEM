@@ -3,7 +3,7 @@ import math
 import shutil
 import random
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
 import time
 import json
@@ -28,7 +28,7 @@ class GridHopperManager:
                     lines.append(line)
         return lines
 
-    def _generate_resume_path(self, job_dir: Path, seed: int) -> Tuple[Path, str]:
+    def _generate_resume_path(self, job_dir: Path, seed: int, simulation: Optional[str] = None) -> Tuple[Path, str]:
         """
         Generates a standardized resume path: OriginalName_S<seed1>_S<seed2>
         """
@@ -38,10 +38,11 @@ class GridHopperManager:
         base_name = re.sub(r'_Res\d+', '', original_name)
         run_name = f"{base_name}_S{seed}"
         
-        # Determine the simulation type from the job_dir path
+        # Determine the simulation type from the job_dir path if not provided
         # dumping_yard/<SimulationType>/<RunName>
-        sim_type = job_dir.parent.name
-        new_path = Path(f"dumping_yard/{sim_type}/{run_name}")
+        if simulation is None:
+            simulation = job_dir.parent.name
+        new_path = Path(f"dumping_yard/{simulation}/{run_name}")
         return new_path, run_name
 
     def run_grid_filling(self, n_hoppers: int, n_fill_per_hopper: Any, N: Any, 
@@ -51,7 +52,6 @@ class GridHopperManager:
                          dt: float = 1e-6,
                          relax_steps: int = 500000,
                          seed: int = 12345,
-                         output_dir: str = "chain_data/grid_filled",
                          lepton_file: str = "simulation_templates/lepton.inc",
                          dump_file: str = "simulation_templates/quiet_dump.inc",
                          viscosity: float = 0.001,
@@ -250,12 +250,13 @@ class GridHopperManager:
         return setup_duration
 
     def resume_grid_filling(self, restart_path: str, relax_steps: int = 500000,
-                           dt: float = 1e-6, output_dir: str = "chain_data/grid_filled",
+                           dt: float = 1e-6,
                            lepton_file: str = "simulation_templates/lepton.inc",
                            dump_file: str = "simulation_templates/quiet_dump.inc",
                            viscosity: float = 0.001,
                            num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                            template: str = "in.grid_hopper_fill_resume",
+                           simulation: str = None,
                            seed: int = 42):
         """
         Resumes a grid filling simulation from a restart file.
@@ -301,7 +302,8 @@ class GridHopperManager:
             
         with open(metadata_path, 'r') as f:
             meta_raw = json.load(f)
-            simulation = meta_raw.get("simulation", "Grid_Hopper_Filling")
+            if simulation is None:
+                simulation = meta_raw.get("simulation", "Grid_Hopper_Filling")
             geometry_inc = meta_raw.get("geometry_inc")
             spacing = meta_raw.get("spacing", 2.0)
             metadata = {int(k): {
@@ -356,7 +358,6 @@ class GridHopperManager:
     def run_grid_flow(self, source_dir: str, run_steps: int = 1000000,
                       freq: Any = 10.0, amp: Any = 0.01, osc_dir: str = 'z',
                       dt: float = 1e-6,
-                      output_dir: str = "chain_data/grid_flow",
                       lepton_file: str = "simulation_templates/lepton.inc",
                       dump_file: str = "simulation_templates/quiet_dump.inc",
                       viscosity: float = 0.001,
@@ -476,6 +477,7 @@ class GridHopperManager:
                          viscosity: float = 0.001,
                          num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                          template: str = "in.grid_hopper_flow_resume",
+                         simulation: str = None,
                          seed: int = 42):
         """
         Resumes a grid flow simulation from a restart file.
@@ -507,7 +509,8 @@ class GridHopperManager:
 
         with open(metadata_path, 'r') as f:
             meta_raw = json.load(f)
-            simulation = meta_raw.get("simulation", "Grid_Hopper_Flow")
+            if simulation is None:
+                simulation = meta_raw.get("simulation", "Grid_Hopper_Flow")
             geometry_inc = meta_raw.get("geometry_inc")
             spacing = meta_raw.get("spacing", 2.0)
             metadata_original = {int(k): {
@@ -518,7 +521,7 @@ class GridHopperManager:
             } for k, v in meta_raw["metadata"].items()}
 
         # Seed-Chain Naming
-        new_job_dir, run_name = self._generate_resume_path(job_dir, seed)
+        new_job_dir, run_name = self._generate_resume_path(job_dir, seed, simulation)
         new_job_dir.mkdir(parents=True, exist_ok=True)
         
         # Inherit Metadata and Update Lineage

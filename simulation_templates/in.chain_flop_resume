@@ -13,6 +13,8 @@ group anchors id 1 2
 group mobile subtract all anchors
 
 include ${lepton_inc}
+# Dynamic timestep based on Lepton smoothing width 'w'
+fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 
 # 5. RE-DEFINE FIXES (Not saved in restart)
 fix grav mobile gravity 9.81 vector 1 0 0

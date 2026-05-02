@@ -12,6 +12,8 @@ read_data ${data_file}
 
 # --- FORCE FIELD ---
 include ${lepton_inc}
+# Dynamic timestep based on Lepton smoothing width 'w'
+fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 
 neighbor 0.005 bin
 neigh_modify delay 0 every 1 check yes

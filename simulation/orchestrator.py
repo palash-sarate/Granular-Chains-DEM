@@ -326,7 +326,6 @@ class SimulationOrchestrator:
     def run_grid_hopper_filling(self, n_hoppers: int = 4, n_fill: Any = 10, N: Any = 4,
                                 spacing: float = 1.0, relax_steps: int = 500000,
                                 seed: Optional[int] = None, dt: float = 1e-6,
-                                output_dir: str = "chain_data/grid_filled",
                                 source_dir: Optional[str] = None,
                                 hopper_template_data: str = "simulation_geometries/2D_hopper.inc",
                                 lepton_file: str = "simulation_templates/lepton.inc",
@@ -360,7 +359,6 @@ class SimulationOrchestrator:
             relax_steps=relax_steps,
             seed=seed,
             dt=dt,
-            output_dir=output_dir,
             source_dir=source_dir,
             hopper_template_data=hopper_template_data,
             lepton_file=lepton_file,
@@ -377,13 +375,14 @@ class SimulationOrchestrator:
         )
 
     def resume_grid_hopper_filling(self, restart_path: str, relax_steps: int = 500000,
-                                  dt: float = 1e-6, output_dir: str = "chain_data/grid_filled",
+                                  dt: float = 1e-6,
                                   lepton_file: str = "simulation_templates/lepton.inc",
                                   dump_file: str = "simulation_templates/quiet_dump.inc",
                                   viscosity: float = 0.001,
                                   num_procs: int = 1, num_threads: int = 1,
                                   use_kokkos: bool = True,
                                   template: str = "in.grid_hopper_fill_resume",
+                                  simulation: str = "Grid_Hopper_Filling",
                                   seed: Optional[int] = None):
         """
         Resumes a grid hopper filling simulation from a restart file.
@@ -402,7 +401,6 @@ class SimulationOrchestrator:
             restart_path=restart_path,
             relax_steps=relax_steps,
             dt=dt,
-            output_dir=output_dir,
             lepton_file=lepton_file,
             dump_file=dump_file,
             viscosity=viscosity,
@@ -410,12 +408,13 @@ class SimulationOrchestrator:
             num_threads=num_threads,
             use_kokkos=use_kokkos,
             template=template,
+            simulation=simulation,
             seed=seed
         )
 
     def run_grid_hopper_flow(self, source_dir: str, run_steps: int = 1000000,
                              freq: Any = 10.0, amp: Any = 0.01, osc_dir: str = 'z',
-                             dt: float = 1e-6, output_dir: str = "chain_data/grid_flow",
+                             dt: float = 1e-6,
                              lepton_file: str = "simulation_templates/lepton.inc",
                              dump_file: str = "simulation_templates/quiet_dump.inc",
                              viscosity: float = 0.001,
@@ -440,7 +439,7 @@ class SimulationOrchestrator:
             source_dir=source_dir,
             run_steps=run_steps,
             freq=freq, amp=amp, osc_dir=osc_dir,
-            dt=dt, output_dir=output_dir,
+            dt=dt,
             lepton_file=lepton_file,
             dump_file=dump_file,
             viscosity=viscosity,
@@ -457,6 +456,7 @@ class SimulationOrchestrator:
                                 viscosity: float = 0.001,
                                 num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                                 template: str = "in.grid_hopper_flow_resume",
+                                simulation: str = "Grid_Hopper_Flow",
                                 seed: Optional[int] = None):
         """
         Resumes a grid hopper flow simulation.
@@ -480,5 +480,6 @@ class SimulationOrchestrator:
             viscosity=viscosity,
             num_procs=num_procs, num_threads=num_threads, use_kokkos=use_kokkos,
             template=template,
+            simulation=simulation,
             seed=seed
         )
