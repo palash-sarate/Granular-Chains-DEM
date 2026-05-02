@@ -65,17 +65,23 @@ def get_job_list(mode):
 
     # Map N to the directory containing the results you want to resume or flow from
     # Replace these paths with actual simulation output directories
+    # ----------------------------------------------------------------------
+    # Currently resumed
+    # ----------------------------------------------------------------------
     # resume_source_dirs = {
-    #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
-    #     12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
-    #     24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
-    #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
+    #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
+    #     12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
+    #     24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
+    #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513"
     # }
+    # ----------------------------------------------------------------------
+    # Next to resume
+    # ----------------------------------------------------------------------
     resume_source_dirs = {
-        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
-        12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
-        24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
-        48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513"
+        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+        12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+        24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+        48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
     }
 
     for n in Ns:
@@ -120,7 +126,7 @@ def get_job_list(mode):
                     jobs.append({
                         "name": f"Resume_Fill_N{n}",
                         "type": "fill_resume",
-                        "walltime": "24:00:00",
+                        "walltime": "48:00:00",
                         "params": {
                             "num_procs": 8,
                             "num_threads": 1,
