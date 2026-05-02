@@ -8,5 +8,23 @@
         "ylim",
         "zlabel",
         "zlim"
-    ]
+    ],
+    "python.analysis.exclude": [
+        "**/.conda",
+        "**/chain_data",
+        "**/out_mesh",
+        "**/PBS_Output",
+        "**/lammps",
+        "**/dumping_yard"
+    ],
+    "files.exclude": {
+        "**/.conda": true,
+        "**/.history": true,
+        "**/__pycache__": true
+    },
+    "search.exclude": {
+        "**/.conda": true,
+        "**/chain_data": true,
+        "**/out_mesh": true
+    }
 }
