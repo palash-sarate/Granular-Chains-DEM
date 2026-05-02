@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: sans-serif; background-color: white; padding: 20px; border-radius: 10px; margin: 0; overflow-y: hidden; }
+  </style>
+</head>
+<body>
+  <div id="graph" class="mermaid"></div>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    function sendMessageToStreamlit(type, data) {
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: type,
+        ...data
+      }, "*");
+    }
+
+    function init() {
+      sendMessageToStreamlit("streamlit:componentReady", {apiVersion: 1});
+    }
+
+    window.addEventListener("message", function(event) {
+      if (event.data.type === "streamlit:render") {
+        const args = event.data.args;
+        const graphDiv = document.getElementById('graph');
+        graphDiv.removeAttribute('data-processed');
+        graphDiv.innerHTML = args.mermaid_code;
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+        
+        mermaid.run({ querySelector: '.mermaid' }).then(() => {
+            // Give it a tiny bit of time to settle layout
+            setTimeout(() => {
+                sendMessageToStreamlit("streamlit:setFrameHeight", {height: document.body.scrollHeight + 40});
+            }, 100);
+        });
+      }
+    });
+
+    window.selectNode = function(nodeId) {
+      sendMessageToStreamlit("streamlit:setComponentValue", {value: nodeId});
+    };
+
+    init();
+  </script>
+</body>
+</html>

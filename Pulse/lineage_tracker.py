@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-LINEAGE_FILE = "Pulse/lineage.json"
+LINEAGE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineage.json")
 DUMPING_YARD = "dumping_yard"
 
 def get_max_step(run_dir):
@@ -126,7 +126,8 @@ def scan_dumping_yard():
                 lineage[run_dir] = run_info
                 
             except Exception as e:
-                print(f"Warning: Failed to parse metadata in {run_dir}: {e}")
+                # print(f"Warning: Failed to parse metadata in {run_dir}: {e}")
+                pass
 
     # Ensure the directory exists
     os.makedirs(os.path.dirname(LINEAGE_FILE), exist_ok=True)
@@ -136,7 +137,7 @@ def scan_dumping_yard():
     
     active_count = len([r for r in lineage.values() if r["status"] == "Active"])
     archived_count = len(lineage) - active_count
-    print(f"Lineage scan complete. Total runs: {len(lineage)} ({active_count} active, {archived_count} archived).")
+    # print(f"Lineage scan complete. Total runs: {len(lineage)} ({active_count} active, {archived_count} archived).")
 
 if __name__ == "__main__":
     scan_dumping_yard()

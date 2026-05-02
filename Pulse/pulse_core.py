@@ -11,6 +11,18 @@ class PBSManager:
     METADATA_FILE = "Pulse/pulse_metadata.json"
 
     @staticmethod
+    def load_lineage() -> Dict:
+        """Loads the simulation lineage data."""
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineage.json")
+        if os.path.exists(path):
+            try:
+                with open(path, 'r') as f:
+                    return json.load(f)
+            except Exception:
+                return {}
+        return {}
+
+    @staticmethod
     def load_metadata() -> Dict:
         """Loads persistent job metadata."""
         if os.path.exists(PBSManager.METADATA_FILE):
@@ -260,16 +272,7 @@ class PBSManager:
             del cache[job_id]
             PBSManager.save_metadata(cache)
 
-    @staticmethod
-    def load_lineage() -> Dict:
-        """Loads the simulation lineage data."""
-        if os.path.exists("Pulse/lineage.json"):
-            try:
-                with open("Pulse/lineage.json", 'r') as f:
-                    return json.load(f)
-            except Exception:
-                return {}
-        return {}
+
 
     @staticmethod
     def get_node_temperatures() -> Dict[str, float]:

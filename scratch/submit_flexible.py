@@ -251,27 +251,24 @@ def get_active_job_ids(user):
         print(f"Warning: Could not fetch active jobs: {e}")
         return []
 
-def main():
-    parser = argparse.ArgumentParser(description="Flexible PBS Job Submitter")
-    parser.add_argument("--mode", choices=["fill", "fill_resume", "flow", "flow_resume"], required=True, help="Mode of simulation study")
-    parser.add_argument("--submit", action="store_true", help="Submit jobs to the queue (otherwise only generates files)")
-    parser.add_argument("--max-concurrent", type=int, default=4, help="Max number of concurrent jobs allowed (default: 4)")
-    parser.add_argument("--user", default="guest", help="User to check for active jobs (default: guest)")
-    args = parser.parse_args()
-
-    jobs = get_job_list(args.mode)
-    
-    # Initialize tails list for concurrency management
+def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
+    """
+    Takes a list of job configurations, generates PBS scripts, and optionally submits them.
+    Returns a list of generated PBS files and a list of submitted job IDs (if submit=True).
+    """
     tails = []
-    if args.submit:
-        tails = get_active_job_ids(args.user)
+    if submit:
+        tails = get_active_job_ids(user)
         # Limit to the most recent max_concurrent jobs if there are already many
-        if len(tails) > args.max_concurrent:
-            tails = tails[-args.max_concurrent:]
-        print(f"Current active jobs detected: {len(tails)}. Limit: {args.max_concurrent}")
+        if len(tails) > max_concurrent:
+            tails = tails[-max_concurrent:]
+        print(f"Current active jobs detected: {len(tails)}. Limit: {max_concurrent}")
 
     if not os.path.exists("PBS_Output"): os.makedirs("PBS_Output")
     if not os.path.exists("temp/temp_pbs"): os.makedirs("temp/temp_pbs")
+
+    generated_files = []
+    submitted_ids = []
 
     for i, job in enumerate(jobs):
         name = job.get("name", "Job_" + datetime.now().strftime("%H%M%S"))
@@ -293,11 +290,13 @@ def main():
             with open(pbs_file, "w") as f:
                 f.write(pbs_content)
             
-            if args.submit:
+            generated_files.append(pbs_file)
+            
+            if submit:
                 dep_id = None
-                if len(tails) >= args.max_concurrent:
+                if len(tails) >= max_concurrent:
                     # Pick a tail to depend on (round-robin)
-                    dep_id = tails[i % args.max_concurrent]
+                    dep_id = tails[i % max_concurrent]
                 
                 cmd = ["qsub"]
                 if dep_id:
@@ -311,16 +310,30 @@ def main():
                 res = subprocess.run(cmd, capture_output=True, text=True)
                 if res.returncode == 0:
                     new_id = res.stdout.strip()
-                    if len(tails) < args.max_concurrent:
+                    submitted_ids.append(new_id)
+                    if len(tails) < max_concurrent:
                         tails.append(new_id)
                     else:
-                        tails[i % args.max_concurrent] = new_id
+                        tails[i % max_concurrent] = new_id
                 else:
                     print(f"Error submitting {name}: {res.stderr.strip()}")
             else:
                 print(f"Generated: {pbs_file}")
         except Exception as e:
             print(f"Error on {name}: {e}")
+            
+    return generated_files, submitted_ids
+
+def main():
+    parser = argparse.ArgumentParser(description="Flexible PBS Job Submitter")
+    parser.add_argument("--mode", choices=["fill", "fill_resume", "flow", "flow_resume"], required=True, help="Mode of simulation study")
+    parser.add_argument("--submit", action="store_true", help="Submit jobs to the queue (otherwise only generates files)")
+    parser.add_argument("--max-concurrent", type=int, default=4, help="Max number of concurrent jobs allowed (default: 4)")
+    parser.add_argument("--user", default="guest", help="User to check for active jobs (default: guest)")
+    args = parser.parse_args()
+
+    jobs = get_job_list(args.mode)
+    submit_jobs(jobs, submit=args.submit, max_concurrent=args.max_concurrent, user=args.user)
 
 if __name__ == "__main__":
     main()

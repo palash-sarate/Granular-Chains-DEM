@@ -12,12 +12,19 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from pulse_core import PBSManager, SimulationMonitor
+from Pulse.pulse_core import PBSManager, SimulationMonitor
 import streamlit.components.v1 as components
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
 from analysis.controllers.highlighter import HighlightController
 import vedo
+import random
+
+scratch_dir = os.path.join(ROOT_DIR, "scratch")
+if scratch_dir not in sys.path:
+    sys.path.append(scratch_dir)
+import submit_flexible
+from lineage_tracker import scan_dumping_yard
 
 def st_directory_picker(label, key, base_path):
     """A simple directory picker for Streamlit."""
@@ -351,10 +358,20 @@ if st.runtime.exists():
         c1, c2 = st.columns([1, 4])
         if c1.button("🔄 Sync from Disk", use_container_width=True):
             with st.spinner("Scanning dumping_yard..."):
-                subprocess.run(["python", "Pulse/lineage_tracker.py"])
+                scan_dumping_yard()
                 st.rerun()
         
+        # Auto-initialize lineage once per session
+        if "lineage_auto_scanned" not in st.session_state:
+            with st.spinner("Scanning simulation lineage..."):
+                try:
+                    scan_dumping_yard()
+                except Exception:
+                    pass
+                st.session_state["lineage_auto_scanned"] = True
+        
         lineage = PBSManager.load_lineage()
+        
         if not lineage:
             st.info("No lineage data found. Click 'Sync from Disk' to scan your simulations.")
         else:
@@ -362,7 +379,7 @@ if st.runtime.exists():
             mermaid_code = "graph LR\n"
             # Define nodes with styles
             for run_id, info in lineage.items():
-                short_id = info['name'].replace('-', '_')
+                short_id = info['name'].replace('-', '_').replace('.', '_')
                 node_label = f"{info['name']}<br/>(N={info['N']}, {info['steps']:,} steps)"
                 
                 # Style based on type
@@ -375,12 +392,13 @@ if st.runtime.exists():
                     style = ":::active"
                 
                 mermaid_code += f'    {short_id}["{node_label}"]{style}\n'
+                mermaid_code += f'    click {short_id} call selectNode("{short_id}")\n'
             
             # Define relationships
             for run_id, info in lineage.items():
                 if info["parent"] and info["parent"] in lineage:
-                    parent_name = lineage[info["parent"]]['name'].replace('-', '_')
-                    child_name = info['name'].replace('-', '_')
+                    parent_name = lineage[info["parent"]]['name'].replace('-', '_').replace('.', '_')
+                    child_name = info['name'].replace('-', '_').replace('.', '_')
                     mermaid_code += f"    {parent_name} --> {child_name}\n"
             
             # Define styles
@@ -388,20 +406,23 @@ if st.runtime.exists():
             mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef flow fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;\n"
 
-            # Render Mermaid
-            components.html(
-                f"""
-                <div class="mermaid" style="background-color: white; padding: 20px; border-radius: 10px;">
-                    {mermaid_code}
-                </div>
-                <script type="module">
-                    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-                    mermaid.initialize({{ startOnLoad: true, theme: 'neutral' }});
-                </script>
-                """,
-                height=600,
-                scrolling=True
+            # Render Mermaid using custom component
+            mermaid_click_component = components.declare_component(
+                "mermaid_click",
+                path=os.path.join(os.path.dirname(__file__), "mermaid_component")
             )
+            
+            clicked_node = mermaid_click_component(mermaid_code=mermaid_code, default=None)
+            
+            # Handle click from the custom component natively
+            if clicked_node:
+                id_to_path = {info['name'].replace('-', '_').replace('.', '_'): rid for rid, info in lineage.items()}
+                if clicked_node in id_to_path:
+                    new_parent = id_to_path[clicked_node]
+                    # Update if changed to avoid infinite rerun loops
+                    if st.session_state.get("lineage_selected_parent") != new_parent:
+                        st.session_state["lineage_selected_parent"] = new_parent
+                        st.rerun()
             
             # 2. Detailed Data View
             with st.expander("📄 View Detailed Parameters"):
@@ -417,6 +438,116 @@ if st.runtime.exists():
                         "Path": rid
                     })
                 st.dataframe(pd.DataFrame(display_lineage), width="stretch", hide_index=True)
+                
+            st.divider()
+            st.subheader("🚀 Launch New Simulation from Lineage")
+            
+            # Select Parent Run
+            run_options = list(lineage.keys())
+            def format_run(rid):
+                return f"{lineage[rid]['name']} ({lineage[rid]['simulation']})"
+            
+            # Synchronize dropdown with session state (which may be set by clicking graph)
+            default_index = 0
+            if "lineage_selected_parent" in st.session_state:
+                if st.session_state["lineage_selected_parent"] in run_options:
+                    default_index = run_options.index(st.session_state["lineage_selected_parent"]) + 1
+            
+            selected_parent = st.selectbox(
+                "Select Parent Run", 
+                ["-- Select --"] + run_options, 
+                index=default_index,
+                format_func=lambda x: format_run(x) if x != "-- Select --" else x
+            )
+            
+            if selected_parent != "-- Select --":
+                # Ensure session state is updated if manually changed in dropdown
+                st.session_state["lineage_selected_parent"] = selected_parent
+                parent_info = lineage[selected_parent]
+                parent_type = parent_info.get("simulation", "")
+                
+                if "Flow" in parent_type:
+                    allowed_modes = ["flow_resume"]
+                else:
+                    allowed_modes = ["fill_resume", "flow"]
+                    
+                selected_mode = st.radio("Select Simulation Mode", allowed_modes, horizontal=True)
+                
+                with st.form("launch_sim_form"):
+                    st.markdown("### 🌍 Global Parameters")
+                    gc1, gc2, gc3, gc4 = st.columns(4)
+                    walltime = gc1.text_input("Walltime", value="24:00:00")
+                    ppn = gc2.number_input("PPN", value=16, step=1)
+                    mem = gc3.text_input("Memory", value="16gb")
+                    max_concurrent = gc4.number_input("Max Concurrent Jobs", value=4, min_value=1, step=1, help="If you submit more jobs than this limit, they will be queued with depend=afterany.")
+                    
+                    gc5, gc6, gc7, gc8 = st.columns(4)
+                    num_procs = gc5.number_input("Num Procs", value=8, step=1)
+                    num_threads = gc6.number_input("Num Threads", value=1, step=1)
+                    dt = gc7.number_input("dt", value=1e-06, format="%e")
+                    viscosity = gc8.number_input("Viscosity", value=0.001, format="%f")
+                    
+                    seed = st.number_input("Seed", value=random.randint(100000, 999999), step=1)
+                    
+                    st.markdown(f"### ⚙️ Mode-Specific Parameters ({selected_mode})")
+                    
+                    # Store mode specific inputs
+                    mode_params = {}
+                    
+                    if selected_mode == "fill_resume":
+                        rc1, rc2 = st.columns(2)
+                        mode_params["relax_steps"] = rc1.number_input("Relax Steps", value=1000000, step=100000)
+                        mode_params["dump_file"] = rc2.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
+                        mode_params["simulation"] = "Hopper_Fill_Resume"
+                        mode_params["restart_path"] = selected_parent
+                        mode_params["N"] = parent_info.get("N", 0)
+                        
+                    elif selected_mode == "flow":
+                        fc1, fc2, fc3, fc4 = st.columns(4)
+                        mode_params["freq"] = fc1.number_input("Frequency", value=5.0)
+                        mode_params["amp"] = fc2.number_input("Amplitude", value=0.01)
+                        mode_params["run_steps"] = fc3.number_input("Run Steps", value=2000000, step=100000)
+                        mode_params["osc_dir"] = fc4.text_input("Oscillation Dir", value="z")
+                        mode_params["source_dir"] = selected_parent
+                        mode_params["simulation"] = f"Flow_Study_N{parent_info.get('N', 0)}_F{mode_params['freq']}_A{mode_params['amp']}"
+                        
+                    elif selected_mode == "flow_resume":
+                        frc1, frc2 = st.columns(2)
+                        mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
+                        mode_params["restart_path"] = selected_parent
+                        
+                    submit_btn = st.form_submit_button("🚀 Submit to PBS")
+                    
+                    if submit_btn:
+                        job_name = f"{selected_mode.capitalize()}_{random.randint(100, 999)}"
+                        if "N" in parent_info:
+                            job_name += f"_N{parent_info['N']}"
+                            
+                        job = {
+                            "name": job_name,
+                            "type": selected_mode,
+                            "walltime": walltime,
+                            "ppn": int(ppn),
+                            "mem": mem,
+                            "params": {
+                                "num_procs": int(num_procs),
+                                "num_threads": int(num_threads),
+                                "dt": dt,
+                                "viscosity": viscosity,
+                                "seed": int(seed),
+                                **mode_params
+                            }
+                        }
+                        
+                        try:
+                            with st.spinner("Generating and submitting job..."):
+                                generated, submitted = submit_flexible.submit_jobs([job], submit=True, max_concurrent=int(max_concurrent), user=user_filter)
+                            if submitted:
+                                st.success(f"Successfully submitted job {submitted[0]}!")
+                            else:
+                                st.warning("Job was generated but not submitted or submission failed.")
+                        except Exception as e:
+                            st.error(f"Error submitting job: {e}")
 
     # 5. System Status (Master Node only)
     if "master" in subprocess.getoutput("hostname"):
