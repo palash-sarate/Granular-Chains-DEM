@@ -3,10 +3,11 @@ from typing import Callable, Optional
 
 class PlaybackController:
     """Manages playback state, timer, and transport controls."""
-    def __init__(self, root: tk.Misc, get_timesteps_cb: Callable, on_frame_change_cb: Callable):
+    def __init__(self, root: tk.Misc, get_timesteps_cb: Callable, on_frame_change_cb: Callable, get_time_cb: Optional[Callable] = None):
         self.root = root
         self.get_timesteps_cb = get_timesteps_cb
         self.on_frame_change_cb = on_frame_change_cb
+        self.get_time_cb = get_time_cb
         
         self.playing = False
         self.job = None
@@ -39,7 +40,13 @@ class PlaybackController:
             self.frame_label.config(text="No frames loaded")
             return
         ts = timesteps[idx]
-        self.frame_label.config(text=f"Frame: {idx+1} / {total} (TS: {ts})")
+        time_str = ""
+        if self.get_time_cb:
+            t = self.get_time_cb(ts)
+            if t is not None:
+                time_str = f", Time: {t:.6f}s"
+        
+        self.frame_label.config(text=f"Frame: {idx+1} / {total} (TS: {ts}{time_str})")
 
     def jump_start(self):
         self.pause()

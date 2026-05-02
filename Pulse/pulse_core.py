@@ -312,130 +312,111 @@ class PBSManager:
 
 class SimulationMonitor:
     @staticmethod
-    def estimate_eta(directory: str, target_timestep: int) -> Dict:
+    def estimate_eta(directory: str, target_relative_steps: int) -> Dict:
         """
-        Estimates the ETA for a running simulation based on dump files.
-        Logic:
-        1. Scan directory for chain_{timestep}.dump files.
-        2. Filter for every 10th file (based on sorted order).
-        3. Get modification times.
-        4. Extrapolate to target_timestep using a quadratic fit (handles slowdown).
+        Estimates simulation ETA by treating 'target' as the number of steps 
+        to be performed in the CURRENT run (relative steps).
         """
         if not os.path.exists(directory):
             return {"error": f"Directory not found: {directory}"}
 
-        # 1. Collect all chain_*.dump files
-        files = []
+        # 1. Collect all dump files
+        search_dirs = [directory]
+        chain_sub = os.path.join(directory, "chain")
+        if os.path.isdir(chain_sub):
+            search_dirs.insert(0, chain_sub)
+            
+        raw_files = []
         try:
-            for f in os.listdir(directory):
-                match = re.match(r'chain_(\d+)\.dump', f)
-                if match:
-                    timestep = int(match.group(1))
-                    files.append((timestep, os.path.getmtime(os.path.join(directory, f))))
+            for s_dir in search_dirs:
+                for f in os.listdir(s_dir):
+                    match = re.match(r'chain_(\d+)\.dump', f)
+                    if match:
+                        timestep = int(match.group(1))
+                        raw_files.append((timestep, os.path.getmtime(os.path.join(s_dir, f))))
+                if raw_files: break
         except Exception as e:
             return {"error": f"Error scanning directory: {str(e)}"}
 
-        if not files:
+        if not raw_files:
             return {"error": "No dump files found matching 'chain_*.dump'"}
 
-        files.sort() # Sort by timestep
-
-        # 2. Sample data points
-        # Every 10th file (0, 10, 20...)
-        sampled_files = files[::10]
+        raw_files.sort() # Sort by absolute timestep
         
-        # Ensure we always include the latest file for better precision
-        if files[-1] not in sampled_files:
-            sampled_files.append(files[-1])
-            sampled_files.sort()
-
-        if len(sampled_files) < 2:
-            if len(files) >= 2:
-                sampled_files = files # Use all if we don't have enough for sampling
-            else:
-                return {"error": "Insufficient data: Need at least 2 dump files."}
-
-        # 3. Prepare for fit
-        x = np.array([f[0] for f in sampled_files])
-        y = np.array([f[1] for f in sampled_files]) # Timestamps in seconds
-
+        # 2. Convert to Relative Timesteps (0 is start of this job)
+        initial_abs_ts = raw_files[0][0]
+        files_rel = [(f[0] - initial_abs_ts, f[1]) for f in raw_files]
+        
+        current_rel_ts = files_rel[-1][0]
+        current_abs_ts = raw_files[-1][0]
         current_time = time.time()
-        current_timestep = files[-1][0]
         
-        if current_timestep >= target_timestep:
+        # 3. Check Progress
+        if current_rel_ts >= target_relative_steps:
             return {
                 "status": "Target Reached",
-                "current_timestep": current_timestep,
-                "target_timestep": target_timestep,
+                "current_timestep": current_abs_ts,
+                "current_relative_step": current_rel_ts,
+                "target_relative_steps": target_relative_steps,
                 "progress_percent": 100.0,
                 "time_remaining_hr": 0.0,
-                "time_elapsed_hr": (files[-1][1] - files[0][1]) / 3600.0,
-                "completion_time": datetime.fromtimestamp(files[-1][1]).strftime("%Y-%m-%d %H:%M:%S"),
+                "time_elapsed_hr": (files_rel[-1][1] - files_rel[0][1]) / 3600.0,
+                "completion_time": datetime.fromtimestamp(files_rel[-1][1]).strftime("%Y-%m-%d %H:%M:%S"),
                 "cost_per_10k_steps": 0.0,
-                "cost_history": [],
-                "data_points": len(sampled_files),
+                "data_points": len(files_rel),
                 "last_updated": datetime.now().strftime("%H:%M:%S"),
-                "message": "The simulation has already reached or passed the target timestep."
+                "message": f"Reached target relative duration: {target_relative_steps:,}"
             }
 
-        # 4. Perform Extrapolation
-        # Quadratic fit: y = ax^2 + bx + c
-        # We use a 2nd degree polynomial because the computational cost often 
-        # increases linearly with time in growing systems, making total time quadratic.
-        degree = 2 if len(sampled_files) >= 3 else 1
-        
-        # Fit
-        coeffs = np.polyfit(x, y, degree)
+        # 4. Sampling & Quadratic Extrapolation
+        sampled_rel = files_rel[::10]
+        if files_rel[-1] not in sampled_rel:
+            sampled_rel.append(files_rel[-1])
+            sampled_rel.sort()
+
+        if len(sampled_rel) < 2:
+            if len(files_rel) >= 2: sampled_rel = files_rel
+            else: return {"error": "Insufficient data: Need at least 2 dump files."}
+
+        x_arr = np.array([f[0] for f in sampled_rel])
+        y_arr = np.array([f[1] for f in sampled_rel])
+
+        degree = 2 if len(sampled_rel) >= 3 else 1
+        coeffs = np.polyfit(x_arr, y_arr, degree)
         poly = np.poly1d(coeffs)
         
-        # Estimate completion time
-        estimated_completion_time = poly(target_timestep)
+        estimated_completion_time = poly(target_relative_steps)
         
-        # Safety Check: If quadratic extrapolation goes "backward" or is unrealistically fast 
-        # (can happen if the simulation recently sped up), fallback to latest linear rate.
-        last_x, last_y = files[-1]
-        prev_x, prev_y = files[-min(len(files), 5)] # Compare with something recent
-        
+        # Linear safety fallback
+        last_x, last_y = files_rel[-1]
+        prev_x, prev_y = files_rel[-min(len(files_rel), 5)]
         if last_x != prev_x:
             latest_rate = (last_y - prev_y) / (last_x - prev_x)
-            linear_eta = last_y + (target_timestep - last_x) * latest_rate
-            
-            # If quadratic is faster than linear (rare in slowing sims) or in the past, use linear
+            linear_eta = last_y + (target_relative_steps - last_x) * latest_rate
             if estimated_completion_time < current_time or estimated_completion_time < linear_eta:
                 estimated_completion_time = linear_eta
 
-        # Calculate metrics
-        time_remaining_sec = max(0, estimated_completion_time - current_time)
-        time_remaining_hr = time_remaining_sec / 3600.0
+        # 5. Result Generation
+        time_remaining_hr = max(0, estimated_completion_time - current_time) / 3600.0
+        time_elapsed_hr = (current_time - files_rel[0][1]) / 3600.0
         
-        # Time elapsed since the first discovered dump file
-        start_time = files[0][1]
-        time_elapsed_hr = (current_time - start_time) / 3600.0
-        
-        # Real world time
-        completion_dt = datetime.fromtimestamp(estimated_completion_time)
-        
-        # Performance trend
         deriv = np.polyder(poly)
-        current_cost_per_step = deriv(current_timestep)
-        
-        # Detect actual dump interval from the last two discovered files
-        step_interval = 1000 # Default fallback
-        if len(files) >= 2:
-            step_interval = files[-1][0] - files[-2][0]
+        current_cost_per_step = deriv(current_rel_ts)
+        step_interval = files_rel[-1][0] - files_rel[-2][0] if len(files_rel) >= 2 else 1000
 
         return {
             "status": "Active",
-            "current_timestep": current_timestep,
-            "target_timestep": target_timestep,
+            "current_timestep": current_abs_ts,
+            "current_relative_step": current_rel_ts,
+            "target_relative_steps": target_relative_steps,
             "step_interval": step_interval,
-            "progress_percent": (current_timestep / target_timestep) * 100,
+            "progress_percent": (current_rel_ts / target_relative_steps) * 100,
             "time_remaining_hr": time_remaining_hr,
             "time_elapsed_hr": time_elapsed_hr,
-            "completion_time": completion_dt.strftime("%Y-%m-%d %H:%M:%S"),
-            "cost_per_10k_steps": current_cost_per_step * 10000 / 60.0, # in minutes
-            "cost_per_dump": (current_cost_per_step * step_interval) / 60.0, # in minutes
-            "cost_history": (deriv(x) * 10000 / 60.0).tolist(), # Convert numpy array to list for JSON/session_state
-            "data_points": len(sampled_files),
+            "completion_time": datetime.fromtimestamp(estimated_completion_time).strftime("%Y-%m-%d %H:%M:%S"),
+            "cost_per_10k_steps": current_cost_per_step * 10000 / 60.0,
+            "cost_per_dump": (current_cost_per_step * step_interval) / 60.0,
+            "cost_history": (deriv(x_arr) * 10000 / 60.0).tolist(),
+            "data_points": len(sampled_rel),
             "last_updated": datetime.now().strftime("%H:%M:%S")
         }

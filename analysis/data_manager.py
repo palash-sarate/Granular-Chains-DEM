@@ -308,6 +308,7 @@ def _parse_single_dump_fast(filepath):
             header_lines = [f.readline() for _ in range(15)]
         
         timestep = 0
+        physical_time = None
         count = 0
         data_start_line = 0
         cols = []
@@ -315,6 +316,9 @@ def _parse_single_dump_fast(filepath):
         for i, line in enumerate(header_lines):
             if "ITEM: TIMESTEP" in line:
                 try: timestep = int(header_lines[i+1].strip())
+                except: pass
+            elif "ITEM: TIME" in line:
+                try: physical_time = float(header_lines[i+1].strip())
                 except: pass
             elif "ITEM: NUMBER OF" in line:
                 try: count = int(header_lines[i+1].strip())
@@ -342,6 +346,11 @@ def _parse_single_dump_fast(filepath):
             df.dropna(subset=[id_col], inplace=True)
         
         df['timestep'] = timestep
+        
+        # Capture physical time from header if renaming wasn't already handled by column extraction
+        if physical_time is not None and 'time' not in df.columns:
+            df['time'] = physical_time
+        
         return df
     except Exception as e:
         print(f"Error parsing {filepath}: {e}")
@@ -436,6 +445,7 @@ class SimulationData:
         self.angle_files = []
         self.loaded_batches = set()
         self.cached_batches = set()
+        self.step_to_time = {} # Mapping of integer timestep to physical time (seconds)
 
     def _get_cache_file(self, batch_idx):
         return os.path.join(self.cache_dir, f"batch_{batch_idx}.pkl")
@@ -540,6 +550,19 @@ class SimulationData:
         if not loaded_data['angles'].empty: self.angle_batches[batch_idx] = loaded_data['angles']
 
         self.loaded_batches.add(batch_idx)
+        
+        # Update physical time mapping from newly loaded atoms
+        if not loaded_data['atoms'].empty:
+            atoms = loaded_data['atoms']
+            # If 'time' or 'v_sim_time' column exists, extract unique step -> time mappings
+            t_col = 'time' if 'time' in atoms.columns else ('v_sim_time' if 'v_sim_time' in atoms.columns else None)
+            if t_col:
+                # We group by the first level of the multi-index (timestep)
+                # and take the first value of the 'time' column for each
+                # This is efficient for small batches
+                times = atoms.reset_index().groupby('timestep')[t_col].first().to_dict()
+                self.step_to_time.update(times)
+
         return loaded_data
 
     def get_atoms_at_timestep(self, ts):

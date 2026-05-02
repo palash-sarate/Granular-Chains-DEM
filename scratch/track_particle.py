@@ -16,22 +16,45 @@ results = []
 for filename in files:
     filepath = os.path.join(base_path, filename)
     step = int(filename.split("_")[1].split(".")[0])
-    time = step * dt
+    time_val = None
     
     with open(filepath, 'r') as f:
         atom_data_started = False
+        headers = []
+        physical_time = None
+        lines = [f.readline() for _ in range(20)] # Read header
+        
+        # Reset and iterate
+        f.seek(0)
         for line in f:
+            if "ITEM: TIME" in line:
+                physical_time = float(f.readline().strip())
             if line.startswith("ITEM: ATOMS"):
                 atom_data_started = True
+                headers = line.split()[2:]
                 continue
             if atom_data_started:
                 parts = line.split()
                 if parts and parts[0] == particle_id:
-                    # id mol type x y z vx vy vz ...
-                    x, y, z = map(float, parts[3:6])
+                    # Parse using headers to find columns
+                    data = dict(zip(headers, parts))
+                    x = float(data['x'])
+                    y = float(data['y'])
+                    z = float(data['z'])
+                    
+                    # Get time from dump if available
+                    if physical_time is not None:
+                        time_val = physical_time
+                    elif 'time' in data:
+                        time_val = float(data['time'])
+                    elif 'v_sim_time' in data:
+                        time_val = float(data['v_sim_time'])
+                    else:
+                        time_val = step * dt
+                        
                     results.append({
                         "step": step,
-                        "time": time,
+                        "time": time_val,
                         "x": x,
                         "y": y,
                         "z": z

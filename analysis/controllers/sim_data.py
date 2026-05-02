@@ -325,6 +325,21 @@ class SimDataController:
         except (KeyError, TypeError):
             return pd.DataFrame()
 
+    def get_time_at_timestep(self, ts: int) -> Optional[float]:
+        """Returns the physical simulation time (seconds) for a given integer timestep."""
+        if self.sim_source and hasattr(self.sim_source, 'step_to_time'):
+            return self.sim_source.step_to_time.get(ts)
+        
+        # Fallback to checking the dataframe directly if loaded manually
+        df = self.df_mi
+        if df is not None and not df.empty and 'time' in df.columns:
+            try:
+                # We take the first value for this timestep
+                return float(df.xs(ts, level='timestep')['time'].iloc[0])
+            except:
+                pass
+        return None
+
     # Compatibility alias for older renderer versions
     def get_frame_data(self, ts):
         return self.get_atom_data_at_timestep(ts)

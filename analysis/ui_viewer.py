@@ -220,7 +220,7 @@ class ViewerApp(BaseTk):
         self.renderer = SimulationRenderer(self.plotter, self.data_ctrl, self.vtk_ctrl, self.hl_ctrl, self._get_ui_settings)
         
         # 3. Logic Controllers
-        self.playback_ctrl = PlaybackController(self, lambda: self.data_ctrl.timesteps, self.renderer.show_timestep)
+        self.playback_ctrl = PlaybackController(self, lambda: self.data_ctrl.timesteps, self.renderer.show_timestep, get_time_cb=self.data_ctrl.get_time_at_timestep)
         self.analysis_ctrl = AnalysisToolManager(self, self.data_ctrl, self._get_ui_vars)
         
         # 3. Status Bar for Picking

@@ -254,21 +254,21 @@ if st.runtime.exists():
             else:
                 dump_dir = st_directory_picker("Select Dump Directory", "eta_browser_path", base_yard)
 
-            # 2. Target Timestep
-            target_ts = st.number_input(
-                "Target Timestep", 
-                value=int(st.session_state.get("eta_target_ts", 2000000)),
+            # 2. Target Duration
+            target_steps = st.number_input(
+                "Target Duration (Steps to Run)", 
+                value=int(st.session_state.get("eta_target_steps", 1000000)),
                 step=100000,
-                help="The timestep you want to reach."
+                help="The number of steps you want this specific job to complete."
             )
-            st.session_state["eta_target_ts"] = target_ts
+            st.session_state["eta_target_steps"] = target_steps
             
             if dump_dir:
                 # Save for persistence
                 st.session_state["eta_dump_dir"] = dump_dir
                 
                 with st.spinner("Analyzing simulation progress..."):
-                    eta_data = SimulationMonitor.estimate_eta(dump_dir, target_ts)
+                    eta_data = SimulationMonitor.estimate_eta(dump_dir, target_steps)
                     
                 if "error" in eta_data:
                     st.error(eta_data["error"])
@@ -296,7 +296,9 @@ if st.runtime.exists():
                     # 3. Status Card
                     st.divider()
                     s1, s2, s3 = st.columns(3)
-                    s1.metric("Steps Remaining", f"{target_ts - eta_data['current_timestep']:,}")
+                    
+                    steps_left = eta_data['target_relative_steps'] - eta_data['current_relative_step']
+                    s1.metric("Steps Remaining", f"{max(0, steps_left):,}")
                     
                     # Format Cost per Dump (using dynamic interval)
                     interval = eta_data.get('step_interval', 1000)
@@ -323,7 +325,8 @@ if st.runtime.exists():
                     # 4. Performance Insights
                     with st.expander("📈 Performance Details"):
                         p_col1, p_col2 = st.columns(2)
-                        p_col1.write(f"**Current Timestep:** {eta_data['current_timestep']:,}")
+                        p_col1.write(f"**Absolute Timestep:** {eta_data['current_timestep']:,}")
+                        p_col1.write(f"**Steps in this Job:** {eta_data['current_relative_step']:,}")
                         p_col1.write(f"**Data points sampled:** {eta_data['data_points']}")
                         p_col2.write(f"**Current Speed:** {eta_data['cost_per_10k_steps']:.1f} min / 10k steps")
                         p_col2.write(f"**Last File Sync:** {eta_data['last_updated']}")

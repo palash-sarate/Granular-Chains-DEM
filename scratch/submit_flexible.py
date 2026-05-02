@@ -65,18 +65,18 @@ def get_job_list(mode):
 
     # Map N to the directory containing the results you want to resume or flow from
     # Replace these paths with actual simulation output directories
-    resume_source_dirs = {
-        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
-        # 12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
-        # 24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
-        # 48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
-    }
     # resume_source_dirs = {
-    #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
-    #     12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
-    #     24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
-    #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513"
+    #     4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+    #     12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+    #     24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+    #     48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667"
     # }
+    resume_source_dirs = {
+        4:  "dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
+        12: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
+        24: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
+        48: "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513"
+    }
 
     for n in Ns:
         n_fill = n_atoms // n
@@ -127,7 +127,7 @@ def get_job_list(mode):
                             "restart_path": f"{resume_source_dirs[n]}",
                             "relax_steps": 1000000,
                             "simulation": f"Hopper_Fill_Resume",
-                            "dt": 7e-06,
+                            "dt": 1e-06,
                             "viscosity": 0.001,
                             "dump_file": "simulation_templates/default_dump.inc",
                             "seed": random.randint(100000, 999999),
