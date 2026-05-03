@@ -247,7 +247,7 @@ def get_active_job_ids(user):
     Fetch current active job IDs for the user.
     """
     try:
-        result = subprocess.run(["qstat", "-u", user], capture_output=True, text=True)
+        result = subprocess.run(["qstat", "-u", user], capture_output=True, text=True, stdin=subprocess.DEVNULL)
         if result.returncode != 0:
             return []
         lines = result.stdout.splitlines()
@@ -259,8 +259,15 @@ def get_active_job_ids(user):
                 ids.append(parts[0])
         return ids
     except Exception as e:
-        print(f"Warning: Could not fetch active jobs: {e}")
+        try: print(f"Warning: Could not fetch active jobs: {e}")
+        except OSError: pass
         return []
+
+def safe_print(msg):
+    try:
+        print(msg)
+    except OSError:
+        pass
 
 def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
     """
@@ -273,7 +280,7 @@ def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
         # Limit to the most recent max_concurrent jobs if there are already many
         if len(tails) > max_concurrent:
             tails = tails[-max_concurrent:]
-        print(f"Current active jobs detected: {len(tails)}. Limit: {max_concurrent}")
+        safe_print(f"Current active jobs detected: {len(tails)}. Limit: {max_concurrent}")
 
     if not os.path.exists("PBS_Output"): os.makedirs("PBS_Output")
     if not os.path.exists("temp/temp_pbs"): os.makedirs("temp/temp_pbs")
@@ -316,9 +323,9 @@ def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
                 
                 msg = f"Submitting: {name}"
                 if dep_id: msg += f" (depends on {dep_id})"
-                print(msg)
+                safe_print(msg)
                 
-                res = subprocess.run(cmd, capture_output=True, text=True)
+                res = subprocess.run(cmd, capture_output=True, text=True, stdin=subprocess.DEVNULL)
                 if res.returncode == 0:
                     new_id = res.stdout.strip()
                     submitted_ids.append(new_id)
@@ -327,11 +334,11 @@ def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
                     else:
                         tails[i % max_concurrent] = new_id
                 else:
-                    print(f"Error submitting {name}: {res.stderr.strip()}")
+                    safe_print(f"Error submitting {name}: {res.stderr.strip()}")
             else:
-                print(f"Generated: {pbs_file}")
+                safe_print(f"Generated: {pbs_file}")
         except Exception as e:
-            print(f"Error on {name}: {e}")
+            safe_print(f"Error on {name}: {e}")
             
     return generated_files, submitted_ids
 

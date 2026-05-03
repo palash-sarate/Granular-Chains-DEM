@@ -546,7 +546,6 @@ if st.runtime.exists():
                         mode_params["dump_file"] = rc2.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
                         mode_params["simulation"] = "Hopper_Fill_Resume"
                         mode_params["restart_path"] = selected_parent
-                        mode_params["N"] = parent_info.get("N", 0)
                         
                     elif selected_mode == "flow":
                         fc1, fc2, fc3, fc4 = st.columns(4)
@@ -601,6 +600,8 @@ if st.runtime.exists():
                         }
                         
                         try:
+                            import importlib
+                            importlib.reload(submit_flexible)
                             with st.spinner("Generating and submitting job..."):
                                 generated, submitted = submit_flexible.submit_jobs([job], submit=True, max_concurrent=int(max_concurrent), user=user_filter)
                             if submitted:
@@ -608,7 +609,11 @@ if st.runtime.exists():
                             else:
                                 st.warning("Job was generated but not submitted or submission failed.")
                         except Exception as e:
-                            st.error(f"Error submitting job: {e}")
+                            import traceback
+                            with open("submit_error.log", "a") as errf:
+                                errf.write(f"\\n--- Error at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\\n")
+                                errf.write(traceback.format_exc())
+                            st.error(f"Error submitting job: {e}. Check submit_error.log for details.")
 
     # 5. System Status (Master Node only)
     if "master" in subprocess.getoutput("hostname"):

@@ -15,7 +15,7 @@ read_restart ${restart_path}
 fix 1 all gravity 9.81 vector 0 0 -1
 include ${lepton_inc}
 # Dynamic timestep based on Lepton smoothing width 'w'
-fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
+# fix 5 all dt/reset 1 ${dt} 1e-04 ${w} units box
 
 # 3. Load Analytical Geometry (MUST be re-included for restarts)
 include ${geometry_inc}
