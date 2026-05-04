@@ -105,10 +105,22 @@ if st.runtime.exists():
     if st.sidebar.button("Refresh Now", use_container_width=False):
         st.rerun()
 
-    # Create Tabs for Active vs History vs ETA vs Visualizer vs Lineage
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Active Queue", "🕰️ Job History", "⏱️ Simulation ETA", "🎥 Visualizer", "🧬 Lineage"])
+    # --- Navigation ---
+    # We use a horizontal radio button to act as 'True Navigation'
+    # Standard st.tabs execute all tabs' code on every rerun, which causes the 1-minute lag for the 3D visualiser.
+    # This radio selector ensures ONLY the active page's code is executed.
+    st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
+    
+    nav = st.radio(
+        "Select Page",
+        ["📊 Active Queue", "🧬 Lineage", "🎥 Visualizer", "⏱️ ETA", "🕰️ History"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
 
-    with tab1:
+    st.divider()
+
+    if nav == "📊 Active Queue":
         @st.fragment(run_every=refresh_rate)
         def render_active_queue():
             # Fetch active jobs
@@ -181,8 +193,8 @@ if st.runtime.exists():
             
         render_active_queue()
 
-    with tab2:
-        st.subheader("🕰️ Persistent Job History")
+    elif nav == "🕰️ History":
+        st.subheader("🕰️ Comprehensive Job History")
         
         # 1. Bulk Scan Section
         with st.expander("🚀 Bulk Scan Job Range", expanded=False):
@@ -250,78 +262,47 @@ if st.runtime.exists():
             
             # Check for deletions
             if len(edited_df) < len(df_hist):
-                # Find which ones were removed
+                # ... deletion logic ...
                 remaining_ids = set(edited_df["Job ID"].tolist())
                 all_ids = set(df_hist["Job ID"].tolist())
                 deleted_ids = all_ids - remaining_ids
-                
                 for did in deleted_ids:
                     PBSManager.delete_cached_job(did)
-                
                 st.toast(f"Deleted {len(deleted_ids)} jobs from history.")
                 st.rerun()
         else:
             st.info("No historical jobs found in metadata. Try running a Bulk Scan above!")
 
-    with tab3:
-        @st.fragment(run_every=refresh_rate)
-        def render_eta_estimator():
+    elif nav == "⏱️ ETA":
+        def render_eta_section():
             st.subheader("⏱️ Simulation ETA Estimator")
             st.markdown("Analyze dump timestamps to estimate completion time, accounting for simulation slowdown.")
-            
             base_yard = "/home/guest/palash/Granular-Chains-DEM/dumping_yard"
-            
-            # 1. Advanced Picker vs Quick Picker
-            pick_mode = st.radio("Selection Mode", ["🔍 Auto-Detect", "📂 Manual Browser"], horizontal=True)
-            
+            pick_mode = st.radio("Selection Mode", ["🔍 Auto-Detect", "📂 Manual Browser"], horizontal=True, key="eta_pick_mode")
             dump_dir = ""
-            
             if pick_mode == "🔍 Auto-Detect":
-                # Find all directories containing chain_*.dump
                 with st.spinner("Scanning dumping_yard..."):
                     detected = []
                     if os.path.exists(base_yard):
-                        # We limit depth for speed
                         for root, dirs, files in os.walk(base_yard):
                             if any(f.startswith("chain_") and f.endswith(".dump") for f in files):
                                 detected.append(root)
-                            if len(detected) > 20: break # Safety limit
-                    
+                            if len(detected) > 20: break
                     if detected:
                         dump_dir = st.selectbox("Select an active simulation dump folder:", detected)
-                    else:
-                        st.warning("No active dump folders (chain_*.dump) found in dumping_yard.")
-                        st.info("Try switching to 'Manual Browser' mode.")
             else:
                 dump_dir = st_directory_picker("Select Dump Directory", "eta_browser_path", base_yard)
 
-            # 2. Target Duration
-            target_steps = st.number_input(
-                "Target Duration (Steps to Run)", 
-                value=int(st.session_state.get("eta_target_steps", 1000000)),
-                step=100000,
-                help="The number of steps you want this specific job to complete."
-            )
-            st.session_state["eta_target_steps"] = target_steps
-            
-            if dump_dir:
-                # Save for persistence
-                st.session_state["eta_dump_dir"] = dump_dir
-                
-                with st.spinner("Analyzing simulation progress..."):
-                    eta_data = SimulationMonitor.estimate_eta(dump_dir, target_steps)
-                    
+            target_steps = st.number_input("Target Duration (Steps to Run)", value=1000000, step=100000)
+            if dump_dir and st.button("Calculate ETA", use_container_width=True):
+                eta_data = SimulationMonitor.estimate_eta(dump_dir, target_steps)
                 if "error" in eta_data:
                     st.error(eta_data["error"])
                 else:
                     # 2. Key Metrics
                     st.divider()
                     m_col1, m_col2, m_col3 = st.columns(3)
-                    
-                    # Progress bar
-                    progress = min(1.0, eta_data['progress_percent'] / 100.0)
-                    st.progress(progress, text=f"Simulation Progress: {eta_data['progress_percent']:.1f}%")
-                    
+
                     # Format Time Elapsed
                     e_hrs = int(eta_data['time_elapsed_hr'])
                     e_mins = int((eta_data['time_elapsed_hr'] - e_hrs) * 60)
@@ -332,7 +313,7 @@ if st.runtime.exists():
                     mins = int((eta_data['time_remaining_hr'] - hrs) * 60)
                     m_col2.metric("ETA Remaining", f"{hrs}h {mins}m")
                     
-                    m_col3.metric("Real-world Completion", eta_data['completion_time'].split(" ")[1], help=eta_data['completion_time'])
+                    m_col3.metric("Completion Time", eta_data['completion_time'].split(" ")[1], help=eta_data['completion_time'])
 
                     # 3. Status Card
                     st.divider()
@@ -375,13 +356,13 @@ if st.runtime.exists():
                         
                         st.caption("Note: Estimation uses a quadratic fit to account for simulation slowdown as more particles enter the system.")
                         
-        render_eta_estimator()
+        render_eta_section()
 
-    with tab4:
+    elif nav == "🎥 Visualizer":
         from visualiser import render_visualiser
         render_visualiser()
 
-    with tab5:
+    elif nav == "🧬 Lineage":
         st.subheader("🧬 Simulation Genealogy & Lineage")
         st.markdown("Persistent history of all simulation runs and their parent-child relationships.")
         
@@ -471,26 +452,27 @@ if st.runtime.exists():
 
             # 1. Prepare Mermaid Diagram
             mermaid_code = "graph LR\n"
-            # Define nodes with styles
+            selected_parents = st.session_state.get("lineage_selected_parents", [])
+
+            # Define nodes
             for run_id, info in lineage.items():
                 short_id = info['name'].replace('-', '_').replace('.', '_')
                 node_label = f"{info['name']}<br/>(N={info['N']}, {info['steps']:,} steps)"
                 seed = str(info.get('params', {}).get('seed', ''))
                 
-                # Style based on type
-                style = ""
-                if seed in running_seeds:
-                    style = ":::running"
-                elif info["status"] == "Archived":
-                    style = ":::archived"
-                elif "Flow" in info["simulation"]:
-                    style = ":::flow"
-                else:
-                    style = ":::active"
+                # Base Style
+                style = "active"
+                if seed in running_seeds: style = "running"
+                elif info["status"] == "Archived": style = "archived"
+                elif "Flow" in info["simulation"]: style = "flow"
                 
-                mermaid_code += f'    {short_id}["{node_label}"]{style}\n'
+                mermaid_code += f'    {short_id}["{node_label}"]:::{style}\n'
                 mermaid_code += f'    click {short_id} call selectNode("{short_id}")\n'
-            
+                
+                # Apply selection highlight separately
+                if run_id in selected_parents:
+                    mermaid_code += f"    class {short_id} selected\n"
+
             # Define relationships
             for run_id, info in lineage.items():
                 if info["parent"] and info["parent"] in lineage:
@@ -501,16 +483,18 @@ if st.runtime.exists():
             # Inject Queued Ghost Nodes
             for ghost_id, ghost_label, parent_short_id in queued_ghosts:
                 mermaid_code += f'    {ghost_id}["{ghost_label}"]:::queued\n'
+                mermaid_code += f'    click {ghost_id} call selectNode("{ghost_id}")\n'
+                if ghost_id in selected_parents:
+                    mermaid_code += f"    class {ghost_id} selected\n"
                 if parent_short_id:
                     mermaid_code += f"    {parent_short_id} --> {ghost_id}\n"
-                mermaid_code += f'    click {ghost_id} call selectNode("{ghost_id}")\n'
 
-            
             # Add "+" Node for new fill runs
             mermaid_code += '    NewRoot[" + Start New Fill Run "]:::new_node\n'
             mermaid_code += '    click NewRoot call selectNode("NewRoot")\n'
+            if "NewRoot" in selected_parents:
+                mermaid_code += "    class NewRoot selected\n"
 
-            
             # Define styles
             mermaid_code += "    classDef active fill:#e1f5fe,stroke:#01579b,stroke-width:2px;\n"
             mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
@@ -518,6 +502,7 @@ if st.runtime.exists():
             mermaid_code += "    classDef running fill:#c8e6c9,stroke:#388e3c,stroke-width:3px;\n"
             mermaid_code += "    classDef queued fill:#ffccbc,stroke:#d32f2f,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef new_node fill:#ffffff,stroke:#333333,stroke-width:2px,stroke-dasharray: 5 5;\n"
+            mermaid_code += "    classDef selected stroke:#ff9800,stroke-width:4px;\n"
 
 
             # Render Mermaid using custom component
@@ -532,8 +517,8 @@ if st.runtime.exists():
             if clicked_node:
                 # 0. Handle New Root Click
                 if clicked_node == "NewRoot":
-                    if st.session_state.get("lineage_selected_parent") != "NewRoot":
-                        st.session_state["lineage_selected_parent"] = "NewRoot"
+                    if "NewRoot" not in st.session_state.get("lineage_selected_parents", []):
+                        st.session_state["lineage_selected_parents"] = ["NewRoot"]
                         st.rerun()
 
                 # 1. Job Deletion Interface (for ongoing/on-hold jobs)
@@ -593,9 +578,14 @@ if st.runtime.exists():
                 # 3. Regular Parent Selection for Launching
                 if clicked_node in id_to_path:
                     new_parent = id_to_path[clicked_node]
-                    # Update if changed to avoid infinite rerun loops
-                    if st.session_state.get("lineage_selected_parent") != new_parent:
-                        st.session_state["lineage_selected_parent"] = new_parent
+                    
+                    # Initialize multiselect state if not present
+                    if "lineage_selected_parents" not in st.session_state:
+                        st.session_state["lineage_selected_parents"] = []
+                    
+                    # Add only if not already selected to avoid infinite rerun loops
+                    if new_parent not in st.session_state["lineage_selected_parents"]:
+                        st.session_state["lineage_selected_parents"].append(new_parent)
                         st.rerun()
 
             
@@ -615,83 +605,105 @@ if st.runtime.exists():
                 st.dataframe(pd.DataFrame(display_lineage), width="stretch", hide_index=True)
                 
             st.divider()
-            st.subheader("🚀 Launch New Simulation from Lineage")
+            st.subheader("🚀 Launch New Simulation(s) from Lineage")
             
-            # Select Parent Run
+            # Select Parent Runs
             run_options = ["NewRoot"] + list(lineage.keys())
             def format_run(rid):
                 if rid == "NewRoot": return "🆕 Start New Fill Run (+)"
                 return f"{lineage[rid]['name']} ({lineage[rid]['simulation']})"
             
-            # Synchronize dropdown with session state (which may be set by clicking graph)
-            default_index = 0
-            if "lineage_selected_parent" in st.session_state:
-                if st.session_state["lineage_selected_parent"] in run_options:
-                    default_index = run_options.index(st.session_state["lineage_selected_parent"])
+            # Initialize session state for multiselect
+            if "lineage_selected_parents" not in st.session_state:
+                st.session_state["lineage_selected_parents"] = []
             
-            selected_parent = st.selectbox(
-                "Select Parent Run", 
-                ["-- Select --"] + run_options, 
-                index=default_index + 1 if default_index >= 0 else 0,
-                format_func=lambda x: format_run(x) if x != "-- Select --" else x
+            selected_parents = st.multiselect(
+                "Select Parent Run(s)", 
+                run_options, 
+                default=st.session_state["lineage_selected_parents"],
+                format_func=lambda x: format_run(x)
             )
             
-            if selected_parent != "-- Select --":
-                # Ensure session state is updated if manually changed in dropdown
-                st.session_state["lineage_selected_parent"] = selected_parent
-                
-                if selected_parent != "NewRoot":
-                    parent_info = lineage[selected_parent]
-                    parent_type = parent_info.get("simulation", "")
-                    
-                    # --- ANNOTATED LINEAGE & SNAPSHOT ---
-                    note_col, snap_col = st.columns([1, 1])
-                    with note_col:
-                        notes_db = load_notes()
-                        current_note = notes_db.get(selected_parent, "")
-                        new_note = st.text_area("🗒️ Run Notes", value=current_note, height=150, help="Save observations or metadata for this run.")
-                        if st.button("💾 Save Notes", key=f"save_note_{selected_parent}"):
-                            save_note(selected_parent, new_note)
-                            st.toast("Notes saved!")
-                    
-                    with snap_col:
-                        with st.spinner("Generating snapshot..."):
-                            try:
-                                from Pulse.snapshot_helper import generate_snapshot
-                                # Support manual refresh
-                                force_refresh = st.button("🔄 Refresh Snapshot", key=f"refresh_snap_{selected_parent}")
-                                snap_path = generate_snapshot(selected_parent, force=force_refresh)
-                                
-                                if snap_path:
-                                    st.image(snap_path, caption=f"Last Snapshot of {parent_info['name']} (Y-Z Plane)", use_container_width=True)
-                                else:
-                                    st.info("No snapshot available (no dump files found).")
-                            except Exception as e:
-                                st.warning(f"Snapshot preview unavailable: {e}")
+            # Update session state source of truth
+            st.session_state["lineage_selected_parents"] = selected_parents
+            
+            if selected_parents:
+                # Validation and Categorization
+                if "NewRoot" in selected_parents and len(selected_parents) > 1:
+                    st.error("⚠️ **Conflict:** 'New Root' cannot be combined with existing parent runs. Please select one or the other.")
+                    st.stop()
 
-
-
+                if selected_parents == ["NewRoot"]:
+                    selected_mode = "fill"
+                    st.info("🆕 **Creating New Root Fill Run** (No Parent)")
+                    active_parent_jids = {} # No dependencies
+                    representative_parent = "NewRoot"
+                else:
+                    # Check compatibility of multiple parents
+                    parent_infos = {rid: lineage[rid] for rid in selected_parents}
+                    parent_types = set(info.get("simulation", "") for info in parent_infos.values())
                     
-                    st.divider()
+                    if len(parent_types) > 1:
+                        st.error(f"⚠️ **Incompatible Types:** You have selected runs of different categories ({parent_types}). All selected runs must be either all 'Fill' or all 'Flow'.")
+                        st.stop()
                     
-                    # Check for ongoing parent job to enforce lineage dependency
-                    parent_short_id = parent_info['name'].replace('-', '_').replace('.', '_')
-                    active_parent_jid = node_to_jobid.get(parent_short_id)
-                    
-                    if active_parent_jid:
-                        st.info(f"🔗 **Lineage Dependency Detected:** This job will automatically wait for its parent (`{parent_short_id}`) to finish (PBS ID: `{active_parent_jid}`).")
-
+                    parent_type = list(parent_types)[0]
                     if "Flow" in parent_type:
                         allowed_modes = ["flow_resume"]
                     else:
                         allowed_modes = ["fill_resume", "flow"]
                         
                     selected_mode = st.radio("Select Simulation Mode", allowed_modes, horizontal=True)
-                else:
-                    parent_info = {"name": "S000000", "simulation": "None", "N": 4, "params": {"seed": "000000"}}
-                    selected_mode = "fill"
-                    st.info("🆕 **Creating New Root Fill Run** (No Parent)")
-                    active_parent_jid = None
+                    representative_parent = selected_parents[0]
+                    
+                    # Resolve dependencies for each selected parent
+                    active_parent_jids = {}
+                    for rid, info in parent_infos.items():
+                        short_id = info['name'].replace('-', '_').replace('.', '_')
+                        jid = node_to_jobid.get(short_id)
+                        if jid:
+                            active_parent_jids[rid] = jid
+                    
+                    if active_parent_jids:
+                        st.info(f"🔗 **Lineage Dependencies:** {len(active_parent_jids)} of the selected runs are still active. Dependent jobs will wait for them.")
+                
+                if selected_parents != ["NewRoot"]:
+                    # Notes and Snapshot (Only for the first selected parent to avoid clutter)
+                    primary_parent = selected_parents[0]
+                    parent_info = lineage[primary_parent]
+                    
+                    st.markdown(f"### 🔍 Inspecting: `{parent_info['name']}`")
+                    note_col, snap_col = st.columns([1, 1])
+                    
+                    with note_col:
+                        notes_db = load_notes()
+                        current_note = notes_db.get(primary_parent, "")
+                        new_note = st.text_area("🗒️ Run Notes", value=current_note, height=100, help="Save observations or metadata for this run.")
+                        if st.button("💾 Save Notes", key=f"save_note_{primary_parent}"):
+                            save_note(primary_parent, new_note)
+                            st.toast("Notes saved!")
+                    
+                    with snap_col:
+                        with st.expander("🖼️ View Simulation Preview"):
+                            with st.spinner("Generating snapshot..."):
+                                try:
+                                    from Pulse.snapshot_helper import generate_snapshot
+                                    # Support manual refresh
+                                    force_refresh = st.button("🔄 Refresh Snapshot", key=f"refresh_snap_{primary_parent}")
+                                    snap_path = generate_snapshot(primary_parent, force=force_refresh)
+                                    
+                                    if snap_path:
+                                        st.image(snap_path, caption=f"Last Snapshot of {parent_info['name']} (Y-Z Plane)", use_container_width=True)
+                                    else:
+                                        st.info("No snapshot available (no dump files found).")
+                                except Exception as e:
+                                    st.warning(f"Snapshot preview unavailable: {e}")
+
+
+
+                    
+                    st.divider()
+                    
                 
                 with st.form("launch_sim_form"):
                     st.markdown("### 🌍 Global Parameters")
@@ -739,7 +751,6 @@ if st.runtime.exists():
                         mode_params["relax_steps"] = rc1.number_input("Relax Steps", value=1000000, step=100000)
                         mode_params["dump_file"] = rc2.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
                         mode_params["simulation"] = "Hopper_Fill_Resume"
-                        mode_params["restart_path"] = selected_parent
                         
                     elif selected_mode == "flow":
                         fc1, fc2, fc3, fc4 = st.columns(4)
@@ -749,15 +760,15 @@ if st.runtime.exists():
                         
                         mode_params["run_steps"] = fc3.number_input("Run Steps", value=2000000, step=100000)
                         mode_params["osc_dir"] = fc4.text_input("Oscillation Dir", value="z")
-                        mode_params["source_dir"] = selected_parent
                         
                         # Parse inputs for display preview
                         freqs = [f.strip() for f in freq_input.split(",") if f.strip()]
                         amps = [a.strip() for a in amp_input.split(",") if a.strip()]
                         num_sweep = len(freqs) * len(amps)
+                        total_batch = num_sweep * len(selected_parents)
                         
-                        if num_sweep > 1:
-                            st.warning(f"🎰 **Parametric Sweep:** This will submit **{num_sweep}** separate jobs.")
+                        if total_batch > 1:
+                            st.warning(f"🎰 **Batch Submission:** This will submit **{total_batch}** separate jobs ({num_sweep} per parent).")
                         
                         mode_params["_freq_list"] = freqs
                         mode_params["_amp_list"] = amps
@@ -765,84 +776,102 @@ if st.runtime.exists():
                     elif selected_mode == "flow_resume":
                         frc1, frc2 = st.columns(2)
                         mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
-                        mode_params["restart_path"] = selected_parent
                         
                     submit_btn = st.form_submit_button("🚀 Submit to PBS")
                     
                     if submit_btn:
-                        parent_seed = str(parent_info.get("params", {}).get("seed", "000000"))[-6:]
-                        
-                        # Handle Parametric Sweep for Flow
                         jobs_to_submit = []
-                        if selected_mode == "flow" and len(mode_params.get("_freq_list", [])) * len(mode_params.get("_amp_list", [])) > 1:
-                            for f in mode_params["_freq_list"]:
-                                for a in mode_params["_amp_list"]:
-                                    child_seed = random.randint(100000, 999999)
-                                    job_name = f"F{parent_seed}_{str(child_seed)[-6:]}"
-                                    
-                                    # Create deep copy/clone of params for this job
-                                    job_params = {
-                                        "num_procs": int(num_procs),
-                                        "num_threads": int(num_threads),
-                                        "dt": dt,
-                                        "viscosity": viscosity,
-                                        "seed": child_seed,
-                                        **mode_params
-                                    }
+                        
+                        for p_rid in selected_parents:
+                            if p_rid == "NewRoot":
+                                p_info = {"name": "S000000", "params": {"seed": "000000"}}
+                                p_seed = "000000"
+                            else:
+                                p_info = lineage[p_rid]
+                                p_seed = str(p_info.get("params", {}).get("seed", "000000"))[-6:]
+                            
+                            p_active_jid = active_parent_jids.get(p_rid)
+                            
+                            # Handle Parametric Sweep for Flow
+                            if selected_mode == "flow" and len(mode_params.get("_freq_list", [])) * len(mode_params.get("_amp_list", [])) > 1:
+                                for f in mode_params["_freq_list"]:
+                                    for a in mode_params["_amp_list"]:
+                                        child_seed = random.randint(100000, 999999)
+                                        job_name = f"F{p_seed}_{str(child_seed)[-6:]}"
+                                        
+                                        job_params = {
+                                            "num_procs": int(num_procs),
+                                            "num_threads": int(num_threads),
+                                            "dt": dt,
+                                            "viscosity": viscosity,
+                                            "seed": child_seed,
+                                            "source_dir": p_rid,
+                                            **mode_params
+                                        }
 
-                                    # Override specific sweep values
-                                    job_params["freq"] = float(f)
-                                    job_params["amp"] = float(a)
-                                    job_params["simulation"] = f"Flow_Study_N{parent_info.get('N', 0)}_F{f}_A{a}"
-                                    # Cleanup internal keys
-                                    job_params.pop("_freq_list", None)
-                                    job_params.pop("_amp_list", None)
+                                        job_params["freq"] = float(f)
+                                        job_params["amp"] = float(a)
+                                        job_params["simulation"] = f"Flow_Study_N{p_info.get('N', 0)}_F{f}_A{a}"
+                                        job_params.pop("_freq_list", None)
+                                        job_params.pop("_amp_list", None)
+                                        
+                                        jobs_to_submit.append({
+                                            "name": job_name,
+                                            "type": selected_mode,
+                                            "walltime": walltime,
+                                            "ppn": int(ppn),
+                                            "mem": mem,
+                                            "dependency": p_active_jid,
+                                            "params": job_params
+                                        })
+                            else:
+                                # Single job submission per parent
+                                # Use unique random seeds if batching multiple parents
+                                if len(selected_parents) > 1:
+                                    current_job_seed = random.randint(100000, 999999)
+                                else:
+                                    current_job_seed = int(seed)
                                     
-                                    jobs_to_submit.append({
-                                        "name": job_name,
-                                        "type": selected_mode,
-                                        "walltime": walltime,
-                                        "ppn": int(ppn),
-                                        "mem": mem,
-                                        "dependency": active_parent_jid,
-                                        "params": job_params
-                                    })
-                        else:
-                            # Single job submission
-                            new_seed = str(seed)[-6:]
-                            if selected_mode == "fill_resume": prefix = "R"
-                            elif selected_mode == "flow": prefix = "F"
-                            elif selected_mode == "flow_resume": prefix = "FR"
-                            else: prefix = "S"
-                            
-                            job_name = f"{prefix}{parent_seed}_{new_seed}"
-                            
-                            # Finalize params
-                            final_params = {
-                                "num_procs": int(num_procs),
-                                "num_threads": int(num_threads),
-                                "dt": dt,
-                                "viscosity": viscosity,
-                                "seed": int(seed),
-                                **mode_params
-                            }
-                            if selected_mode == "flow":
-                                final_params["freq"] = float(mode_params.get("_freq_list", [0])[0])
-                                final_params["amp"] = float(mode_params.get("_amp_list", [0])[0])
-                                final_params["simulation"] = f"Flow_Study_N{parent_info.get('N', 0)}_F{final_params['freq']}_A{final_params['amp']}"
-                            
-                            final_params.pop("_freq_list", None)
-                            final_params.pop("_amp_list", None)
+                                new_seed_suffix = str(current_job_seed)[-6:]
+                                if selected_mode == "fill_resume": prefix = "R"
+                                elif selected_mode == "flow": prefix = "F"
+                                elif selected_mode == "flow_resume": prefix = "FR"
+                                else: prefix = "S"
+                                
+                                job_name = f"{prefix}{p_seed}_{new_seed_suffix}"
+                                
+                                # Finalize params
+                                final_params = {
+                                    "num_procs": int(num_procs),
+                                    "num_threads": int(num_threads),
+                                    "dt": dt,
+                                    "viscosity": viscosity,
+                                    "seed": current_job_seed,
+                                    **mode_params
+                                }
+                                
+                                # Inject parent-specific path
+                                if selected_mode == "fill_resume":
+                                    final_params["restart_path"] = p_rid
+                                elif selected_mode == "flow":
+                                    final_params["source_dir"] = p_rid
+                                    final_params["freq"] = float(mode_params.get("_freq_list", [0])[0])
+                                    final_params["amp"] = float(mode_params.get("_amp_list", [0])[0])
+                                elif selected_mode == "flow_resume":
+                                    final_params["restart_path"] = p_rid
+                                
+                                final_params.pop("_freq_list", None)
+                                final_params.pop("_amp_list", None)
 
-                            jobs_to_submit.append({
-                                "name": job_name,
-                                "type": selected_mode,
-                                "walltime": walltime,
-                                "ppn": int(ppn),
-                                "mem": mem,
-                                "dependency": active_parent_jid,
-                                "params": final_params
-                            })
+                                jobs_to_submit.append({
+                                    "name": job_name,
+                                    "type": selected_mode,
+                                    "walltime": walltime,
+                                    "ppn": int(ppn),
+                                    "mem": mem,
+                                    "dependency": p_active_jid,
+                                    "params": final_params
+                                })
                         
                         try:
                             import importlib

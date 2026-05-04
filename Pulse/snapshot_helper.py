@@ -27,23 +27,36 @@ def get_latest_dump(run_dir):
     return dump_files[-1]
 
 def parse_dump_last_frame(dump_path):
-    """Parses x, y coordinates from a LAMMPS dump file."""
-    skip = 0
-    cols = []
+    """Efficiently parses only the LAST frame of a LAMMPS dump file."""
     try:
-        with open(dump_path, 'r') as f:
-            for i, line in enumerate(f):
-                if line.startswith("ITEM: ATOMS"):
-                    cols = line.strip().split()[2:]
-                    skip = i + 1
-                    break
+        file_size = os.path.getsize(dump_path)
+        # Read the last 1MB of the file (should be enough for a frame of several thousand atoms)
+        # If it's not enough, we can increase this or implement a multi-step seek.
+        read_size = min(file_size, 1024 * 1024 * 5) # 5MB buffer
         
-        # We only need x, y for a 2D preview. 
-        # Check if they exist.
-        needed = [c for c in cols if c in ['x', 'y', 'z', 'mol', 'diameter', 'type']]
-        df = pd.read_csv(dump_path, skiprows=skip, sep=r'\s+', names=cols, usecols=needed, engine='c')
-        return df
+        with open(dump_path, 'rb') as f:
+            f.seek(file_size - read_size)
+            chunk = f.read(read_size).decode('utf-8', errors='ignore')
+            
+            # Find the last occurrence of "ITEM: ATOMS"
+            atom_start = chunk.rfind("ITEM: ATOMS")
+            if atom_start == -1:
+                # If not found in the last 5MB, we might need to read more, but for now fallback
+                return None
+            
+            # Extract column names
+            lines = chunk[atom_start:].splitlines()
+            cols = lines[0].strip().split()[2:]
+            
+            # The remaining lines are the atom data
+            data_lines = lines[1:]
+            
+            # Parse into DataFrame
+            from io import StringIO
+            df = pd.read_csv(StringIO("\n".join(data_lines)), sep=r'\s+', names=cols, engine='c')
+            return df
     except Exception as e:
+        print(f"Error parsing last frame: {e}")
         return None
 
 def generate_snapshot(run_dir, output_dir="temp/snapshots", force=False):

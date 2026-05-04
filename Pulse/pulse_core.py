@@ -68,18 +68,44 @@ class PBSManager:
     @staticmethod
     def get_jobs(user: Optional[str] = None) -> List[Dict]:
         """Gets a list of jobs, optionally filtered by user."""
-        cmd = ["qstat", "-f"]
-        if user:
-            # Note: qstat -f doesn't always support -u directly in all versions
-            # so we fetch all and filter in python for robustness
-            pass
-            
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-            if result.returncode != 0:
+            # Step 1: Get the list of Job IDs for the user
+            # We use qstat -u as it's the most reliable way to get a user's job list across PBS versions
+            if user:
+                id_cmd = ["qstat", "-u", user]
+            else:
+                id_cmd = ["qstat"]
+                
+            id_res = subprocess.run(id_cmd, capture_output=True, text=True, timeout=10)
+            if id_res.returncode != 0:
                 return []
-            return PBSManager.parse_qstat_f(result.stdout, user)
-        except Exception:
+            
+            # Extract IDs from the table (first column)
+            job_ids = []
+            lines = id_res.stdout.splitlines()
+            for line in lines:
+                parts = line.split()
+                # Job IDs usually look like '1234.master' or '1234'
+                if parts and ("." in parts[0] or parts[0].isdigit()):
+                    job_ids.append(parts[0])
+            
+            if not job_ids:
+                return []
+            
+            # Step 2: Fetch detailed info for these specific IDs
+            # We limit to batches of 50 to avoid command line length limits
+            all_jobs = []
+            for i in range(0, len(job_ids), 50):
+                batch = job_ids[i:i+50]
+                detail_cmd = ["qstat", "-f"] + batch
+                detail_res = subprocess.run(detail_cmd, capture_output=True, text=True, timeout=15)
+                
+                if detail_res.returncode == 0:
+                    all_jobs.extend(PBSManager.parse_qstat_f(detail_res.stdout, user))
+                
+            return all_jobs
+        except Exception as e:
+            print(f"Error in get_jobs: {e}")
             return []
 
     @staticmethod
