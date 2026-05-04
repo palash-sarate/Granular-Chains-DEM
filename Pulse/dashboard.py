@@ -56,6 +56,21 @@ def save_note(run_id, note):
     notes[run_id] = note
     with open(NOTES_FILE, "w") as f: json.dump(notes, f)
 
+def wrap_sim_name(name, max_width=25):
+    """Wraps simulation names by breaking on underscores to keep nodes compact."""
+    if len(name) <= max_width: return name
+    parts = name.split("_")
+    lines = []
+    current_line = ""
+    for part in parts:
+        if len(current_line) + len(part) + 1 > max_width and current_line:
+            lines.append(current_line)
+            current_line = part
+        else:
+            current_line = (current_line + "_" + part) if current_line else part
+    if current_line: lines.append(current_line)
+    return "<br/>".join(lines)
+
 def st_directory_picker(label, key, base_path):
     """A simple directory picker for Streamlit."""
     if key not in st.session_state:
@@ -457,7 +472,8 @@ if st.runtime.exists():
             # Define nodes
             for run_id, info in lineage.items():
                 short_id = info['name'].replace('-', '_').replace('.', '_')
-                node_label = f"{info['name']}<br/>(N={info['N']}, {info['steps']:,} steps)"
+                wrapped_name = wrap_sim_name(info['name'], max_width=20)
+                node_label = f"{wrapped_name}<br/>(N={info['N']}, {info['steps']:,} steps)"
                 seed = str(info.get('params', {}).get('seed', ''))
                 
                 # Base Style
@@ -517,9 +533,14 @@ if st.runtime.exists():
             if clicked_node:
                 # 0. Handle New Root Click
                 if clicked_node == "NewRoot":
-                    if "NewRoot" not in st.session_state.get("lineage_selected_parents", []):
-                        st.session_state["lineage_selected_parents"] = ["NewRoot"]
-                        st.rerun()
+                    if "lineage_selected_parents" not in st.session_state:
+                        st.session_state["lineage_selected_parents"] = []
+                    
+                    if "NewRoot" in st.session_state["lineage_selected_parents"]:
+                        st.session_state["lineage_selected_parents"].remove("NewRoot")
+                    else:
+                        st.session_state["lineage_selected_parents"].append("NewRoot")
+                    st.rerun()
 
                 # 1. Job Deletion Interface (for ongoing/on-hold jobs)
                 if clicked_node in node_to_jobid:
@@ -583,10 +604,12 @@ if st.runtime.exists():
                     if "lineage_selected_parents" not in st.session_state:
                         st.session_state["lineage_selected_parents"] = []
                     
-                    # Add only if not already selected to avoid infinite rerun loops
-                    if new_parent not in st.session_state["lineage_selected_parents"]:
+                    # Toggle selection
+                    if new_parent in st.session_state["lineage_selected_parents"]:
+                        st.session_state["lineage_selected_parents"].remove(new_parent)
+                    else:
                         st.session_state["lineage_selected_parents"].append(new_parent)
-                        st.rerun()
+                    st.rerun()
 
             
             # 2. Detailed Data View
