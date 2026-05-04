@@ -42,7 +42,7 @@ do
         --num_procs 1 \
         --num_threads 1 \
         --template "in.relax_2d_gen" \
-        --dump_inc "simulation_templates/quiet_dump.inc" \
+        --dump_inc "simulation_templates/default_dump.inc" \
         --output_dir "chain_data/relaxed_2D_x" \
         --run_name_prefix "relax_N${N}_2D_x" \
         --simulation_name "Relax_2D_Library_Gen" \

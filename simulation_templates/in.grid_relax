@@ -25,7 +25,7 @@ group chain_particles type 1
 
 timestep ${dt}
 
-# Include the external dump settings (e.g., quiet_dump.inc or default_dump.inc)
+# Include the external dump settings (e.g., default_dump.inc or default_dump.inc)
 include ${dump_inc}
 
 # --- Step 1: Initialize 2D Restricted Motion ---

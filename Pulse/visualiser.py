@@ -113,7 +113,11 @@ def set_cam(pos):
     st.session_state.cam_pos = pos
 
 def render_visualiser():
+    # Force off-screen rendering to prevent Errno 5 in headless/remote environments
+    pv.OFF_SCREEN = True
+    
     st.subheader("🎥 Advanced PyVista Visualizer")
+
     st.markdown("Visualize particles and geometry from simulation run directories using PyVista.")
     
     base_yard = os.path.join(ROOT_DIR, "dumping_yard")
@@ -307,12 +311,14 @@ def render_visualiser():
                         except: pass
                         
                     # Render using patched stpyvista
-                    # We use a unique key to keep the component state
                     stpv_state = stpyvista(plotter, key="pv_plot")
                     
-                    # Save the camera position returned by the component for the next rerun
                     if stpv_state and "camera_position" in stpv_state:
                         st.session_state.last_cam_pos = stpv_state["camera_position"]
                     
                 except Exception as e:
+                    import traceback
                     st.error(f"Failed to render 3D scene: {e}")
+                    with st.expander("Show Detailed Error Log"):
+                        st.code(traceback.format_exc())
+

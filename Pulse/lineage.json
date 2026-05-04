@@ -199,7 +199,7 @@
         "steps": 1811000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S481365_S956135",
         "rel_path": "dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S481365_S956135",
-        "status": "Active",
+        "status": "Archived",
         "params": {
             "seed": "956135",
             "freq": null,
@@ -215,7 +215,7 @@
         "steps": 1773000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S469898_S180256",
         "rel_path": "dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S469898_S180256",
-        "status": "Active",
+        "status": "Archived",
         "params": {
             "seed": "180256",
             "freq": null,
@@ -231,7 +231,7 @@
         "steps": 1852000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S808086_S234775",
         "rel_path": "dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S808086_S234775",
-        "status": "Active",
+        "status": "Archived",
         "params": {
             "seed": "234775",
             "freq": null,
@@ -247,7 +247,7 @@
         "steps": 1670000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S437513_S404527",
         "rel_path": "dumping_yard/Hopper_Fill_Resume_failed_fix5dt/Grid_Fill_1H_S437513_S404527",
-        "status": "Active",
+        "status": "Archived",
         "params": {
             "seed": "404527",
             "freq": null,
@@ -324,7 +324,7 @@
         "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 1623000,
+        "steps": 2000000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923",
         "status": "Active",
@@ -340,7 +340,7 @@
         "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 1632000,
+        "steps": 2000000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132",
         "status": "Active",
@@ -356,7 +356,7 @@
         "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 1718000,
+        "steps": 2000000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401",
         "status": "Active",
@@ -372,12 +372,140 @@
         "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 1644000,
+        "steps": 2000000,
         "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801",
         "status": "Active",
         "params": {
             "seed": "906801",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899_S727483": {
+        "name": "Grid_Fill_1H_S437513_S402899_S727483",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
+        "simulation": "Hopper_Fill",
+        "N": 48,
+        "steps": 3000000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899_S727483",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899_S727483",
+        "status": "Active",
+        "params": {
+            "seed": "727483",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S240587_S803190_S857247": {
+        "name": "Grid_Fill_1H_S240587_S803190_S857247",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S240587_S803190",
+        "simulation": "Hopper_Fill",
+        "N": 24,
+        "steps": 3000000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S240587_S803190_S857247",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S240587_S803190_S857247",
+        "status": "Active",
+        "params": {
+            "seed": "857247",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S374952_S785565_S430895": {
+        "name": "Grid_Fill_1H_S374952_S785565_S430895",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S374952_S785565",
+        "simulation": "Hopper_Fill",
+        "N": 4,
+        "steps": 3000000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S374952_S785565_S430895",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S374952_S785565_S430895",
+        "status": "Active",
+        "params": {
+            "seed": "430895",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S918498_S405677": {
+        "name": "Grid_Fill_1H_S481365_S918498_S405677",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S918498",
+        "simulation": "Hopper_Fill",
+        "N": 12,
+        "steps": 3000000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S918498_S405677",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S918498_S405677",
+        "status": "Active",
+        "params": {
+            "seed": "405677",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923_S286904": {
+        "name": "Grid_Fill_1H_S935840_S448923_S286904",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923",
+        "simulation": "Hopper_Fill",
+        "N": 12,
+        "steps": 2006000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923_S286904",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S935840_S448923_S286904",
+        "status": "Active",
+        "params": {
+            "seed": "286904",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842": {
+        "name": "Grid_Fill_1H_S358667_S348132_S521842",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132",
+        "simulation": "Hopper_Fill",
+        "N": 48,
+        "steps": 2006000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842",
+        "status": "Active",
+        "params": {
+            "seed": "521842",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801_S672044": {
+        "name": "Grid_Fill_1H_S469898_S906801_S672044",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801",
+        "simulation": "Hopper_Fill",
+        "N": 24,
+        "steps": 2006000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801_S672044",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801_S672044",
+        "status": "Active",
+        "params": {
+            "seed": "672044",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06"
+        }
+    },
+    "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401_S492052": {
+        "name": "Grid_Fill_1H_S808086_S242401_S492052",
+        "parent": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401",
+        "simulation": "Hopper_Fill",
+        "N": 4,
+        "steps": 2006000,
+        "path": "/home/guest/palash/Granular-Chains-DEM/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401_S492052",
+        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S808086_S242401_S492052",
+        "status": "Active",
+        "params": {
+            "seed": "492052",
             "freq": null,
             "amp": null,
             "dt": "1e-06"

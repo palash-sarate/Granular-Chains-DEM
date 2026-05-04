@@ -311,19 +311,29 @@ def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
             generated_files.append(pbs_file)
             
             if submit:
-                dep_id = None
+                # 1. Lineage/Manual Dependency (Specific parent job)
+                manual_dep = job.get("dependency")
+                
+                # 2. Concurrency Dependency (Round-robin to stay under max_concurrent)
+                concurrency_dep = None
                 if len(tails) >= max_concurrent:
-                    # Pick a tail to depend on (round-robin)
-                    dep_id = tails[i % max_concurrent]
+                    concurrency_dep = tails[i % max_concurrent]
+                
+                # Combine dependencies (PBS supports afterany:id1:id2)
+                deps = []
+                if manual_dep: deps.append(manual_dep)
+                if concurrency_dep and concurrency_dep not in deps: deps.append(concurrency_dep)
                 
                 cmd = ["qsub"]
-                if dep_id:
-                    cmd.extend(["-W", f"depend=afterany:{dep_id}"])
+                if deps:
+                    cmd.extend(["-W", f"depend=afterany:{':'.join(deps)}"])
+
                 cmd.append(pbs_file)
                 
                 msg = f"Submitting: {name}"
-                if dep_id: msg += f" (depends on {dep_id})"
+                if deps: msg += f" (depends on {', '.join(deps)})"
                 safe_print(msg)
+
                 
                 res = subprocess.run(cmd, capture_output=True, text=True, stdin=subprocess.DEVNULL)
                 if res.returncode == 0:

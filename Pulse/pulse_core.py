@@ -23,6 +23,13 @@ class PBSManager:
         return {}
 
     @staticmethod
+    def save_lineage(data: Dict):
+        """Saves simulation lineage data."""
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineage.json")
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    @staticmethod
     def load_metadata() -> Dict:
         """Loads persistent job metadata."""
         if os.path.exists(PBSManager.METADATA_FILE):
