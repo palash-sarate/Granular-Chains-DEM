@@ -497,7 +497,7 @@ class SyncManager:
     SYNC_LOG = "Pulse/sync.log"
     SYNC_LOCK = "Pulse/sync.lock"
     SYNC_STOP = "Pulse/.sync_stop"
-    SYNC_SCRIPT = "Pulse/sync_drive.sh"
+    # SYNC_SCRIPT = "Pulse/sync_drive.sh"
 
     @staticmethod
     def start_sync(user: str = "guest"):
