@@ -122,7 +122,14 @@ def scan_dumping_yard():
                     }
                 }
                 
-                # If we already had this run and it was archived, we update it
+                # If we already had this run, preserve its sync metadata
+                if run_dir in lineage:
+                    run_info["sync_status"] = lineage[run_dir].get("sync_status", "Local")
+                    run_info["sync_time"] = lineage[run_dir].get("sync_time", None)
+                else:
+                    run_info["sync_status"] = "Local"
+                    run_info["sync_time"] = None
+
                 lineage[run_dir] = run_info
                 
             except Exception as e:

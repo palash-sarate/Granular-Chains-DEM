@@ -3,6 +3,7 @@
 *.dump
 /dumping_yard
 /chain_data
+/Visualisations
 log.lammps
 temp_frame*
 *.pyc

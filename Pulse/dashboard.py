@@ -27,7 +27,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from Pulse.pulse_core import PBSManager, SimulationMonitor
+from Pulse.pulse_core import PBSManager, SimulationMonitor, SyncManager
 import streamlit.components.v1 as components
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
@@ -128,7 +128,7 @@ if st.runtime.exists():
     
     nav = st.radio(
         "Select Page",
-        ["📊 Active Queue", "🧬 Lineage", "🎥 Visualizer", "⏱️ ETA", "🕰️ History"],
+        ["📊 Active Queue", "🧬 Lineage", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"],
         horizontal=True,
         label_visibility="collapsed"
     )
@@ -350,7 +350,7 @@ if st.runtime.exists():
                     sc1, sc2, sc3 = s2.columns([1, 1.5, 0.5], vertical_alignment="bottom")
                     sc1.metric("Speed", cost_str, label_visibility="collapsed")
                     if eta_data.get("cost_history"):
-                        sc2.line_chart(eta_data["cost_history"], height=60, width="stretch")
+                        sc2.line_chart(eta_data["cost_history"], height=60, use_container_width=True)
                     # sc3 acts as a spacer
                     
                     s3.metric("Data Points", f"{eta_data['data_points']}")
@@ -374,8 +374,182 @@ if st.runtime.exists():
         render_eta_section()
 
     elif nav == "🎥 Visualizer":
-        from visualiser import render_visualiser
+        from Pulse.visualiser import render_visualiser
         render_visualiser()
+
+    elif nav == "🎬 Visualization":
+        st.subheader("🎬 Lineage Visualization & Movie Generation")
+        st.markdown("Create high-quality movies across multiple simulation stages with automatic cloud-restoration.")
+        
+        from Pulse.viz_manager import VizManager
+        lineage = PBSManager.load_lineage()
+        
+        if not lineage:
+            st.info("No lineage data found. Please scan your simulations in the 'Lineage' tab first.")
+        else:
+            # 1. Chain Selection
+            st.write("### 1. Select Lineage Chain")
+            all_paths = sorted(list(lineage.keys()))
+            names = {p: lineage[p]['name'] for p in all_paths}
+            
+            c1, c2 = st.columns(2)
+            start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names[x], index=0)
+            
+            # Filter end_node options based on descendants of start_node
+            possible_ends = VizManager.get_descendants(start_node, lineage)
+            if possible_ends:
+                end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names[x], index=len(possible_ends)-1)
+            else:
+                c2.info("This node has no descendants.")
+                end_node = None
+
+            if end_node:
+                chain = VizManager.get_lineage_chain(start_node, end_node)
+            else:
+                chain = []
+            
+            if not chain:
+                st.error("No valid direct lineage chain found. Select a different Start/End node.")
+            else:
+                st.success(f"Resolved Chain: {' → '.join([names[p] for p in chain])}")
+                
+                # Frame Scanning & Scrubbing
+                if "last_viz_chain" not in st.session_state or st.session_state["last_viz_chain"] != chain:
+                    st.session_state["last_viz_chain"] = chain
+                    with st.spinner("Scanning chain frames..."):
+                        st.session_state["viz_chain_frames"] = VizManager.get_chain_frames(chain)
+                
+                all_frames = st.session_state.get("viz_chain_frames", [])
+                
+                if not all_frames:
+                    st.warning("No dump frames found in this chain. Ensure simulations have data files.")
+                else:
+                    st.divider()
+                    st.write("### ⏱️ Timeline Scrubber")
+                    scrub_idx = st.slider("Scrub through all frames in chain", 0, len(all_frames)-1, 0, 
+                                         format="Frame %d", help="Drag to select a specific moment from any run in the chain.")
+                    target_frame = all_frames[scrub_idx]
+                    st.caption(f"📍 **Selected**: `{os.path.basename(target_frame['path'])}` | Timestep: `{target_frame['ts']}`")
+
+                # 2. Configuration
+                st.divider()
+                st.write("### 2. Rendering Configuration")
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.write("**Camera & View**")
+                    cam_preset = st.selectbox("Camera View", list(VizManager.CAMERA_PRESETS.keys()), index=1)
+                    zoom = st.slider("Zoom Level", 0.1, 5.0, 1.0)
+                    fps = st.number_input("FPS", 1, 60, 24)
+                    dt = st.number_input("Time Step (dt)", 1e-8, 1e-3, 1e-6, format="%.2e")
+                
+                with col2:
+                    st.write("**Overlays & Scene**")
+                    ts_pos = st.selectbox("Timestamp Position", ["top-left", "top-right", "bottom-left", "bottom-right"])
+                    ts_size = st.slider("Timestamp Size", 0.5, 2.0, 0.8)
+                    show_geo = st.checkbox("Show Box/Geometry", value=True)
+                    show_axes = st.checkbox("Show Coordinate Axes", value=False)
+                    bg_color = st.selectbox("Background Color", ["Black", "White", "Dark Gray", "Light Gray"], index=1)
+                    show_sb = st.checkbox("Add Scale Bar (3D)", value=False)
+                    sb_length = 0.1
+                    sb_thick = 0.02
+                    sb_pos = "bottom-left"
+                    if show_sb:
+                        c1, c2 = st.columns(2)
+                        sb_length = c1.number_input("Length", value=0.1, help="X dimension")
+                        sb_thick = c2.number_input("Thickness", value=0.02, help="Y & Z dimensions")
+                        sb_pos = st.selectbox("Scale Bar Position", ["bottom-left", "bottom-right", "top-left", "top-right"], key="sb_pos")
+                
+                with col3:
+                    st.write("**VTK Files**")
+                    # Scan start_node for available VTKs as a baseline
+                    available_vtks = [f for f in os.listdir(start_node) if f.endswith('.vtk')] if os.path.exists(start_node) else []
+                    selected_vtks = st.multiselect("Visible VTK Files", available_vtks)
+
+                # 3. Job Submission
+                st.divider()
+                st.write("### 3. Execution")
+                
+                # Check for existing job
+                lock_path = os.path.join(ROOT_DIR, VizManager.VIZ_LOCK)
+                is_running = False
+                job_id = ""
+                if os.path.exists(lock_path):
+                    try:
+                        with open(lock_path, "r") as f:
+                            content = f.read().strip()
+                            if content.startswith("PBS:"):
+                                job_id = content.replace("PBS:", "")
+                                is_running = True
+                    except: pass
+
+                if is_running:
+                    st.warning(f"⚠️ **Visualization job is currently running** (PBS ID: `{job_id}`)")
+                    if st.button("🛑 Cancel Viz Job", type="secondary"):
+                        subprocess.run(["qdel", job_id])
+                        if os.path.exists(lock_path): os.remove(lock_path)
+                        st.rerun()
+                else:
+                    output_name = st.text_input("Movie Name", value=f"{names[start_node]}_to_{names[end_node]}.mp4")
+                    
+                    c_btn1, c_btn2 = st.columns(2)
+                    
+                    if c_btn1.button("👁️ Preview Snapshot", use_container_width=True):
+                        with st.spinner("Generating preview..."):
+                            params = {
+                                "chain_paths": chain,
+                                "target_path": target_frame['path'] if all_frames else None,
+                                "target_ts": target_frame['ts'] if all_frames else None,
+                                "show_geometry": show_geo,
+                                "show_axes": show_axes,
+                                "bg_color": bg_color,
+                                "scalebar": {"show": show_sb, "length": sb_length, "thickness": sb_thick, "pos": sb_pos},
+                                "dt": dt,
+                                "timestamp": {"pos": ts_pos, "size": ts_size},
+                                "vtk_files": selected_vtks,
+                                "camera_preset": cam_preset,
+                                "zoom": zoom
+                            }
+                            res = VizManager.generate_preview(params)
+                            if res and os.path.exists(res):
+                                st.session_state["viz_preview_img"] = res
+                            else:
+                                st.error(res or "Failed to generate preview.")
+
+                    if c_btn2.button("🎬 Submit Visualization Job", type="primary", use_container_width=True):
+                        params = {
+                            "chain_paths": chain,
+                            "output_name": output_name,
+                            "fps": fps,
+                            "dt": dt,
+                            "show_geometry": show_geo,
+                            "show_axes": show_axes,
+                            "bg_color": bg_color,
+                            "scalebar": {"show": show_sb, "length": sb_length, "thickness": sb_thick, "pos": sb_pos},
+                            "timestamp": {"pos": ts_pos, "size": ts_size},
+                            "vtk_files": selected_vtks,
+                            "camera_preset": cam_preset,
+                            "zoom": zoom
+                        }
+                        
+                        success, msg = VizManager.submit_viz_job(params)
+                        if success:
+                            st.success(msg)
+                            st.rerun()
+                        else:
+                            st.error(msg)
+                
+                # Show Preview Image if it exists
+                if "viz_preview_img" in st.session_state and os.path.exists(st.session_state["viz_preview_img"]):
+                    st.divider()
+                    st.write("#### 🖼️ Configuration Preview")
+                    st.image(st.session_state["viz_preview_img"], use_container_width=True)
+                    if st.button("🗑️ Clear Preview"):
+                        del st.session_state["viz_preview_img"]
+                        st.rerun()
+
+                st.info("💡 Note: Missing simulation data will be automatically restored from Google Drive and cleaned up after the job finishes.")
 
     elif nav == "🧬 Lineage":
         st.subheader("🧬 Simulation Genealogy & Lineage")
@@ -479,6 +653,7 @@ if st.runtime.exists():
                 # Base Style
                 style = "active"
                 if seed in running_seeds: style = "running"
+                elif info.get("sync_status") == "Synced": style = "synced"
                 elif info["status"] == "Archived": style = "archived"
                 elif "Flow" in info["simulation"]: style = "flow"
                 
@@ -514,6 +689,7 @@ if st.runtime.exists():
             # Define styles
             mermaid_code += "    classDef active fill:#e1f5fe,stroke:#01579b,stroke-width:2px;\n"
             mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
+            mermaid_code += "    classDef synced fill:#e0f2f1,stroke:#00897b,stroke-width:2px;\n"
             mermaid_code += "    classDef flow fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;\n"
             mermaid_code += "    classDef running fill:#c8e6c9,stroke:#388e3c,stroke-width:3px;\n"
             mermaid_code += "    classDef queued fill:#ffccbc,stroke:#d32f2f,stroke-dasharray: 5 5;\n"
@@ -596,8 +772,34 @@ if st.runtime.exists():
                                 st.session_state["confirm_archive_delete"] = rid
                                 st.rerun()
 
-                # 3. Regular Parent Selection for Launching
                 if clicked_node in id_to_path:
+                    rid = id_to_path[clicked_node]
+                    info = lineage[rid]
+                    
+                    # 3.1 Display Sync & Restore Options
+                    sync_status = info.get("sync_status", "Local")
+                    is_local = os.path.exists(rid)
+                    
+                    st.divider()
+                    st.markdown(f"### 📦 Storage Status: **{sync_status}**")
+                    
+                    c1, c2 = st.columns([1, 1])
+                    if sync_status == "Synced" and not is_local:
+                        if c1.button(f"📥 Restore {info['name']} to Disk", use_container_width=True):
+                            with st.spinner("Downloading from Google Drive..."):
+                                success, msg = SyncManager.restore_run(rid)
+                                if success:
+                                    st.success(msg)
+                                    time.sleep(1)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
+                    elif is_local:
+                        c1.success("✅ Files are available offline.")
+                    
+                    st.divider()
+
+                    # 4. Regular Parent Selection for Launching
                     new_parent = id_to_path[clicked_node]
                     
                     # Initialize multiselect state if not present
@@ -914,6 +1116,94 @@ if st.runtime.exists():
                                 errf.write(f"\\n--- Error at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\\n")
                                 errf.write(traceback.format_exc())
                             st.error(f"Error submitting job: {e}. Check submit_error.log for details.")
+
+
+    elif nav == "🔄 Sync":
+        st.subheader("🔄 Sophisticated Google Drive Sync")
+        st.markdown("""
+        This module synchronizes your simulation data to Google Drive and manages your local storage.
+        - **Safe Sync**: Automatically skips ongoing PBS jobs to avoid partial uploads.
+        - **Smart Cleanup**: Deletes local files for synced runs that are NOT leaf nodes (parents).
+        - **Lineage Integration**: Sync status is stored in `lineage.json` and visible in the graph.
+        """)
+        
+        is_running = SyncManager.is_running()
+        
+        col1, col2 = st.columns([1, 1])
+        
+        if not is_running:
+            c1, c2 = st.columns(2)
+            if c1.button("🚀 Run in Dashboard (Thread)", use_container_width=True):
+                success, msg = SyncManager.start_sync(user=user_filter)
+                if success:
+                    st.toast(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+            
+            if c2.button("💾 Submit as HPC Job (ppn=8)", use_container_width=True, type="primary"):
+                success, msg = SyncManager.start_sync_pbs(user=user_filter)
+                if success:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+        else:
+            run_info = SyncManager.get_running_info()
+            mode = run_info["mode"] if run_info else "Unknown"
+            jid = run_info["id"] if run_info else "???"
+            
+            if mode == "HPC Job":
+                st.warning(f"⚠️ **Sync is running as an HPC Job** (PBS ID: `{jid}`)")
+            else:
+                st.info(f"ℹ️ **Sync is running in Dashboard Thread** (PID: `{jid}`)")
+
+            if col1.button("🛑 Stop Sync", use_container_width=True, type="secondary"):
+                success, msg = SyncManager.stop_sync()
+                if success:
+                    st.toast(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+        
+        if col2.button("🔄 Refresh Logs", use_container_width=True):
+            st.rerun()
+
+        st.divider()
+        
+        # Live Log Section
+        st.markdown("### 📝 Sync Logs & Progress")
+        
+        @st.fragment(run_every=2 if is_running else None)
+        def render_sync_logs():
+            logs = SyncManager.get_logs(max_lines=50)
+            st.code(logs, language="bash")
+            
+            if SyncManager.is_running():
+                st.info("🔄 Sync cycle is currently running in the background...")
+                
+                # 1. Detect Rclone Progress
+                if "Transferred:" in logs:
+                    try:
+                        progress_match = re.search(r'(\d+)%,', logs)
+                        if progress_match:
+                            progress_val = int(progress_match.group(1))
+                            st.progress(progress_val / 100.0, text=f"Syncing to Google Drive: {progress_val}%")
+                    except:
+                        pass
+                # 2. Detect Compression Progress
+                elif "PROGRESS_COMPRESS:" in logs:
+                    try:
+                        comp_match = re.findall(r'PROGRESS_COMPRESS: (\d+) / (\d+)', logs)
+                        if comp_match:
+                            current, total = map(int, comp_match[-1])
+                            st.progress(current / total, text=f"Preparing Archives: {current}/{total} folders")
+                    except:
+                        pass
+            else:
+                st.success("✅ Sync is idle or completed.")
+        
+        render_sync_logs()
 
     # 5. System Status (Master Node only)
     if "master" in socket.gethostname():

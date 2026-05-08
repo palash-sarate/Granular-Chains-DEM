@@ -27,9 +27,10 @@ class SimulationRenderer:
         ]
         
         # Add interactive picker callback
-        self.plotter.add_callback('LeftButtonPress', self._on_mouse_click)
-        # Add interaction callback to save camera state
-        self.plotter.add_callback('InteractionEvent', self._on_interaction)
+        if not self.plotter.offscreen:
+            self.plotter.add_callback('LeftButtonPress', self._on_mouse_click)
+            # Add interaction callback to save camera state
+            self.plotter.add_callback('InteractionEvent', self._on_interaction)
         
         # Setup view orientation buttons
         self._setup_view_buttons()
@@ -68,6 +69,7 @@ class SimulationRenderer:
 
     def _setup_view_buttons(self):
         """Adds interactive buttons for camera orientation."""
+        if self.plotter.offscreen: return
         # Standard backgrounds
         bg = ("#f0f0f0", "#333333") # (off-white, dark gray)
         
@@ -301,7 +303,8 @@ class SimulationRenderer:
             self._dynamic_actors.append(spheres)
         
         # 3. Update Highlights
-        self.hl_ctrl.render_highlights(frame_data)
+        if self.hl_ctrl:
+            self.hl_ctrl.render_highlights(frame_data)
         
         # Sync current rendering state back to the app if needed
         # (Usually handled via callbacks in the controller)
@@ -315,8 +318,6 @@ class SimulationRenderer:
                 self.plotter.add(g_act)
                 self._dynamic_actors.append(g_act)
         
-        if self.hl_ctrl:
-            self.hl_ctrl.render_highlights(frame_data)
         self.plotter.render()
 
     def plot_chain_data(self, subset_df: pd.DataFrame):

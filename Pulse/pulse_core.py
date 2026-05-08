@@ -5,7 +5,10 @@ import json
 import time
 from datetime import datetime
 from typing import List, Dict, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class PBSManager:
     METADATA_FILE = "Pulse/pulse_metadata.json"
@@ -305,6 +308,21 @@ class PBSManager:
             del cache[job_id]
             PBSManager.save_metadata(cache)
 
+    @staticmethod
+    def get_active_seeds(user: Optional[str] = None) -> List[str]:
+        """Returns a list of seeds currently running in PBS jobs."""
+        jobs = PBSManager.get_jobs(user=user)
+        active_seeds = []
+        for job in jobs:
+            job_name = job.get('Job_Name', '')
+            # Match convention: [Prefix][ParentSeed]_[ChildSeed]
+            # e.g., S374952_481365 or R481365_956135
+            match = re.match(r"^[A-Z]+(\d{3,6})_(\d{3,6})$", job_name)
+            if match:
+                parent_seed, child_seed = match.groups()
+                active_seeds.append(child_seed)
+        return active_seeds
+
 
 
     @staticmethod
@@ -474,3 +492,463 @@ class SimulationMonitor:
             "data_points": len(sampled_rel),
             "last_updated": datetime.now().strftime("%H:%M:%S")
         }
+
+class SyncManager:
+    SYNC_LOG = "Pulse/sync.log"
+    SYNC_LOCK = "Pulse/sync.lock"
+    SYNC_STOP = "Pulse/.sync_stop"
+    SYNC_SCRIPT = "Pulse/sync_drive.sh"
+
+    @staticmethod
+    def start_sync(user: str = "guest"):
+        """Starts the sync process in a background thread."""
+        if SyncManager.is_running():
+            return False, "Sync is already running."
+
+        # Clear any old stop requests
+        stop_path = os.path.join(ROOT_DIR, SyncManager.SYNC_STOP)
+        if os.path.exists(stop_path):
+            os.remove(stop_path)
+
+        import threading
+        thread = threading.Thread(target=SyncManager.run_sync_cycle, args=(user,))
+        thread.daemon = True
+        
+        # We still use a lock file to track it globally
+        lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+        with open(lock_path, "w") as f:
+            f.write(str(os.getpid())) # Note: in-thread sync uses current PID
+            
+        thread.start()
+        return True, "Sync started in background."
+
+    @staticmethod
+    def start_sync_pbs(user: str = "guest"):
+        """Submits the sync process as a PBS job."""
+        if SyncManager.is_running():
+            return False, "Sync is already running."
+
+        # Clear any old stop requests
+        stop_path = os.path.join(ROOT_DIR, SyncManager.SYNC_STOP)
+        if os.path.exists(stop_path):
+            os.remove(stop_path)
+
+        job_script = f"""#!/bin/bash
+#PBS -N Sync_Cycle
+#PBS -q workq
+#PBS -l nodes=master:ppn=8
+#PBS -l walltime=24:00:00
+#PBS -j oe
+#PBS -o {os.path.join(ROOT_DIR, SyncManager.SYNC_LOG)}
+
+cd $PBS_O_WORKDIR
+
+# Ensure all child processes are killed on exit
+trap 'kill 0' EXIT
+
+# Activate conda environment if available
+if [ -f /home/guest/miniconda3/etc/profile.d/conda.sh ]; then
+    source /home/guest/miniconda3/etc/profile.d/conda.sh
+    conda activate gchain
+fi
+
+python Pulse/run_sync_job.py --user {user}
+"""
+        
+        script_path = os.path.join(ROOT_DIR, "Pulse/temp_sync.pbs")
+        with open(script_path, "w") as f:
+            f.write(job_script)
+        
+        try:
+            result = subprocess.run(["qsub", script_path], capture_output=True, text=True, check=True)
+            job_id = result.stdout.strip()
+            
+            # Write Job ID to lock file (prepended with PBS: to distinguish)
+            lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+            with open(lock_path, "w") as f:
+                f.write(f"PBS:{job_id}")
+            
+            return True, f"Sync submitted as PBS job: {job_id}"
+        except Exception as e:
+            return False, f"Failed to submit PBS job: {e}"
+        finally:
+            if os.path.exists(script_path):
+                os.remove(script_path)
+
+    @staticmethod
+    def run_sync_cycle(user: str = "guest"):
+        """The main sync logic: Zip, Move, Update Lineage, and Cleanup."""
+        log_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOG)
+        lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+        stop_path = os.path.join(ROOT_DIR, SyncManager.SYNC_STOP)
+        
+        try:
+            with open(log_path, "w") as log:
+                def log_msg(msg):
+                    print(msg)
+                    log.write(f"{datetime.now().strftime('%H:%M:%S')} - {msg}\n")
+                    log.flush()
+
+                def check_stop():
+                    if os.path.exists(stop_path):
+                        log_msg("STOP REQUESTED. Terminating sync cycle...")
+                        return True
+                    return False
+
+                log_msg("Starting Sync Cycle...")
+                
+                # 0. Rescan Lineage from disk to get latest state
+                try:
+                    from Pulse.lineage_tracker import scan_dumping_yard
+                    scan_dumping_yard()
+                    log_msg("Lineage rescan complete.")
+                except Exception as e:
+                    log_msg(f"Warning: Lineage rescan failed: {e}")
+
+                # 1. Load Lineage
+                lineage = PBSManager.load_lineage()
+                if not lineage:
+                    log_msg("No lineage data found. Skipping.")
+                    return
+
+                # 2. Identify Ongoing Runs (to skip)
+                active_seeds = PBSManager.get_active_seeds(user=user)
+                log_msg(f"Active seeds in PBS: {active_seeds}")
+
+                # 3. Identify Syncable Runs
+                # Rules: Not currently running, has local data, and not already synced (or dirty)
+                syncable = []
+                for path, info in lineage.items():
+                    seed = str(info.get('params', {}).get('seed', ''))
+                    if seed in active_seeds:
+                        continue
+                    
+                    if not os.path.exists(path):
+                        continue
+                    
+                    # Check if dirty or never synced
+                    status = info.get('sync_status', 'Local')
+                    if status != 'Synced':
+                        syncable.append(path)
+                
+                log_msg(f"Found {len(syncable)} runs to check for sync.")
+                
+                # 4. Cloud Inventory Check (Optimization)
+                # Get list of existing zips on Drive to avoid redundant compression
+                log_msg("Fetching cloud inventory from Google Drive...")
+                cloud_zips = set()
+                try:
+                    res = subprocess.run([
+                        "rclone", "lsf", 
+                        "gdrive:Granular-Chains-DEM/dumping_yard_zips"
+                    ], capture_output=True, text=True, timeout=120)
+                    if res.returncode == 0:
+                        cloud_zips = set(res.stdout.splitlines())
+                        log_msg(f"Found {len(cloud_zips)} files already on Drive.")
+                except Exception as e:
+                    log_msg(f"Warning: Could not fetch cloud inventory: {e}")
+
+                # 5. Parallel Compression
+                ZIP_DIR = os.path.join(ROOT_DIR, "Zips_dir")
+                os.makedirs(ZIP_DIR, exist_ok=True)
+                
+                processed_zips = []
+                lineage_changed = False
+                
+                def compress_task(path):
+                    info = lineage[path]
+                    rel_path = info.get('rel_path', os.path.basename(path))
+                    unique_name = rel_path.replace('/', '_').replace('\\', '_').replace(' ', '_')
+                    zip_name = unique_name + ".tar.gz"
+                    
+                    if zip_name in cloud_zips:
+                        return path, None, True
+                        
+                    zip_path = os.path.join(ZIP_DIR, zip_name)
+                    subprocess.run(["tar", "-czf", zip_path, "-C", os.path.dirname(path), os.path.basename(path)], check=True)
+                    return path, zip_path, False
+
+                log_msg(f"Starting parallel compression with 8 workers...")
+                with ThreadPoolExecutor(max_workers=8) as executor:
+                    futures = {executor.submit(compress_task, path): path for path in syncable}
+                    
+                    completed = 0
+                    for future in as_completed(futures):
+                        if check_stop(): break
+                        
+                        path, zip_path, already_synced = future.result()
+                        info = lineage[path]
+                        completed += 1
+                        
+                        if already_synced:
+                            log_msg(f"Skipping {info['name']} (Already in Cloud Inventory)")
+                            lineage[path]['sync_status'] = 'Synced'
+                            lineage[path]['sync_time'] = lineage[path].get('sync_time') or datetime.now().isoformat()
+                            lineage_changed = True
+                        else:
+                            log_msg(f"PROGRESS_COMPRESS: {completed} / {len(syncable)}")
+                            log_msg(f"Finished compressing {info['name']}.")
+                            processed_zips.append((path, zip_path))
+                
+                if lineage_changed:
+                    PBSManager.save_lineage(lineage)
+
+                # 6. Bulk Move
+                if processed_zips:
+                    log_msg("Starting bulk upload to Google Drive...")
+                    cmd = [
+                        "rclone", "move", ZIP_DIR, 
+                        "gdrive:Granular-Chains-DEM/dumping_yard_zips",
+                        "--transfers", "16",
+                        "--drive-chunk-size", "128M",
+                        "--buffer-size", "256M",
+                        "--progress"
+                    ]
+                    
+                    # We use Popen so we can pipe output to our log for the dashboard
+                    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    for line in proc.stdout:
+                        if os.path.exists(stop_path):
+                            log_msg("STOP REQUESTED. Killing rclone...")
+                            import signal
+                            proc.terminate()
+                            break
+                        log.write(line)
+                        log.flush()
+                    proc.wait()
+                    
+                    if proc.returncode == 0:
+                        log_msg("Upload successful.")
+                        # Update Lineage Metadata
+                        for path, z_path in processed_zips:
+                            if not os.path.exists(z_path): # Verified moved
+                                lineage[path]['sync_status'] = 'Synced'
+                                lineage[path]['sync_time'] = datetime.now().isoformat()
+                        PBSManager.save_lineage(lineage)
+                    else:
+                        log_msg(f"Upload failed with code {proc.returncode}")
+                
+                # 6. Smart Cleanup (Refined Logic)
+                if not os.path.exists(stop_path):
+                    log_msg("Starting Smart Cleanup...")
+                
+                # Pre-calculate children and ghost status
+                child_map = {} # parent_path -> list of child_paths
+                for path, info in lineage.items():
+                    p = info.get('parent')
+                    if p:
+                        if p not in child_map: child_map[p] = []
+                        child_map[p].append(path)
+                
+                # Find Ghost children in PBS
+                jobs = PBSManager.get_jobs(user=user)
+                seed_to_path = {str(info.get('params', {}).get('seed', '')): path for path, info in lineage.items()}
+                ghost_parents = set()
+                for job in jobs:
+                    job_name = job.get('Job_Name', '')
+                    match = re.match(r"^[A-Z]+(\d{3,6})_(\d{3,6})$", job_name)
+                    if match:
+                        parent_seed, _ = match.groups()
+                        if parent_seed in seed_to_path:
+                            ghost_parents.add(seed_to_path[parent_seed])
+
+                cleaned_count = 0
+                for path, info in lineage.items():
+                    # Condition 1: Must be Synced
+                    if info.get('sync_status') != 'Synced':
+                        continue
+                    
+                    children = child_map.get(path, [])
+                    has_ghosts = path in ghost_parents
+                    
+                    # Condition 2: Must NOT be the last run (Leaf Node Protection)
+                    if len(children) == 0 and not has_ghosts:
+                        # This is a leaf node, we keep it on disk for convenience
+                        continue
+                    
+                    # Condition 3: ALL children must be Synced
+                    # If there are ghosts, it's definitely not safe to delete
+                    if has_ghosts:
+                        continue
+                    
+                    all_children_synced = True
+                    for c_path in children:
+                        if lineage.get(c_path, {}).get('sync_status') != 'Synced':
+                            all_children_synced = False
+                            break
+                    
+                    if all_children_synced:
+                        if os.path.exists(path):
+                            log_msg(f"Cleaning up local files for: {info['name']}")
+                            import shutil
+                            shutil.rmtree(path, ignore_errors=True)
+                            cleaned_count += 1
+                
+                log_msg(f"Cleanup complete. Removed {cleaned_count} parent directories.")
+                log_msg("Sync Cycle Finished Successfully.")
+
+        except Exception as e:
+            with open(log_path, "a") as log:
+                log.write(f"CRITICAL ERROR: {str(e)}\n")
+                import traceback
+                log.write(traceback.format_exc())
+        finally:
+            if os.path.exists(lock_path):
+                os.remove(lock_path)
+            if os.path.exists(stop_path):
+                os.remove(stop_path)
+
+    @staticmethod
+    def restore_run(run_path: str):
+        """Downloads a run back from Drive and extracts it."""
+        lineage = PBSManager.load_lineage()
+        if run_path not in lineage:
+            return False, "Run not found in lineage."
+        
+        info = lineage[run_path]
+        
+        # Use the same unique naming convention as the sync process
+        rel_path = info.get('rel_path', os.path.basename(run_path))
+        unique_name = rel_path.replace('/', '_').replace('\\', '_').replace(' ', '_')
+        zip_name = unique_name + ".tar.gz"
+        
+        ZIP_DIR = os.path.join(ROOT_DIR, "Zips_dir")
+        os.makedirs(ZIP_DIR, exist_ok=True)
+        zip_path = os.path.join(ZIP_DIR, zip_name)
+        
+        try:
+            # 1. Download
+            subprocess.run([
+                "rclone", "copy", 
+                f"gdrive:Granular-Chains-DEM/dumping_yard_zips/{zip_name}", 
+                ZIP_DIR
+            ], check=True)
+            
+            # 2. Unzip
+            # Ensure target directory exists
+            target_parent = os.path.dirname(run_path)
+            os.makedirs(target_parent, exist_ok=True)
+            
+            subprocess.run(["tar", "-xzf", zip_path, "-C", target_parent], check=True)
+            
+            # 3. Cleanup zip
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+            
+            # 4. Update lineage
+            lineage[run_path]['sync_status'] = 'Local'
+            PBSManager.save_lineage(lineage)
+            
+            return True, f"Successfully restored {info['name']} to {run_path}"
+        except Exception as e:
+            return False, f"Restore failed: {str(e)}"
+
+    @staticmethod
+    def free_restored_space(run_paths: List[str]):
+        """
+        Clears local folders for runs that are confirmed synced on Drive.
+        This is used to clean up runs that were temporarily restored for tasks like visualization.
+        """
+        lineage = PBSManager.load_lineage()
+        freed_count = 0
+        for path in run_paths:
+            # Safety check: Must be in lineage and marked as Synced
+            if path in lineage and lineage[path].get('sync_status') == 'Synced':
+                if os.path.exists(path):
+                    import shutil
+                    shutil.rmtree(path, ignore_errors=True)
+                    freed_count += 1
+        return freed_count
+
+    @staticmethod
+    def is_running():
+        """Checks if a sync process is currently running (locally or on PBS)."""
+        lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+        if not os.path.exists(lock_path):
+            return False
+        
+        try:
+            with open(lock_path, "r") as f:
+                lock_content = f.read().strip()
+            
+            if lock_content.startswith("PBS:"):
+                job_id = lock_content.replace("PBS:", "")
+                # Check if PBS job is still in queue
+                jobs = PBSManager.get_jobs()
+                for job in jobs:
+                    if job.get('id') == job_id:
+                        return True
+            else:
+                pid = int(lock_content)
+                # Check if local process exists
+                import psutil
+                if psutil.pid_exists(pid):
+                    proc = psutil.Process(pid)
+                    if proc.is_running() and proc.status() != psutil.STATUS_ZOMBIE:
+                        return True
+        except Exception:
+            pass
+        
+        # If we got here, the process is not running, so remove lock
+        if os.path.exists(lock_path):
+            try: os.remove(lock_path)
+            except: pass
+        return False
+
+    @staticmethod
+    def stop_sync():
+        """Stops the ongoing sync process (local or PBS)."""
+        lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+        if not os.path.exists(lock_path):
+            return False, "No sync process found."
+        
+        try:
+            with open(lock_path, "r") as f:
+                lock_content = f.read().strip()
+            
+            if lock_content.startswith("PBS:"):
+                job_id = lock_content.replace("PBS:", "")
+                subprocess.run(["qdel", job_id], check=True)
+                return True, f"Sent qdel for PBS job: {job_id}"
+            else:
+                # Signal local thread to stop
+                stop_path = os.path.join(ROOT_DIR, SyncManager.SYNC_STOP)
+                with open(stop_path, "w") as f:
+                    f.write("stop")
+                return True, "Stop signal sent to local thread."
+        except Exception as e:
+            return False, f"Error stopping sync: {e}"
+        finally:
+            if os.path.exists(lock_path):
+                try: os.remove(lock_path)
+                except: pass
+
+    @staticmethod
+    def get_logs(max_lines=100):
+        """Reads the latest logs from the sync log file."""
+        log_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOG)
+        if not os.path.exists(log_path):
+            return "No logs found. Start a sync to see progress."
+        
+        try:
+            with open(log_path, "r") as f:
+                lines = f.readlines()
+                return "".join(lines[-max_lines:])
+        except Exception as e:
+            return f"Error reading logs: {e}"
+
+    @staticmethod
+    def get_running_info():
+        """Returns details about the currently running sync process."""
+        lock_path = os.path.join(ROOT_DIR, SyncManager.SYNC_LOCK)
+        if not os.path.exists(lock_path):
+            return None
+        try:
+            with open(lock_path, "r") as f:
+                content = f.read().strip()
+            if content.startswith("PBS:"):
+                return {"mode": "HPC Job", "id": content.replace("PBS:", "")}
+            else:
+                return {"mode": "Local Thread", "id": content}
+        except:
+            return None
