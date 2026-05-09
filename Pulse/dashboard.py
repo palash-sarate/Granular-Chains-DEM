@@ -3,6 +3,8 @@ import pandas as pd
 import sys
 import os
 import json
+import glob
+from pathlib import Path
 
 # Prevent "Errno 5" I/O errors by redirecting stdout/stderr to devnull
 # This is required for libraries that try to flush standard streams in headless environments
@@ -32,6 +34,7 @@ import streamlit.components.v1 as components
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
 from analysis.controllers.highlighter import HighlightController
+from stpyvista import stpyvista
 import socket
 import random
 
@@ -40,9 +43,10 @@ if scratch_dir not in sys.path:
     sys.path.append(scratch_dir)
 import submit_flexible
 from lineage_tracker import scan_dumping_yard
-
-
-# Persistent Notes Storage
+import importlib
+import analysis.controllers.unified_renderer
+importlib.reload(analysis.controllers.unified_renderer)
+from analysis.controllers.unified_renderer import UnifiedRenderer
 NOTES_FILE = os.path.join(ROOT_DIR, "Pulse/lineage_notes.json")
 def load_notes():
     if os.path.exists(NOTES_FILE):
@@ -395,13 +399,9 @@ if st.runtime.exists():
             c1, c2 = st.columns(2)
             start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names[x], index=0)
             
-            # Filter end_node options based on descendants of start_node
-            possible_ends = VizManager.get_descendants(start_node, lineage)
-            if possible_ends:
-                end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names[x], index=len(possible_ends)-1)
-            else:
-                c2.info("This node has no descendants.")
-                end_node = None
+            # Filter end_node options based on descendants of start_node (including start_node itself)
+            possible_ends = [start_node] + VizManager.get_descendants(start_node, lineage)
+            end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names[x], index=len(possible_ends)-1)
 
             if end_node:
                 chain = VizManager.get_lineage_chain(start_node, end_node)
@@ -435,37 +435,47 @@ if st.runtime.exists():
                 st.divider()
                 st.write("### 2. Rendering Configuration")
                 
-                col1, col2, col3 = st.columns(3)
+                col1, col2 = st.columns(2)
+                
+                col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.write("**Camera & View**")
-                    cam_preset = st.selectbox("Camera View", list(VizManager.CAMERA_PRESETS.keys()), index=1)
-                    zoom = st.slider("Zoom Level", 0.1, 5.0, 1.0)
-                    fps = st.number_input("FPS", 1, 60, 24)
+                    st.write("**Canvas & Resolution**")
+                    c_w, c_h = st.columns(2)
+                    canvas_width = c_w.number_input("Width (px)", 320, 3840, 1280)
+                    canvas_height = c_h.number_input("Height (px)", 240, 2160, 720)
+                    fps = st.number_input("FPS", 1, 60, 30)
                     dt = st.number_input("Time Step (dt)", 1e-8, 1e-3, 1e-6, format="%.2e")
+
+                    st.write("**Scene Translation (Offset)**")
+                    off_x, off_y, off_z = st.columns(3)
+                    trans_x = off_x.number_input("Move X", value=0.0, format="%.3f")
+                    trans_y = off_y.number_input("Move Y", value=0.0, format="%.3f")
+                    trans_z = off_z.number_input("Move Z", value=0.0, format="%.3f")
+                    
+                    # Store these in session state for persistence
+                    st.session_state["viz_canvas_res"] = [canvas_width, canvas_height]
+                    st.session_state["viz_scene_offset"] = [trans_x, trans_y, trans_z]
+
+                    zoom = st.slider("Base Zoom", 0.1, 5.0, 1.0)
                 
                 with col2:
-                    st.write("**Overlays & Scene**")
-                    ts_pos = st.selectbox("Timestamp Position", ["top-left", "top-right", "bottom-left", "bottom-right"])
-                    ts_size = st.slider("Timestamp Size", 0.5, 2.0, 0.8)
-                    show_geo = st.checkbox("Show Box/Geometry", value=True)
-                    show_axes = st.checkbox("Show Coordinate Axes", value=False)
-                    bg_color = st.selectbox("Background Color", ["Black", "White", "Dark Gray", "Light Gray"], index=1)
-                    show_sb = st.checkbox("Add Scale Bar (3D)", value=False)
-                    sb_length = 0.1
-                    sb_thick = 0.02
-                    sb_pos = "bottom-left"
-                    if show_sb:
-                        c1, c2 = st.columns(2)
-                        sb_length = c1.number_input("Length", value=0.1, help="X dimension")
-                        sb_thick = c2.number_input("Thickness", value=0.02, help="Y & Z dimensions")
-                        sb_pos = st.selectbox("Scale Bar Position", ["bottom-left", "bottom-right", "top-left", "top-right"], key="sb_pos")
-                
-                with col3:
-                    st.write("**VTK Files**")
-                    # Scan start_node for available VTKs as a baseline
-                    available_vtks = [f for f in os.listdir(start_node) if f.endswith('.vtk')] if os.path.exists(start_node) else []
-                    selected_vtks = st.multiselect("Visible VTK Files", available_vtks)
+                    st.write("**Visual Elements**")
+                    
+                    # Discover all available VTKs in the chain
+                    all_chain_vtks = []
+                    for p in chain:
+                        geo_dir = os.path.join(p, "Geometry_vtk")
+                        if os.path.exists(geo_dir):
+                            all_chain_vtks.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
+                    
+                    vtk_basenames = sorted(list(set([os.path.basename(v) for v in all_chain_vtks])))
+                    selected_vtk_names = st.multiselect("Visible Geometry Layers", vtk_basenames, default=vtk_basenames)
+                    
+                    show_geo = st.checkbox("Show Geometry (Global)", value=True)
+                    show_interactive = st.checkbox("Enable Interactive 3D View", value=True)
+                    show_axes = st.checkbox("Show Corner Axes", value=True)
+                    show_grid = st.checkbox("Show 3D Grid", value=False)
 
                 # 3. Job Submission
                 st.divider()
@@ -493,43 +503,19 @@ if st.runtime.exists():
                 else:
                     output_name = st.text_input("Movie Name", value=f"{names[start_node]}_to_{names[end_node]}.mp4")
                     
-                    c_btn1, c_btn2 = st.columns(2)
-                    
-                    if c_btn1.button("👁️ Preview Snapshot", use_container_width=True):
-                        with st.spinner("Generating preview..."):
-                            params = {
-                                "chain_paths": chain,
-                                "target_path": target_frame['path'] if all_frames else None,
-                                "target_ts": target_frame['ts'] if all_frames else None,
-                                "show_geometry": show_geo,
-                                "show_axes": show_axes,
-                                "bg_color": bg_color,
-                                "scalebar": {"show": show_sb, "length": sb_length, "thickness": sb_thick, "pos": sb_pos},
-                                "dt": dt,
-                                "timestamp": {"pos": ts_pos, "size": ts_size},
-                                "vtk_files": selected_vtks,
-                                "camera_preset": cam_preset,
-                                "zoom": zoom
-                            }
-                            res = VizManager.generate_preview(params)
-                            if res and os.path.exists(res):
-                                st.session_state["viz_preview_img"] = res
-                            else:
-                                st.error(res or "Failed to generate preview.")
-
-                    if c_btn2.button("🎬 Submit Visualization Job", type="primary", use_container_width=True):
+                    if st.button("🎬 Submit Visualization Job", type="primary", use_container_width=True):
                         params = {
                             "chain_paths": chain,
                             "output_name": output_name,
                             "fps": fps,
                             "dt": dt,
                             "show_geometry": show_geo,
+                            "selected_vtks": selected_vtk_names,
                             "show_axes": show_axes,
-                            "bg_color": bg_color,
-                            "scalebar": {"show": show_sb, "length": sb_length, "thickness": sb_thick, "pos": sb_pos},
-                            "timestamp": {"pos": ts_pos, "size": ts_size},
-                            "vtk_files": selected_vtks,
-                            "camera_preset": cam_preset,
+                            "show_grid": show_grid,
+                            "camera_position": st.session_state.get("viz_last_cam_pos"),
+                            "offset": st.session_state["viz_scene_offset"],
+                            "resolution": st.session_state["viz_canvas_res"],
                             "zoom": zoom
                         }
                         
@@ -540,14 +526,237 @@ if st.runtime.exists():
                         else:
                             st.error(msg)
                 
-                # Show Preview Image if it exists
-                if "viz_preview_img" in st.session_state and os.path.exists(st.session_state["viz_preview_img"]):
-                    st.divider()
-                    st.write("#### 🖼️ Configuration Preview")
-                    st.image(st.session_state["viz_preview_img"], use_container_width=True)
-                    if st.button("🗑️ Clear Preview"):
-                        del st.session_state["viz_preview_img"]
+                # Show Restore Button if needed
+                if st.session_state.get("viz_restore_error"):
+                    st.error(st.session_state["viz_restore_error"])
+                    t_path = st.session_state.get("viz_restore_path")
+                    if t_path and st.button(f"📥 Restore {os.path.basename(t_path)} Now", use_container_width=True, type="primary"):
+                        with st.spinner("Restoring from Google Drive..."):
+                            success, msg = SyncManager.restore_run(t_path)
+                            if success:
+                                st.success("Restore complete! You can now preview the snapshot.")
+                                st.session_state.pop("viz_restore_error", None)
+                                st.rerun()
+                            else:
+                                st.error(msg)
+
+                # Interactive 3D Configuration Preview
+                st.divider()
+                st.write("#### 🕹️ Interactive Configuration Preview")
+                st.caption("Rotate, zoom, and pan to set the perfect camera view for your movie.")
+                
+                # Setup Plotter
+                plotter = UnifiedRenderer.setup_plotter(window_size=[800, 600])
+                
+                # Get the frame to preview
+                all_frames = VizManager.get_chain_frames(chain)
+                target_frame = all_frames[0] if all_frames else None
+                target_dump = None
+                if target_frame:
+                    f_path, f_ts = target_frame['path'], target_frame['ts']
+                    s_dirs = [os.path.join(f_path, "chain"), f_path]
+                    for sd in s_dirs:
+                        if os.path.isdir(sd):
+                            matches = glob.glob(os.path.join(sd, f"*{f_ts}.dump"))
+                            if matches:
+                                target_dump = matches[0]
+                                break
+                
+                # Collect geometry files
+                vtk_files = []
+                for p in chain:
+                    geo_dir = os.path.join(p, "Geometry_vtk")
+                    if os.path.exists(geo_dir):
+                        vtk_files.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
+
+                # Check for missing data in the interactive preview
+                geo_vtk_dir = os.path.join(target_frame['path'], "Geometry_vtk") if target_frame else None
+                missing_vtks = geo_vtk_dir and not os.path.exists(geo_vtk_dir)
+
+                if target_frame and not os.path.exists(target_frame['path']):
+                    st.error(f"Data not local for {os.path.basename(target_frame['path'])}. Restore it first for a preview.")
+                    if st.button(f"📥 Restore {os.path.basename(target_frame['path'])} Now", use_container_width=True, type="primary"):
+                        with st.spinner("Restoring..."):
+                            success, msg = SyncManager.restore_run(target_frame['path'])
+                            if success:
+                                st.success("Restore complete!")
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                elif target_frame:
+                    if missing_vtks:
+                        st.warning("⚠️ **Geometry VTKs Missing**: The hopper boundaries will not be visible in the preview or movie.")
+                        if st.button("🛠️ Generate Geometry VTKs (from metadata)", use_container_width=True):
+                            with st.spinner("Regenerating geometry meshes..."):
+                                try:
+                                    import warnings
+                                    warnings.filterwarnings('ignore', message='.*OVITO.*PyPI')
+                                    
+                                    from simulation.grid_hopper_manager import GridHopperManager
+                                    from simulation.runner import SimulationRunner
+                                    from analysis.geometry_extractor import GeometryExtractor
+                                    
+                                    # 1. Robust Metadata Search
+                                    meta_path = None
+                                    curr_p = Path(target_frame['path'])
+                                    # Search current and up to 3 parents (to catch lineage inheritance)
+                                    for _ in range(4):
+                                        for m_name in ["grid_metadata.json", "metadata.json"]:
+                                            test_p = curr_p / m_name
+                                            if test_p.exists():
+                                                meta_path = test_p
+                                                break
+                                        if meta_path: break
+                                        curr_p = curr_p.parent
+                                        if curr_p.name == "dumping_yard": break
+
+                                    if not meta_path:
+                                        st.error("Metadata not found in this run or its parents. Cannot regenerate geometry.")
+                                    else:
+                                        with open(meta_path, 'r') as f:
+                                            meta = json.load(f)
+                                        
+                                        # 2. Setup Manager & Runner
+                                        runner = SimulationRunner(lammps_executable="lmp") # Default to standard lmp
+                                        mgr = GridHopperManager(runner)
+                                        
+                                        # 3. Ensure .inc file exists (regenerate if missing)
+                                        inc_name = meta.get("geometry_inc", "replicated_geometry.inc")
+                                        inc_path = os.path.join(target_frame['path'], os.path.basename(inc_name))
+                                        
+                                        if not os.path.exists(inc_path):
+                                            st.info("Regenerating .inc file...")
+                                            mgr._generate_replicated_geometry(
+                                                setup_path=Path(meta["hopper_template_data"]),
+                                                n_hoppers=len(meta["metadata"]),
+                                                spacing=meta["spacing"],
+                                                job_dir=Path(target_frame['path']),
+                                                normalized_geo_vars=meta["geometry_vars"],
+                                                inc_name=os.path.basename(inc_name)
+                                            )
+                                        
+                                        # 4. Extract VTKs
+                                        extractor = GeometryExtractor(lammps_cmd="lmp")
+                                        # Get bounds from envelope in metadata
+                                        env = meta.get("envelope", {})
+                                        bounds = [env['total_bounds']['x'][0], env['total_bounds']['x'][1],
+                                                  env['total_bounds']['y'][0], env['total_bounds']['y'][1],
+                                                  env['total_bounds']['z'][0], env['total_bounds']['z'][1]] if 'total_bounds' in env else None
+                                        
+                                        extractor.extract(
+                                            inc_file=Path(inc_path),
+                                            outdir=Path(geo_vtk_dir),
+                                            auto_vis=True,
+                                            combined=False,
+                                            bounds=bounds,
+                                            spacing=0.005 # Match the standard resolution
+                                        )
+                                        st.success("Geometry VTKs generated successfully!")
+                                        st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to generate VTKs: {e}")
+                                    import traceback
+                                    st.code(traceback.format_exc())
+
+                    # Filter VTKs based on selection
+                    active_vtk_files = []
+                    for v in vtk_files:
+                        if os.path.basename(v) in selected_vtk_names:
+                            active_vtk_files.append(v)
+
+                    # Setup Plotter with custom resolution
+                    plotter = UnifiedRenderer.setup_plotter(window_size=st.session_state["viz_canvas_res"])
+
+                    UnifiedRenderer.apply_scene(
+                        plotter,
+                        vtk_files=active_vtk_files,
+                        dump_path=target_dump,
+                        show_geometry=show_geo,
+                        show_particles=True,
+                        show_axes=show_axes,
+                        show_grid=show_grid,
+                        camera_state=st.session_state.get("viz_last_cam_pos"),
+                        offset=st.session_state["viz_scene_offset"],
+                        zoom=zoom
+                    )
+                    
+                    # Viewfinder Border CSS
+                    vw, vh = st.session_state["viz_canvas_res"]
+                    st.markdown(f"""
+                        <style>
+                        .viz-viewfinder {{
+                            border: 2px solid #333;
+                            border-radius: 5px;
+                            padding: 10px;
+                            background: #000;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin-bottom: 10px;
+                        }}
+                        .viz-info-overlay {{
+                            color: #666;
+                            font-family: monospace;
+                            font-size: 0.8rem;
+                            text-align: center;
+                            margin-top: 5px;
+                        }}
+                        </style>
+                        <div class="viz-info-overlay">Recording Frame: {vw}x{vh}px (Aspect Ratio: {round(vw/vh, 2)})</div>
+                    """, unsafe_allow_html=True)
+
+                    # Display interactive plotter in a bordered 'Viewfinder' container (if enabled)
+                    if show_interactive:
+                        with st.container(border=True):
+                            st_state = stpyvista(plotter, key="viz_preview_plot")
+                        
+                        # Persist camera state on interaction
+                        if st_state is not None:
+                            # Extract camera position safely
+                            new_pos = st_state.get("camera_position")
+                            if new_pos:
+                                st.session_state["viz_last_cam_pos"] = new_pos
+                    else:
+                        st.info("💡 **Interactive Preview Disabled**: Use 'High-Res Snapshot' below to see your current scene setup.")
+                    
+                    c_cam1, c_cam2, c_cam3 = st.columns(3)
+                    if c_cam1.button("🎥 Capture View", use_container_width=True):
+                        st.success("View captured for movie!")
+                    
+                    if c_cam2.button("🔄 Reset View", use_container_width=True):
+                        st.session_state.pop("viz_last_cam_pos", None)
                         st.rerun()
+                    
+                    if c_cam3.button("📸 High-Res Snapshot", use_container_width=True):
+                        with st.spinner("Generating High-Res PNG..."):
+                            params = {
+                                "chain_paths": chain,
+                                "fps": fps,
+                                "dt": dt,
+                                "show_geometry": show_geo,
+                                "selected_vtks": selected_vtk_names,
+                                "show_axes": show_axes,
+                                "show_grid": show_grid,
+                                "camera_position": st.session_state.get("viz_last_cam_pos"),
+                                "offset": st.session_state["viz_scene_offset"],
+                                "resolution": st.session_state["viz_canvas_res"],
+                                "zoom": zoom
+                            }
+                            shot_path = VizManager.generate_high_res_snapshot(params, target_frame)
+                            st.session_state["last_viz_snapshot"] = shot_path
+
+                    if "last_viz_snapshot" in st.session_state:
+                        st.write("---")
+                        st.write("🖼️ **Latest High-Res Snapshot**")
+                        st.image(st.session_state["last_viz_snapshot"], use_container_width=True)
+                        if st.button("🗑️ Clear Snapshot"):
+                            st.session_state.pop("last_viz_snapshot")
+                            st.rerun()
+
+                    st.info("📌 **Capture Active**: Your current orientation, zoom, resolution, and offset will be used for the movie.")
+                else:
+                    st.info("No frames found in the selected lineage. Please check if simulation data exists.")
 
                 st.info("💡 Note: Missing simulation data will be automatically restored from Google Drive and cleaned up after the job finishes.")
 
@@ -651,9 +860,11 @@ if st.runtime.exists():
                 seed = str(info.get('params', {}).get('seed', ''))
                 
                 # Base Style
+                on_disk = os.path.exists(run_id)
                 style = "active"
                 if seed in running_seeds: style = "running"
-                elif info.get("sync_status") == "Synced": style = "synced"
+                elif info.get("sync_status") == "Synced":
+                    style = "synced" if on_disk else "cleared"
                 elif info["status"] == "Archived": style = "archived"
                 elif "Flow" in info["simulation"]: style = "flow"
                 
@@ -689,9 +900,10 @@ if st.runtime.exists():
             # Define styles
             mermaid_code += "    classDef active fill:#e1f5fe,stroke:#01579b,stroke-width:2px;\n"
             mermaid_code += "    classDef archived fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray: 5 5;\n"
-            mermaid_code += "    classDef synced fill:#e0f2f1,stroke:#00897b,stroke-width:2px;\n"
+            mermaid_code += "    classDef synced fill:#80cbc4,stroke:#00695c,stroke-width:2px;\n" # Deep Teal
+            mermaid_code += "    classDef cleared fill:#b39ddb,stroke:#512da8,stroke-width:2px;\n" # Deep Purple
             mermaid_code += "    classDef flow fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;\n"
-            mermaid_code += "    classDef running fill:#c8e6c9,stroke:#388e3c,stroke-width:3px;\n"
+            mermaid_code += "    classDef running fill:#a5d6a7,stroke:#2e7d32,stroke-width:3px;\n"
             mermaid_code += "    classDef queued fill:#ffccbc,stroke:#d32f2f,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef new_node fill:#ffffff,stroke:#333333,stroke-width:2px,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef selected stroke:#ff9800,stroke-width:4px;\n"
@@ -783,6 +995,23 @@ if st.runtime.exists():
                     st.divider()
                     st.markdown(f"### 📦 Storage Status: **{sync_status}**")
                     
+                    # Display Run Parameters for the selected node
+                    p_info = info.get('params', {})
+                    if p_info:
+                        st.markdown("#### 📋 Run Parameters")
+                        # Display main params in columns
+                        main_params = {k: v for k, v in p_info.items() if k != "geometry_vars" and v is not None}
+                        if main_params:
+                            p_cols = st.columns(min(len(main_params), 4))
+                            for i, (k, v) in enumerate(main_params.items()):
+                                p_cols[i % 4].metric(k.capitalize(), str(v))
+                        
+                        # Dedicated section for geometry variables
+                        geo_vars = p_info.get("geometry_vars")
+                        if geo_vars and geo_vars != {}:
+                            with st.expander("🛠️ Geometry Overrides", expanded=True):
+                                st.json(geo_vars)
+                    
                     c1, c2 = st.columns([1, 1])
                     if sync_status == "Synced" and not is_local:
                         if c1.button(f"📥 Restore {info['name']} to Disk", use_container_width=True):
@@ -825,6 +1054,7 @@ if st.runtime.exists():
                         "N": info["N"],
                         "Steps": info["steps"],
                         "Status": info["status"],
+                        "GeoVars": str(info.get("params", {}).get("geometry_vars", {})),
                         "Path": rid
                     })
                 st.dataframe(pd.DataFrame(display_lineage), width="stretch", hide_index=True)
@@ -968,6 +1198,19 @@ if st.runtime.exists():
                         
                         mode_params["hopper_template_data"] = st.text_input("Hopper Template Data", value="simulation_geometries/2D_hopper_with_orifice_cover.inc")
                         
+                        # Add geometry_vars support
+                        geo_vars_str = st.text_area(
+                            "Geometry Variables (JSON)", 
+                            value="{}", 
+                            placeholder='{"orifice_half": 0.05, "hopper_ang": 60}',
+                            help='e.g. {"orifice_half": 0.05, "hopper_ang": 60} or lists for multiple hoppers {"orifice_half": [0.04, 0.06]}'
+                        )
+                        try:
+                            mode_params["geometry_vars"] = json.loads(geo_vars_str)
+                        except Exception as e:
+                            st.error(f"Invalid JSON in Geometry Variables: {e}")
+                            st.stop()
+
                         mode_params["simulation"] = "Hopper_Fill"
                         mode_params["no-vtk"] = True
 

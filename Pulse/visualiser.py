@@ -6,6 +6,7 @@ import nest_asyncio2
 import json
 import pandas as pd
 from stpyvista import stpyvista
+from analysis.controllers.unified_renderer import UnifiedRenderer
 nest_asyncio2.apply()
 
 # The dashboard.py defines ROOT_DIR
@@ -224,71 +225,20 @@ def render_visualiser():
         if True: 
             with st.spinner("Rendering Scene with PyVista..."):
                 try:
-                    # Setup Plotter
-                    plotter = pv.Plotter(window_size=[800, 600])
-                    plotter.background_color = "white"
+                    # Setup Plotter using UnifiedRenderer
+                    plotter = UnifiedRenderer.setup_plotter(window_size=[800, 600])
                     
-                    # Add Geometry
-                    if show_geom and vtk_files:
-                        COLORS = ["#ADD8E6", "#90EE90", "#FFB6C1", "#FFFFE0", "#E6E6FA", "#F08080", "#AFEEEE", "#FFE4E1"]
-                        for i, vtk_file in enumerate(vtk_files):
-                            mesh = load_vtk_geometry(vtk_file)
-                            color = COLORS[i % len(COLORS)]
-                            plotter.add_mesh(mesh, color=color, opacity=geom_alpha, show_edges=False)
-                            
-                    # Add Particles
-                    if show_particles and selected_dump:
-                        df = parse_lammps_dump(selected_dump)
-                        if df is not None and not df.empty:
-                            P_COLORS = ["#FF5733", "#33FF57", "#3357FF", "#F333FF", "#FF33A8", "#33FFF3", "#F3FF33", "#FF8C00"]
-                            
-                            if all(k in df.columns for k in ['x', 'y', 'z']):
-                                points = df[['x', 'y', 'z']].values
-                                pdata = pv.PolyData(points)
-                                
-                                # Set radius
-                                if 'diameter' in df.columns:
-                                    pdata['radius'] = df['diameter'].values / 2.0
-                                else:
-                                    pdata['radius'] = [0.001] * len(points)
-                                
-                                # Fast Batched Rendering: One glyph call for all particles
-                                # Color by molecule ID if present
-                                if 'mol' in df.columns:
-                                    # Map molecule IDs to color indices
-                                    m_ids = df['mol'].values
-                                    # Use a simple mapping: mol_id % num_colors
-                                    pdata['color_idx'] = m_ids % len(P_COLORS)
-                                    
-                                    # Create the glyphs
-                                    sphere = pv.Sphere(radius=1.0, theta_resolution=8, phi_resolution=8)
-                                    particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
-                                    
-                                    # Add all particles in a single mesh call with a custom colormap
-                                    from matplotlib.colors import ListedColormap
-                                    my_cmap = ListedColormap(P_COLORS)
-                                    
-                                    plotter.add_mesh(
-                                        particles, 
-                                        scalars="color_idx", 
-                                        cmap=my_cmap, 
-                                        smooth_shading=True,
-                                        show_scalar_bar=False,
-                                        categories=True
-                                    )
-                                else:
-                                    # Fallback for single color
-                                    sphere = pv.Sphere(radius=1.0, theta_resolution=8, phi_resolution=8)
-                                    particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
-                                    plotter.add_mesh(particles, color="#FF5733", smooth_shading=True)
-                    
-                    # (Camera application moved below axes/grid)
-                        
-                    if show_axes:
-                        plotter.add_axes()
-                        
-                    if show_grid:
-                        plotter.show_grid(color='gray', font_size=10)
+                    UnifiedRenderer.apply_scene(
+                        plotter,
+                        vtk_files=vtk_files if show_geom else None,
+                        dump_path=selected_dump if show_particles else None,
+                        show_geometry=show_geom,
+                        geom_opacity=geom_alpha,
+                        show_particles=show_particles,
+                        show_axes=show_axes,
+                        show_grid=show_grid,
+                        camera_state=None # Handled below by custom logic
+                    )
 
                     # Camera logic: Apply after all meshes/axes are added to prevent VTK auto-reset
                     # 1. Apply preset if requested

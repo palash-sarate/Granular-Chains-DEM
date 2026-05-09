@@ -118,7 +118,9 @@ def scan_dumping_yard():
                         "seed": seed or data.get("seed"),
                         "freq": in_params["freq"] or data.get("freq"),
                         "amp": in_params["amp"] or data.get("amp"),
-                        "dt": in_params["dt"] or data.get("dt")
+                        "dt": in_params["dt"] or data.get("dt"),
+                        "n_hoppers": data.get("n_hoppers", 1),
+                        "geometry_vars": data.get("geometry_vars", {})
                     }
                 }
                 

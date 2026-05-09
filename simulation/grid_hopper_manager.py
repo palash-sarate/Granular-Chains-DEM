@@ -149,9 +149,9 @@ class GridHopperManager:
             Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars
         )
         
-        geometry_inc, envelope = self._generate_replicated_geometry(
-            Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars
-        )
+        # geometry_inc, envelope = self._generate_replicated_geometry(
+        #     Path(hopper_template_data), n_hoppers, spacing, job_dir, normalized_geo_vars
+        # )
 
         # 3.2 Optional: Generate VTK meshes for UI visualization
         if generate_vtk:
@@ -228,7 +228,10 @@ class GridHopperManager:
                 "geometry_vars": normalized_geo_vars,
                 "geometry_inc": geometry_inc,
                 "simulation": simulation,
-                "relaxed_sources": relaxed_sources
+                "relaxed_sources": relaxed_sources,
+                "n_hoppers": n_hoppers,
+                "cols": cols,
+                "hopper_template_data": str(hopper_template_data)
             }, f)
 
         self.runner.run(config, clean_dir=False)
@@ -306,6 +309,13 @@ class GridHopperManager:
                 simulation = meta_raw.get("simulation", "Grid_Hopper_Filling")
             geometry_inc = meta_raw.get("geometry_inc")
             spacing = meta_raw.get("spacing", 2.0)
+            
+            # Reconstruction parameters for self-contained geometry
+            n_hoppers = meta_raw.get("n_hoppers", len(meta_raw["metadata"]))
+            cols = meta_raw.get("cols", 1)
+            geo_vars = meta_raw.get("geometry_vars", [])
+            hopper_template = meta_raw.get("hopper_template_data", "simulation_geometries/2D_hopper_with_orifice_cover.inc")
+
             metadata = {int(k): {
                 "offset": np.array(v["offset"]),
                 "N": v.get("N"),
@@ -319,6 +329,11 @@ class GridHopperManager:
             
         new_job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
         new_job_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Regeneration of geometry to ensure self-contained jobs (fixes missing parent files after sync)
+        local_geometry_inc, _ = self._generate_replicated_geometry(
+            Path(hopper_template), n_hoppers, spacing, new_job_dir, geo_vars
+        )
         
         # Metadata Inheritance: Copy and Update with Lineage
         new_meta = meta_raw.copy()
@@ -337,7 +352,7 @@ class GridHopperManager:
             dump_file=dump_file,
             extra_vars={
                 "restart_path": str(restart_p).replace("\\", "/"),
-                "geometry_inc": geometry_inc.replace("\\", "/"),
+                "geometry_inc": local_geometry_inc.replace("\\", "/"),
                 "relax_steps": relax_steps,
                 "dt": dt,
                 "viscosity": viscosity
@@ -428,6 +443,7 @@ class GridHopperManager:
         new_meta["source_run"] = source_p.name
         new_meta["simulation"] = simulation
         new_meta["geometry_inc"] = geometry_flow_inc
+        new_meta["hopper_template_data"] = str(hopper_template)
         
         with open(job_dir / "metadata.json", 'w') as f:
             json.dump(new_meta, f)
@@ -513,6 +529,16 @@ class GridHopperManager:
                 simulation = meta_raw.get("simulation", "Grid_Hopper_Flow")
             geometry_inc = meta_raw.get("geometry_inc")
             spacing = meta_raw.get("spacing", 2.0)
+            
+            # Reconstruction parameters for self-contained geometry
+            n_hoppers = len(meta_raw["metadata"])
+            geo_vars = meta_raw.get("geometry_vars", [])
+            hopper_template = meta_raw.get("hopper_template_data", "simulation_geometries/2D_hopper_with_orifice_cover.inc")
+            
+            freq_list = meta_raw.get("freq", [])
+            amp_list = meta_raw.get("amp", [])
+            osc_dir = meta_raw.get("osc_dir", "z")
+
             metadata_original = {int(k): {
                 "offset": np.array(v["offset"]),
                 "N": v.get("N"),
@@ -523,6 +549,16 @@ class GridHopperManager:
         # Seed-Chain Naming
         new_job_dir, run_name = self._generate_resume_path(job_dir, seed, simulation)
         new_job_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Regeneration of geometry to ensure self-contained jobs
+        osc_params = [{"freq": freq_list[i], "amp": amp_list[i], "dir": osc_dir} for i in range(n_hoppers)] if freq_list else None
+        
+        local_geometry_inc, _ = self._generate_replicated_geometry(
+            Path(hopper_template), n_hoppers, spacing, new_job_dir, geo_vars,
+            exclude_regions=["orifice_cover"] if "Flow" in simulation else [],
+            oscillation_params=osc_params,
+            inc_name="replicated_geometry_flow.inc" if "Flow" in simulation else "replicated_geometry.inc"
+        )
         
         # Inherit Metadata and Update Lineage
         new_meta = meta_raw.copy()
@@ -541,7 +577,7 @@ class GridHopperManager:
             dump_file=dump_file,
             extra_vars={
                 "restart_path": str(restart_p).replace("\\", "/"),
-                "geometry_inc": geometry_inc.replace("\\", "/"),
+                "geometry_inc": local_geometry_inc.replace("\\", "/"),
                 "run_steps": run_steps,
                 "dt": dt,
                 "viscosity": viscosity
