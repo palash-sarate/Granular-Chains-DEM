@@ -60,6 +60,20 @@ def save_note(run_id, note):
     notes[run_id] = note
     with open(NOTES_FILE, "w") as f: json.dump(notes, f)
 
+VIZ_SETTINGS_FILE = os.path.join(ROOT_DIR, "Pulse/viz_settings.json")
+def load_viz_settings():
+    if os.path.exists(VIZ_SETTINGS_FILE):
+        try:
+            with open(VIZ_SETTINGS_FILE, "r") as f: return json.load(f)
+        except: pass
+    return {"offset": [0.0, 0.0, 0.0], "zoom": 1.0, "camera": None, "width": 1280, "height": 720}
+
+def save_viz_settings(offset, zoom, camera=None, width=1280, height=720):
+    try:
+        with open(VIZ_SETTINGS_FILE, "w") as f:
+            json.dump({"offset": offset, "zoom": zoom, "camera": camera, "width": width, "height": height}, f)
+    except: pass
+
 def wrap_sim_name(name, max_width=25):
     """Wraps simulation names by breaking on underscores to keep nodes compact."""
     if len(name) <= max_width: return name
@@ -130,12 +144,28 @@ if st.runtime.exists():
     # This radio selector ensures ONLY the active page's code is executed.
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
     
+    # --- Navigation Persistence ---
+    pages = ["📊 Active Queue", "🧬 Lineage", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
+    
+    # Initialize from URL or default
+    query_nav = st.query_params.get("tab", pages[0])
+    if query_nav not in pages:
+        query_nav = pages[0]
+    
+    current_idx = pages.index(query_nav)
+    
     nav = st.radio(
         "Select Page",
-        ["📊 Active Queue", "🧬 Lineage", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"],
+        pages,
+        index=current_idx,
         horizontal=True,
-        label_visibility="collapsed"
+        label_visibility="collapsed",
+        key="nav_selector"
     )
+
+    # Sync URL with selection
+    if nav != query_nav:
+        st.query_params["tab"] = nav
 
     st.divider()
 
@@ -176,6 +206,7 @@ if st.runtime.exists():
                         "CPU %": job.get("resources_used.cpupercent", "0"),
                         "RAM": job.get("resources_used.mem", "0kb"),
                         "Node": job.get("exec_vnode", "N/A"),
+                        "Polite": "😇" if int(job.get("Priority", 0)) < 0 else "⚡",
                         "Comment": job.get("comment") or job.get("Comment") or job.get("depend", "")
                     })
                 
@@ -413,6 +444,26 @@ if st.runtime.exists():
             else:
                 st.success(f"Resolved Chain: {' → '.join([names[p] for p in chain])}")
                 
+                # Check for missing synced runs in the chain
+                missing_synced = []
+                for p in chain:
+                    if not os.path.exists(p) and lineage.get(p, {}).get("sync_status") == "Synced":
+                        missing_synced.append(p)
+                
+                if missing_synced:
+                    st.warning(f"⚠️ **{len(missing_synced)} runs** in this chain are synced but not local. They must be restored for scrubbing and preview.")
+                    if st.button("📥 Restore Missing Data in Chain", use_container_width=True, type="primary"):
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        for i, p in enumerate(missing_synced):
+                            status_text.text(f"Restoring {os.path.basename(p)}... ({i+1}/{len(missing_synced)})")
+                            SyncManager.restore_run(p)
+                            progress_bar.progress((i + 1) / len(missing_synced))
+                        st.success("Restoration complete!")
+                        st.session_state.pop("viz_chain_frames", None)
+                        st.session_state.pop("last_viz_chain", None) # Force re-scan
+                        st.rerun()
+                
                 # Frame Scanning & Scrubbing
                 if "last_viz_chain" not in st.session_state or st.session_state["last_viz_chain"] != chain:
                     st.session_state["last_viz_chain"] = chain
@@ -429,7 +480,8 @@ if st.runtime.exists():
                     scrub_idx = st.slider("Scrub through all frames in chain", 0, len(all_frames)-1, 0, 
                                          format="Frame %d", help="Drag to select a specific moment from any run in the chain.")
                     target_frame = all_frames[scrub_idx]
-                    st.caption(f"📍 **Selected**: `{os.path.basename(target_frame['path'])}` | Timestep: `{target_frame['ts']}`")
+                    viz_dt = st.session_state.get("viz_dt", 1e-6)
+                    st.caption(f"📍 **Selected**: `{os.path.basename(target_frame['path'])}` | Timestep: `{target_frame['ts']}` | `{target_frame['ts']*viz_dt:.3f}s`")
 
                 # 2. Configuration
                 st.divider()
@@ -442,22 +494,45 @@ if st.runtime.exists():
                 with col1:
                     st.write("**Canvas & Resolution**")
                     c_w, c_h = st.columns(2)
-                    canvas_width = c_w.number_input("Width (px)", 320, 3840, 1280)
-                    canvas_height = c_h.number_input("Height (px)", 240, 2160, 720)
+                    
+                    saved_settings = load_viz_settings()
+                    canvas_width = c_w.number_input("Width (px)", 320, 3840, saved_settings.get("width", 1280))
+                    canvas_height = c_h.number_input("Height (px)", 240, 2160, saved_settings.get("height", 720))
                     fps = st.number_input("FPS", 1, 60, 30)
-                    dt = st.number_input("Time Step (dt)", 1e-8, 1e-3, 1e-6, format="%.2e")
+                    dt = st.number_input("Time Step (dt)", 1e-8, 1e-3, 1e-6, format="%.2e", key="viz_dt")
 
                     st.write("**Scene Translation (Offset)**")
                     off_x, off_y, off_z = st.columns(3)
-                    trans_x = off_x.number_input("Move X", value=0.0, format="%.3f")
-                    trans_y = off_y.number_input("Move Y", value=0.0, format="%.3f")
-                    trans_z = off_z.number_input("Move Z", value=0.0, format="%.3f")
                     
-                    # Store these in session state for persistence
-                    st.session_state["viz_canvas_res"] = [canvas_width, canvas_height]
-                    st.session_state["viz_scene_offset"] = [trans_x, trans_y, trans_z]
+                    # Ensure persistence using file-based settings and session state
+                    if "viz_scene_offset" not in st.session_state:
+                        saved_settings = load_viz_settings()
+                        st.session_state["viz_scene_offset"] = saved_settings.get("offset", [0.0, 0.0, 0.0])
+                        st.session_state["viz_zoom"] = saved_settings.get("zoom", 1.0)
+                        if saved_settings.get("camera"):
+                            st.session_state["viz_last_cam_pos"] = saved_settings["camera"]
 
-                    zoom = st.slider("Base Zoom", 0.1, 5.0, 1.0)
+                    trans_x = off_x.number_input("Move X", value=st.session_state["viz_scene_offset"][0], format="%.3f")
+                    trans_y = off_y.number_input("Move Y", value=st.session_state["viz_scene_offset"][1], format="%.3f")
+                    trans_z = off_z.number_input("Move Z", value=st.session_state["viz_scene_offset"][2], format="%.3f")
+                    
+                    # Sync to session state
+                    new_offset = [trans_x, trans_y, trans_z]
+                    
+                    # Store these in session state for UI responsiveness
+                    st.session_state["viz_canvas_res"] = [canvas_width, canvas_height]
+                    st.session_state["viz_scene_offset"] = new_offset
+
+                    zoom = st.number_input("Base Zoom", min_value=0.01, max_value=100.0, value=st.session_state["viz_zoom"], format="%.2f", help="Set the camera magnification level.")
+                    
+                    # If anything changed, save to disk (excluding camera, which is saved via button)
+                    if zoom != st.session_state["viz_zoom"] or \
+                       new_offset != saved_settings["offset"] or \
+                       canvas_width != saved_settings.get("width") or \
+                       canvas_height != saved_settings.get("height"):
+                        
+                        st.session_state["viz_zoom"] = zoom
+                        save_viz_settings(new_offset, zoom, camera=st.session_state.get("viz_last_cam_pos"), width=canvas_width, height=canvas_height)
                 
                 with col2:
                     st.write("**Visual Elements**")
@@ -473,9 +548,239 @@ if st.runtime.exists():
                     selected_vtk_names = st.multiselect("Visible Geometry Layers", vtk_basenames, default=vtk_basenames)
                     
                     show_geo = st.checkbox("Show Geometry (Global)", value=True)
-                    show_interactive = st.checkbox("Enable Interactive 3D View", value=True)
+                    show_interactive = st.checkbox("Enable Interactive 3D View", value=False)
                     show_axes = st.checkbox("Show Corner Axes", value=True)
                     show_grid = st.checkbox("Show 3D Grid", value=False)
+
+                # Interactive 3D Configuration Preview
+                st.divider()
+                st.write("#### 🕹️ Interactive Configuration Preview")
+                st.caption("Rotate, zoom, and pan to set the perfect camera view for your movie.")
+                
+                # Use the target_frame from the scrubber above
+                target_dump = None
+                if target_frame:
+                    f_path, f_ts = target_frame['path'], target_frame['ts']
+                    s_dirs = [os.path.join(f_path, "chain"), f_path]
+                    for sd in s_dirs:
+                        if os.path.isdir(sd):
+                            matches = glob.glob(os.path.join(sd, f"*{f_ts}.dump"))
+                            if matches:
+                                target_dump = matches[0]
+                                break
+                
+                # Collect geometry files
+                vtk_files = []
+                for p in chain:
+                    geo_dir = os.path.join(p, "Geometry_vtk")
+                    if os.path.exists(geo_dir):
+                        vtk_files.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
+
+                # Check for missing data in the interactive preview
+                geo_vtk_dir = os.path.join(target_frame['path'], "Geometry_vtk") if target_frame else None
+                missing_vtks = geo_vtk_dir and not os.path.exists(geo_vtk_dir)
+
+                if target_frame and not os.path.exists(target_frame['path']):
+                    st.error(f"Data not local for {os.path.basename(target_frame['path'])}. Restore it first for a preview.")
+                    if st.button(f"📥 Restore {os.path.basename(target_frame['path'])} Now", use_container_width=True, type="primary"):
+                        with st.spinner("Restoring..."):
+                            success, msg = SyncManager.restore_run(target_frame['path'])
+                            if success:
+                                st.success("Restore complete!")
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                elif target_frame:
+                    # --- Advanced Geometry Tools Expander ---
+                    with st.expander("🛠️ Advanced Geometry Tools", expanded=missing_vtks):
+                        st.write("#### 🏗️ VTK Mesh (Re)generation")
+                        st.caption("Reconstruct the hopper geometry from simulation metadata. Useful if files are missing or you want higher resolution.")
+                        
+                        v_col1, v_col2 = st.columns(2)
+                        lattice_spacing = v_col1.number_input("Lattice Spacing (m)", 0.0001, 0.02, 0.002, format="%.4f", help="Resolution of the sampling grid. Lower = Sharper but Slower.")
+                        recon_radius = v_col2.number_input("Recon. Radius (m)", 0.0, 0.1, 0.0, format="%.4f", help="Radius for surface reconstruction. Leave 0.0 for auto-calculation (1.2 * spacing).")
+                        
+                        if st.button("🔄 (Re)generate Geometry Meshes", use_container_width=True, type="primary" if missing_vtks else "secondary"):
+                            with st.spinner("Regenerating geometry meshes..."):
+                                try:
+                                    import warnings
+                                    warnings.filterwarnings('ignore', message='.*OVITO.*PyPI')
+                                    
+                                    from simulation.grid_hopper_manager import GridHopperManager
+                                    from simulation.runner import SimulationRunner
+                                    from analysis.geometry_extractor import GeometryExtractor
+                                    
+                                    # 1. Robust Metadata Search
+                                    meta_path = None
+                                    curr_p = Path(target_frame['path'])
+                                    for _ in range(4):
+                                        for m_name in ["grid_metadata.json", "metadata.json"]:
+                                            test_p = curr_p / m_name
+                                            if test_p.exists():
+                                                meta_path = test_p
+                                                break
+                                        if meta_path: break
+                                        curr_p = curr_p.parent
+                                        if curr_p.name == "dumping_yard": break
+
+                                    if not meta_path:
+                                        st.error("Metadata not found. Cannot regenerate geometry.")
+                                    else:
+                                        with open(meta_path, 'r') as f:
+                                            meta = json.load(f)
+                                        
+                                        runner = SimulationRunner(lammps_executable="lmp") 
+                                        mgr = GridHopperManager(runner)
+                                        
+                                        inc_name = meta.get("geometry_inc", "replicated_geometry.inc")
+                                        inc_path = os.path.join(target_frame['path'], os.path.basename(inc_name))
+                                        
+                                        if not os.path.exists(inc_path):
+                                            mgr._generate_replicated_geometry(
+                                                setup_path=Path(meta["hopper_template_data"]),
+                                                n_hoppers=len(meta["metadata"]),
+                                                spacing=meta["spacing"],
+                                                job_dir=Path(target_frame['path']),
+                                                normalized_geo_vars=meta["geometry_vars"],
+                                                inc_name=os.path.basename(inc_name)
+                                            )
+                                        
+                                        extractor = GeometryExtractor(lammps_cmd="lmp")
+                                        env = meta.get("envelope", {})
+                                        bounds = [env['total_bounds']['x'][0], env['total_bounds']['x'][1],
+                                                  env['total_bounds']['y'][0], env['total_bounds']['y'][1],
+                                                  env['total_bounds']['z'][0], env['total_bounds']['z'][1]] if 'total_bounds' in env else None
+                                        
+                                        extractor.extract(
+                                            inc_file=Path(inc_path),
+                                            outdir=Path(geo_vtk_dir),
+                                            auto_vis=True,
+                                            combined=False,
+                                            bounds=bounds,
+                                            spacing=lattice_spacing,
+                                            radius=recon_radius if recon_radius > 0 else None
+                                        )
+                                        st.success("Geometry VTKs generated successfully!")
+                                        st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to generate VTKs: {e}")
+                                    import traceback
+                                    st.code(traceback.format_exc())
+
+                    if missing_vtks:
+                        st.warning("⚠️ **Geometry VTKs Missing**: Hopper boundaries will not be visible. Use the tools above to generate them.")
+
+                    # Filter VTKs based on selection
+                    active_vtk_files = []
+                    for v in vtk_files:
+                        if os.path.basename(v) in selected_vtk_names:
+                            active_vtk_files.append(v)
+
+                    # Setup Plotter with custom resolution
+                    plotter = UnifiedRenderer.setup_plotter(window_size=st.session_state["viz_canvas_res"])
+
+                    UnifiedRenderer.apply_scene(
+                        plotter,
+                        vtk_files=active_vtk_files,
+                        dump_path=target_dump,
+                        show_geometry=show_geo,
+                        show_particles=True,
+                        show_axes=show_axes,
+                        show_grid=show_grid,
+                        camera_state=st.session_state.get("viz_last_cam_pos"),
+                        offset=st.session_state["viz_scene_offset"],
+                        zoom=zoom
+                    )
+                    
+                    # Viewfinder Border CSS
+                    vw, vh = st.session_state["viz_canvas_res"]
+                    st.markdown(f"""
+                        <style>
+                        .viz-viewfinder {{
+                            border: 2px solid #333;
+                            border-radius: 5px;
+                            padding: 10px;
+                            background: #000;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin-bottom: 10px;
+                        }}
+                        .viz-info-overlay {{
+                            color: #666;
+                            font-family: monospace;
+                            font-size: 0.8rem;
+                            text-align: center;
+                            margin-top: 5px;
+                        }}
+                        </style>
+                        <div class="viz-info-overlay">Recording Frame: {vw}x{vh}px (Aspect Ratio: {round(vw/vh, 2)})</div>
+                    """, unsafe_allow_html=True)
+
+                    # Display interactive plotter in a bordered 'Viewfinder' container (if enabled)
+                    if show_interactive:
+                        with st.container(border=True):
+                            st_state = stpyvista(plotter, key="viz_preview_plot")
+                        
+                        # Persist camera state on interaction
+                        if st_state is not None:
+                            # Extract camera position safely
+                            new_pos = st_state.get("camera_position")
+                            if new_pos:
+                                # Subtract current offset before saving to maintain 'subject-relative' view
+                                import numpy as np
+                                off = np.array(st.session_state["viz_scene_offset"])
+                                clean_pos = list(np.array(new_pos[0]) - off)
+                                clean_fp = list(np.array(new_pos[1]) - off)
+                                st.session_state["viz_last_cam_pos"] = [clean_pos, clean_fp, new_pos[2]]
+                    else:
+                        st.info("💡 **Interactive Preview Disabled**: Use 'High-Res Snapshot' below to see your current scene setup.")
+                    
+                    c_cam1, c_cam2, c_cam3 = st.columns(3)
+                    if c_cam1.button("💾 Save View", use_container_width=True, help="Save the current camera angle as the default for this session and future restarts."):
+                        save_viz_settings(
+                            st.session_state["viz_scene_offset"], 
+                            st.session_state["viz_zoom"], 
+                            camera=st.session_state.get("viz_last_cam_pos"),
+                            width=canvas_width,
+                            height=canvas_height
+                        )
+                        st.success("Camera orientation and resolution saved to disk!")
+                    
+                    if c_cam2.button("🔄 Reset View", use_container_width=True):
+                        st.session_state.pop("viz_last_cam_pos", None)
+                        st.rerun()
+                    
+                    if c_cam3.button("📸 High-Res Snapshot", use_container_width=True):
+                        with st.spinner("Generating High-Res PNG..."):
+                            params = {
+                                "chain_paths": chain,
+                                "fps": fps,
+                                "dt": dt,
+                                "show_geometry": show_geo,
+                                "selected_vtks": selected_vtk_names,
+                                "show_axes": show_axes,
+                                "show_grid": show_grid,
+                                "camera_position": st.session_state.get("viz_last_cam_pos"),
+                                "offset": st.session_state["viz_scene_offset"],
+                                "resolution": st.session_state["viz_canvas_res"],
+                                "zoom": zoom
+                            }
+                            shot_path = VizManager.generate_high_res_snapshot(params, target_frame)
+                            st.session_state["last_viz_snapshot"] = shot_path
+
+                    if "last_viz_snapshot" in st.session_state:
+                        st.write("---")
+                        st.write("🖼️ **Latest High-Res Snapshot**")
+                        st.image(st.session_state["last_viz_snapshot"], use_container_width=True)
+                        if st.button("🗑️ Clear Snapshot"):
+                            st.session_state.pop("last_viz_snapshot")
+                            st.rerun()
+
+                    st.info("📌 **Capture Active**: Your current orientation, zoom, resolution, and offset will be used for the movie.")
+                else:
+                    st.info("No frames found in the selected lineage. Please check if simulation data exists.")
 
                 # 3. Job Submission
                 st.divider()
@@ -539,224 +844,6 @@ if st.runtime.exists():
                                 st.rerun()
                             else:
                                 st.error(msg)
-
-                # Interactive 3D Configuration Preview
-                st.divider()
-                st.write("#### 🕹️ Interactive Configuration Preview")
-                st.caption("Rotate, zoom, and pan to set the perfect camera view for your movie.")
-                
-                # Setup Plotter
-                plotter = UnifiedRenderer.setup_plotter(window_size=[800, 600])
-                
-                # Get the frame to preview
-                all_frames = VizManager.get_chain_frames(chain)
-                target_frame = all_frames[0] if all_frames else None
-                target_dump = None
-                if target_frame:
-                    f_path, f_ts = target_frame['path'], target_frame['ts']
-                    s_dirs = [os.path.join(f_path, "chain"), f_path]
-                    for sd in s_dirs:
-                        if os.path.isdir(sd):
-                            matches = glob.glob(os.path.join(sd, f"*{f_ts}.dump"))
-                            if matches:
-                                target_dump = matches[0]
-                                break
-                
-                # Collect geometry files
-                vtk_files = []
-                for p in chain:
-                    geo_dir = os.path.join(p, "Geometry_vtk")
-                    if os.path.exists(geo_dir):
-                        vtk_files.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
-
-                # Check for missing data in the interactive preview
-                geo_vtk_dir = os.path.join(target_frame['path'], "Geometry_vtk") if target_frame else None
-                missing_vtks = geo_vtk_dir and not os.path.exists(geo_vtk_dir)
-
-                if target_frame and not os.path.exists(target_frame['path']):
-                    st.error(f"Data not local for {os.path.basename(target_frame['path'])}. Restore it first for a preview.")
-                    if st.button(f"📥 Restore {os.path.basename(target_frame['path'])} Now", use_container_width=True, type="primary"):
-                        with st.spinner("Restoring..."):
-                            success, msg = SyncManager.restore_run(target_frame['path'])
-                            if success:
-                                st.success("Restore complete!")
-                                st.rerun()
-                            else:
-                                st.error(msg)
-                elif target_frame:
-                    if missing_vtks:
-                        st.warning("⚠️ **Geometry VTKs Missing**: The hopper boundaries will not be visible in the preview or movie.")
-                        if st.button("🛠️ Generate Geometry VTKs (from metadata)", use_container_width=True):
-                            with st.spinner("Regenerating geometry meshes..."):
-                                try:
-                                    import warnings
-                                    warnings.filterwarnings('ignore', message='.*OVITO.*PyPI')
-                                    
-                                    from simulation.grid_hopper_manager import GridHopperManager
-                                    from simulation.runner import SimulationRunner
-                                    from analysis.geometry_extractor import GeometryExtractor
-                                    
-                                    # 1. Robust Metadata Search
-                                    meta_path = None
-                                    curr_p = Path(target_frame['path'])
-                                    # Search current and up to 3 parents (to catch lineage inheritance)
-                                    for _ in range(4):
-                                        for m_name in ["grid_metadata.json", "metadata.json"]:
-                                            test_p = curr_p / m_name
-                                            if test_p.exists():
-                                                meta_path = test_p
-                                                break
-                                        if meta_path: break
-                                        curr_p = curr_p.parent
-                                        if curr_p.name == "dumping_yard": break
-
-                                    if not meta_path:
-                                        st.error("Metadata not found in this run or its parents. Cannot regenerate geometry.")
-                                    else:
-                                        with open(meta_path, 'r') as f:
-                                            meta = json.load(f)
-                                        
-                                        # 2. Setup Manager & Runner
-                                        runner = SimulationRunner(lammps_executable="lmp") # Default to standard lmp
-                                        mgr = GridHopperManager(runner)
-                                        
-                                        # 3. Ensure .inc file exists (regenerate if missing)
-                                        inc_name = meta.get("geometry_inc", "replicated_geometry.inc")
-                                        inc_path = os.path.join(target_frame['path'], os.path.basename(inc_name))
-                                        
-                                        if not os.path.exists(inc_path):
-                                            st.info("Regenerating .inc file...")
-                                            mgr._generate_replicated_geometry(
-                                                setup_path=Path(meta["hopper_template_data"]),
-                                                n_hoppers=len(meta["metadata"]),
-                                                spacing=meta["spacing"],
-                                                job_dir=Path(target_frame['path']),
-                                                normalized_geo_vars=meta["geometry_vars"],
-                                                inc_name=os.path.basename(inc_name)
-                                            )
-                                        
-                                        # 4. Extract VTKs
-                                        extractor = GeometryExtractor(lammps_cmd="lmp")
-                                        # Get bounds from envelope in metadata
-                                        env = meta.get("envelope", {})
-                                        bounds = [env['total_bounds']['x'][0], env['total_bounds']['x'][1],
-                                                  env['total_bounds']['y'][0], env['total_bounds']['y'][1],
-                                                  env['total_bounds']['z'][0], env['total_bounds']['z'][1]] if 'total_bounds' in env else None
-                                        
-                                        extractor.extract(
-                                            inc_file=Path(inc_path),
-                                            outdir=Path(geo_vtk_dir),
-                                            auto_vis=True,
-                                            combined=False,
-                                            bounds=bounds,
-                                            spacing=0.005 # Match the standard resolution
-                                        )
-                                        st.success("Geometry VTKs generated successfully!")
-                                        st.rerun()
-                                except Exception as e:
-                                    st.error(f"Failed to generate VTKs: {e}")
-                                    import traceback
-                                    st.code(traceback.format_exc())
-
-                    # Filter VTKs based on selection
-                    active_vtk_files = []
-                    for v in vtk_files:
-                        if os.path.basename(v) in selected_vtk_names:
-                            active_vtk_files.append(v)
-
-                    # Setup Plotter with custom resolution
-                    plotter = UnifiedRenderer.setup_plotter(window_size=st.session_state["viz_canvas_res"])
-
-                    UnifiedRenderer.apply_scene(
-                        plotter,
-                        vtk_files=active_vtk_files,
-                        dump_path=target_dump,
-                        show_geometry=show_geo,
-                        show_particles=True,
-                        show_axes=show_axes,
-                        show_grid=show_grid,
-                        camera_state=st.session_state.get("viz_last_cam_pos"),
-                        offset=st.session_state["viz_scene_offset"],
-                        zoom=zoom
-                    )
-                    
-                    # Viewfinder Border CSS
-                    vw, vh = st.session_state["viz_canvas_res"]
-                    st.markdown(f"""
-                        <style>
-                        .viz-viewfinder {{
-                            border: 2px solid #333;
-                            border-radius: 5px;
-                            padding: 10px;
-                            background: #000;
-                            width: 100%;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            margin-bottom: 10px;
-                        }}
-                        .viz-info-overlay {{
-                            color: #666;
-                            font-family: monospace;
-                            font-size: 0.8rem;
-                            text-align: center;
-                            margin-top: 5px;
-                        }}
-                        </style>
-                        <div class="viz-info-overlay">Recording Frame: {vw}x{vh}px (Aspect Ratio: {round(vw/vh, 2)})</div>
-                    """, unsafe_allow_html=True)
-
-                    # Display interactive plotter in a bordered 'Viewfinder' container (if enabled)
-                    if show_interactive:
-                        with st.container(border=True):
-                            st_state = stpyvista(plotter, key="viz_preview_plot")
-                        
-                        # Persist camera state on interaction
-                        if st_state is not None:
-                            # Extract camera position safely
-                            new_pos = st_state.get("camera_position")
-                            if new_pos:
-                                st.session_state["viz_last_cam_pos"] = new_pos
-                    else:
-                        st.info("💡 **Interactive Preview Disabled**: Use 'High-Res Snapshot' below to see your current scene setup.")
-                    
-                    c_cam1, c_cam2, c_cam3 = st.columns(3)
-                    if c_cam1.button("🎥 Capture View", use_container_width=True):
-                        st.success("View captured for movie!")
-                    
-                    if c_cam2.button("🔄 Reset View", use_container_width=True):
-                        st.session_state.pop("viz_last_cam_pos", None)
-                        st.rerun()
-                    
-                    if c_cam3.button("📸 High-Res Snapshot", use_container_width=True):
-                        with st.spinner("Generating High-Res PNG..."):
-                            params = {
-                                "chain_paths": chain,
-                                "fps": fps,
-                                "dt": dt,
-                                "show_geometry": show_geo,
-                                "selected_vtks": selected_vtk_names,
-                                "show_axes": show_axes,
-                                "show_grid": show_grid,
-                                "camera_position": st.session_state.get("viz_last_cam_pos"),
-                                "offset": st.session_state["viz_scene_offset"],
-                                "resolution": st.session_state["viz_canvas_res"],
-                                "zoom": zoom
-                            }
-                            shot_path = VizManager.generate_high_res_snapshot(params, target_frame)
-                            st.session_state["last_viz_snapshot"] = shot_path
-
-                    if "last_viz_snapshot" in st.session_state:
-                        st.write("---")
-                        st.write("🖼️ **Latest High-Res Snapshot**")
-                        st.image(st.session_state["last_viz_snapshot"], use_container_width=True)
-                        if st.button("🗑️ Clear Snapshot"):
-                            st.session_state.pop("last_viz_snapshot")
-                            st.rerun()
-
-                    st.info("📌 **Capture Active**: Your current orientation, zoom, resolution, and offset will be used for the movie.")
-                else:
-                    st.info("No frames found in the selected lineage. Please check if simulation data exists.")
 
                 st.info("💡 Note: Missing simulation data will be automatically restored from Google Drive and cleaned up after the job finishes.")
 
@@ -862,7 +949,27 @@ if st.runtime.exists():
                 # Base Style
                 on_disk = os.path.exists(run_id)
                 style = "active"
-                if seed in running_seeds: style = "running"
+                
+                # Check for in-place running via active_seeds in metadata
+                is_inplace_running = False
+                if on_disk:
+                    try:
+                        m_path = os.path.join(run_id, "grid_metadata.json")
+                        if not os.path.exists(m_path):
+                            m_path = os.path.join(run_id, "metadata.json")
+                        if os.path.exists(m_path):
+                            with open(m_path, 'r') as f:
+                                m_data = json.load(f)
+                                if "active_seeds" in m_data:
+                                    for s in m_data["active_seeds"]:
+                                        if str(s) in running_seeds:
+                                            is_inplace_running = True
+                                            break
+                    except Exception:
+                        pass
+
+                if seed in running_seeds or is_inplace_running: 
+                    style = "running"
                 elif info.get("sync_status") == "Synced":
                     style = "synced" if on_disk else "cleared"
                 elif info["status"] == "Archived": style = "archived"
@@ -1121,6 +1228,61 @@ if st.runtime.exists():
                     
                     if active_parent_jids:
                         st.info(f"🔗 **Lineage Dependencies:** {len(active_parent_jids)} of the selected runs are still active. Dependent jobs will wait for them.")
+                    
+                    # --- CONSOLIDATION / MERGE SECTION ---
+                    if len(selected_parents) == 2:
+                        id1, id2 = selected_parents
+                        # Identify Parent and Child
+                        p1, p2 = lineage[id1], lineage[id2]
+                        can_merge = False
+                        if p2.get("parent") == id1:
+                            parent_id, child_id = id1, id2
+                            can_merge = True
+                        elif p1.get("parent") == id2:
+                            parent_id, child_id = id2, id1
+                            can_merge = True
+                        
+                        if can_merge:
+                            st.sidebar.markdown("---")
+                            st.sidebar.subheader("🛠️ Consolidation Tool")
+                            st.sidebar.info(f"Merge **{lineage[child_id]['name']}** into **{lineage[parent_id]['name']}** to shorten lineage.")
+                            
+                            # Check local status
+                            parent_local = os.path.exists(parent_id)
+                            child_local = os.path.exists(child_id)
+                            
+                            needs_restore = not (parent_local and child_local)
+                            if needs_restore:
+                                st.sidebar.warning("☁️ Some files are in the cloud and must be restored first.")
+                            
+                            if st.sidebar.button("🚀 Start Consolidation", use_container_width=True):
+                                try:
+                                    from Pulse.pulse_core import SyncManager
+                                    from Pulse.merge_runs import merge_folders
+                                    
+                                    with st.sidebar.status("Consolidating runs...", expanded=True) as status:
+                                        # 1. Restore if needed
+                                        if not parent_local:
+                                            status.write(f"Downloading parent: {lineage[parent_id]['name']}...")
+                                            success, msg = SyncManager.restore_run(parent_id)
+                                            if not success: raise Exception(msg)
+                                        
+                                        if not child_local:
+                                            status.write(f"Downloading child: {lineage[child_id]['name']}...")
+                                            success, msg = SyncManager.restore_run(child_id)
+                                            if not success: raise Exception(msg)
+                                        
+                                        # 2. Execute Merge
+                                        status.write("Merging files and metadata...")
+                                        success = merge_folders(parent_id, child_id)
+                                        if not success: raise Exception("Merge script failed.")
+                                        
+                                        status.update(label="✅ Consolidation Complete!", state="complete")
+                                        st.session_state["lineage_selected_parents"] = [parent_id]
+                                        time.sleep(1)
+                                        st.rerun()
+                                except Exception as e:
+                                    st.sidebar.error(f"Consolidation failed: {e}")
                 
                 if selected_parents != ["NewRoot"]:
                     # Notes and Snapshot (Only for the first selected parent to avoid clutter)
@@ -1167,6 +1329,10 @@ if st.runtime.exists():
                     ppn = gc2.number_input("PPN", value=16, step=1)
                     mem = gc3.text_input("Memory", value="16gb")
                     max_concurrent = gc4.number_input("Max Concurrent Jobs", value=4, min_value=1, step=1, help="If you submit more jobs than this limit, they will be queued with depend=afterany.")
+                    
+                    polite_mode = st.checkbox("😇 Polite Mode (Low Priority)", value=False, help="Sets priority to -1024 so student jobs run first. Suggests shorter walltimes for better backfilling.")
+                    if polite_mode:
+                        st.info("💡 **Polite Mode Active**: Priority set to -1024. Consider reducing Walltime to 2-4 hours for faster backfilling.")
                     
                     gc5, gc6, gc7, gc8 = st.columns(4)
                     num_procs = gc5.number_input("Num Procs", value=8, step=1)
@@ -1244,6 +1410,13 @@ if st.runtime.exists():
                     elif selected_mode == "flow_resume":
                         frc1, frc2 = st.columns(2)
                         mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
+                    
+                    # In-place Resumption Toggle (not for new fill runs)
+                    inplace_mode = False
+                    if selected_mode != "fill":
+                        inplace_mode = st.checkbox("😇 In-place Resumption (Same Folder)", value=False, help="Continues simulation in the parent's folder instead of creating a new one. WARNING: Modifies parent files.")
+                        if inplace_mode:
+                            st.info("⚠️ In-place selected. Sync status will be reset to Local.")
                         
                     submit_btn = st.form_submit_button("🚀 Submit to PBS")
                     
@@ -1289,8 +1462,9 @@ if st.runtime.exists():
                                             "walltime": walltime,
                                             "ppn": int(ppn),
                                             "mem": mem,
+                                            "priority": -1024 if polite_mode else 0,
                                             "dependency": p_active_jid,
-                                            "params": job_params
+                                            "params": {**job_params, "inplace": inplace_mode}
                                         })
                             else:
                                 # Single job submission per parent
@@ -1337,8 +1511,9 @@ if st.runtime.exists():
                                     "walltime": walltime,
                                     "ppn": int(ppn),
                                     "mem": mem,
+                                    "priority": -1024 if polite_mode else 0,
                                     "dependency": p_active_jid,
-                                    "params": final_params
+                                    "params": {**final_params, "inplace": inplace_mode}
                                 })
                         
                         try:

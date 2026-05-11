@@ -65,10 +65,8 @@ class UnifiedRenderer:
             for i, vtk_file in enumerate(vtk_files):
                 if os.path.exists(vtk_file):
                     mesh = pv.read(vtk_file)
-                    if offset:
-                        mesh.translate(offset)
                     color = UnifiedRenderer.GEOM_COLORS[i % len(UnifiedRenderer.GEOM_COLORS)]
-                    plotter.add_mesh(mesh, color=color, opacity=geom_opacity, show_edges=False)
+                    plotter.add_mesh(mesh, color=color, opacity=geom_opacity, show_edges=False, reset_camera=False)
 
         # 2. Add Particles
         if show_particles and dump_path and os.path.exists(dump_path):
@@ -76,9 +74,6 @@ class UnifiedRenderer:
             if df is not None and not df.empty:
                 if all(k in df.columns for k in ['x', 'y', 'z']):
                     points = df[['x', 'y', 'z']].values
-                    if offset:
-                        points += np.array(offset)
-                    
                     pdata = pv.PolyData(points)
                     
                     if 'diameter' in df.columns:
@@ -100,11 +95,12 @@ class UnifiedRenderer:
                             cmap=my_cmap, 
                             smooth_shading=True,
                             show_scalar_bar=False,
-                            categories=True
+                            categories=True,
+                            reset_camera=False
                         )
                     else:
                         particles = pdata.glyph(scale="radius", geom=sphere, orient=False)
-                        plotter.add_mesh(particles, color="#FF5733", smooth_shading=True)
+                        plotter.add_mesh(particles, color="#FF5733", smooth_shading=True, reset_camera=False)
 
         # 3. Decorators
         if show_axes:
@@ -120,11 +116,34 @@ class UnifiedRenderer:
                 norm_cam = [list(x) if isinstance(x, (list, tuple)) else x for x in camera_state]
                 plotter.camera_position = norm_cam
             except Exception as e:
-                # print(f"DEBUG: Camera restore failed: {e}")
                 plotter.view_yz() # Fallback to +X
         else:
-            plotter.view_yz() # Default to +X
+            # Smart Centering: Prioritize centering on Geometry (Hoppers)
+            # This prevents the camera from "following" falling particles.
+            geom_bounds = None
+            if vtk_files:
+                all_v = []
+                for v in vtk_files:
+                    if os.path.exists(v):
+                        all_v.append(pv.read(v))
+                if all_v:
+                    geom_bounds = pv.MultiBlock(all_v).bounds
             
+            plotter.view_yz() # Set orientation first
+            if geom_bounds:
+                plotter.reset_camera(bounds=geom_bounds) # Center and zoom to hoppers
+            else:
+                plotter.reset_camera() # Fallback to whole scene
+            
+        # Apply translation offset to the CAMERA (moves the whole view)
+        if offset:
+            # We move the camera position and focal point by the offset
+            # This effectively "shifts" the entire world view without modifying subjects
+            pos = np.array(plotter.camera.position)
+            fp = np.array(plotter.camera.focal_point)
+            plotter.camera.position = pos + np.array(offset)
+            plotter.camera.focal_point = fp + np.array(offset)
+
         if zoom != 1.0:
             plotter.camera.zoom(zoom)
             

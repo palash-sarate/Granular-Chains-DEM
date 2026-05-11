@@ -836,7 +836,8 @@ python Pulse/run_sync_job.py --user {user}
                 os.remove(zip_path)
             
             # 4. Update lineage
-            lineage[run_path]['sync_status'] = 'Local'
+            # We keep it as Synced because it is still on Drive, but now also local.
+            lineage[run_path]['sync_status'] = 'Synced'
             PBSManager.save_lineage(lineage)
             
             return True, f"Successfully restored {info['name']} to {run_path}"

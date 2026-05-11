@@ -177,7 +177,8 @@ class HopperManager:
                             dump_inc: str = "simulation_templates/default_dump.inc", 
                             viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
                             N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1,
-                            use_kokkos: bool = True, use_intel: bool = True) -> str:
+                            use_kokkos: bool = True, use_intel: bool = True,
+                            inplace: bool = False) -> str:
         """Resume a hopper fill simulation from a restart file and add more chains.
         Returns the path to the saved data file.
         """
@@ -218,7 +219,10 @@ class HopperManager:
         if mol_dir is None or mol_dir == "chain_data/molecules_temp":
             # outdir is handled in SimulationConfig compute_output_dir if not provided
             from .config import SimulationConfig
-            actual_outdir = outdir if outdir else SimulationConfig.compute_output_dir("Hopper_Fill", run_name)
+            if inplace:
+                actual_outdir = outdir if outdir else restart_path.parent.parent # restart is in <dir>/restart/f.bin
+            else:
+                actual_outdir = outdir if outdir else SimulationConfig.compute_output_dir("Hopper_Fill", run_name)
             mol_dir = os.path.join(actual_outdir, "molecules")
 
         # Prepare molecules (ensure we have the .mol files for create_atoms)
@@ -234,7 +238,7 @@ class HopperManager:
             run=run_name,
             resume_file=restart_path,
             dump_file=dump_inc,
-            outdir_override=outdir,
+            outdir_override=outdir if not inplace else actual_outdir,
             extra_vars={
                 "viscosity": viscosity,
                 "setup_inc": setup_inc,
@@ -256,6 +260,25 @@ class HopperManager:
         print(f"Resuming filled hopper state: {run_name}")
         # Use runner.resume instead of runner.run
         self.runner.resume(cfg, verbose=True)
+
+        # Metadata tracking (Non-grid)
+        m_path = os.path.join(cfg.output_dir, "metadata.json")
+        m_data = {}
+        if os.path.exists(m_path):
+            with open(m_path, 'r') as f: m_data = json.load(f)
+        
+        if "active_seeds" not in m_data: m_data["active_seeds"] = []
+        if str(seed) not in m_data["active_seeds"]: m_data["active_seeds"].append(str(seed))
+        
+        if inplace:
+            from Pulse.pulse_core import PBSManager
+            lineage = PBSManager.load_lineage()
+            if cfg.output_dir in lineage:
+                lineage[cfg.output_dir]["sync_status"] = "Local"
+                PBSManager.save_lineage(lineage)
+
+        with open(m_path, 'w') as f:
+            json.dump(m_data, f, indent=4)
 
         saved_data = f"{cfg.output_dir}/final_hopper_resume.data".replace("\\", "/")
         return saved_data

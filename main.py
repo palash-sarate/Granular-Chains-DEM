@@ -52,6 +52,7 @@ def main():
     p_resume_h.add_argument("--num_threads", type=int, default=1)
     p_resume_h.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
     p_resume_h.add_argument("--no-intel", action="store_false", dest="use_intel")
+    p_resume_h.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     # 3. run_flop_simulation
     p_flop = subparsers.add_parser("run_flop_simulation", help="Run a single chain-flop mobility simulation")
@@ -153,6 +154,7 @@ def main():
     p_grid_h.set_defaults(generate_vtk=True)
     p_grid_h.add_argument("--geometry_vars", type=str, help="JSON string for per-hopper geometry variables")
     p_grid_h.add_argument("--seed", type=int, default=None)
+    p_grid_h.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     # 10. resume_grid_hopper_filling
     p_res_grid = subparsers.add_parser("resume_grid_hopper_filling", help="Resume a super-simulation for batch hopper filling")
@@ -168,6 +170,7 @@ def main():
     p_res_grid.add_argument("--template", default="in.grid_hopper_fill_resume")
     p_res_grid.add_argument("--simulation", default="Grid_Hopper_Filling")
     p_res_grid.add_argument("--seed", type=int, default=None)
+    p_res_grid.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     # 11. run_grid_hopper_flow
     p_flow = subparsers.add_parser("run_grid_hopper_flow", help="Transition filled hoppers to oscillatory flow")
@@ -186,6 +189,7 @@ def main():
     p_flow.add_argument("--simulation", default="Grid_Hopper_Flow")
     p_flow.add_argument("--template", default="in.grid_hopper_flow")
     p_flow.add_argument("--seed", type=int, default=None)
+    p_flow.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     # 12. resume_grid_hopper_flow
     p_res_flow = subparsers.add_parser("resume_grid_hopper_flow", help="Resume a grid flow simulation")
@@ -201,6 +205,7 @@ def main():
     p_res_flow.add_argument("--template", default="in.grid_hopper_flow_resume")
     p_res_flow.add_argument("--simulation", default="Grid_Hopper_Flow")
     p_res_flow.add_argument("--seed", type=int, default=None)
+    p_res_flow.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     args = parser.parse_args()
     

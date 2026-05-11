@@ -1,26 +1,18 @@
 --- HPC Sync Job Started for user: guest ---
 Starting Sync Cycle...
 Lineage rescan complete.
-Active seeds in PBS: ['769729', '296008', '169565', '515432', '155721', '381262', '902296', '123891', '920841', '339261']
-Found 4 runs to check for sync.
+Active seeds in PBS: ['515432', '381262', '902296', '920841', '832601', '538767', '834779', '506010', '417172', '275397', '391480', '171758', '761949', '246775', '577899', '940885', '605007', '486441']
+Found 0 runs to check for sync.
 Fetching cloud inventory from Google Drive...
-Found 61 files already on Drive.
+Found 69 files already on Drive.
 Starting parallel compression with 8 workers...
-PROGRESS_COMPRESS: 1 / 4
-Finished compressing Grid_Fill_1H_S694955_S950784_S371727_S801731.
-PROGRESS_COMPRESS: 2 / 4
-Finished compressing Grid_Fill_1H_S469898_S906801_S672044_S388652_S172787_S623109_S276554.
-PROGRESS_COMPRESS: 3 / 4
-Finished compressing Grid_Fill_1H_S935840_S448923_S286904_S279832_S749841_S615063_S355510.
-PROGRESS_COMPRESS: 4 / 4
-Finished compressing Grid_Fill_1H_S481365_S918498_S405677_S328882_S276082_S443193_S440630.
-Starting bulk upload to Google Drive...
-Upload successful.
 Starting Smart Cleanup...
-Cleaning up local files for: Grid_Fill_1H_S694955_S950784_S371727
-Cleaning up local files for: Grid_Fill_1H_S481365_S918498_S405677_S328882_S276082_S443193
-Cleaning up local files for: Grid_Fill_1H_S935840_S448923_S286904_S279832_S749841_S615063
-Cleaning up local files for: Grid_Fill_1H_S469898_S906801_S672044_S388652_S172787_S623109
-Cleanup complete. Removed 4 parent directories.
+Cleaning up local files for: Grid_Fill_1H_S240587
+Cleaning up local files for: Grid_Fill_1H_S240587_S803190
+Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247
+Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791
+Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791_S854497
+Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791_S854497_S936826
+Cleanup complete. Removed 6 parent directories.
 Sync Cycle Finished Successfully.
 --- HPC Sync Job Finished ---

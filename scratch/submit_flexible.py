@@ -18,6 +18,7 @@ PBS_TEMPLATE = """#!/bin/bash
 #PBS -M palashsarate@iisc.ac.in
 #PBS -o PBS_Output/{job_name}.log
 #PBS -e PBS_Output/{job_name}_err.log
+#PBS -p {priority}
 #PBS -S /bin/bash
 
 # 1. Set working directory
@@ -45,6 +46,7 @@ DEFAULTS = {
     "walltime": "24:00:00",
     "ppn": 16,
     "mem": "16gb",
+    "priority": 0,
 }
 
 # --- 2. DEFINE YOUR STUDY HERE ---
@@ -221,7 +223,7 @@ def generate_command(config):
     cmd_parts = [base_cmd]
     
     # Parameters to ignore for the CLI (they go to PBS header instead)
-    ignore_keys = ["walltime", "ppn", "mem", "type", "name"]
+    ignore_keys = ["walltime", "ppn", "mem", "type", "name", "priority"]
     
     for key, val in full_params.items():
         if key in ignore_keys: continue
@@ -301,6 +303,7 @@ def submit_jobs(jobs, submit=True, max_concurrent=4, user="guest"):
                 walltime=walltime,
                 ppn=ppn,
                 mem=mem,
+                priority=job.get("priority", 0),
                 command=command
             )
             

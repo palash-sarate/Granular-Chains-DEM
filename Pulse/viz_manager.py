@@ -219,7 +219,7 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
         )
         
         # Add Overlay
-        plotter.add_text(f"Time: {f_ts*dt:.4e}s", position='upper_left', font_size=12, color='red')
+        plotter.add_text(f"{f_ts*dt:.3f}s", position='upper_left', font_size=12, color='red')
         
         snapshot_path = os.path.join(ROOT_DIR, VizManager.VIZ_DIR, f"snapshot_{f_ts}.png")
         os.makedirs(os.path.dirname(snapshot_path), exist_ok=True)
@@ -302,7 +302,7 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
                 offset=offset,
                 zoom=params.get('zoom', 1.0)
             )
-            plotter.add_text(f"Time: {f_ts*dt:.4e}s\nFrame: {i}", position='upper_left', font_size=10, color='red')
+            plotter.add_text(f"{f_ts*dt:.3f}s\nFrame: {i}", position='upper_left', font_size=10, color='red')
             plotter.screenshot(os.path.join(frames_dir, f"frame_{i:06d}.png"))
             if i % 10 == 0: print(f"Rendered {i}/{len(frames)} frames...")
 

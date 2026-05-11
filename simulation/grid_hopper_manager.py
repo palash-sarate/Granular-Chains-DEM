@@ -170,7 +170,7 @@ class GridHopperManager:
                     auto_vis=True,
                     combined=False,
                     bounds=vtk_bounds,
-                    spacing=0.005, # Finer sampling to resolve small features (e.g. 2.5mm gaps)
+                    spacing=0.002, # High resolution to resolve small features (e.g. 2.5mm gaps)
                     num_procs=num_procs,
                     num_threads=num_threads,
                     use_kokkos=False # Permanent -no-kokkos for extraction as it often conflicts with OVITO/sampling
@@ -260,7 +260,8 @@ class GridHopperManager:
                            num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                            template: str = "in.grid_hopper_fill_resume",
                            simulation: str = None,
-                           seed: int = 42):
+                           seed: int = 42,
+                           inplace: bool = False):
         """
         Resumes a grid filling simulation from a restart file.
         """
@@ -323,12 +324,14 @@ class GridHopperManager:
                 "geometry_vars": v.get("geometry_vars")
             } for k, v in meta_raw["metadata"].items()}
 
-        # New Naming Strategy: Append the new seed to the original name
-        original_name = prev_job_dir.name
-        run_name = f"{original_name}_S{seed}"
-            
-        new_job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
-        new_job_dir.mkdir(parents=True, exist_ok=True)
+        # Naming Strategy: Inplace vs New Folder
+        if inplace:
+            new_job_dir = prev_job_dir
+            run_name = prev_job_dir.name
+        else:
+            run_name = f"{prev_job_dir.name}_S{seed}"
+            new_job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
+            new_job_dir.mkdir(parents=True, exist_ok=True)
         
         # Regeneration of geometry to ensure self-contained jobs (fixes missing parent files after sync)
         local_geometry_inc, _ = self._generate_replicated_geometry(
@@ -337,11 +340,20 @@ class GridHopperManager:
         
         # Metadata Inheritance: Copy and Update with Lineage
         new_meta = meta_raw.copy()
-        new_meta["source_dir"] = str(prev_job_dir.absolute()).replace("\\", "/")
-        new_meta["run_name"] = run_name
+        if not inplace:
+            new_meta["source_dir"] = str(prev_job_dir.absolute()).replace("\\", "/")
+            new_meta["run_name"] = run_name
         
+        # Track active seeds for dashboard color logic
+        if "active_seeds" not in new_meta: new_meta["active_seeds"] = []
+        if str(seed) not in new_meta["active_seeds"]: new_meta["active_seeds"].append(str(seed))
+        
+        # Reset sync status if resuming in-place
+        if inplace:
+            self._reset_sync_status(str(new_job_dir.absolute()))
+
         with open(new_job_dir / "grid_metadata.json", 'w') as f:
-            json.dump(new_meta, f)
+            json.dump(new_meta, f, indent=4)
         
         config = SimulationConfig(
             template="in.grid_hopper_fill_resume",
@@ -379,7 +391,8 @@ class GridHopperManager:
                       num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                       simulation: str = "Grid_Hopper_Flow",
                       template: str = "in.grid_hopper_flow",
-                      seed: int = 12345):
+                      seed: int = 12345,
+                      inplace: bool = False):
         """
         Takes a filled grid state and starts the flow simulation (opens orifices + oscillation).
         """
@@ -417,10 +430,14 @@ class GridHopperManager:
             amp_list = (list(amp) * (n_hoppers // len(amp) + 1))[:n_hoppers]
 
         # 2. Setup Flow Run Directory
-        is_mixed = "_MixedN" in source_p.name
-        run_name = f"Grid_Flow_{n_hoppers}H{'_MixedN' if is_mixed else ''}_S{seed}"
-        job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
-        job_dir.mkdir(parents=True, exist_ok=True)
+        if inplace:
+            job_dir = source_p
+            run_name = source_p.name
+        else:
+            is_mixed = "_MixedN" in source_p.name
+            run_name = f"Grid_Flow_{n_hoppers}H{'_MixedN' if is_mixed else ''}_S{seed}"
+            job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
+            job_dir.mkdir(parents=True, exist_ok=True)
 
         # 3. Generate Flow Geometry (No lids, includes oscillation variables)
         hopper_template = "simulation_geometries/2D_hopper_with_orifice_cover.inc"
@@ -439,14 +456,23 @@ class GridHopperManager:
         new_meta["freq"] = freq_list
         new_meta["amp"] = amp_list
         new_meta["osc_dir"] = osc_dir
-        new_meta["source_dir"] = str(source_p).replace("\\", "/")
-        new_meta["source_run"] = source_p.name
+        if not inplace:
+            new_meta["source_dir"] = str(source_p).replace("\\", "/")
+            new_meta["source_run"] = source_p.name
+            new_meta["run_name"] = run_name
         new_meta["simulation"] = simulation
         new_meta["geometry_inc"] = geometry_flow_inc
         new_meta["hopper_template_data"] = str(hopper_template)
         
-        with open(job_dir / "metadata.json", 'w') as f:
-            json.dump(new_meta, f)
+        # Track active seeds
+        if "active_seeds" not in new_meta: new_meta["active_seeds"] = []
+        if str(seed) not in new_meta["active_seeds"]: new_meta["active_seeds"].append(str(seed))
+
+        if inplace:
+            self._reset_sync_status(str(job_dir.absolute()))
+
+        with open(job_dir / "grid_metadata.json", 'w') as f:
+            json.dump(new_meta, f, indent=4)
 
         # 6. Configure & Run
         restart_path = source_p / "restart" / "restart.final.bin"
@@ -494,7 +520,8 @@ class GridHopperManager:
                          num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                          template: str = "in.grid_hopper_flow_resume",
                          simulation: str = None,
-                         seed: int = 42):
+                         seed: int = 42,
+                         inplace: bool = False):
         """
         Resumes a grid flow simulation from a restart file.
         """
@@ -546,9 +573,13 @@ class GridHopperManager:
                 "geometry_vars": v.get("geometry_vars")
             } for k, v in meta_raw["metadata"].items()}
 
-        # Seed-Chain Naming
-        new_job_dir, run_name = self._generate_resume_path(job_dir, seed, simulation)
-        new_job_dir.mkdir(parents=True, exist_ok=True)
+        # Naming Strategy
+        if inplace:
+            new_job_dir = job_dir
+            run_name = job_dir.name
+        else:
+            new_job_dir, run_name = self._generate_resume_path(job_dir, seed, simulation)
+            new_job_dir.mkdir(parents=True, exist_ok=True)
         
         # Regeneration of geometry to ensure self-contained jobs
         osc_params = [{"freq": freq_list[i], "amp": amp_list[i], "dir": osc_dir} for i in range(n_hoppers)] if freq_list else None
@@ -562,11 +593,19 @@ class GridHopperManager:
         
         # Inherit Metadata and Update Lineage
         new_meta = meta_raw.copy()
-        new_meta["source_dir"] = str(job_dir.absolute()).replace("\\", "/")
-        new_meta["run_name"] = run_name
+        if not inplace:
+            new_meta["source_dir"] = str(job_dir.absolute()).replace("\\", "/")
+            new_meta["run_name"] = run_name
         
+        # Track active seeds
+        if "active_seeds" not in new_meta: new_meta["active_seeds"] = []
+        if str(seed) not in new_meta["active_seeds"]: new_meta["active_seeds"].append(str(seed))
+
+        if inplace:
+            self._reset_sync_status(str(new_job_dir.absolute()))
+
         with open(new_job_dir / "grid_metadata.json", 'w') as f:
-            json.dump(new_meta, f)
+            json.dump(new_meta, f, indent=4)
 
         config = SimulationConfig(
             template=template,
@@ -923,6 +962,18 @@ class GridHopperManager:
         with open(insertion_path, 'w') as f:
             f.write("\n".join(insertion_lines))
         return str(insertion_path).replace("\\", "/"), z_max_global
+
+    def _reset_sync_status(self, run_id: str):
+        """Resets the sync status in lineage.json to Local."""
+        try:
+            from Pulse.pulse_core import PBSManager
+            lineage = PBSManager.load_lineage()
+            if run_id in lineage:
+                lineage[run_id]["sync_status"] = "Local"
+                PBSManager.save_lineage(lineage)
+                print(f"[INFO] Reset sync status for {run_id} to Local due to in-place resumption.")
+        except Exception as e:
+            print(f"[WARNING] Could not reset sync status: {e}")
 
     def split_grid_results(self, big_data_path: Path, metadata: Dict[int, Any], output_base_dir: str, spacing: float = 2.0):
         # [Splitting logic similar to GridRelaxManager but aware of hopper boundaries]

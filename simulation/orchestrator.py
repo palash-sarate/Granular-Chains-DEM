@@ -78,7 +78,8 @@ class SimulationOrchestrator:
                           num_procs: int = None,
                           num_threads: int = 1,
                           use_kokkos: bool = True,
-                          use_intel: bool = True):
+                          use_intel: bool = True,
+                          inplace: bool = False):
         """Resume filling a hopper from a binary restart file."""
         if seed is None:
             seed = int(time.time()) % 1000000
@@ -102,7 +103,8 @@ class SimulationOrchestrator:
                                     num_procs=num_procs,
                                     num_threads=num_threads,
                                     use_kokkos=use_kokkos,
-                                    use_intel=use_intel)
+                                    use_intel=use_intel,
+                                    inplace=inplace)
 
     def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Run a single chain-flop simulation to analyze mobility."""
@@ -383,7 +385,8 @@ class SimulationOrchestrator:
                                   use_kokkos: bool = True,
                                   template: str = "in.grid_hopper_fill_resume",
                                   simulation: str = "Grid_Hopper_Filling",
-                                  seed: Optional[int] = None):
+                                  seed: Optional[int] = None,
+                                  inplace: bool = False):
         """
         Resumes a grid hopper filling simulation from a restart file.
         """
@@ -409,7 +412,8 @@ class SimulationOrchestrator:
             use_kokkos=use_kokkos,
             template=template,
             simulation=simulation,
-            seed=seed
+            seed=seed,
+            inplace=inplace
         )
 
     def run_grid_hopper_flow(self, source_dir: str, run_steps: int = 1000000,
@@ -421,7 +425,8 @@ class SimulationOrchestrator:
                              num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                              simulation: str = "Grid_Hopper_Flow",
                              template: str = "in.grid_hopper_flow",
-                             seed: Optional[int] = None):
+                             seed: Optional[int] = None,
+                             inplace: bool = False):
         """
         Transitions a filling simulation to a flow simulation with oscillation.
         """
@@ -446,7 +451,8 @@ class SimulationOrchestrator:
             num_procs=num_procs, num_threads=num_threads, use_kokkos=use_kokkos,
             simulation=simulation,
             template=template,
-            seed=seed
+            seed=seed,
+            inplace=inplace
         )
 
     def resume_grid_hopper_flow(self, restart_path: str, run_steps: int = 1000000,
@@ -456,8 +462,9 @@ class SimulationOrchestrator:
                                 viscosity: float = 0.001,
                                 num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                                 template: str = "in.grid_hopper_flow_resume",
-                                simulation: str = "Grid_Hopper_Flow",
-                                seed: Optional[int] = None):
+                                simulation: str = None,
+                                seed: Optional[int] = None,
+                                inplace: bool = False):
         """
         Resumes a grid hopper flow simulation.
         """
@@ -481,5 +488,6 @@ class SimulationOrchestrator:
             num_procs=num_procs, num_threads=num_threads, use_kokkos=use_kokkos,
             template=template,
             simulation=simulation,
-            seed=seed
+            seed=seed,
+            inplace=inplace
         )
