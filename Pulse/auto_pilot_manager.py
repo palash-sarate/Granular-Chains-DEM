@@ -15,9 +15,9 @@ QSUB_PATH = "/opt/pbs/bin/qsub"
 PBS_TEMPLATE = """#!/bin/bash
 #PBS -N {job_name}
 #PBS -q workq
-#PBS -l walltime=24:00:00
-#PBS -l nodes=master:ppn=16
-#PBS -l mem=16gb
+#PBS -l walltime={walltime}
+#PBS -l nodes=master:ppn={ppn}
+#PBS -l mem={mem}
 #PBS -m n
 #PBS -o {log_dir}/{job_name}.log
 #PBS -e {log_dir}/{job_name}_err.log
@@ -172,7 +172,10 @@ def run_manager():
         script_content = PBS_TEMPLATE.format(
             job_name=job_name,
             log_dir=log_dir,
-            command=full_command
+            command=full_command,
+            walltime=overrides.get("walltime", "24:00:00"),
+            ppn=overrides.get("ppn", 16),
+            mem=overrides.get("mem", "16gb")
         )
         
         script_path = os.path.join(ROOT_DIR, "Pulse", f"temp_{job_name}.pbs")

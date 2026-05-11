@@ -885,6 +885,10 @@ if st.runtime.exists():
         if not lineage:
             st.info("No lineage data found. Click 'Sync from Disk' to scan your simulations.")
         else:
+            # Load Auto-Pilot goals for graph badges
+            auto_data = load_auto_pilot()
+            auto_goals = auto_data.get("goals", {})
+
             # Parse PBS Jobs for Status Overlay
             import re
             pbs_manager = PBSManager()
@@ -962,6 +966,11 @@ if st.runtime.exists():
                 
                 # Base Style
                 on_disk = os.path.exists(run_id)
+                is_auto = run_id in auto_goals
+                
+                if is_auto:
+                    node_label = f"🤖 {node_label}"
+
                 style = "active"
                 
                 # Check for in-place running via active_seeds in metadata
@@ -989,6 +998,8 @@ if st.runtime.exists():
                 elif info["status"] == "Archived": style = "archived"
                 elif "Flow" in info["simulation"]: style = "flow"
                 
+                if is_auto: style = "auto_pilot"
+
                 mermaid_code += f'    {short_id}["{node_label}"]:::{style}\n'
                 mermaid_code += f'    click {short_id} call selectNode("{short_id}")\n'
                 
@@ -1027,6 +1038,7 @@ if st.runtime.exists():
             mermaid_code += "    classDef running fill:#a5d6a7,stroke:#2e7d32,stroke-width:3px;\n"
             mermaid_code += "    classDef queued fill:#ffccbc,stroke:#d32f2f,stroke-dasharray: 5 5;\n"
             mermaid_code += "    classDef new_node fill:#ffffff,stroke:#333333,stroke-width:2px,stroke-dasharray: 5 5;\n"
+            mermaid_code += "    classDef auto_pilot fill:#b2ebf2,stroke:#00acc1,stroke-width:3px;\n"
             mermaid_code += "    classDef selected stroke:#ff9800,stroke-width:4px;\n"
 
 
@@ -1545,6 +1557,10 @@ if st.runtime.exists():
                                         "dt": dt,
                                         "viscosity": viscosity,
                                         "num_procs": int(num_procs),
+                                        "num_threads": int(num_threads),
+                                        "walltime": walltime,
+                                        "ppn": int(ppn),
+                                        "mem": mem,
                                         **{k:v for k,v in mode_params.items() if not k.startswith("_") and k not in ["relax_steps", "run_steps"]}
                                     }
                                 }
