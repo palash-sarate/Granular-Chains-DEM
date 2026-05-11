@@ -661,12 +661,16 @@ python Pulse/run_sync_job.py --user {user}
                     unique_name = rel_path.replace('/', '_').replace('\\', '_').replace(' ', '_')
                     zip_name = unique_name + ".tar.gz"
                     
-                    if zip_name in cloud_zips:
+                    if zip_name in cloud_zips and info.get('sync_status') == 'Synced':
                         return path, None, True
                         
                     zip_path = os.path.join(ZIP_DIR, zip_name)
-                    subprocess.run(["tar", "-czf", zip_path, "-C", os.path.dirname(path), os.path.basename(path)], check=True)
-                    return path, zip_path, False
+                    try:
+                        subprocess.run(["tar", "-czf", zip_path, "-C", os.path.dirname(path), os.path.basename(path)], check=True)
+                        return path, zip_path, False
+                    except Exception as e:
+                        if os.path.exists(zip_path): os.remove(zip_path) # Cleanup partial file
+                        raise e
 
                 log_msg(f"Starting parallel compression with 8 workers...")
                 with ThreadPoolExecutor(max_workers=8) as executor:
@@ -676,19 +680,23 @@ python Pulse/run_sync_job.py --user {user}
                     for future in as_completed(futures):
                         if check_stop(): break
                         
-                        path, zip_path, already_synced = future.result()
-                        info = lineage[path]
-                        completed += 1
-                        
-                        if already_synced:
-                            log_msg(f"Skipping {info['name']} (Already in Cloud Inventory)")
-                            lineage[path]['sync_status'] = 'Synced'
-                            lineage[path]['sync_time'] = lineage[path].get('sync_time') or datetime.now().isoformat()
-                            lineage_changed = True
-                        else:
-                            log_msg(f"PROGRESS_COMPRESS: {completed} / {len(syncable)}")
-                            log_msg(f"Finished compressing {info['name']}.")
-                            processed_zips.append((path, zip_path))
+                        try:
+                            path, zip_path, already_synced = future.result()
+                            info = lineage[path]
+                            completed += 1
+                            
+                            if already_synced:
+                                log_msg(f"Skipping {info['name']} (Already in Cloud Inventory)")
+                                lineage[path]['sync_status'] = 'Synced'
+                                lineage[path]['sync_time'] = lineage[path].get('sync_time') or datetime.now().isoformat()
+                                lineage_changed = True
+                            else:
+                                log_msg(f"PROGRESS_COMPRESS: {completed} / {len(syncable)}")
+                                log_msg(f"Finished compressing {info['name']}.")
+                                if zip_path: processed_zips.append((path, zip_path))
+                        except Exception as e:
+                            log_msg(f"ERROR: Failed to compress {futures[future]}: {e}")
+                            continue # Don't crash the whole cycle for one bad folder
                 
                 if lineage_changed:
                     PBSManager.save_lineage(lineage)
@@ -740,17 +748,18 @@ python Pulse/run_sync_job.py --user {user}
                         if p not in child_map: child_map[p] = []
                         child_map[p].append(path)
                 
-                # Find Ghost children in PBS
+                # Find Ghost children in PBS (jobs that haven't written metadata yet)
                 jobs = PBSManager.get_jobs(user=user)
-                seed_to_path = {str(info.get('params', {}).get('seed', '')): path for path, info in lineage.items()}
+                # Map all known seeds to their paths
+                seed_to_path = {str(info.get('params', {}).get('seed', '')): path for path, info in lineage.items() if info.get('params', {}).get('seed')}
+                
                 ghost_parents = set()
                 for job in jobs:
                     job_name = job.get('Job_Name', '')
-                    match = re.match(r"^[A-Z]+(\d{3,6})_(\d{3,6})$", job_name)
-                    if match:
-                        parent_seed, _ = match.groups()
-                        if parent_seed in seed_to_path:
-                            ghost_parents.add(seed_to_path[parent_seed])
+                    # If any job in the queue contains a seed we know, protect that path
+                    for seed, path in seed_to_path.items():
+                        if seed in job_name:
+                            ghost_parents.add(path)
 
                 cleaned_count = 0
                 for path, info in lineage.items():

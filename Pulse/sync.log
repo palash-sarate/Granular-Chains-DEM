@@ -1,18 +1,29 @@
 --- HPC Sync Job Started for user: guest ---
 Starting Sync Cycle...
+DEBUG: Parsed Grid_Fill_1H_S240587_S803190 with N=24
+DEBUG: Parsed Grid_Fill_1H_S374952_S785565 with N=4
+DEBUG: Parsed Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721 with N=24
+DEBUG: Parsed Grid_Fill_1H_S437513_S402899 with N=48
+DEBUG: Parsed Grid_Fill_1H_S469898_S906801_S672044_S388652_S172787_S623109_S276554_S920841 with N=24
+DEBUG: Parsed Grid_Fill_1H_S481365_S918498_S405677_S328882_S276082_S443193_S440630 with N=12
+DEBUG: Parsed Grid_Fill_1H_S808086_S242401 with N=4
+DEBUG: Parsed Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262 with N=12
+DEBUG: Parsed Grid_Fill_1H_S468103_S304626_S306669_S281764_S515432 with N=4
+DEBUG: Parsed Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565 with N=48
+DEBUG: Parsed Grid_Fill_1H_S935840_S448923 with N=12
+DEBUG: Parsed Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729 with N=48
+Lineage scan complete. Total runs: 31 (12 active, 19 archived).
 Lineage rescan complete.
-Active seeds in PBS: ['515432', '381262', '902296', '920841', '832601', '538767', '834779', '506010', '417172', '275397', '391480', '171758', '761949', '246775', '577899', '940885', '605007', '486441']
-Found 0 runs to check for sync.
+Active seeds in PBS: []
+Found 1 runs to check for sync.
 Fetching cloud inventory from Google Drive...
-Found 69 files already on Drive.
+Found 72 files already on Drive.
 Starting parallel compression with 8 workers...
+PROGRESS_COMPRESS: 1 / 1
+Finished compressing Grid_Fill_1H_S240587_S803190.
+Starting bulk upload to Google Drive...
+Upload successful.
 Starting Smart Cleanup...
-Cleaning up local files for: Grid_Fill_1H_S240587
-Cleaning up local files for: Grid_Fill_1H_S240587_S803190
-Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247
-Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791
-Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791_S854497
-Cleaning up local files for: Grid_Fill_1H_S240587_S803190_S857247_S121791_S854497_S936826
-Cleanup complete. Removed 6 parent directories.
+Cleanup complete. Removed 0 parent directories.
 Sync Cycle Finished Successfully.
 --- HPC Sync Job Finished ---

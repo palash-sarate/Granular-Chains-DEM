@@ -1,0 +1,26 @@
+{
+    "settings": {
+        "max_concurrent": 4,
+        "polite_mode": true,
+        "cron_interval_minutes": 60,
+        "enabled": true,
+        "last_heartbeat": "2026-05-11T21:02:55.752295"
+    },
+    "goals": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "fill_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill_Resume"
+            }
+        }
+    }
+}

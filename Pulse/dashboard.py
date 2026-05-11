@@ -23,6 +23,7 @@ import time
 import subprocess
 import psutil
 import tempfile
+import datetime
 
 # Add project root to sys.path to allow importing from analysis module
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -145,7 +146,7 @@ if st.runtime.exists():
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
     
     # --- Navigation Persistence ---
-    pages = ["📊 Active Queue", "🧬 Lineage", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
+    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
     
     # Initialize from URL or default
     query_nav = st.query_params.get("tab", pages[0])
@@ -168,6 +169,19 @@ if st.runtime.exists():
         st.query_params["tab"] = nav
 
     st.divider()
+
+    # --- AUTO-PILOT SETTINGS LOADER ---
+    AUTO_PILOT_FILE = os.path.join(ROOT_DIR, "Pulse", "auto_pilot.json")
+    def load_auto_pilot():
+        if os.path.exists(AUTO_PILOT_FILE):
+            try:
+                with open(AUTO_PILOT_FILE, "r") as f: return json.load(f)
+            except: pass
+        return {"settings": {"enabled": False}, "goals": {}}
+
+    def save_auto_pilot(data):
+        with open(AUTO_PILOT_FILE, "w") as f:
+            json.dump(data, f, indent=4)
 
     if nav == "📊 Active Queue":
         @st.fragment(run_every=refresh_rate)
@@ -1134,6 +1148,19 @@ if st.runtime.exists():
                         c1.success("✅ Files are available offline.")
                     
                     st.divider()
+                    st.markdown("#### 🤖 Auto-Pilot Control")
+                    auto_data = load_auto_pilot()
+                    if rid in auto_data["goals"]:
+                        g = auto_data["goals"][rid]
+                        st.success(f"Target: {g['target_steps']} | Increment: {g['increment']}")
+                        if st.button("❌ Remove from Auto-Pilot", key=f"rm_auto_{rid}"):
+                            del auto_data["goals"][rid]
+                            save_auto_pilot(auto_data)
+                            st.rerun()
+                    else:
+                        st.info("💡 Use the **Launch** section below to configure standard or Auto-Pilot runs for this node.")
+
+                    st.divider()
 
                     # 4. Regular Parent Selection for Launching
                     new_parent = id_to_path[clicked_node]
@@ -1230,59 +1257,69 @@ if st.runtime.exists():
                         st.info(f"🔗 **Lineage Dependencies:** {len(active_parent_jids)} of the selected runs are still active. Dependent jobs will wait for them.")
                     
                     # --- CONSOLIDATION / MERGE SECTION ---
-                    if len(selected_parents) == 2:
-                        id1, id2 = selected_parents
-                        # Identify Parent and Child
-                        p1, p2 = lineage[id1], lineage[id2]
-                        can_merge = False
-                        if p2.get("parent") == id1:
-                            parent_id, child_id = id1, id2
-                            can_merge = True
-                        elif p1.get("parent") == id2:
-                            parent_id, child_id = id2, id1
-                            can_merge = True
+                    if len(selected_parents) >= 2:
+                        # 1. Identify Ultimate Parent (closest to root)
+                        def get_depth(node_id, current_lineage):
+                            depth = 0
+                            curr = node_id
+                            while curr and curr in current_lineage and current_lineage[curr].get("parent"):
+                                curr = current_lineage[curr]["parent"]
+                                depth += 1
+                            return depth
                         
-                        if can_merge:
+                        sorted_nodes = sorted(selected_parents, key=lambda x: get_depth(x, lineage))
+                        ultimate_parent = sorted_nodes[0]
+                        children_to_merge = sorted_nodes[1:]
+                        
+                        # 2. Verify Lineage Continuity (all must descend from ultimate_parent)
+                        def is_descendant(child_id, ancestor_id, current_lineage):
+                            curr = child_id
+                            while curr and curr in current_lineage:
+                                p = current_lineage[curr].get("parent")
+                                if p == ancestor_id: return True
+                                curr = p
+                            return False
+
+                        all_valid = all(is_descendant(c, ultimate_parent, lineage) for c in children_to_merge)
+                        
+                        if all_valid:
                             st.sidebar.markdown("---")
-                            st.sidebar.subheader("🛠️ Consolidation Tool")
-                            st.sidebar.info(f"Merge **{lineage[child_id]['name']}** into **{lineage[parent_id]['name']}** to shorten lineage.")
+                            st.sidebar.subheader("🛠️ Batch Consolidation")
+                            st.sidebar.info(f"Merge **{len(children_to_merge)}** runs into **{lineage[ultimate_parent]['name']}**.")
                             
-                            # Check local status
-                            parent_local = os.path.exists(parent_id)
-                            child_local = os.path.exists(child_id)
+                            # Storage implication warning
+                            st.sidebar.warning("⚠️ **Storage Tip**: Shortening the lineage to < 3 nodes may cause the Sync Manager to keep this data local rather than archiving it to the cloud, as it considers the branch 'actively being worked on'.")
                             
-                            needs_restore = not (parent_local and child_local)
-                            if needs_restore:
-                                st.sidebar.warning("☁️ Some files are in the cloud and must be restored first.")
-                            
-                            if st.sidebar.button("🚀 Start Consolidation", use_container_width=True):
+                            if st.sidebar.button(f"🚀 Merge {len(children_to_merge)} Runs", use_container_width=True):
                                 try:
                                     from Pulse.pulse_core import SyncManager
                                     from Pulse.merge_runs import merge_folders
                                     
-                                    with st.sidebar.status("Consolidating runs...", expanded=True) as status:
-                                        # 1. Restore if needed
-                                        if not parent_local:
-                                            status.write(f"Downloading parent: {lineage[parent_id]['name']}...")
-                                            success, msg = SyncManager.restore_run(parent_id)
-                                            if not success: raise Exception(msg)
-                                        
-                                        if not child_local:
-                                            status.write(f"Downloading child: {lineage[child_id]['name']}...")
-                                            success, msg = SyncManager.restore_run(child_id)
-                                            if not success: raise Exception(msg)
-                                        
-                                        # 2. Execute Merge
-                                        status.write("Merging files and metadata...")
-                                        success = merge_folders(parent_id, child_id)
-                                        if not success: raise Exception("Merge script failed.")
-                                        
-                                        status.update(label="✅ Consolidation Complete!", state="complete")
-                                        st.session_state["lineage_selected_parents"] = [parent_id]
+                                    with st.sidebar.status("Batch consolidating...", expanded=True) as status:
+                                        for child_id in children_to_merge:
+                                            child_name = lineage[child_id]['name']
+                                            status.write(f"Processing {child_name}...")
+                                            
+                                            # Restore if needed
+                                            if not os.path.exists(ultimate_parent):
+                                                status.write(f"Restoring parent: {lineage[ultimate_parent]['name']}...")
+                                                SyncManager.restore_run(ultimate_parent)
+                                            if not os.path.exists(child_id):
+                                                status.write(f"Restoring child: {child_name}...")
+                                                SyncManager.restore_run(child_id)
+                                            
+                                            # Execute Merge
+                                            success = merge_folders(ultimate_parent, child_id)
+                                            if not success: raise Exception(f"Merge failed for {child_name}")
+                                            
+                                        status.update(label="✅ Batch Consolidation Complete!", state="complete")
+                                        st.session_state["lineage_selected_parents"] = [ultimate_parent]
                                         time.sleep(1)
                                         st.rerun()
                                 except Exception as e:
-                                    st.sidebar.error(f"Consolidation failed: {e}")
+                                    st.sidebar.error(f"Batch failed: {e}")
+                        else:
+                            st.sidebar.warning("⚠️ **Selection Mismatch:** Selected nodes must belong to the same linear branch for batch merge.")
                 
                 if selected_parents != ["NewRoot"]:
                     # Notes and Snapshot (Only for the first selected parent to avoid clutter)
@@ -1322,200 +1359,204 @@ if st.runtime.exists():
                     st.divider()
                     
                 
-                with st.form("launch_sim_form"):
-                    st.markdown("### 🌍 Global Parameters")
-                    gc1, gc2, gc3, gc4 = st.columns(4)
-                    walltime = gc1.text_input("Walltime", value="24:00:00")
-                    ppn = gc2.number_input("PPN", value=16, step=1)
-                    mem = gc3.text_input("Memory", value="16gb")
-                    max_concurrent = gc4.number_input("Max Concurrent Jobs", value=4, min_value=1, step=1, help="If you submit more jobs than this limit, they will be queued with depend=afterany.")
+                # REACTIVE LAUNCH SECTION
+                st.markdown("### 🌍 Global Parameters")
+                gc1, gc2, gc3, gc4 = st.columns(4)
+                walltime = gc1.text_input("Walltime", value="24:00:00")
+                ppn = gc2.number_input("PPN", value=16, step=1)
+                mem = gc3.text_input("Memory", value="16gb")
+                max_concurrent = gc4.number_input("Max Concurrent Jobs", value=4, min_value=1, step=1)
+                
+                polite_mode = st.checkbox("😇 Polite Mode (Low Priority)", value=True)
+                
+                gc5, gc6, gc7, gc8 = st.columns(4)
+                num_procs = gc5.number_input("Num Procs", value=8, step=1)
+                num_threads = gc6.number_input("Num Threads", value=1, step=1)
+                dt = gc7.number_input("dt", value=1e-06, format="%e")
+                viscosity = gc8.number_input("Viscosity", value=0.001, format="%f")
+                
+                seed = st.number_input("Seed", value=random.randint(100000, 999999), step=1)
+                
+                st.markdown(f"### ⚙️ Mode-Specific Parameters ({selected_mode})")
+                mode_params = {}
+                
+                if selected_mode == "fill":
+                    fc1, fc2, fc3 = st.columns(3)
+                    mode_params["N"] = fc1.number_input("Chain Length (N)", value=4, step=1)
+                    mode_params["n_fill"] = fc2.number_input("Number of Chains", value=3600, step=100)
+                    mode_params["relax_steps"] = fc3.number_input("Relax Steps", value=1000000, step=100000)
                     
-                    polite_mode = st.checkbox("😇 Polite Mode (Low Priority)", value=False, help="Sets priority to -1024 so student jobs run first. Suggests shorter walltimes for better backfilling.")
-                    if polite_mode:
-                        st.info("💡 **Polite Mode Active**: Priority set to -1024. Consider reducing Walltime to 2-4 hours for faster backfilling.")
-                    
-                    gc5, gc6, gc7, gc8 = st.columns(4)
-                    num_procs = gc5.number_input("Num Procs", value=8, step=1)
-                    num_threads = gc6.number_input("Num Threads", value=1, step=1)
-                    dt = gc7.number_input("dt", value=1e-06, format="%e")
-                    viscosity = gc8.number_input("Viscosity", value=0.001, format="%f")
-                    
-                    seed = st.number_input("Seed", value=random.randint(100000, 999999), step=1)
-                    
-                    st.markdown(f"### ⚙️ Mode-Specific Parameters ({selected_mode})")
-                    
-                    # Store mode specific inputs
-                    mode_params = {}
-                    
-                    if selected_mode == "fill":
-                        fc1, fc2, fc3 = st.columns(3)
-                        mode_params["N"] = fc1.number_input("Chain Length (N)", value=4, step=1)
-                        mode_params["n_fill"] = fc2.number_input("Number of Chains", value=3600, step=100)
-                        mode_params["relax_steps"] = fc3.number_input("Relax Steps", value=1000000, step=100000)
-                        
-                        fc4, fc5, fc6 = st.columns(3)
-                        mode_params["source_dir"] = fc4.text_input("Source Relaxed Chains", value="chain_data/relaxed_2D_x")
-                        mode_params["spacing"] = fc5.number_input("Hopper Spacing", value=0.5)
-                        mode_params["n_hoppers"] = fc6.number_input("Number of Hoppers", value=1, step=1)
+                    fc4, fc5, fc6 = st.columns(3)
+                    mode_params["source_dir"] = fc4.text_input("Source Relaxed Chains", value="chain_data/relaxed_2D_x")
+                    mode_params["spacing"] = fc5.number_input("Hopper Spacing", value=0.5)
+                    mode_params["n_hoppers"] = fc6.number_input("Number of Hoppers", value=1, step=1)
 
-                        fc7, fc8 = st.columns(2)
-                        mode_params["mode"] = fc7.selectbox("Pouring Mode", ["2D_stacked", "2D_worst_case"], index=0)
-                        mode_params["dump_file"] = fc8.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
-                        
-                        mode_params["hopper_template_data"] = st.text_input("Hopper Template Data", value="simulation_geometries/2D_hopper_with_orifice_cover.inc")
-                        
-                        # Add geometry_vars support
-                        geo_vars_str = st.text_area(
-                            "Geometry Variables (JSON)", 
-                            value="{}", 
-                            placeholder='{"orifice_half": 0.05, "hopper_ang": 60}',
-                            help='e.g. {"orifice_half": 0.05, "hopper_ang": 60} or lists for multiple hoppers {"orifice_half": [0.04, 0.06]}'
-                        )
-                        try:
-                            mode_params["geometry_vars"] = json.loads(geo_vars_str)
-                        except Exception as e:
-                            st.error(f"Invalid JSON in Geometry Variables: {e}")
-                            st.stop()
+                    fc7, fc8 = st.columns(2)
+                    mode_params["mode"] = fc7.selectbox("Pouring Mode", ["2D_stacked", "2D_worst_case"], index=0)
+                    mode_params["dump_file"] = fc8.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
+                    mode_params["simulation"] = "Hopper_Fill"
+                    mode_params["no-vtk"] = True
 
-                        mode_params["simulation"] = "Hopper_Fill"
-                        mode_params["no-vtk"] = True
-
-                    elif selected_mode == "fill_resume":
-                        rc1, rc2 = st.columns(2)
-                        mode_params["relax_steps"] = rc1.number_input("Relax Steps", value=1000000, step=100000)
-                        mode_params["dump_file"] = rc2.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
-                        mode_params["simulation"] = "Hopper_Fill_Resume"
-                        
-                    elif selected_mode == "flow":
-                        fc1, fc2, fc3, fc4 = st.columns(4)
-                        # Parametric Sweep Support
-                        freq_input = fc1.text_input("Frequency(s)", value="5.0", help="Single value (5.0) or comma separated (5.0, 10.0, 15.0)")
-                        amp_input = fc2.text_input("Amplitude(s)", value="0.01", help="Single value (0.01) or comma separated (0.01, 0.02)")
-                        
-                        mode_params["run_steps"] = fc3.number_input("Run Steps", value=2000000, step=100000)
-                        mode_params["osc_dir"] = fc4.text_input("Oscillation Dir", value="z")
-                        
-                        # Parse inputs for display preview
-                        freqs = [f.strip() for f in freq_input.split(",") if f.strip()]
-                        amps = [a.strip() for a in amp_input.split(",") if a.strip()]
-                        num_sweep = len(freqs) * len(amps)
-                        total_batch = num_sweep * len(selected_parents)
-                        
-                        if total_batch > 1:
-                            st.warning(f"🎰 **Batch Submission:** This will submit **{total_batch}** separate jobs ({num_sweep} per parent).")
-                        
-                        mode_params["_freq_list"] = freqs
-                        mode_params["_amp_list"] = amps
-                        
-                    elif selected_mode == "flow_resume":
-                        frc1, frc2 = st.columns(2)
-                        mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
+                elif selected_mode == "fill_resume":
+                    rc1, rc2 = st.columns(2)
+                    mode_params["relax_steps"] = rc1.number_input("Relax Steps", value=1000000, step=100000)
+                    mode_params["dump_file"] = rc2.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
+                    mode_params["simulation"] = "Hopper_Fill_Resume"
                     
-                    # In-place Resumption Toggle (not for new fill runs)
-                    inplace_mode = False
-                    if selected_mode != "fill":
-                        inplace_mode = st.checkbox("😇 In-place Resumption (Same Folder)", value=False, help="Continues simulation in the parent's folder instead of creating a new one. WARNING: Modifies parent files.")
-                        if inplace_mode:
-                            st.info("⚠️ In-place selected. Sync status will be reset to Local.")
-                        
-                    submit_btn = st.form_submit_button("🚀 Submit to PBS")
+                elif selected_mode == "flow":
+                    ffc1, ffc2, ffc3, ffc4 = st.columns(4)
+                    freq_input = ffc1.text_input("Frequency(s)", value="5.0")
+                    amp_input = ffc2.text_input("Amplitude(s)", value="0.01")
+                    mode_params["run_steps"] = ffc3.number_input("Run Steps", value=2000000, step=100000)
+                    mode_params["osc_dir"] = ffc4.text_input("Oscillation Dir", value="z")
+                    mode_params["_freq_list"] = [f.strip() for f in freq_input.split(",") if f.strip()]
+                    mode_params["_amp_list"] = [a.strip() for a in amp_input.split(",") if a.strip()]
                     
-                    if submit_btn:
-                        jobs_to_submit = []
-                        
-                        for p_rid in selected_parents:
-                            if p_rid == "NewRoot":
-                                p_info = {"name": "S000000", "params": {"seed": "000000"}}
-                                p_seed = "000000"
-                            else:
-                                p_info = lineage[p_rid]
-                                p_seed = str(p_info.get("params", {}).get("seed", "000000"))[-6:]
-                            
-                            p_active_jid = active_parent_jids.get(p_rid)
-                            
-                            # Handle Parametric Sweep for Flow
-                            if selected_mode == "flow" and len(mode_params.get("_freq_list", [])) * len(mode_params.get("_amp_list", [])) > 1:
-                                for f in mode_params["_freq_list"]:
-                                    for a in mode_params["_amp_list"]:
-                                        child_seed = random.randint(100000, 999999)
-                                        job_name = f"F{p_seed}_{str(child_seed)[-6:]}"
-                                        
-                                        job_params = {
-                                            "num_procs": int(num_procs),
-                                            "num_threads": int(num_threads),
-                                            "dt": dt,
-                                            "viscosity": viscosity,
-                                            "seed": child_seed,
-                                            "source_dir": p_rid,
-                                            **mode_params
-                                        }
+                elif selected_mode == "flow_resume":
+                    frc1, frc2 = st.columns(2)
+                    mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
 
-                                        job_params["freq"] = float(f)
-                                        job_params["amp"] = float(a)
-                                        job_params["simulation"] = f"Flow_Study_N{p_info.get('N', 0)}_F{f}_A{a}"
-                                        job_params.pop("_freq_list", None)
-                                        job_params.pop("_amp_list", None)
-                                        
-                                        jobs_to_submit.append({
-                                            "name": job_name,
-                                            "type": selected_mode,
-                                            "walltime": walltime,
-                                            "ppn": int(ppn),
-                                            "mem": mem,
-                                            "priority": -1024 if polite_mode else 0,
-                                            "dependency": p_active_jid,
-                                            "params": {**job_params, "inplace": inplace_mode}
-                                        })
-                            else:
-                                # Single job submission per parent
-                                # Use unique random seeds if batching multiple parents
-                                if len(selected_parents) > 1:
-                                    current_job_seed = random.randint(100000, 999999)
-                                else:
-                                    current_job_seed = int(seed)
+                inplace_mode = False
+                if selected_mode != "fill":
+                    inplace_mode = st.checkbox("😇 In-place Resumption", value=True)
+
+                st.markdown("---")
+                use_auto_pilot = st.checkbox("🤖 **Handover to Auto-Pilot**", value=False)
+                ap_target, ap_inc = 10000000, 100000
+                if use_auto_pilot:
+                    ap_col1, ap_col2 = st.columns(2)
+                    ap_target = ap_col1.number_input("Target Total Steps", value=10000000, step=1000000)
+                    ap_inc = ap_col2.number_input("Step Increment", value=100000, step=10000)
+                
+                submit_btn = st.button("🚀 Launch Auto-Pilot" if use_auto_pilot else "🚀 Submit to PBS", use_container_width=True)
+                    
+                if submit_btn:
+                    jobs_to_submit = []
+                    
+                    for p_rid in selected_parents:
+                        if p_rid == "NewRoot":
+                            p_info = {"name": "S000000", "params": {"seed": "000000"}}
+                            p_seed = "000000"
+                        else:
+                            p_info = lineage[p_rid]
+                            p_seed = str(p_info.get("params", {}).get("seed", "000000"))[-6:]
+                        
+                        p_active_jid = active_parent_jids.get(p_rid)
+                        
+                        # Handle Parametric Sweep for Flow
+                        if selected_mode == "flow" and len(mode_params.get("_freq_list", [])) * len(mode_params.get("_amp_list", [])) > 1:
+                            for f in mode_params["_freq_list"]:
+                                for a in mode_params["_amp_list"]:
+                                    child_seed = random.randint(100000, 999999)
+                                    job_name = f"F{p_seed}_{str(child_seed)[-6:]}"
                                     
-                                new_seed_suffix = str(current_job_seed)[-6:]
-                                if selected_mode == "fill_resume": prefix = "R"
-                                elif selected_mode == "flow": prefix = "F"
-                                elif selected_mode == "flow_resume": prefix = "FR"
-                                else: prefix = "S"
-                                
-                                job_name = f"{prefix}{p_seed}_{new_seed_suffix}"
-                                
-                                # Finalize params
-                                final_params = {
-                                    "num_procs": int(num_procs),
-                                    "num_threads": int(num_threads),
-                                    "dt": dt,
-                                    "viscosity": viscosity,
-                                    "seed": current_job_seed,
-                                    **mode_params
-                                }
-                                
-                                # Inject parent-specific path
-                                if selected_mode == "fill_resume":
-                                    final_params["restart_path"] = p_rid
-                                elif selected_mode == "flow":
-                                    final_params["source_dir"] = p_rid
-                                    final_params["freq"] = float(mode_params.get("_freq_list", [0])[0])
-                                    final_params["amp"] = float(mode_params.get("_amp_list", [0])[0])
-                                elif selected_mode == "flow_resume":
-                                    final_params["restart_path"] = p_rid
-                                
-                                final_params.pop("_freq_list", None)
-                                final_params.pop("_amp_list", None)
+                                    job_params = {
+                                        "num_procs": int(num_procs),
+                                        "num_threads": int(num_threads),
+                                        "dt": dt,
+                                        "viscosity": viscosity,
+                                        "seed": child_seed,
+                                        "source_dir": p_rid,
+                                        **mode_params
+                                    }
 
-                                jobs_to_submit.append({
-                                    "name": job_name,
-                                    "type": selected_mode,
-                                    "walltime": walltime,
-                                    "ppn": int(ppn),
-                                    "mem": mem,
-                                    "priority": -1024 if polite_mode else 0,
-                                    "dependency": p_active_jid,
-                                    "params": {**final_params, "inplace": inplace_mode}
-                                })
-                        
+                                    job_params["freq"] = float(f)
+                                    job_params["amp"] = float(a)
+                                    job_params["simulation"] = f"Flow_Study_N{p_info.get('N', 0)}_F{f}_A{a}"
+                                    job_params.pop("_freq_list", None)
+                                    job_params.pop("_amp_list", None)
+                                    
+                                    jobs_to_submit.append({
+                                        "name": job_name,
+                                        "type": selected_mode,
+                                        "walltime": walltime,
+                                        "ppn": int(ppn),
+                                        "mem": mem,
+                                        "priority": -1024 if polite_mode else 0,
+                                        "dependency": p_active_jid,
+                                        "params": {**job_params, "inplace": inplace_mode}
+                                    })
+                        else:
+                            # Single job submission per parent
+                            # Use unique random seeds if batching multiple parents
+                            if len(selected_parents) > 1:
+                                current_job_seed = random.randint(100000, 999999)
+                            else:
+                                current_job_seed = int(seed)
+                                
+                            new_seed_suffix = str(current_job_seed)[-6:]
+                            if selected_mode == "fill_resume": prefix = "R"
+                            elif selected_mode == "flow": prefix = "F"
+                            elif selected_mode == "flow_resume": prefix = "FR"
+                            else: prefix = "S"
+                            
+                            job_name = f"{prefix}{p_seed}_{new_seed_suffix}"
+                            
+                            # Finalize params
+                            final_params = {
+                                "num_procs": int(num_procs),
+                                "num_threads": int(num_threads),
+                                "dt": dt,
+                                "viscosity": viscosity,
+                                "seed": current_job_seed,
+                                **mode_params
+                            }
+                            
+                            # Inject parent-specific path
+                            if selected_mode == "fill_resume":
+                                final_params["restart_path"] = p_rid
+                            elif selected_mode == "flow":
+                                final_params["source_dir"] = p_rid
+                                final_params["freq"] = float(mode_params.get("_freq_list", [0])[0])
+                                final_params["amp"] = float(mode_params.get("_amp_list", [0])[0])
+                            elif selected_mode == "flow_resume":
+                                final_params["restart_path"] = p_rid
+                            
+                            final_params.pop("_freq_list", None)
+                            final_params.pop("_amp_list", None)
+
+                            jobs_to_submit.append({
+                                "name": job_name,
+                                "type": selected_mode,
+                                "walltime": walltime,
+                                "ppn": int(ppn),
+                                "mem": mem,
+                                "priority": -1024 if polite_mode else 0,
+                                "dependency": p_active_jid,
+                                "params": {**final_params, "inplace": inplace_mode}
+                            })
+                    
+                    if use_auto_pilot:
+                        # --- ENROLL IN AUTO-PILOT ---
+                        with st.spinner("Enrolling goals..."):
+                            auto_data = load_auto_pilot()
+                            enrolled_count = 0
+                            for p_rid in selected_parents:
+                                if p_rid == "NewRoot": continue # Root fill not yet supported by AP manager
+                                
+                                auto_data["goals"][p_rid] = {
+                                    "target_steps": ap_target,
+                                    "increment": ap_inc,
+                                    "in_place": inplace_mode,
+                                    "last_submitted": None,
+                                    "status": "Idle",
+                                    "mode": selected_mode,
+                                    "params": {
+                                        "dt": dt,
+                                        "viscosity": viscosity,
+                                        "num_procs": int(num_procs),
+                                        **{k:v for k,v in mode_params.items() if not k.startswith("_") and k not in ["relax_steps", "run_steps"]}
+                                    }
+                                }
+                                enrolled_count += 1
+                            
+                            save_auto_pilot(auto_data)
+                            st.success(f"🤖 Successfully enrolled {enrolled_count} run(s) into Auto-Pilot!")
+                            st.info("The system will start them during the next hourly cycle (or when you trigger a manual heartbeat).")
+                            time.sleep(2)
+                            st.rerun()
+                    else:
+                        # --- STANDARD PBS SUBMISSION ---
                         try:
                             import importlib
                             importlib.reload(submit_flexible)
@@ -1531,10 +1572,115 @@ if st.runtime.exists():
                         except Exception as e:
                             import traceback
                             with open("submit_error.log", "a") as errf:
-                                errf.write(f"\\n--- Error at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\\n")
+                                errf.write(f"\n--- Error at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\n")
                                 errf.write(traceback.format_exc())
                             st.error(f"Error submitting job: {e}. Check submit_error.log for details.")
 
+
+    elif nav == "🤖 Auto-Pilot":
+        st.header("🤖 Auto-Pilot Fleet Management")
+        auto_data = load_auto_pilot()
+        
+        # --- Heartbeat Indicator ---
+        hb_str = auto_data["settings"].get("last_heartbeat")
+        if hb_str:
+            last_hb = datetime.datetime.fromisoformat(hb_str)
+            diff = datetime.datetime.now() - last_hb
+            if diff.total_seconds() < 3900: # 65 minutes
+                st.success(f"🟢 **SYSTEM ACTIVE** (Last heartbeat: {diff.total_seconds()/60:.1f}m ago)")
+            else:
+                st.error(f"🔴 **SYSTEM STALE** (Last heartbeat: {diff.total_seconds()/60:.1f}m ago)")
+        else:
+            st.warning("⚪ **SYSTEM INACTIVE** (No heartbeat recorded yet)")
+
+        st.divider()
+        
+        # --- Global Settings ---
+        with st.expander("⚙️ Auto-Pilot Logic Settings", expanded=False):
+            col1, col2, col3 = st.columns(3)
+            auto_data["settings"]["enabled"] = col1.toggle("Auto-Pilot Enabled", value=auto_data["settings"].get("enabled", True))
+            auto_data["settings"]["max_concurrent"] = col2.number_input("Max Concurrent Jobs", value=auto_data["settings"].get("max_concurrent", 4), min_value=1)
+            auto_data["settings"]["polite_mode"] = col3.toggle("Polite Mode (Yield to Students)", value=auto_data["settings"].get("polite_mode", True))
+            if st.button("Save Logic Settings"):
+                save_auto_pilot(auto_data)
+                st.success("Logic settings saved.")
+                st.rerun()
+
+        # --- Scheduler Settings ---
+        with st.expander("⏰ Scheduler Settings (Cron)", expanded=False):
+            st.markdown("##### System Crontab Status")
+            try:
+                curr_cron = subprocess.check_output(["crontab", "-l"], text=True).strip()
+                st.code(curr_cron, language="bash")
+            except:
+                st.info("No active crontab found for this user.")
+            
+            st.divider()
+            st.markdown("##### Update Schedule")
+            freq = st.selectbox("Select Frequency", 
+                               ["Hourly (Recommended)", "Every 30 Minutes", "Every 2 Hours", "Every 6 Hours", "Daily (Midnight)"],
+                               index=0)
+            
+            cron_map = {
+                "Hourly (Recommended)": "0 * * * *",
+                "Every 30 Minutes": "*/30 * * * *",
+                "Every 2 Hours": "0 */2 * * *",
+                "Every 6 Hours": "0 */6 * * *",
+                "Daily (Midnight)": "0 0 * * *"
+            }
+            
+            if st.button("Update System Schedule"):
+                new_schedule = cron_map[freq]
+                python_path = "/home/guest/miniconda3/envs/gchain/bin/python"
+                manager_path = os.path.join(ROOT_DIR, "Pulse/auto_pilot_manager.py")
+                log_path = os.path.join(ROOT_DIR, "Pulse/auto_pilot.log")
+                
+                cron_line = f"{new_schedule} cd {ROOT_DIR} && {python_path} {manager_path} >> {log_path} 2>&1"
+                
+                try:
+                    # Clear old and add new
+                    subprocess.run(f"(crontab -l 2>/dev/null | grep -v 'auto_pilot_manager.py'; echo '{cron_line}') | crontab -", shell=True, check=True)
+                    st.success(f"Schedule updated to: {freq}")
+                    time.sleep(1)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to update crontab: {e}")
+
+        # --- Fleet Progress ---
+        st.subheader("📋 Active Fleet Progress")
+        goals = auto_data.get("goals", {})
+        if not goals:
+            st.info("Your fleet is currently empty. Add nodes from the '🧬 Lineage' tab to start automated runs.")
+        else:
+            # Prepare table data
+            # We need to read the latest lineage to show progress
+            lineage = scan_dumping_yard() or {} # Refresh lineage for accuracy
+            
+            table_data = []
+            for run_path, goal in goals.items():
+                name = os.path.basename(run_path)
+                current_info = lineage.get(run_path, {})
+                current_steps = current_info.get("steps", 0)
+                target = goal["target_steps"]
+                progress = min(100, (current_steps / target * 100)) if target > 0 else 0
+                
+                table_data.append({
+                    "Simulation": name,
+                    "Progress": f"{progress:.1f}%",
+                    "Current": f"{current_steps:,}",
+                    "Target": f"{target:,}",
+                    "Increment": f"{goal['increment']:,}",
+                    "Status": goal.get("status", "Idle"),
+                    "Last Submit": goal.get("last_submitted", "Never")
+                })
+            
+            st.table(table_data)
+            
+            if st.button("Clear Completed Goals"):
+                new_goals = {k: v for k, v in goals.items() if lineage.get(k, {}).get("steps", 0) < v["target_steps"]}
+                auto_data["goals"] = new_goals
+                save_auto_pilot(auto_data)
+                st.rerun()
 
     elif nav == "🔄 Sync":
         st.subheader("🔄 Sophisticated Google Drive Sync")

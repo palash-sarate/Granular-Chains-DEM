@@ -12,6 +12,10 @@ def merge_folders(target_dir: str, source_dir: str):
     target = Path(target_dir)
     source = Path(source_dir)
 
+    # Helper for extracting seeds from names
+    def extract_seeds(name):
+        return re.findall(r'_S(\d+)', name)
+
     if not target.exists() or not source.exists():
         print(f"Error: One of the paths does not exist: {target}, {source}")
         return False
@@ -78,13 +82,32 @@ def merge_folders(target_dir: str, source_dir: str):
                     else:
                         f.unlink()
 
-    # 4. Replace split_states
+    # 4. Replace split_states and .data files
     s_states = source / "split_states"
     t_states = target / "split_states"
     if s_states.exists():
         if t_states.exists():
             shutil.rmtree(t_states)
         shutil.move(str(s_states), str(t_states))
+    
+    # Move root .data files (e.g. final_grid.data)
+    for f in source.glob("*.data"):
+        dest = target / f.name
+        if dest.exists():
+            dest.unlink()
+        shutil.move(str(f), str(dest))
+
+    # Preserve Logs and Input Scripts with child seed
+    seed_list = extract_seeds(source.name)
+    suffix = f"_S{seed_list[-1]}" if seed_list else f"_{source.name}"
+    
+    for log_file in source.glob("lammps.log*"):
+        new_name = f"lammps{suffix}.log"
+        shutil.move(str(log_file), str(target / new_name))
+    
+    for in_file in source.glob("in.*"):
+        new_name = f"{in_file.name}{suffix}"
+        shutil.move(str(in_file), str(target / new_name))
 
     # 5. Consolidate Metadata
     # Update target steps by scanning dump files for the true max timestep
@@ -98,10 +121,6 @@ def merge_folders(target_dir: str, source_dir: str):
     # Consolidate active_seeds
     t_seeds = target_meta.get("active_seeds", [])
     s_seeds = source_meta.get("active_seeds", [])
-    
-    # Attempt to extract seeds from folder names if metadata is legacy
-    def extract_seeds(name):
-        return re.findall(r'_S(\d+)', name)
     
     all_seeds = set(t_seeds + s_seeds + extract_seeds(target.name) + extract_seeds(source.name))
     target_meta["active_seeds"] = sorted(list(all_seeds), key=lambda x: int(x) if x.isdigit() else 0)
@@ -144,6 +163,7 @@ def merge_folders(target_dir: str, source_dir: str):
             source_info = lineage[source_id]
             
             target_info["steps"] = max(target_info.get("steps", 0), source_info.get("steps", 0))
+            target_info["status"] = "Active"    # Ensure it's not gray/archived
             target_info["sync_status"] = "Local" # Force re-sync
             
             # Record the merge in a history field for future tracking
@@ -160,6 +180,24 @@ def merge_folders(target_dir: str, source_dir: str):
                 if info.get("parent") == source_id:
                     lineage[rid]["parent"] = target_id
                     reparented_count += 1
+                    
+                    # PHYSICAL REPAIR: Update the metadata file on disk for the survivor
+                    for meta_name in ["grid_metadata.json", "metadata.json"]:
+                        child_meta_path = Path(rid) / meta_name
+                        if child_meta_path.exists():
+                            try:
+                                with open(child_meta_path, 'r') as f:
+                                    child_meta = json.load(f)
+                                
+                                # Update parent path pointer
+                                if "source_dir" in child_meta: child_meta["source_dir"] = target_id
+                                if "restart_path" in child_meta: child_meta["restart_path"] = target_id
+                                
+                                with open(child_meta_path, 'w') as f:
+                                    json.dump(child_meta, f, indent=4)
+                                print(f"  -> Physically updated metadata for survivor: {info['name']}")
+                            except Exception as e:
+                                print(f"  -> Warning: Could not update child metadata file: {e}")
             
             # Remove source from lineage
             del lineage[source_id]

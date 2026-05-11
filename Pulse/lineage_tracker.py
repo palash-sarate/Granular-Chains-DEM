@@ -2,30 +2,32 @@ import os
 import json
 import re
 from pathlib import Path
+import subprocess
 
 LINEAGE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineage.json")
 DUMPING_YARD = "dumping_yard"
 
 def get_max_step(run_dir):
-    """Finds the maximum timestep reached in the run."""
+    """Finds the maximum timestep reached in the run efficiently using shell streams."""
     chain_dir = os.path.join(run_dir, "chain")
     if not os.path.exists(chain_dir):
         return 0
-    max_step = 0
     try:
-        for f in os.listdir(chain_dir):
-            match = re.match(r'chain_(\d+)\.dump', f)
+        # Use shell streams to find the last file alphabetically (corresponds to max step)
+        cmd = f"ls -1f {chain_dir} | grep '^chain_' | sort -V | tail -n 1"
+        last_file = subprocess.check_output(cmd, shell=True, text=True).strip()
+        if last_file:
+            match = re.search(r'chain_(\d+)\.dump', last_file)
             if match:
-                max_step = max(max_step, int(match.group(1)))
-    except Exception:
+                return int(match.group(1))
+    except Exception as e:
         pass
-    return max_step
+    return 0
 
 def get_params_from_in_file(run_dir):
     """Parses dt, freq, and amp from the LAMMPS input file."""
     params = {"dt": None, "freq": None, "amp": None}
     try:
-        # Find the input file (starts with 'in.')
         in_files = [f for f in os.listdir(run_dir) if f.startswith("in.")]
         if not in_files:
             return params
@@ -34,7 +36,6 @@ def get_params_from_in_file(run_dir):
         with open(in_file_path, 'r') as f:
             content = f.read()
             
-        # Parse variables like 'variable dt string 1e-06'
         for key in params.keys():
             match = re.search(fr'variable\s+{key}\s+string\s+([\w.e-]+)', content)
             if match:
@@ -48,14 +49,13 @@ def get_seed_from_name(name):
     match = re.search(r'_S(\d+)$', name)
     if match:
         return match.group(1)
-    # Also handle intermediate seeds in chains
     match = re.search(r'_S(\d+)_', name)
     if match:
         return match.group(1)
     return None
 
 def scan_dumping_yard():
-    """Scans the dumping yard and updates the lineage JSON."""
+    """Scans the dumping yard and updates the lineage JSON with ancestral inheritance."""
     lineage = {}
     if os.path.exists(LINEAGE_FILE):
         try:
@@ -64,12 +64,12 @@ def scan_dumping_yard():
         except Exception:
             lineage = {}
             
-    # Mark all currently known runs as 'Archived'. We will unmark them if found on disk.
+    # Mark all currently known runs as 'Archived'.
     for run_id in lineage:
         lineage[run_id]["status"] = "Archived"
 
     # Walk through the dumping yard
-    for root, dirs, files in os.walk(DUMPING_YARD):
+    for root, dirs, files in os.walk(DUMPING_YARD, followlinks=True):
         metadata_file = None
         if "grid_metadata.json" in files:
             metadata_file = "grid_metadata.json"
@@ -77,34 +77,32 @@ def scan_dumping_yard():
             metadata_file = "metadata.json"
             
         if metadata_file:
-            run_dir = os.path.abspath(root)
+            dirs[:] = [] 
+            run_dir = os.path.realpath(root)
             run_name = os.path.basename(run_dir)
             
             try:
                 with open(os.path.join(run_dir, metadata_file), 'r') as f:
                     data = json.load(f)
                 
-                # Determine parent path (Source of truth for lineage)
                 parent_path = data.get("source_dir") or data.get("restart_path")
                 if parent_path:
-                    parent_path = os.path.abspath(parent_path)
-                    # If parent is just the current dir (rare bug), set to None
+                    parent_path = os.path.realpath(parent_path)
                     if parent_path == run_dir:
                         parent_path = None
                 
-                # Extract N (handles different metadata formats)
                 n_val = data.get("N", 0)
                 if isinstance(n_val, list) and len(n_val) > 0:
                     n_val = n_val[0]
                 
-                # Parse additional params from .in file and name
                 in_params = get_params_from_in_file(run_dir)
                 seed = get_seed_from_name(run_name)
-                
-                # Get relative path for cleaner display
-                rel_path = os.path.relpath(run_dir, os.getcwd())
+                # Normalize rel_path to keep zip names clean
+                if run_dir.startswith("/Data/palash_data/dumping_yard"):
+                    rel_path = run_dir.replace("/Data/palash_data/", "")
+                else:
+                    rel_path = os.path.relpath(run_dir, os.getcwd())
 
-                # Build run info
                 run_info = {
                     "name": run_name,
                     "parent": parent_path,
@@ -124,7 +122,6 @@ def scan_dumping_yard():
                     }
                 }
                 
-                # If we already had this run, preserve its sync metadata
                 if run_dir in lineage:
                     run_info["sync_status"] = lineage[run_dir].get("sync_status", "Local")
                     run_info["sync_time"] = lineage[run_dir].get("sync_time", None)
@@ -133,20 +130,52 @@ def scan_dumping_yard():
                     run_info["sync_time"] = None
 
                 lineage[run_dir] = run_info
+                print(f"DEBUG: Parsed {run_name} with N={n_val}")
                 
             except Exception as e:
-                # print(f"Warning: Failed to parse metadata in {run_dir}: {e}")
                 pass
 
-    # Ensure the directory exists
-    os.makedirs(os.path.dirname(LINEAGE_FILE), exist_ok=True)
+    # --- ANCESTRAL INHERITANCE PASS ---
+    missing_parents = {}
+    for rid, info in lineage.items():
+        parent_path = info.get("parent")
+        if parent_path:
+            # If parent is missing OR exists as a corrupted/archived placeholder with N=0
+            if parent_path not in lineage or (lineage[parent_path].get("status") == "Archived" and lineage[parent_path].get("N", 0) == 0):
+                parent_name = os.path.basename(parent_path)
+                parent_seed = get_seed_from_name(parent_name)
+                
+                # Normalize rel_path to keep zip names clean
+                if parent_path.startswith("/Data/palash_data/dumping_yard"):
+                    rel_path = parent_path.replace("/Data/palash_data/", "")
+                else:
+                    try: rel_path = os.path.relpath(parent_path, os.getcwd())
+                    except: rel_path = parent_path
+                
+                missing_parents[parent_path] = {
+                    "name": parent_name,
+                    "parent": None, 
+                    "simulation": "Hopper_Fill" if "Hopper_Fill" in parent_path else "Unknown", 
+                    "N": info.get("N", 0), 
+                    "steps": 0, 
+                    "path": parent_path,
+                    "rel_path": rel_path,
+                    "status": "Archived",
+                    "params": {"seed": parent_seed},
+                    "sync_status": "Synced",
+                    "sync_time": None
+                }
     
+    lineage.update(missing_parents)
+
     with open(LINEAGE_FILE, 'w') as f:
         json.dump(lineage, f, indent=4)
     
     active_count = len([r for r in lineage.values() if r["status"] == "Active"])
     archived_count = len(lineage) - active_count
-    # print(f"Lineage scan complete. Total runs: {len(lineage)} ({active_count} active, {archived_count} archived).")
+    print(f"Lineage scan complete. Total runs: {len(lineage)} ({active_count} active, {archived_count} archived).")
+
+    return lineage
 
 if __name__ == "__main__":
     scan_dumping_yard()
