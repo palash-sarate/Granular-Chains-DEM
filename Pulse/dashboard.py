@@ -1713,8 +1713,27 @@ if st.runtime.exists():
                 target = goal["target_steps"]
                 progress = min(100, (current_steps / target * 100)) if target > 0 else 0
                 
+                # Get params from goal or lineage fallback
+                params = goal.get("params", {})
+                n_val = params.get("N")
+                n_fill_val = params.get("n_fill")
+                geo_vars = params.get("geometry_vars")
+                
+                # Fallback to lineage if not in goal params
+                if n_val is None: n_val = current_info.get("N", "-")
+                if n_fill_val is None: n_fill_val = current_info.get("params", {}).get("n_fill", "-")
+                if not geo_vars: geo_vars = current_info.get("params", {}).get("geometry_vars", {})
+                
+                if isinstance(geo_vars, dict) and geo_vars:
+                    geo_str = ", ".join([f"{k}:{v}" for k, v in geo_vars.items()])
+                else:
+                    geo_str = "-"
+
                 table_data.append({
                     "Simulation": name,
+                    "N": n_val,
+                    "n_fill": n_fill_val,
+                    "Geo": geo_str,
                     "Progress": f"{progress:.1f}%",
                     "Current": f"{current_steps:,}",
                     "Target": f"{target:,}",

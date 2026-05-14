@@ -118,6 +118,7 @@ def scan_dumping_yard():
                         "amp": in_params["amp"] or data.get("amp"),
                         "dt": in_params["dt"] or data.get("dt"),
                         "n_hoppers": data.get("n_hoppers", 1),
+                        "n_fill": data.get("n_fill"),
                         "geometry_vars": data.get("geometry_vars", {})
                     }
                 }
