@@ -182,6 +182,17 @@ def run_manager():
             "--inplace" if g.get("in_place", True) else ""
         ])
         
+        # Ensure a unique seed for NewRoot jobs if not already present
+        # This prevents collisions and allows discovery to work
+        overrides = g.get("params", {})
+        if path.startswith("NewRoot") and "seed" not in overrides:
+            try:
+                # Use the numeric suffix from the NewRoot path as the seed
+                seed_val = int(path.split("_")[-1]) % 1000000
+                overrides["seed"] = seed_val
+            except (ValueError, IndexError):
+                overrides["seed"] = int(time.time() * 1000) % 1000000
+        
         # Add any overrides (dt, viscosity, num_procs, etc.)
         # Exclude PBS-specific params that are not main.py arguments
         pbs_params = {"walltime", "ppn", "mem"}

@@ -4,7 +4,7 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-14T18:00:01.747313"
+        "last_heartbeat": "2026-05-14T23:30:50.368564"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
@@ -128,7 +128,8 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "orifice_half": 0.025
-                }
+                },
+                "seed": 761319
             }
         },
         "NewRoot_fill_1778761743": {
@@ -157,7 +158,8 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "orifice_half": 0.025
-                }
+                },
+                "seed": 761743
             }
         },
         "NewRoot_fill_1778762056": {
@@ -186,7 +188,8 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "orifice_half": 0.025
-                }
+                },
+                "seed": 762056
             }
         },
         "NewRoot_fill_1778762071": {
@@ -215,15 +218,16 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "orifice_half": 0.025
-                }
+                },
+                "seed": 762071
             }
         },
         "NewRoot_fill_1778762224": {
             "target_steps": 5000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
+            "last_submitted": "2026-05-14T23:30:50.380012",
+            "status": "Running",
             "mode": "fill",
             "params": {
                 "dt": 1e-06,
@@ -244,15 +248,16 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "hopper_ang": 30
-                }
+                },
+                "seed": 762224
             }
         },
         "NewRoot_fill_1778762251": {
             "target_steps": 7000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
+            "last_submitted": "2026-05-14T23:30:50.382346",
+            "status": "Running",
             "mode": "fill",
             "params": {
                 "dt": 1e-06,
@@ -273,15 +278,16 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "hopper_ang": 30
-                }
+                },
+                "seed": 762251
             }
         },
         "NewRoot_fill_1778762269": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
+            "last_submitted": "2026-05-14T23:30:50.384130",
+            "status": "Running",
             "mode": "fill",
             "params": {
                 "dt": 1e-06,
@@ -302,15 +308,16 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "hopper_ang": 30
-                }
+                },
+                "seed": 762269
             }
         },
         "NewRoot_fill_1778762288": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
+            "last_submitted": "2026-05-14T23:30:50.386195",
+            "status": "Running",
             "mode": "fill",
             "params": {
                 "dt": 1e-06,
@@ -331,7 +338,8 @@
                 "no-vtk": true,
                 "geometry_vars": {
                     "hopper_ang": 30
-                }
+                },
+                "seed": 762288
             }
         }
     }

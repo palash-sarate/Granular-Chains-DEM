@@ -716,5 +716,32 @@
         },
         "sync_status": "Synced",
         "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S776202": {
+        "name": "Grid_Fill_1H_S776202",
+        "parent": null,
+        "simulation": "Hopper_Fill",
+        "N": 48,
+        "steps": 91000,
+        "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S776202",
+        "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S776202",
+        "status": "Archived",
+        "params": {
+            "seed": "776202",
+            "freq": null,
+            "amp": null,
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": [
+                300
+            ],
+            "geometry_vars": [
+                {
+                    "orifice_half": 0.025
+                }
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
     }
 }

@@ -30,7 +30,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from Pulse.pulse_core import PBSManager, SimulationMonitor, SyncManager
+from Pulse.pulse_core import PBSManager, SimulationMonitor, SyncManager, AutoPilotManager
 import streamlit.components.v1 as components
 from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
@@ -1641,6 +1641,33 @@ if st.runtime.exists():
                 st.error(f"🔴 **SYSTEM STALE** (Last heartbeat: {diff.total_seconds()/60:.1f}m ago)")
         else:
             st.warning("⚪ **SYSTEM INACTIVE** (No heartbeat recorded yet)")
+
+        st.divider()
+        
+        # --- Manual Trigger ---
+        ap_col1, ap_col2 = st.columns([2, 1])
+        if AutoPilotManager.is_running():
+            ap_col1.info("⚙️ Auto-Pilot Manager is currently running...")
+            if ap_col2.button("🔄 Refresh Status", use_container_width=True):
+                st.rerun()
+        else:
+            if ap_col1.button("🚀 Run Auto-Pilot Now", type="primary", use_container_width=True):
+                success, msg = AutoPilotManager.trigger_manual()
+                if success:
+                    st.success(msg)
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error(msg)
+            
+            if ap_col2.button("📄 View Log", use_container_width=True):
+                log_path = os.path.join(ROOT_DIR, "Pulse", "auto_pilot.log")
+                if os.path.exists(log_path):
+                    with open(log_path, "r") as f:
+                        log_lines = f.readlines()
+                        st.code("".join(log_lines[-50:]), language="text")
+                else:
+                    st.info("No log file found.")
 
         st.divider()
         

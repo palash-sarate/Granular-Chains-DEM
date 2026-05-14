@@ -639,7 +639,9 @@ class GridHopperManager:
                                       normalized_geo_vars: List[Dict], exclude_regions: List[str] = None,
                                       oscillation_params: List[Dict] = None, inc_name: str = "replicated_geometry.inc"):
         original_commands = self._resolve_includes(setup_path)
-        vars_dict = self._evaluate_variables(original_commands)
+        # Use overrides from the first hopper for the global block if available
+        global_overrides = normalized_geo_vars[0] if normalized_geo_vars else {}
+        vars_dict = self._evaluate_variables(original_commands, global_overrides)
         
         if normalized_geo_vars:
             all_override_vars = set().union(*[g.keys() for g in normalized_geo_vars])
@@ -724,14 +726,35 @@ class GridHopperManager:
                         new_line = f"region {new_name} block {' '.join(coords)} {' '.join(final_rest)}{move_str}\n"
                     elif style == "plane":
                         coords = [str(resolve_val(c, offset[j])) for j, c in enumerate(rest[:3])]
-                        final_rest = [f"{p}_{i}" if p in original_region_names else p for p in rest[3:]]
-                        new_line = f"region {new_name} plane {' '.join(coords)} {' '.join(final_rest)}{move_str}\n"
+                        # Resolve normal components without offset
+                        normals = [str(resolve_val(c, 0)) for c in rest[3:6]]
+                        final_rest = [f"{p}_{i}" if p in original_region_names else p for p in rest[6:]]
+                        new_line = f"region {new_name} plane {' '.join(coords)} {' '.join(normals)} {' '.join(final_rest)}{move_str}\n"
+                    elif style == "cylinder":
+                        # region ID cylinder dim c1 c2 radius lo hi
+                        dim = rest[0]
+                        c1_idx = 1 if dim == 'x' else 0
+                        c2_idx = 2 if dim == 'z' else 1
+                        c1 = str(resolve_val(rest[1], offset[c1_idx]))
+                        c2 = str(resolve_val(rest[2], offset[c2_idx]))
+                        radius = str(resolve_val(rest[3], 0))
+                        lo = str(resolve_val(rest[4], offset["xyz".find(dim)]))
+                        hi = str(resolve_val(rest[5], offset["xyz".find(dim)]))
+                        final_rest = [f"{p}_{i}" if p in original_region_names else p for p in rest[6:]]
+                        new_line = f"region {new_name} cylinder {dim} {c1} {c2} {radius} {lo} {hi} {' '.join(final_rest)}{move_str}\n"
                     elif style in ["intersect", "union"]:
                         num = rest[0]
                         regs = [f"{r}_{i}" if r in original_region_names else r for r in rest[1:]]
                         new_line = f"region {new_name} {style} {num} {' '.join(regs)}{move_str}\n"
                     else:
-                        new_line = f"region {new_name} {style} {' '.join([f'{p}_{i}' if p in original_region_names else p for p in rest])}{move_str}\n"
+                        # Fallback for other styles: resolve everything as best as possible
+                        resolved_rest = []
+                        for part in rest:
+                            if part in original_region_names:
+                                resolved_rest.append(f"{part}_{i}")
+                            else:
+                                resolved_rest.append(str(resolve_val(part, 0)))
+                        new_line = f"region {new_name} {style} {' '.join(resolved_rest)}{move_str}\n"
                     replicated_lines.append(new_line)
                 
                 # Replicate Fixes

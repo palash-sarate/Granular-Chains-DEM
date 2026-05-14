@@ -7,6 +7,8 @@ from datetime import datetime
 from typing import List, Dict, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
+import psutil
+import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -962,3 +964,46 @@ python Pulse/run_sync_job.py --user {user}
                 return {"mode": "Local Thread", "id": content}
         except:
             return None
+
+class AutoPilotManager:
+    LOG_FILE = "Pulse/auto_pilot.log"
+
+    @staticmethod
+    def is_running():
+        """Checks if the auto_pilot_manager.py script is currently executing."""
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                cmd = proc.info.get('cmdline')
+                if cmd and any("auto_pilot_manager.py" in part for part in cmd):
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+        return False
+
+    @staticmethod
+    def trigger_manual() -> tuple[bool, str]:
+        """Triggers a manual run of the auto-pilot manager in the background."""
+        if AutoPilotManager.is_running():
+            return False, "Auto-Pilot manager is already running."
+        
+        # Use the current python executable if possible
+        python_exe = sys.executable or "/home/guest/miniconda3/envs/gchain/bin/python"
+        manager_path = os.path.join(ROOT_DIR, "Pulse", "auto_pilot_manager.py")
+        log_path = os.path.join(ROOT_DIR, AutoPilotManager.LOG_FILE)
+        
+        try:
+            # Ensure log file exists and append a separator
+            with open(log_path, "a") as f:
+                f.write(f"\n--- [MANUAL TRIGGER] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+                f.flush()
+                # Run as a detached process
+                subprocess.Popen(
+                    [python_exe, manager_path],
+                    stdout=f,
+                    stderr=f,
+                    cwd=ROOT_DIR,
+                    start_new_session=True
+                )
+            return True, "Auto-Pilot manager triggered in background."
+        except Exception as e:
+            return False, f"Failed to trigger manager: {str(e)}"
