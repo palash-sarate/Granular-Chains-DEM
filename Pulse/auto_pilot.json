@@ -4,7 +4,7 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-14T23:30:50.368564"
+        "last_heartbeat": "2026-05-15T00:00:01.265105"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
@@ -340,6 +340,126 @@
                     "hopper_ang": 30
                 },
                 "seed": 762288
+            }
+        },
+        "NewRoot_fill_1778782642": {
+            "target_steps": 5000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "fill",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 4,
+                "n_fill": 3600,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025,
+                    "hopper_ang": 30
+                }
+            }
+        },
+        "NewRoot_fill_1778782733": {
+            "target_steps": 7000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "fill",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 12,
+                "n_fill": 1200,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025,
+                    "hopper_ang": 30
+                }
+            }
+        },
+        "NewRoot_fill_1778782860": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "fill",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 24,
+                "n_fill": 600,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025,
+                    "hopper_ang": 30
+                }
+            }
+        },
+        "NewRoot_fill_1778782876": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "fill",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 48,
+                "n_fill": 300,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025,
+                    "hopper_ang": 30
+                }
             }
         }
     }
