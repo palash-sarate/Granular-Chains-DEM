@@ -4,7 +4,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 6000000,
+        "steps": 6300000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
         "status": "Active",
@@ -18,7 +18,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-11T18:06:30.373628"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
@@ -26,7 +26,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243",
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 5000000,
+        "steps": 5300000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "status": "Active",
@@ -114,7 +114,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 7000000,
+        "steps": 7300000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
         "status": "Active",
@@ -128,7 +128,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-11T18:06:30.373670"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S481365_S918498": {
@@ -268,7 +268,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 5000000,
+        "steps": 5400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "status": "Active",
@@ -282,7 +282,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-11T18:06:30.373648"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S469898_S906801": {
@@ -356,7 +356,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784",
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 5000000,
+        "steps": 5300000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "status": "Active",
@@ -370,7 +370,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-11T18:06:30.373666"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784": {

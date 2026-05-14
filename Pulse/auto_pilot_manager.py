@@ -93,7 +93,7 @@ def run_manager():
 
     # 3. Check Concurrency
     active_guest_jobs = count_guest_jobs(jobs)
-    max_concurrent = data["settings"].get("max_concurrent", 3)
+    max_concurrent = data["settings"].get("max_concurrent") or 3
     
     if active_guest_jobs >= max_concurrent:
         print(f"Concurrency limit reached ({active_guest_jobs}/{max_concurrent})")
@@ -109,11 +109,32 @@ def run_manager():
 
     # 5. Round Robin Selection
     goals = data.get("goals", {})
+    
+    # Discovery: Transition NewRoot goals to actual paths once they appear in lineage
+    for path, g in list(goals.items()):
+        if path.startswith("NewRoot") and g.get("last_submitted"):
+            target_seed = g.get("params", {}).get("seed")
+            for l_path, l_info in lineage.items():
+                l_seed = l_info.get("params", {}).get("seed")
+                if l_seed and str(l_seed) == str(target_seed):
+                    # Found the newly created run! Hand off the goal to the real path
+                    goals[l_path] = g.copy()
+                    goals[l_path]["mode"] = "fill_resume" if g["mode"] == "fill" else g["mode"]
+                    del goals[path]
+                    # Update data store immediately to persist the transition
+                    save_auto_pilot(data)
+                    break
+
     eligible = []
     for path, g in goals.items():
+        if path.startswith("NewRoot"):
+            if g.get("last_submitted"): continue
+            eligible.append((path, g, 0))
+            continue
         if path not in lineage: continue
-        curr_steps = lineage[path].get("steps", 0)
-        if curr_steps < g["target_steps"]:
+        curr_steps = lineage[path].get("steps") or 0
+        target_steps = g.get("target_steps") or 0
+        if curr_steps < target_steps:
             # Check if this run is already in queue by name
             run_name = os.path.basename(path)
             if any(run_name in j["name"] for j in jobs):
@@ -121,8 +142,8 @@ def run_manager():
             
             eligible.append((path, g, curr_steps))
 
-    # Sort by last_submitted
-    eligible.sort(key=lambda x: x[1].get("last_submitted", ""))
+    # Sort by last_submitted (handle None by converting to empty string)
+    eligible.sort(key=lambda x: x[1].get("last_submitted") or "")
 
     # 6. Submit
     log_dir = os.path.join(ROOT_DIR, "PBS_Output")
@@ -146,7 +167,10 @@ def run_manager():
         cmd_parts = ["python", "-u", "main.py", cmd_name]
         
         # Handle specific mode paths
-        if "flow" in mode and "resume" not in mode:
+        if path.startswith("NewRoot"):
+            # New fill doesn't have a source path usually, or it's in params
+            pass
+        elif "flow" in mode and "resume" not in mode:
             # Flow study takes source_dir
             cmd_parts.extend(["--source_dir", path])
         else:
@@ -154,16 +178,23 @@ def run_manager():
             cmd_parts.extend(["--restart_path", path])
 
         cmd_parts.extend([
-            "--relax_steps" if "fill" in mode else "--run_steps", str(g["increment"]),
+            "--relax_steps" if "fill" in mode else "--run_steps", str(g.get("increment") or 100000),
             "--inplace" if g.get("in_place", True) else ""
         ])
         
         # Add any overrides (dt, viscosity, num_procs, etc.)
+        # Exclude PBS-specific params that are not main.py arguments
+        pbs_params = {"walltime", "ppn", "mem"}
         overrides = g.get("params", {})
         if overrides:
             for k, v in overrides.items():
-                if v is not None and v != "":
-                    cmd_parts.extend([f"--{k}", str(v)])
+                if k not in pbs_params and v is not None and v != "":
+                    if isinstance(v, (dict, list)):
+                        cmd_parts.extend([f"--{k}", f"'{json.dumps(v)}'"])
+                    elif isinstance(v, bool):
+                        if v: cmd_parts.append(f"--{k}")
+                    else:
+                        cmd_parts.extend([f"--{k}", str(v)])
         
         full_command = " ".join([c for c in cmd_parts if c])
 

@@ -1409,6 +1409,25 @@ if st.runtime.exists():
                     mode_params["simulation"] = "Hopper_Fill"
                     mode_params["no-vtk"] = True
 
+                    with st.expander("🛠️ Geometry Overrides", expanded=False):
+                        st.info("Provide custom geometry parameters for the hopper(s) as a JSON object.")
+                        geo_json = st.text_area("Geometry Variables (JSON)", value="{}", help='Example: {"orifice_half": 0.04, "hopper_ang": 55.0}. You can also provide lists for per-hopper settings: {"orifice_half": [0.05, 0.04]}')
+                        try:
+                            if geo_json.strip():
+                                parsed_geo = json.loads(geo_json)
+                                if not isinstance(parsed_geo, dict):
+                                    st.error("JSON must be a dictionary/object.")
+                                    mode_params["_invalid_geo"] = True
+                                else:
+                                    mode_params["geometry_vars"] = parsed_geo
+                                    if parsed_geo != {}:
+                                        st.success("Configuration loaded.")
+                            else:
+                                mode_params["geometry_vars"] = {}
+                        except Exception as e:
+                            st.error(f"Invalid JSON: {e}")
+                            mode_params["_invalid_geo"] = True
+
                 elif selected_mode == "fill_resume":
                     rc1, rc2 = st.columns(2)
                     mode_params["relax_steps"] = rc1.number_input("Relax Steps", value=1000000, step=100000)
@@ -1428,21 +1447,27 @@ if st.runtime.exists():
                     frc1, frc2 = st.columns(2)
                     mode_params["run_steps"] = frc1.number_input("Run Steps", value=1000000, step=100000)
 
-                inplace_mode = False
-                if selected_mode != "fill":
-                    inplace_mode = st.checkbox("😇 In-place Resumption", value=True)
-
                 st.markdown("---")
-                use_auto_pilot = st.checkbox("🤖 **Handover to Auto-Pilot**", value=False)
+                use_auto_pilot = st.checkbox("🤖 **Handover to Auto-Pilot**", value=False, help="Automatically queue and resume simulations until a target step count is reached.")
+                
                 ap_target, ap_inc = 10000000, 100000
                 if use_auto_pilot:
                     ap_col1, ap_col2 = st.columns(2)
                     ap_target = ap_col1.number_input("Target Total Steps", value=10000000, step=1000000)
                     ap_inc = ap_col2.number_input("Step Increment", value=100000, step=10000)
+                    st.info("💡 **Auto-Pilot Note**: Simulations will always run 'In-place' to ensure that each increment resumes from the absolute latest state of the previous run.")
+                    inplace_mode = True
+                else:
+                    inplace_mode = False
+                    if selected_mode != "fill":
+                        inplace_mode = st.checkbox("😇 In-place Resumption", value=True, help="Run simulation in the same directory as parent. Recommended for long relaxations.")
                 
                 submit_btn = st.button("🚀 Launch Auto-Pilot" if use_auto_pilot else "🚀 Submit to PBS", use_container_width=True)
                     
                 if submit_btn:
+                    if mode_params.get("_invalid_geo"):
+                        st.error("Submission blocked: Please fix the invalid JSON in Geometry Overrides.")
+                        st.stop()
                     jobs_to_submit = []
                     
                     for p_rid in selected_parents:
@@ -1527,6 +1552,11 @@ if st.runtime.exists():
                             final_params.pop("_freq_list", None)
                             final_params.pop("_amp_list", None)
 
+                            # Final job parameters
+                            job_data_params = {**final_params}
+                            if selected_mode != "fill":
+                                job_data_params["inplace"] = inplace_mode
+
                             jobs_to_submit.append({
                                 "name": job_name,
                                 "type": selected_mode,
@@ -1535,7 +1565,7 @@ if st.runtime.exists():
                                 "mem": mem,
                                 "priority": -1024 if polite_mode else 0,
                                 "dependency": p_active_jid,
-                                "params": {**final_params, "inplace": inplace_mode}
+                                "params": job_data_params
                             })
                     
                     if use_auto_pilot:
@@ -1544,9 +1574,12 @@ if st.runtime.exists():
                             auto_data = load_auto_pilot()
                             enrolled_count = 0
                             for p_rid in selected_parents:
-                                if p_rid == "NewRoot": continue # Root fill not yet supported by AP manager
+                                path_key = p_rid
+                                if p_rid == "NewRoot":
+                                    import time
+                                    path_key = f"NewRoot_{selected_mode}_{int(time.time())}"
                                 
-                                auto_data["goals"][p_rid] = {
+                                auto_data["goals"][path_key] = {
                                     "target_steps": ap_target,
                                     "increment": ap_inc,
                                     "in_place": inplace_mode,

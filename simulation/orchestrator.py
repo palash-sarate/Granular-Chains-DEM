@@ -339,7 +339,8 @@ class SimulationOrchestrator:
                                 simulation: str = "Grid_Hopper_Filling",
                                 template: str = "in.grid_hopper_fill",
                                 generate_vtk: bool = True,
-                                geometry_vars: Dict[str, Any] = None):
+                                geometry_vars: Dict[str, Any] = None,
+                                inplace: bool = False):
         """
         Main entry point for grid-based batch hopper filling.
         Packs multiple hoppers into one simulation box for faster generation.

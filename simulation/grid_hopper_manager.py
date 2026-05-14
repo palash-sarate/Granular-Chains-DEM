@@ -95,8 +95,9 @@ class GridHopperManager:
                         normalized_geo_vars[i][var_name] = values
 
         unique_Ns = sorted(list(set(N_list)))
+        cols = math.ceil(math.sqrt(n_hoppers))
 
-        # 2. Setup Run Name and Job Directory (Moved up to ensure unique molecule directory)
+        # 2. Setup Run Name and Job Directory
         mixed_tag = "_MixedN" if len(unique_Ns) > 1 else ""
         run_name = f"Grid_Fill_{n_hoppers}H{mixed_tag}_S{seed}"
         job_dir = Path(f"dumping_yard/{simulation}/{run_name}")
