@@ -59,7 +59,7 @@ class GridHopperManager:
                          num_threads: int = 1,
                          use_kokkos: bool = True,
                          mode: str = "2D_stacked",
-                         simulation: str = "Grid_Hopper_Filling",
+                         simulation: str = "Hopper_Fill",
                          template: str = "in.grid_hopper_fill",
                          generate_vtk: bool = True,
                          geometry_vars: Dict[str, Any] = None):
@@ -1052,7 +1052,7 @@ class GridHopperManager:
                 json.dump({
                     "N": n_val, 
                     "n_fill": fill_val, 
-                    "offset": offset,
+                    "offset": offset.tolist() if hasattr(offset, "tolist") else offset,
                     "geometry_overrides": meta.get('geometry_vars', {}),
                     "source_dir": meta.get('source_dir')
                 }, f)

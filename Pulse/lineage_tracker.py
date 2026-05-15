@@ -104,6 +104,10 @@ def scan_dumping_yard():
                 else:
                     rel_path = os.path.relpath(run_dir, os.getcwd())
 
+                n_fill = data.get("n_fill")
+                if isinstance(n_fill, list) and len(n_fill) > 0:
+                    n_fill = n_fill[0]
+
                 run_info = {
                     "name": run_name,
                     "parent": parent_path,
@@ -119,7 +123,7 @@ def scan_dumping_yard():
                         "amp": in_params["amp"] or data.get("amp"),
                         "dt": in_params["dt"] or data.get("dt"),
                         "n_hoppers": data.get("n_hoppers", 1),
-                        "n_fill": data.get("n_fill"),
+                        "n_fill": n_fill,
                         "geometry_vars": data.get("geometry_vars", {})
                     }
                 }

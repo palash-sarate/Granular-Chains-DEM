@@ -148,7 +148,7 @@ def main():
     p_grid_h.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
     p_grid_h.add_argument("--mode", type=str, default="2D_stacked", choices=["2D_stacked", "2D_worst_case", "3D_grid"],
                             help="Pouring mode: 2D_stacked (smart bbox), 2D_worst_case (linear spacing), or 3D_grid")
-    p_grid_h.add_argument("--simulation", default="Grid_Hopper_Filling")
+    p_grid_h.add_argument("--simulation", default="Hopper_Fill")
     p_grid_h.add_argument("--template", default="in.grid_hopper_fill")
     p_grid_h.add_argument("--no-vtk", action="store_false", dest="generate_vtk", help="Skip VTK mesh generation")
     p_grid_h.set_defaults(generate_vtk=True)
@@ -168,13 +168,13 @@ def main():
     p_res_grid.add_argument("--num_threads", type=int, default=1)
     p_res_grid.add_argument("--no-kokkos", action="store_false", dest="use_kokkos")
     p_res_grid.add_argument("--template", default="in.grid_hopper_fill_resume")
-    p_res_grid.add_argument("--simulation", default="Grid_Hopper_Filling")
+    p_res_grid.add_argument("--simulation", default=None)
     p_res_grid.add_argument("--seed", type=int, default=None)
     p_res_grid.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
     # 11. run_grid_hopper_flow
     p_flow = subparsers.add_parser("run_grid_hopper_flow", help="Transition filled hoppers to oscillatory flow")
-    p_flow.add_argument("--source_dir", required=True, help="Directory of a Grid_Hopper_Filling run")
+    p_flow.add_argument("--source_dir", required=True, help="Directory of a Hopper_Fill run")
     p_flow.add_argument("--run_steps", type=int, default=1000000)
     p_flow.add_argument("--freq", type=str, default="10.0", help="Freq (single float or JSON list)")
     p_flow.add_argument("--amp", type=str, default="0.01", help="Amp (single float or JSON list)")
@@ -203,7 +203,7 @@ def main():
     p_res_flow.add_argument("--dump_file", default="simulation_templates/default_dump.inc")
     p_res_flow.add_argument("--viscosity", type=float, default=0.001)
     p_res_flow.add_argument("--template", default="in.grid_hopper_flow_resume")
-    p_res_flow.add_argument("--simulation", default="Grid_Hopper_Flow")
+    p_res_flow.add_argument("--simulation", default=None)
     p_res_flow.add_argument("--seed", type=int, default=None)
     p_res_flow.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 

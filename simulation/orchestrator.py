@@ -336,7 +336,7 @@ class SimulationOrchestrator:
                                 num_procs: int = 1, num_threads: int = 1,
                                 use_kokkos: bool = True,
                                 mode: str = "2D_stacked",
-                                simulation: str = "Grid_Hopper_Filling",
+                                simulation: str = "Hopper_Fill",
                                 template: str = "in.grid_hopper_fill",
                                 generate_vtk: bool = True,
                                 geometry_vars: Dict[str, Any] = None,
@@ -385,7 +385,7 @@ class SimulationOrchestrator:
                                   num_procs: int = 1, num_threads: int = 1,
                                   use_kokkos: bool = True,
                                   template: str = "in.grid_hopper_fill_resume",
-                                  simulation: str = "Grid_Hopper_Filling",
+                                  simulation: Optional[str] = None,
                                   seed: Optional[int] = None,
                                   inplace: bool = False):
         """

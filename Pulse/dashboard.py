@@ -1204,10 +1204,13 @@ if st.runtime.exists():
                 # Clean up for display
                 display_lineage = []
                 for rid, info in lineage.items():
+                    n_val = info.get("N", 0)
+                    if isinstance(n_val, list) and len(n_val) > 0: n_val = n_val[0]
+
                     display_lineage.append({
                         "Name": info["name"],
                         "Type": info["simulation"],
-                        "N": info["N"],
+                        "N": n_val,
                         "Steps": info["steps"],
                         "Status": info["status"],
                         "GeoVars": str(info.get("params", {}).get("geometry_vars", {})),
@@ -1759,6 +1762,10 @@ if st.runtime.exists():
                 # Fallback to lineage if not in goal params
                 if n_val is None: n_val = current_info.get("N", "-")
                 if n_fill_val is None: n_fill_val = current_info.get("params", {}).get("n_fill", "-")
+
+                # Normalize to scalar for table display (prevents Arrow mixed-type errors)
+                if isinstance(n_val, list) and len(n_val) > 0: n_val = n_val[0]
+                if isinstance(n_fill_val, list) and len(n_fill_val) > 0: n_fill_val = n_fill_val[0]
                 if not geo_vars: geo_vars = current_info.get("params", {}).get("geometry_vars", {})
                 
                 if isinstance(geo_vars, dict) and geo_vars:
