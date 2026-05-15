@@ -4,14 +4,14 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-15T00:00:01.265105"
+        "last_heartbeat": "2026-05-15T10:00:01.869926"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T07:00:01.189736",
+            "last_submitted": "2026-05-15T06:00:01.648421",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -30,7 +30,7 @@
             "target_steps": 7000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T07:00:01.192027",
+            "last_submitted": "2026-05-15T06:00:01.650806",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -49,7 +49,7 @@
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T07:00:01.193942",
+            "last_submitted": "2026-05-15T06:00:01.653098",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -68,7 +68,7 @@
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T07:00:01.195856",
+            "last_submitted": "2026-05-15T08:00:01.764838",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -87,7 +87,7 @@
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T05:00:01.074791",
+            "last_submitted": "2026-05-15T06:00:01.645604",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -102,133 +102,13 @@
                 "simulation": "Hopper_Fill_Resume"
             }
         },
-        "NewRoot_fill_1778761319": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224": {
             "target_steps": 5000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 4,
-                "n_fill": 3600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 761319
-            }
-        },
-        "NewRoot_fill_1778761743": {
-            "target_steps": 7000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 12,
-                "n_fill": 1200,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 761743
-            }
-        },
-        "NewRoot_fill_1778762056": {
-            "target_steps": 8000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 24,
-                "n_fill": 600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 762056
-            }
-        },
-        "NewRoot_fill_1778762071": {
-            "target_steps": 8000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 48,
-                "n_fill": 300,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 762071
-            }
-        },
-        "NewRoot_fill_1778762224": {
-            "target_steps": 5000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-05-14T23:30:50.380012",
+            "last_submitted": "2026-05-15T08:00:01.767584",
             "status": "Running",
-            "mode": "fill",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -252,13 +132,13 @@
                 "seed": 762224
             }
         },
-        "NewRoot_fill_1778762251": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251": {
             "target_steps": 7000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T23:30:50.382346",
+            "last_submitted": "2026-05-15T08:00:01.770169",
             "status": "Running",
-            "mode": "fill",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -282,13 +162,13 @@
                 "seed": 762251
             }
         },
-        "NewRoot_fill_1778762269": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T23:30:50.384130",
+            "last_submitted": "2026-05-15T08:00:01.772334",
             "status": "Running",
-            "mode": "fill",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -312,13 +192,13 @@
                 "seed": 762269
             }
         },
-        "NewRoot_fill_1778762288": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-14T23:30:50.386195",
+            "last_submitted": "2026-05-15T08:52:48.045592",
             "status": "Running",
-            "mode": "fill",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -342,13 +222,133 @@
                 "seed": 762288
             }
         },
-        "NewRoot_fill_1778782642": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319": {
             "target_steps": 5000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
+            "last_submitted": "2026-05-15T08:52:48.048485",
+            "status": "Running",
+            "mode": "fill_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 4,
+                "n_fill": 3600,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025
+                },
+                "seed": 761319
+            }
+        },
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743": {
+            "target_steps": 7000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-15T08:52:48.050995",
+            "status": "Running",
+            "mode": "fill_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 12,
+                "n_fill": 1200,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025
+                },
+                "seed": 761743
+            }
+        },
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-15T08:52:48.053283",
+            "status": "Running",
+            "mode": "fill_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 24,
+                "n_fill": 600,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025
+                },
+                "seed": 762056
+            }
+        },
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762071": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-15T09:53:43.820848",
+            "status": "Running",
+            "mode": "fill_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 0.001,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 48,
+                "n_fill": 300,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "orifice_half": 0.025
+                },
+                "seed": 762071
+            }
+        },
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642": {
+            "target_steps": 5000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-15T09:53:43.823823",
+            "status": "Running",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -369,16 +369,17 @@
                 "geometry_vars": {
                     "orifice_half": 0.025,
                     "hopper_ang": 30
-                }
+                },
+                "seed": 782642
             }
         },
-        "NewRoot_fill_1778782733": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733": {
             "target_steps": 7000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
+            "last_submitted": "2026-05-15T09:53:43.826159",
+            "status": "Running",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -399,16 +400,17 @@
                 "geometry_vars": {
                     "orifice_half": 0.025,
                     "hopper_ang": 30
-                }
+                },
+                "seed": 782733
             }
         },
-        "NewRoot_fill_1778782860": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
+            "last_submitted": "2026-05-15T09:53:43.828618",
+            "status": "Running",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -429,16 +431,17 @@
                 "geometry_vars": {
                     "orifice_half": 0.025,
                     "hopper_ang": 30
-                }
+                },
+                "seed": 782860
             }
         },
-        "NewRoot_fill_1778782876": {
+        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876": {
             "target_steps": 8000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": null,
-            "status": "Idle",
-            "mode": "fill",
+            "last_submitted": "2026-05-15T04:00:01.532925",
+            "status": "Running",
+            "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
                 "viscosity": 0.001,
@@ -459,7 +462,25 @@
                 "geometry_vars": {
                     "orifice_half": 0.025,
                     "hopper_ang": 30
-                }
+                },
+                "seed": 782876
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S454157": {
+            "target_steps": 1000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 4e-07,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
             }
         }
     }

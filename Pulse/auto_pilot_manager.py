@@ -12,6 +12,11 @@ LINEAGE_FILE = os.path.join(ROOT_DIR, "Pulse", "lineage.json")
 QSTAT_PATH = "/opt/pbs/bin/qstat"
 QSUB_PATH = "/opt/pbs/bin/qsub"
 
+def save_auto_pilot(data):
+    with open(AUTO_PILOT_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
 PBS_TEMPLATE = """#!/bin/bash
 #PBS -N {job_name}
 #PBS -q workq
@@ -79,16 +84,14 @@ def run_manager():
     data["settings"]["last_heartbeat"] = datetime.datetime.now().isoformat()
     
     if not data["settings"]["enabled"]:
-        with open(AUTO_PILOT_FILE, "w") as f:
-            json.dump(data, f, indent=4)
+        save_auto_pilot(data)
         return
 
     # 2. Check for Students (Polite Mode)
     jobs = get_pbs_jobs()
     if data["settings"]["polite_mode"] and is_student_active(jobs):
         print("Student detected. Standing down.")
-        with open(AUTO_PILOT_FILE, "w") as f:
-            json.dump(data, f, indent=4)
+        save_auto_pilot(data)
         return
 
     # 3. Check Concurrency
@@ -97,8 +100,7 @@ def run_manager():
     
     if active_guest_jobs >= max_concurrent:
         print(f"Concurrency limit reached ({active_guest_jobs}/{max_concurrent})")
-        with open(AUTO_PILOT_FILE, "w") as f:
-            json.dump(data, f, indent=4)
+        save_auto_pilot(data)
         return
 
     slots_available = max_concurrent - active_guest_jobs
@@ -194,12 +196,21 @@ def run_manager():
                 overrides["seed"] = int(time.time() * 1000) % 1000000
         
         # Add any overrides (dt, viscosity, num_procs, etc.)
-        # Exclude PBS-specific params that are not main.py arguments
-        pbs_params = {"walltime", "ppn", "mem"}
+        # Exclude PBS-specific params and setup-only params for resumes/flows
+        skip_params = {"walltime", "ppn", "mem"}
+        if "resume" in mode or "flow" in mode:
+            # These are handled by the restart file or source_dir
+            skip_params.update({
+                "N", "n_fill", "spacing", "n_hoppers", "mode", "simulation", 
+                "source_dir", "no-vtk", "geometry_vars", "hopper_template_data"
+            })
+            if "resume" in mode:
+                skip_params.add("restart_path")
+
         overrides = g.get("params", {})
         if overrides:
             for k, v in overrides.items():
-                if k not in pbs_params and v is not None and v != "":
+                if k not in skip_params and v is not None and v != "":
                     if isinstance(v, (dict, list)):
                         cmd_parts.extend([f"--{k}", f"'{json.dumps(v)}'"])
                     elif isinstance(v, bool):
@@ -231,13 +242,15 @@ def run_manager():
             
             data["goals"][path]["last_submitted"] = datetime.datetime.now().isoformat()
             data["goals"][path]["status"] = "Running"
+            
+            # Transactional save to prevent duplicate submissions if we crash later
+            save_auto_pilot(data)
         except Exception as e:
             print(f"Failed to submit {job_name}: {e}")
         finally:
             if os.path.exists(script_path): os.remove(script_path)
 
-    with open(AUTO_PILOT_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    save_auto_pilot(data)
 
 if __name__ == "__main__":
     run_manager()

@@ -962,6 +962,16 @@ if st.runtime.exists():
                 short_id = info['name'].replace('-', '_').replace('.', '_')
                 wrapped_name = wrap_sim_name(info['name'], max_width=20)
                 node_label = f"{wrapped_name}<br/>(N={info['N']}, {info['steps']:,} steps)"
+                
+                # Append freq/amp for flow simulations
+                p = info.get('params', {})
+                f, a = p.get('freq'), p.get('amp')
+                if f is not None or a is not None:
+                    # Handle single values or lists (for grid runs)
+                    f_val = f[0] if isinstance(f, list) else f
+                    a_val = a[0] if isinstance(a, list) else a
+                    if f_val or a_val:
+                        node_label += f"<br/>f={f_val}, a={a_val}"
                 seed = str(info.get('params', {}).get('seed', ''))
                 
                 # Base Style

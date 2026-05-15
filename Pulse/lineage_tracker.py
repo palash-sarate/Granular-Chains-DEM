@@ -4,8 +4,9 @@ import re
 from pathlib import Path
 import subprocess
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LINEAGE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lineage.json")
-DUMPING_YARD = "dumping_yard"
+DUMPING_YARD = os.path.join(ROOT_DIR, "dumping_yard")
 
 def get_max_step(run_dir):
     """Finds the maximum timestep reached in the run efficiently using shell streams."""
