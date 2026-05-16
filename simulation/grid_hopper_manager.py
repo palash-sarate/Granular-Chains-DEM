@@ -363,6 +363,7 @@ class GridHopperManager:
             data_file=str(restart_p), # Passed as restart_path in template
             lepton_file=lepton_file,
             dump_file=dump_file,
+            outdir_override=str(new_job_dir),
             extra_vars={
                 "restart_path": str(restart_p).replace("\\", "/"),
                 "geometry_inc": local_geometry_inc.replace("\\", "/"),
@@ -491,6 +492,7 @@ class GridHopperManager:
             data_file=None,
             lepton_file=lepton_file,
             dump_file=dump_file,
+            outdir_override=str(job_dir),
             extra_vars={
                 "restart_path": str(restart_path).replace("\\", "/"),
                 "geometry_inc": geometry_flow_inc.replace("\\", "/"),
@@ -615,6 +617,7 @@ class GridHopperManager:
             data_file=str(restart_p).replace("\\", "/"),
             lepton_file=lepton_file,
             dump_file=dump_file,
+            outdir_override=str(new_job_dir),
             extra_vars={
                 "restart_path": str(restart_p).replace("\\", "/"),
                 "geometry_inc": local_geometry_inc.replace("\\", "/"),

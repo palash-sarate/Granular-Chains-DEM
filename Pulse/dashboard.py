@@ -438,20 +438,41 @@ if st.runtime.exists():
         else:
             # 1. Chain Selection
             st.write("### 1. Select Lineage Chain")
-            all_paths = sorted(list(lineage.keys()))
-            names = {p: lineage[p]['name'] for p in all_paths}
+            use_manual = st.checkbox("🧩 Use Manual Path (e.g. for Archived Runs)")
             
-            c1, c2 = st.columns(2)
-            start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names[x], index=0)
-            
-            # Filter end_node options based on descendants of start_node (including start_node itself)
-            possible_ends = [start_node] + VizManager.get_descendants(start_node, lineage)
-            end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names[x], index=len(possible_ends)-1)
+            start_node = end_node = None # Initialize for safety
 
-            if end_node:
-                chain = VizManager.get_lineage_chain(start_node, end_node)
+            if use_manual:
+                manual_path = st.text_input("Absolute Path to Run Directory", 
+                                           placeholder="/Data/palash_data/dumping_yard/Archived_Runs/...")
+                if manual_path:
+                    manual_path = manual_path.strip()
+                    if os.path.exists(manual_path):
+                        chain = [manual_path]
+                        start_node = manual_path
+                        end_node = manual_path
+                        names = {manual_path: os.path.basename(manual_path)}
+                        st.success(f"Manual Path Resolved: `{os.path.basename(manual_path)}`")
+                    else:
+                        st.error("❌ Path does not exist. Please provide a valid absolute path.")
+                        chain = []
+                else:
+                    chain = []
             else:
-                chain = []
+                all_paths = sorted(list(lineage.keys()))
+                names = {p: lineage[p]['name'] for p in all_paths}
+                
+                c1, c2 = st.columns(2)
+                start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names.get(x, x), index=0)
+                
+                # Filter end_node options based on descendants of start_node (including start_node itself)
+                possible_ends = [start_node] + VizManager.get_descendants(start_node, lineage)
+                end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names.get(x, x), index=len(possible_ends)-1)
+
+                if end_node:
+                    chain = VizManager.get_lineage_chain(start_node, end_node)
+                else:
+                    chain = []
             
             if not chain:
                 st.error("No valid direct lineage chain found. Select a different Start/End node.")
@@ -815,6 +836,16 @@ if st.runtime.exists():
 
                 if is_running:
                     st.warning(f"⚠️ **Visualization job is currently running** (PBS ID: `{job_id}`)")
+                    
+                    # Log Display
+                    log_path = os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
+                    if os.path.exists(log_path):
+                        with st.expander("📄 View Visualization Logs", expanded=True):
+                            with open(log_path, "r") as f:
+                                st.code(f.read(), language="text")
+                            if st.button("🔄 Refresh Logs"):
+                                st.rerun()
+
                     if st.button("🛑 Cancel Viz Job", type="secondary"):
                         subprocess.run(["qdel", job_id])
                         if os.path.exists(lock_path): os.remove(lock_path)
@@ -972,6 +1003,18 @@ if st.runtime.exists():
                     a_val = a[0] if isinstance(a, list) else a
                     if f_val or a_val:
                         node_label += f"<br/>f={f_val}, a={a_val}"
+                
+                # Append geometry_vars if present
+                gv_data = p.get('geometry_vars', [])
+                if gv_data:
+                    # Extract the first dict if it's a list, otherwise use as is
+                    gv = gv_data[0] if isinstance(gv_data, list) and len(gv_data) > 0 else gv_data
+                    if isinstance(gv, dict) and gv:
+                        # Use shorter labels for specific variables to save space
+                        label_map = {"orifice_half": "Orf_H", "hopper_ang": "Ang"}
+                        gv_str = ", ".join([f"{label_map.get(k, k)}={v}" for k, v in gv.items()])
+                        node_label += f"<br/>{gv_str}"
+
                 seed = str(info.get('params', {}).get('seed', ''))
                 
                 # Base Style

@@ -7,12 +7,12 @@ import glob
 import re
 from datetime import datetime
 from typing import List, Dict, Optional
-from analysis.controllers.unified_renderer import UnifiedRenderer
-
 # Add project root to sys.path
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
+
+from analysis.controllers.unified_renderer import UnifiedRenderer
 
 from Pulse.pulse_core import PBSManager, SyncManager
 
@@ -84,6 +84,11 @@ class VizManager:
     @staticmethod
     def submit_viz_job(params: Dict):
         """Submits the movie generation process as a PBS job."""
+        log_path = os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
+        if os.path.exists(log_path):
+            try: os.remove(log_path)
+            except: pass
+
         os.makedirs(os.path.join(ROOT_DIR, VizManager.VIZ_DIR), exist_ok=True)
         
         job_script = f"""#!/bin/bash
@@ -95,6 +100,7 @@ class VizManager:
 #PBS -o {os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)}
 
 cd $PBS_O_WORKDIR
+export PYTHONPATH=$PYTHONPATH:$PBS_O_WORKDIR
 trap 'kill 0' EXIT
 
 if [ -f /home/guest/miniconda3/etc/profile.d/conda.sh ]; then

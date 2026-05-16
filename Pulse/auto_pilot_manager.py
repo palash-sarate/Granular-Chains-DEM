@@ -3,6 +3,7 @@ import json
 import subprocess
 import datetime
 import time
+import fcntl
 
 # Paths
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +44,9 @@ echo "Starting simulation: {job_name} at: $(date)"
 echo "=============================================================================="
 echo "Simulation complete at: $(date)"
 echo "=============================================================================="
+
+# 4. Trigger next Auto-Pilot cycle
+python3 {manager_script}
 """
 
 def get_pbs_jobs():
@@ -74,7 +78,16 @@ def count_guest_jobs(jobs):
     return len([j for j in jobs if j["user"] == "guest"])
 
 def run_manager():
-    # 1. Update Heartbeat
+    # 1. Use a lock file to prevent concurrent manager runs
+    lock_path = os.path.join(ROOT_DIR, "Pulse", "auto_pilot.lock")
+    lock_f = open(lock_path, "w")
+    try:
+        fcntl.flock(lock_f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        print("Auto-Pilot is already running. Exiting.")
+        return
+
+    # 2. Update Heartbeat
     if not os.path.exists(AUTO_PILOT_FILE):
         return
         
@@ -201,11 +214,15 @@ def run_manager():
         if "resume" in mode or "flow" in mode:
             # These are handled by the restart file or source_dir
             skip_params.update({
-                "N", "n_fill", "spacing", "n_hoppers", "mode", "simulation", 
+                "N", "n_fill", "spacing", "n_hoppers", "mode", 
                 "source_dir", "no-vtk", "geometry_vars", "hopper_template_data"
             })
             if "resume" in mode:
                 skip_params.add("restart_path")
+            elif mode == "flow":
+                # When starting a new flow from a fill, we want to pivot to the 
+                # default Grid_Hopper_Flow category rather than inheriting the fill category.
+                skip_params.add("simulation")
 
         overrides = g.get("params", {})
         if overrides:
@@ -226,6 +243,7 @@ def run_manager():
             job_name=job_name,
             log_dir=log_dir,
             command=full_command,
+            manager_script=os.path.abspath(__file__),
             walltime=overrides.get("walltime", "24:00:00"),
             ppn=overrides.get("ppn", 16),
             mem=overrides.get("mem", "16gb")

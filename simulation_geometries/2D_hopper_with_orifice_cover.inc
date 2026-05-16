@@ -47,4 +47,7 @@ region orifice_cover_vis block -${x_half} ${x_half} -${orifice_half} ${orifice_h
 region orifice_cover block -${x_half} ${x_half} -${orifice_half} ${orifice_half} -${eps} 0 side out
 fix lid all wall/gran/region hertz/history 1.0e6 1.0e6 5e-4 5e-4 0.3 1 region orifice_cover
 
+# Include collection box below the hopper
+include 2D_hopper_collectionBox.inc
+
 # funnel_neg_vis funnel_pos_vis funnel_left_vis funnel_right_vis hopper_pos_vis hopper_neg_vis hopper_front_vis hopper_back_vis exit_neg_vis exit_pos_vis orifice_cover_vis
