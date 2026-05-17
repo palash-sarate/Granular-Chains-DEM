@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 import subprocess
 import datetime
 import time
@@ -7,11 +8,17 @@ import fcntl
 
 # Paths
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utilities.env_loader import load_env
 AUTO_PILOT_FILE = os.path.join(ROOT_DIR, "Pulse", "auto_pilot.json")
 LINEAGE_FILE = os.path.join(ROOT_DIR, "Pulse", "lineage.json")
 
-QSTAT_PATH = "/opt/pbs/bin/qstat"
-QSUB_PATH = "/opt/pbs/bin/qsub"
+# Load dynamic environment variables
+env = load_env()
+QSTAT_PATH = env.get("QSTAT_PATH", "/opt/pbs/bin/qstat")
+QSUB_PATH = env.get("QSUB_PATH", "/opt/pbs/bin/qsub")
 
 def save_auto_pilot(data):
     with open(AUTO_PILOT_FILE, "w") as f:
@@ -195,71 +202,95 @@ def run_manager():
         run_name = os.path.basename(path)
         # Generate Command
         mode = g.get("mode", "fill_resume")
-        
-        # Map modes to main.py commands
-        mapping = {
-            "fill": "run_grid_hopper_filling",
-            "fill_resume": "resume_grid_hopper_filling",
-            "flow": "run_grid_hopper_flow",
-            "flow_resume": "resume_grid_hopper_flow"
-        }
-        cmd_name = mapping.get(mode, mode)
-        
-        cmd_parts = ["python", "-u", "main.py", cmd_name]
-        
-        # Handle specific mode paths
-        if path.startswith("NewRoot"):
-            # New fill doesn't have a source path usually, or it's in params
-            pass
-        elif "flow" in mode and "resume" not in mode:
-            # Flow study takes source_dir
-            cmd_parts.extend(["--source_dir", path])
-        else:
-            # Resumes take restart_path
-            cmd_parts.extend(["--restart_path", path])
-
-        cmd_parts.extend([
-            "--relax_steps" if "fill" in mode else "--run_steps", str(g.get("increment") or 100000),
-            "--inplace" if g.get("in_place", True) else ""
-        ])
-        
-        # Ensure a unique seed for NewRoot jobs if not already present
-        # This prevents collisions and allows discovery to work
         overrides = g.get("params", {})
-        if path.startswith("NewRoot") and "seed" not in overrides:
-            try:
-                # Use the numeric suffix from the NewRoot path as the seed
-                seed_val = int(path.split("_")[-1]) % 1000000
-                overrides["seed"] = seed_val
-            except (ValueError, IndexError):
-                overrides["seed"] = int(time.time() * 1000) % 1000000
         
-        # Add any overrides (dt, viscosity, num_procs, etc.)
-        # Exclude PBS-specific params and setup-only params for resumes/flows
-        skip_params = {"walltime", "ppn", "mem"}
-        if "resume" in mode or "flow" in mode:
-            # These are handled by the restart file or source_dir
-            skip_params.update({
-                "N", "n_fill", "spacing", "n_hoppers", "mode", 
-                "source_dir", "no-vtk", "geometry_vars", "hopper_template_data"
-            })
-            if "resume" in mode:
-                skip_params.add("restart_path")
-            elif mode == "flow":
-                # When starting a new flow from a fill, we want to pivot to the 
-                # default Grid_Hopper_Flow category rather than inheriting the fill category.
-                skip_params.add("simulation")
-
-        overrides = g.get("params", {})
-        if overrides:
+        # Check if it is a generalized simulation goal
+        schema_file = g.get("schema") or overrides.get("schema")
+        
+        if schema_file:
+            # Generalized simulation pipeline execution!
+            cmd_parts = ["python", "-u", "main.py", "run_generalized", "--schema", schema_file, "--stage", mode]
+            
+            # Parentage/Resume/Branch path mapping
+            if not path.startswith("NewRoot"):
+                cmd_parts.extend(["--parent-dir", path])
+                
+            if g.get("in_place", True):
+                cmd_parts.append("--inplace")
+                
+            # Compile parameter overrides
+            stage_overrides = {}
+            steps_increment = g.get("increment") or 100000
+            
+            # Auto-determine target steps key based on stage modes
+            if "resume" in mode or "flow" in mode:
+                stage_overrides["run_steps"] = steps_increment
+                stage_overrides["relax_steps"] = steps_increment
+            else:
+                stage_overrides["relax_steps"] = steps_increment
+                stage_overrides["run_steps"] = steps_increment
+                
+            # Add user overrides (skip PBS keys and schema path)
             for k, v in overrides.items():
-                if k not in skip_params and v is not None and v != "":
-                    if isinstance(v, (dict, list)):
-                        cmd_parts.extend([f"--{k}", f"'{json.dumps(v)}'"])
-                    elif isinstance(v, bool):
-                        if v: cmd_parts.append(f"--{k}")
-                    else:
-                        cmd_parts.extend([f"--{k}", str(v)])
+                if k not in ["walltime", "ppn", "mem", "schema"] and v is not None and v != "":
+                    stage_overrides[k] = v
+                    
+            if stage_overrides:
+                cmd_parts.extend(["--params", f"'{json.dumps(stage_overrides)}'"])
+        else:
+            # Map legacy modes to main.py commands
+            mapping = {
+                "fill": "run_grid_hopper_filling",
+                "fill_resume": "resume_grid_hopper_filling",
+                "flow": "run_grid_hopper_flow",
+                "flow_resume": "resume_grid_hopper_flow"
+            }
+            cmd_name = mapping.get(mode, mode)
+            
+            cmd_parts = ["python", "-u", "main.py", cmd_name]
+            
+            # Handle specific mode paths
+            if path.startswith("NewRoot"):
+                pass
+            elif "flow" in mode and "resume" not in mode:
+                cmd_parts.extend(["--source_dir", path])
+            else:
+                cmd_parts.extend(["--restart_path", path])
+
+            cmd_parts.extend([
+                "--relax_steps" if "fill" in mode else "--run_steps", str(g.get("increment") or 100000),
+                "--inplace" if g.get("in_place", True) else ""
+            ])
+            
+            # Ensure a unique seed for NewRoot jobs if not already present
+            if path.startswith("NewRoot") and "seed" not in overrides:
+                try:
+                    seed_val = int(path.split("_")[-1]) % 1000000
+                    overrides["seed"] = seed_val
+                except (ValueError, IndexError):
+                    overrides["seed"] = int(time.time() * 1000) % 1000000
+            
+            # Add any overrides
+            skip_params = {"walltime", "ppn", "mem"}
+            if "resume" in mode or "flow" in mode:
+                skip_params.update({
+                    "N", "n_fill", "spacing", "n_hoppers", "mode", 
+                    "source_dir", "no-vtk", "geometry_vars", "hopper_template_data"
+                })
+                if "resume" in mode:
+                    skip_params.add("restart_path")
+                elif mode == "flow":
+                    skip_params.add("simulation")
+
+            if overrides:
+                for k, v in overrides.items():
+                    if k not in skip_params and v is not None and v != "":
+                        if isinstance(v, (dict, list)):
+                            cmd_parts.extend([f"--{k}", f"'{json.dumps(v)}'"])
+                        elif isinstance(v, bool):
+                            if v: cmd_parts.append(f"--{k}")
+                        else:
+                            cmd_parts.extend([f"--{k}", str(v)])
         
         full_command = " ".join([c for c in cmd_parts if c])
 

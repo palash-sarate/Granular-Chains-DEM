@@ -1,0 +1,53 @@
+simulation_type: "Test_Shear_Sim"
+description: "A dry-run simulation pipeline to test the generalized LAMMPS engine"
+
+global_parameters:
+  - name: "dt"
+    label: "Timestep"
+    type: "float"
+    default: 0.000001
+  - name: "viscosity"
+    label: "Viscosity"
+    type: "float"
+    default: 0.000001
+
+stages:
+  - id: "stage1"
+    name: "Shear Filling Stage"
+    mode: "start"
+    templates:
+      input_script: "in.test_shear.template"
+      includes:
+        - target: "includes/test_geometry.inc"
+          template: "test_geometry.inc.template"
+    parameters:
+      - name: "relax_steps"
+        label: "Relaxation Steps"
+        type: "int"
+        default: 50000
+      - name: "spacing"
+        label: "Grid Spacing"
+        type: "float"
+        default: 0.5
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"
+
+  - id: "stage2"
+    name: "Shear Resume Stage"
+    mode: "resume"
+    parent_stage: "stage1"
+    templates:
+      input_script: "in.test_shear_resume.template"
+    parameters:
+      - name: "run_steps"
+        label: "Run Steps"
+        type: "int"
+        default: 100000
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps_resume.log"

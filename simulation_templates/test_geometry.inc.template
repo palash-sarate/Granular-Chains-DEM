@@ -1,0 +1,2 @@
+# Test geometry file with spacing = {{spacing}} and seed = {{seed}}
+print "Loaded geometry include with spacing = {{spacing}} and seed = {{seed}}"
