@@ -104,7 +104,7 @@ class HopperManager:
                               dt: float = 1e-6, run_name: str = None, seed: int = 12345,
                               mol_dir: Optional[str] = None, setup_inc: str = "",
                               dump_inc: str = "simulation_templates/default_dump.inc", 
-                              viscosity: float = 0.001, N: int = 4, fill_template: str = "in.hopper_fill",
+                              viscosity: float = 0.000001, N: int = 4, fill_template: str = "in.hopper_fill",
                               outdir: str = None, num_procs: int = None, num_threads: int = 1,
                               use_kokkos: bool = True, use_intel: bool = True,
                               clean_dir: bool = True) -> str:
@@ -175,7 +175,7 @@ class HopperManager:
                             dt: float = 1e-6, restart_path: str = None, seed: int = 12345,
                             mol_dir: Optional[str] = None, setup_inc: str = "",
                             dump_inc: str = "simulation_templates/default_dump.inc", 
-                            viscosity: float = 0.001, fill_template: str = "in.hopper_fill_resume",
+                            viscosity: float = 0.000001, fill_template: str = "in.hopper_fill_resume",
                             N: int = 4, outdir: str = None, num_procs: int = None, num_threads: int = 1,
                             use_kokkos: bool = True, use_intel: bool = True,
                             inplace: bool = False) -> str:

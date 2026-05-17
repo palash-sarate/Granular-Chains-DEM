@@ -4,7 +4,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 6500000,
+        "steps": 6600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
         "status": "Active",
@@ -19,7 +19,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366075"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
@@ -27,7 +27,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S904266",
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 5500000,
+        "steps": 5600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "status": "Active",
@@ -42,7 +42,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505867"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
@@ -50,7 +50,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 7500000,
+        "steps": 7600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
         "status": "Active",
@@ -65,7 +65,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366132"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565": {
@@ -73,7 +73,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S442391",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 5600000,
+        "steps": 5700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "status": "Active",
@@ -88,7 +88,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505876"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262": {
@@ -96,7 +96,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S694955",
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 5500000,
+        "steps": 5600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "status": "Active",
@@ -111,7 +111,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366060"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103": {
@@ -394,7 +394,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288",
         "status": "Active",
@@ -419,7 +419,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224",
         "status": "Active",
@@ -436,7 +436,7 @@
                 }
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366088"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251": {
@@ -444,7 +444,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251",
         "status": "Active",
@@ -461,7 +461,7 @@
                 }
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366092"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269": {
@@ -469,7 +469,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269",
         "status": "Active",
@@ -519,7 +519,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "status": "Active",
@@ -544,7 +544,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "status": "Active",
@@ -561,7 +561,7 @@
                 }
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505910"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319": {
@@ -569,7 +569,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 300000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "status": "Active",
@@ -589,201 +589,12 @@
         "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505939"
     },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S454157": {
-        "name": "Grid_Flow_1H_S454157",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 4,
-        "steps": 5000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S454157",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S454157",
-        "status": "Archived",
-        "params": {
-            "seed": "454157",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 3600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505914"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S434946": {
-        "name": "Grid_Flow_1H_S434946",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 12,
-        "steps": 7000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S434946",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S434946",
-        "status": "Active",
-        "params": {
-            "seed": "434946",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 1200,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505918"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S310145": {
-        "name": "Grid_Flow_1H_S310145",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 12,
-        "steps": 7000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S310145",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S310145",
-        "status": "Active",
-        "params": {
-            "seed": "310145",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 1200,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505922"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S742337": {
-        "name": "Grid_Flow_1H_S742337",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 4,
-        "steps": 5000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S742337",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S742337",
-        "status": "Active",
-        "params": {
-            "seed": "742337",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 3600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505925"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S800568": {
-        "name": "Grid_Flow_1H_S800568",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 24,
-        "steps": 8000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S800568",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S800568",
-        "status": "Active",
-        "params": {
-            "seed": "800568",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505929"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S723908": {
-        "name": "Grid_Flow_1H_S723908",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 24,
-        "steps": 8000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S723908",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S723908",
-        "status": "Active",
-        "params": {
-            "seed": "723908",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505932"
-    },
-    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S660283": {
-        "name": "Grid_Flow_1H_S660283",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 4,
-        "steps": 5000000,
-        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S660283",
-        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S660283",
-        "status": "Active",
-        "params": {
-            "seed": "660283",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 3600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Synced",
-        "sync_time": "2026-05-16T01:17:35.505935"
-    },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876": {
         "name": "Grid_Fill_1H_S782876",
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 303000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876",
         "status": "Active",
@@ -809,7 +620,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 303000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733",
         "status": "Active",
@@ -835,7 +646,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 303000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860",
         "status": "Active",
@@ -861,7 +672,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 303000,
+        "steps": 400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642",
         "status": "Active",
@@ -881,32 +692,5 @@
         },
         "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366113"
-    },
-    "/Data/palash_data/dumping_yard/Archived_Runs/Grid_Flow_1H_S454157_S116932": {
-        "name": "Grid_Flow_1H_S454157_S116932",
-        "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S454157",
-        "simulation": "Grid_Hopper_Flow",
-        "N": 4,
-        "steps": 5576000,
-        "path": "/Data/palash_data/dumping_yard/Archived_Runs/Grid_Flow_1H_S454157_S116932",
-        "rel_path": "dumping_yard/Archived_Runs/Grid_Flow_1H_S454157_S116932",
-        "status": "Active",
-        "params": {
-            "seed": "116932",
-            "freq": [
-                5.0
-            ],
-            "amp": [
-                0.01
-            ],
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 3600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Local",
-        "sync_time": null
     }
 }

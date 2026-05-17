@@ -943,7 +943,7 @@ python Pulse/run_sync_job.py --user {user}
             return "No logs found. Start a sync to see progress."
         
         try:
-            with open(log_path, "r") as f:
+            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
                 lines = f.readlines()
                 return "".join(lines[-max_lines:])
         except Exception as e:

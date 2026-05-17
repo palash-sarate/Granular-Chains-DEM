@@ -22,7 +22,7 @@ jobs = [{
         "relax_steps": 1000,
         "simulation": "Test_Job",
         "dt": 1e-06,
-        "viscosity": 0.001
+        "viscosity": 0.000001
     }
 }]
 

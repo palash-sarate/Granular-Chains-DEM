@@ -146,7 +146,7 @@ if st.runtime.exists():
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
     
     # --- Navigation Persistence ---
-    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "🎥 Visualizer", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
+    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
     
     # Initialize from URL or default
     query_nav = st.query_params.get("tab", pages[0])
@@ -422,10 +422,6 @@ if st.runtime.exists():
                         
         render_eta_section()
 
-    elif nav == "🎥 Visualizer":
-        from Pulse.visualiser import render_visualiser
-        render_visualiser()
-
     elif nav == "🎬 Visualization":
         st.subheader("🎬 Lineage Visualization & Movie Generation")
         st.markdown("Create high-quality movies across multiple simulation stages with automatic cloud-restoration.")
@@ -505,6 +501,7 @@ if st.runtime.exists():
                     with st.spinner("Scanning chain frames..."):
                         st.session_state["viz_chain_frames"] = VizManager.get_chain_frames(chain)
                 
+                target_frame = None
                 all_frames = st.session_state.get("viz_chain_frames", [])
                 
                 if not all_frames:
@@ -512,8 +509,12 @@ if st.runtime.exists():
                 else:
                     st.divider()
                     st.write("### ⏱️ Timeline Scrubber")
-                    scrub_idx = st.slider("Scrub through all frames in chain", 0, len(all_frames)-1, 0, 
-                                         format="Frame %d", help="Drag to select a specific moment from any run in the chain.")
+                    if len(all_frames) == 1:
+                        scrub_idx = 0
+                        st.info("ℹ️ Only 1 frame found in this chain.")
+                    else:
+                        scrub_idx = st.slider("Scrub through all frames in chain", 0, len(all_frames)-1, 0, 
+                                             format="Frame %d", help="Drag to select a specific moment from any run in the chain.")
                     target_frame = all_frames[scrub_idx]
                     viz_dt = st.session_state.get("viz_dt", 1e-6)
                     st.caption(f"📍 **Selected**: `{os.path.basename(target_frame['path'])}` | Timestep: `{target_frame['ts']}` | `{target_frame['ts']*viz_dt:.3f}s`")
@@ -841,7 +842,7 @@ if st.runtime.exists():
                     log_path = os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
                     if os.path.exists(log_path):
                         with st.expander("📄 View Visualization Logs", expanded=True):
-                            with open(log_path, "r") as f:
+                            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
                                 st.code(f.read(), language="text")
                             if st.button("🔄 Refresh Logs"):
                                 st.rerun()
@@ -1441,7 +1442,7 @@ if st.runtime.exists():
                 num_procs = gc5.number_input("Num Procs", value=8, step=1)
                 num_threads = gc6.number_input("Num Threads", value=1, step=1)
                 dt = gc7.number_input("dt", value=1e-06, format="%e")
-                viscosity = gc8.number_input("Viscosity", value=0.001, format="%f")
+                viscosity = gc8.number_input("Viscosity", value=0.000001, format="%f")
                 
                 seed = st.number_input("Seed", value=random.randint(100000, 999999), step=1)
                 
@@ -1493,7 +1494,7 @@ if st.runtime.exists():
                 elif selected_mode == "flow":
                     ffc1, ffc2, ffc3, ffc4 = st.columns(4)
                     freq_input = ffc1.text_input("Frequency(s)", value="5.0")
-                    amp_input = ffc2.text_input("Amplitude(s)", value="0.01")
+                    amp_input = ffc2.text_input("Amplitude(s)", value="0.001")
                     mode_params["run_steps"] = ffc3.number_input("Run Steps", value=2000000, step=100000)
                     mode_params["osc_dir"] = ffc4.text_input("Oscillation Dir", value="z")
                     mode_params["_freq_list"] = [f.strip() for f in freq_input.split(",") if f.strip()]
@@ -1719,7 +1720,7 @@ if st.runtime.exists():
             if ap_col2.button("📄 View Log", use_container_width=True):
                 log_path = os.path.join(ROOT_DIR, "Pulse", "auto_pilot.log")
                 if os.path.exists(log_path):
-                    with open(log_path, "r") as f:
+                    with open(log_path, "r", encoding="utf-8", errors="replace") as f:
                         log_lines = f.readlines()
                         st.code("".join(log_lines[-50:]), language="text")
                 else:

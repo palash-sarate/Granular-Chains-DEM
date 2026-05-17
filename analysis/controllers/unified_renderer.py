@@ -1,4 +1,5 @@
 import pyvista as pv
+pv.global_theme.allow_empty_mesh = True
 import pandas as pd
 import numpy as np
 import os
@@ -65,8 +66,9 @@ class UnifiedRenderer:
             for i, vtk_file in enumerate(vtk_files):
                 if os.path.exists(vtk_file):
                     mesh = pv.read(vtk_file)
-                    color = UnifiedRenderer.GEOM_COLORS[i % len(UnifiedRenderer.GEOM_COLORS)]
-                    plotter.add_mesh(mesh, color=color, opacity=geom_opacity, show_edges=False, reset_camera=False)
+                    if mesh.n_points > 0:
+                        color = UnifiedRenderer.GEOM_COLORS[i % len(UnifiedRenderer.GEOM_COLORS)]
+                        plotter.add_mesh(mesh, color=color, opacity=geom_opacity, show_edges=False, reset_camera=False)
 
         # 2. Add Particles
         if show_particles and dump_path and os.path.exists(dump_path):

@@ -124,7 +124,7 @@ def get_job_list(mode):
                         "relax_steps": 1000000,
                         "simulation": "Hopper_Fill",
                         "dt": 1e-06,
-                        "viscosity": 0.001,
+                        "viscosity": 0.000001,
                         "dump_file": "simulation_templates/default_dump.inc",
                         "no-vtk": True,
                         "spacing": 0.5,
@@ -153,7 +153,7 @@ def get_job_list(mode):
                             "relax_steps": 1000000,
                             "simulation": f"Hopper_Fill_Resume",
                             "dt": 1e-06,
-                            "viscosity": 0.001,
+                            "viscosity": 0.000001,
                             "dump_file": "simulation_templates/default_dump.inc",
                             "seed": child_seed,
                         }

@@ -26,7 +26,7 @@ class SimulationOrchestrator:
                         mol_dir: Optional[str] = None,
                         setup_inc: str = "simulation_geometries/2D_hopper.inc",
                         dump_inc: str = "simulation_templates/default_dump.inc",
-                        viscosity: float = 0.001, 
+                        viscosity: float = 0.000001, 
                         N: int = 4,
                         outdir: Optional[str] = None,
                         num_procs: int = 1,
@@ -72,7 +72,7 @@ class SimulationOrchestrator:
                           mol_dir: Optional[str] = None,
                           setup_inc: str = "simulation_geometries/2D_hopper.inc",
                           dump_inc: str = "simulation_templates/default_dump.inc",
-                          viscosity: float = 0.001, 
+                          viscosity: float = 0.000001, 
                           N: int = 4,
                           outdir: Optional[str] = None,
                           num_procs: int = None,
@@ -106,7 +106,7 @@ class SimulationOrchestrator:
                                     use_intel=use_intel,
                                     inplace=inplace)
 
-    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
+    def run_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.000001, dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Run a single chain-flop simulation to analyze mobility."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
@@ -132,7 +132,7 @@ class SimulationOrchestrator:
         print(f"Running simulation: {config.simulation}=>{config.run}")
         runner.run(config)
 
-    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.001, dt: float = 1e-6, resume_token: str = "100000", num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
+    def resume_flop_simulation(self, N: int = 4, run_steps: int = 50000, viscosity: float = 0.000001, dt: float = 1e-6, resume_token: str = "100000", num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Resume a chain-flop simulation from a restart point."""
         viscosity_token = get_viscosity_token(viscosity)
         dt_token = get_dt_token(dt)
@@ -213,7 +213,7 @@ class SimulationOrchestrator:
             path = write_chain_data(linear_config)
             print(f"Created: {path}")
 
-    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.001], dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
+    def run_flop_batch(self, Ns: List[int] = [4, 6], run_steps: List[int] = [50000], viscosities: List[float] = [0.000001], dt: float = 1e-6, num_procs: int = None, num_threads: int = 1, use_kokkos: bool = True, use_intel: bool = True):
         """Run a batch of flop simulations across multiple parameters."""
         total = len(Ns) * len(run_steps) * len(viscosities)
         eta = ETAEstimator(total=total)
@@ -332,7 +332,7 @@ class SimulationOrchestrator:
                                 hopper_template_data: str = "simulation_geometries/2D_hopper.inc",
                                 lepton_file: str = "simulation_templates/lepton.inc",
                                 dump_file: str = "simulation_templates/default_dump.inc",
-                                viscosity: float = 0.001,
+                                viscosity: float = 0.000001,
                                 num_procs: int = 1, num_threads: int = 1,
                                 use_kokkos: bool = True,
                                 mode: str = "2D_stacked",
@@ -381,7 +381,7 @@ class SimulationOrchestrator:
                                   dt: float = 1e-6,
                                   lepton_file: str = "simulation_templates/lepton.inc",
                                   dump_file: str = "simulation_templates/default_dump.inc",
-                                  viscosity: float = 0.001,
+                                  viscosity: float = 0.000001,
                                   num_procs: int = 1, num_threads: int = 1,
                                   use_kokkos: bool = True,
                                   template: str = "in.grid_hopper_fill_resume",
@@ -422,7 +422,7 @@ class SimulationOrchestrator:
                              dt: float = 1e-6,
                              lepton_file: str = "simulation_templates/lepton.inc",
                              dump_file: str = "simulation_templates/default_dump.inc",
-                             viscosity: float = 0.001,
+                             viscosity: float = 0.000001,
                              num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                              simulation: str = "Grid_Hopper_Flow",
                              template: str = "in.grid_hopper_flow",
@@ -460,7 +460,7 @@ class SimulationOrchestrator:
                                 dt: float = 1e-6,
                                 lepton_file: str = "simulation_templates/lepton.inc",
                                 dump_file: str = "simulation_templates/default_dump.inc",
-                                viscosity: float = 0.001,
+                                viscosity: float = 0.000001,
                                 num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                                 template: str = "in.grid_hopper_flow_resume",
                                 simulation: str = None,

@@ -15,6 +15,62 @@ class GridHopperManager:
     def __init__(self, runner: SimulationRunner):
         self.runner = runner
 
+    def _ensure_local_directory(self, target_path: str):
+        """Helper to ensure a directory is present locally, restoring it from Drive if synced."""
+        from pathlib import Path
+        import os
+        
+        path_p = Path(target_path)
+        path_str = str(path_p.absolute()).replace("\\", "/")
+        
+        # 1. Resolve to the main run directory by finding the segment that matches the run name pattern
+        if "/restart" in path_str:
+            dir_str = path_str.split("/restart")[0]
+            dir_p = Path(dir_str)
+        elif "/results" in path_str:
+            dir_str = path_str.split("/results")[0]
+            dir_p = Path(dir_str)
+        else:
+            if path_p.suffix:
+                dir_p = path_p.parent
+            else:
+                dir_p = path_p
+                
+        # 2. Check if the local directory actually exists and is complete
+        metadata_exists = (dir_p / "metadata.json").exists() or (dir_p / "grid_metadata.json").exists()
+        if not dir_p.exists() or not metadata_exists:
+            # 3. Find the exact matching lineage key by matching relative path
+            target_rel = str(dir_p).replace("\\", "/")
+            # Strip common root prefixes to isolate the relative path
+            target_rel = target_rel.replace("/home/guest/palash/Granular-Chains-DEM/", "")
+            target_rel = target_rel.replace("/Data/palash_data/", "")
+            target_rel = target_rel.lstrip("/")
+            
+            try:
+                from Pulse.pulse_core import PBSManager, SyncManager
+                lineage = PBSManager.load_lineage()
+                
+                matching_key = None
+                for k, info in lineage.items():
+                    k_rel = info.get('rel_path', '').replace("\\", "/").lstrip("/")
+                    if target_rel == k_rel or k == str(dir_p.absolute()).replace("\\", "/"):
+                        matching_key = k
+                        break
+                
+                if matching_key:
+                    print(f"[RECOVERY] Local directory for {target_rel} is missing or incomplete. Restoring from cloud...")
+                    success, msg = SyncManager.restore_run(matching_key)
+                    if success:
+                        print(f"[RECOVERY] {msg}")
+                    else:
+                        print(f"[RECOVERY WARNING] Could not restore: {msg}")
+                else:
+                    print(f"[RECOVERY WARNING] Could not find a lineage match for {target_rel}. Cannot restore from cloud.")
+            except Exception as e:
+                print(f"[RECOVERY ERROR] Failed during cloud restoration attempt: {e}")
+
+
+
     def _resolve_includes(self, path: Path):
         lines = []
         with open(path, 'r') as f:
@@ -54,7 +110,7 @@ class GridHopperManager:
                          seed: int = 12345,
                          lepton_file: str = "simulation_templates/lepton.inc",
                          dump_file: str = "simulation_templates/default_dump.inc",
-                         viscosity: float = 0.001,
+                         viscosity: float = 0.000001,
                          num_procs: int = 1,
                          num_threads: int = 1,
                          use_kokkos: bool = True,
@@ -257,7 +313,7 @@ class GridHopperManager:
                            dt: float = 1e-6,
                            lepton_file: str = "simulation_templates/lepton.inc",
                            dump_file: str = "simulation_templates/default_dump.inc",
-                           viscosity: float = 0.001,
+                           viscosity: float = 0.000001,
                            num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                            template: str = "in.grid_hopper_fill_resume",
                            simulation: str = None,
@@ -267,6 +323,7 @@ class GridHopperManager:
         Resumes a grid filling simulation from a restart file.
         """
         import json
+        self._ensure_local_directory(restart_path)
         restart_p = Path(restart_path)
         if restart_p.is_dir():
             prev_job_dir = restart_p
@@ -389,7 +446,7 @@ class GridHopperManager:
                       dt: float = 1e-6,
                       lepton_file: str = "simulation_templates/lepton.inc",
                       dump_file: str = "simulation_templates/default_dump.inc",
-                      viscosity: float = 0.001,
+                      viscosity: float = 0.000001,
                       num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                       simulation: str = "Grid_Hopper_Flow",
                       template: str = "in.grid_hopper_flow",
@@ -399,6 +456,7 @@ class GridHopperManager:
         Takes a filled grid state and starts the flow simulation (opens orifices + oscillation).
         """
         import json
+        self._ensure_local_directory(source_dir)
         source_p = Path(source_dir)
         metadata_path = source_p / "metadata.json"
         if not metadata_path.exists():
@@ -519,7 +577,7 @@ class GridHopperManager:
                          dt: float = 1e-6,
                          lepton_file: str = "simulation_templates/lepton.inc",
                          dump_file: str = "simulation_templates/default_dump.inc",
-                         viscosity: float = 0.001,
+                         viscosity: float = 0.000001,
                          num_procs: int = 1, num_threads: int = 1, use_kokkos: bool = True,
                          template: str = "in.grid_hopper_flow_resume",
                          simulation: str = None,
@@ -529,6 +587,7 @@ class GridHopperManager:
         Resumes a grid flow simulation from a restart file.
         """
         import json
+        self._ensure_local_directory(restart_path)
         restart_p = Path(restart_path)
         if restart_p.is_dir():
             job_dir = restart_p
