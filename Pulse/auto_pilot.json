@@ -4,7 +4,7 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-17T14:30:01.569765"
+        "last_heartbeat": "2026-05-17T18:30:01.127745"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
@@ -464,6 +464,126 @@
                     "hopper_ang": 30
                 },
                 "seed": 782876
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217_S319327": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-17T18:20:51.253483",
+            "status": "Running",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            },
+            "polite_mode": false
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S232222_S113495": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116_S329384": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209_S287816": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764_S135240": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
+            }
+        },
+        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277": {
+            "target_steps": 10000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": null,
+            "status": "Idle",
+            "mode": "flow_resume",
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb"
             }
         }
     }

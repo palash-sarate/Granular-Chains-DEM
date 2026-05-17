@@ -1643,6 +1643,7 @@ if st.runtime.exists():
                                     "last_submitted": None,
                                     "status": "Idle",
                                     "mode": selected_mode,
+                                    "polite_mode": polite_mode,
                                     "params": {
                                         "dt": dt,
                                         "viscosity": viscosity,
@@ -1785,29 +1786,40 @@ if st.runtime.exists():
         if not goals:
             st.info("Your fleet is currently empty. Add nodes from the '🧬 Lineage' tab to start automated runs.")
         else:
-            # Prepare table data
+            # Prepare interactive layout
             # We need to read the latest lineage to show progress
             lineage = scan_dumping_yard() or {} # Refresh lineage for accuracy
             
-            table_data = []
-            for run_path, goal in goals.items():
+            # Fetch active jobs once for real-time status updates
+            active_jobs = PBSManager.get_jobs(user=user_filter)
+            
+            st.markdown("#### 🚢 Fleet Active Goals")
+            
+            # Interactive columns grid
+            hdr_cols = st.columns([2.2, 1.8, 1.0, 1.2, 1.3, 0.5])
+            hdr_cols[0].markdown("**Simulation Run**")
+            hdr_cols[1].markdown("**Step Progress**")
+            hdr_cols[2].markdown("**Status**")
+            hdr_cols[3].markdown("**Polite Mode**")
+            hdr_cols[4].markdown("**Last Submitted**")
+            hdr_cols[5].markdown("**Actions**")
+            st.markdown("<hr style='margin: 0px 0px 10px 0px; border-color: rgba(49, 51, 63, 0.2);'>", unsafe_allow_html=True)
+            
+            for run_path, goal in list(goals.items()):
                 name = os.path.basename(run_path)
                 current_info = lineage.get(run_path, {})
                 current_steps = current_info.get("steps", 0)
                 target = goal["target_steps"]
-                progress = min(100, (current_steps / target * 100)) if target > 0 else 0
+                progress = min(100.0, (current_steps / target * 100.0)) if target > 0 else 0.0
                 
-                # Get params from goal or lineage fallback
+                # Retrieve parameters
                 params = goal.get("params", {})
                 n_val = params.get("N")
                 n_fill_val = params.get("n_fill")
                 geo_vars = params.get("geometry_vars")
                 
-                # Fallback to lineage if not in goal params
                 if n_val is None: n_val = current_info.get("N", "-")
                 if n_fill_val is None: n_fill_val = current_info.get("params", {}).get("n_fill", "-")
-
-                # Normalize to scalar for table display (prevents Arrow mixed-type errors)
                 if isinstance(n_val, list) and len(n_val) > 0: n_val = n_val[0]
                 if isinstance(n_fill_val, list) and len(n_fill_val) > 0: n_fill_val = n_fill_val[0]
                 if not geo_vars: geo_vars = current_info.get("params", {}).get("geometry_vars", {})
@@ -1816,21 +1828,85 @@ if st.runtime.exists():
                     geo_str = ", ".join([f"{k}:{v}" for k, v in geo_vars.items()])
                 else:
                     geo_str = "-"
-
-                table_data.append({
-                    "Simulation": name,
-                    "N": n_val,
-                    "n_fill": n_fill_val,
-                    "Geo": geo_str,
-                    "Progress": f"{progress:.1f}%",
-                    "Current": f"{current_steps:,}",
-                    "Target": f"{target:,}",
-                    "Increment": f"{goal['increment']:,}",
-                    "Status": goal.get("status", "Idle"),
-                    "Last Submit": goal.get("last_submitted", "Never")
-                })
-            
-            st.table(table_data)
+                
+                # Determine mode/type icon
+                mode = goal.get("mode", "fill_resume")
+                if "flow" in mode:
+                    mode_icon = "🌊"
+                    mode_label = "Flow"
+                else:
+                    mode_icon = "🧬"
+                    mode_label = "Fill"
+                
+                # Create row
+                row_cols = st.columns([2.2, 1.8, 1.0, 1.2, 1.3, 0.5])
+                
+                # Column 0: Simulation name and details
+                row_cols[0].markdown(
+                    f"**{mode_icon} {name}**<br>"
+                    f"<small style='color: grey;'>Type: {mode_label} | N: {n_val} | geo: {geo_str}</small>", 
+                    unsafe_allow_html=True
+                )
+                
+                # Column 1: Progress visual + details
+                row_cols[1].markdown(f"**{progress:.1f}%** ({current_steps:,} / {target:,})")
+                row_cols[1].progress(progress / 100.0)
+                
+                # Determine live status dynamically
+                if current_steps >= target:
+                    status = "Completed"
+                elif any(name in j.get("Job_Name", "") for j in active_jobs):
+                    status = "Running"
+                else:
+                    status = "Idle"
+                
+                # Column 2: Status
+                if status == "Running":
+                    status_badge = "⚡ <span style='color: #00e676; font-weight: bold;'>Running</span>"
+                elif status == "Completed":
+                    status_badge = "✅ <span style='color: #aeea00; font-weight: bold;'>Completed</span>"
+                elif status == "Idle":
+                    status_badge = "💤 <span style='color: #80d8ff; font-weight: bold;'>Idle</span>"
+                else:
+                    status_badge = f"📋 <span>{status}</span>"
+                row_cols[2].markdown(status_badge, unsafe_allow_html=True)
+                
+                # Column 3: Polite Mode toggle (interactive!)
+                is_polite = goal.get("polite_mode", True)
+                new_polite = row_cols[3].toggle(
+                    "Polite", 
+                    value=is_polite, 
+                    key=f"polite_toggle_{run_path}", 
+                    label_visibility="collapsed"
+                )
+                if new_polite != is_polite:
+                    auto_data["goals"][run_path]["polite_mode"] = new_polite
+                    save_auto_pilot(auto_data)
+                    st.toast(f"Updated polite mode for {name} to {'😇 Polite' if new_polite else '⚡ Priority'}")
+                    time.sleep(0.5)
+                    st.rerun()
+                
+                # Column 4: Last Submit time
+                last_sub = goal.get("last_submitted")
+                if last_sub:
+                    try:
+                        dt_sub = datetime.datetime.fromisoformat(last_sub)
+                        sub_str = dt_sub.strftime("%m/%d %H:%M")
+                    except:
+                        sub_str = last_sub
+                else:
+                    sub_str = "Never"
+                row_cols[4].markdown(f"<div style='padding-top: 5px;'>{sub_str}</div>", unsafe_allow_html=True)
+                
+                # Column 5: Actions (Remove button)
+                if row_cols[5].button("❌", key=f"rm_fleet_{run_path}", help="Remove from Auto-Pilot"):
+                    del auto_data["goals"][run_path]
+                    save_auto_pilot(auto_data)
+                    st.toast(f"Removed {name} from Auto-Pilot")
+                    time.sleep(0.5)
+                    st.rerun()
+                
+                st.markdown("<hr style='margin: 5px 0px 5px 0px; border-color: rgba(49, 51, 63, 0.1);'>", unsafe_allow_html=True)
             
             if st.button("Clear Completed Goals"):
                 new_goals = {k: v for k, v in goals.items() if lineage.get(k, {}).get("steps", 0) < v["target_steps"]}
