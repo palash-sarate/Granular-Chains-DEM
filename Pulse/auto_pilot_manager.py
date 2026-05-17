@@ -21,6 +21,7 @@ def save_auto_pilot(data):
 PBS_TEMPLATE = """#!/bin/bash
 #PBS -N {job_name}
 #PBS -q workq
+#PBS -p {priority}
 #PBS -l walltime={walltime}
 #PBS -l nodes=master:ppn={ppn}
 #PBS -l mem={mem}
@@ -52,24 +53,42 @@ python3 {manager_script}
 def get_pbs_jobs():
     """Returns a list of all jobs currently in the PBS queue."""
     try:
-        # Standard qstat shows all jobs on this cluster
-        result = subprocess.check_output([QSTAT_PATH], text=True)
-        lines = result.strip().split("\n")
+        # Try structured JSON format first (prevents job name truncation!)
+        result = subprocess.check_output([QSTAT_PATH, "-f", "-F", "json"], text=True)
+        data = json.loads(result)
         jobs = []
-        for line in lines:
-            if "---" in line or "Job id" in line: continue
-            parts = line.split()
-            if len(parts) >= 5:
-                jobs.append({
-                    "id": parts[0],
-                    "name": parts[1],
-                    "user": parts[2],
-                    "status": parts[4] if len(parts) > 4 else "?"
-                })
+        for job_id, details in data.get("Jobs", {}).items():
+            # Standardize user name (remove host suffix if present)
+            owner = details.get("Job_Owner", "")
+            user = owner.split("@")[0] if "@" in owner else owner
+            
+            jobs.append({
+                "id": job_id,
+                "name": details.get("Job_Name", ""),
+                "user": user,
+                "status": details.get("job_state", "?")
+            })
         return jobs
-    except Exception as e:
-        print(f"Error fetching PBS jobs: {e}")
-        return []
+    except Exception as json_err:
+        try:
+            # Fallback: Standard qstat shows all jobs on this cluster (names may be truncated)
+            result = subprocess.check_output([QSTAT_PATH], text=True)
+            lines = result.strip().split("\n")
+            jobs = []
+            for line in lines:
+                if "---" in line or "Job id" in line: continue
+                parts = line.split()
+                if len(parts) >= 5:
+                    jobs.append({
+                        "id": parts[0],
+                        "name": parts[1],
+                        "user": parts[2],
+                        "status": parts[4] if len(parts) > 4 else "?"
+                    })
+            return jobs
+        except Exception as e:
+            print(f"Error fetching PBS jobs: {e}")
+            return []
 
 def is_student_active(jobs):
     return any(j["user"] != "guest" for j in jobs)
@@ -102,10 +121,10 @@ def run_manager():
 
     # 2. Check for Students (Polite Mode)
     jobs = get_pbs_jobs()
-    if data["settings"]["polite_mode"] and is_student_active(jobs):
-        print("Student detected. Standing down.")
-        save_auto_pilot(data)
-        return
+    students_active = is_student_active(jobs)
+    global_polite = data["settings"].get("polite_mode", True)
+    if students_active and global_polite:
+        print("Student detected and global Polite Mode is active. Yielding polite goals.")
 
     # 3. Check Concurrency
     active_guest_jobs = count_guest_jobs(jobs)
@@ -142,6 +161,13 @@ def run_manager():
 
     eligible = []
     for path, g in goals.items():
+        # A goal is polite if the global polite mode is on AND the goal's polite mode is also on (or defaults to on)
+        is_goal_polite = global_polite and g.get("polite_mode", True)
+        
+        if students_active and is_goal_polite:
+            # Skip this goal since students are active and this goal is polite
+            continue
+            
         if path.startswith("NewRoot"):
             if g.get("last_submitted"): continue
             eligible.append((path, g, 0))
@@ -239,6 +265,9 @@ def run_manager():
 
         # Generate PBS script
         job_name = f"AP_{run_name}"
+        goal_polite = g.get("polite_mode", True)
+        priority_val = -1024 if goal_polite else 0
+
         script_content = PBS_TEMPLATE.format(
             job_name=job_name,
             log_dir=log_dir,
@@ -246,7 +275,8 @@ def run_manager():
             manager_script=os.path.abspath(__file__),
             walltime=overrides.get("walltime", "24:00:00"),
             ppn=overrides.get("ppn", 16),
-            mem=overrides.get("mem", "16gb")
+            mem=overrides.get("mem", "16gb"),
+            priority=priority_val
         )
         
         script_path = os.path.join(ROOT_DIR, "Pulse", f"temp_{job_name}.pbs")
