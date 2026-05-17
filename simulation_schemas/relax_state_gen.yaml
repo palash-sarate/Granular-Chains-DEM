@@ -1,0 +1,27 @@
+# Generalized LAMMPS Simulation Schema: Chains Relax State Library Generation
+simulation_type: Relax_State_Gen
+
+global_params:
+  dt: 1.0e-6
+  temperature: 1.0e12
+  motion_steps: 500000
+  explore_steps: 200000
+  viscous_relax_steps: 300000
+  quench_viscosity: 10.0
+  lepton_inc: "simulation_templates/lepton.inc"
+  dump_inc: "simulation_templates/default_dump.inc.template"
+
+stages:
+  relax:
+    template_path: "simulation_templates/in.relax_3d_gen.template"
+    mode: "start"
+    params:
+      data_file: "chain_data/linear_x/linear_N{{N}}.data"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      data_file: "relaxed_chain.data"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"

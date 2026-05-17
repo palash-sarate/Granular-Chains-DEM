@@ -146,7 +146,7 @@ if st.runtime.exists():
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
     
     # --- Navigation Persistence ---
-    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
+    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "⏱️ ETA", "🕰️ History", "🔄 Sync", "🛠️ Schema IDE", "📖 Guide"]
     
     # Initialize from URL or default
     query_nav = st.query_params.get("tab", pages[0])
@@ -2000,6 +2000,291 @@ if st.runtime.exists():
                 st.success("✅ Sync is idle or completed.")
         
         render_sync_logs()
+
+    elif nav == "🛠️ Schema IDE":
+        st.subheader("🛠️ Visual Schema IDE & Template Inspector")
+        st.markdown("""
+        Build, lint, and save your simulation schemas interactively. 
+        Use the **Template Inspector** to automatically discover required parameters from input templates.
+        """)
+        
+        tab_inspector, tab_builder = st.tabs(["🔍 Template Parameter Inspector", "✍️ Visual Schema Builder"])
+        
+        with tab_inspector:
+            st.markdown("### 🔍 Template Parameter Inspector")
+            st.info("Select any template file below to automatically lint it and discover all `{{ placeholder }}` parameters required by the schema stage.")
+            
+            tpl_dir = os.path.join(ROOT_DIR, "simulation_templates")
+            if os.path.exists(tpl_dir):
+                tpl_files = sorted([f for f in os.listdir(tpl_dir) if os.path.isfile(os.path.join(tpl_dir, f))])
+            else:
+                tpl_files = []
+                
+            if tpl_files:
+                selected_tpl = st.selectbox("Select Template File", tpl_files, key="ide_inspect_tpl")
+                tpl_path = os.path.join(tpl_dir, selected_tpl)
+                
+                with open(tpl_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    
+                # Discover placeholders
+                placeholders = sorted(list(set(re.findall(r'\{\{\s*(\w+)\s*\}\}', content))))
+                
+                col_left, col_right = st.columns([1, 1])
+                with col_left:
+                    st.markdown(f"#### 📊 Parameter List ({len(placeholders)} found)")
+                    if placeholders:
+                        param_df = pd.DataFrame([{"Parameter Token": f"`{p}`", "Description": "Required placeholder binding"} for p in placeholders])
+                        st.dataframe(param_df, use_container_width=True, hide_index=True)
+                    else:
+                        st.success("✅ No template placeholders found. This template runs as a static input script.")
+                        
+                with col_right:
+                    st.markdown("#### 📝 Template Source Code")
+                    st.code(content, language="bash" if ".inc" in selected_tpl or "in." in selected_tpl else "text")
+            else:
+                st.warning("No template files found in `simulation_templates/`.")
+                
+        with tab_builder:
+            st.markdown("### ✍️ Visual Schema Builder")
+            st.info("Design a complete configuration-driven simulation schema and save it directly to your schemas library.")
+            
+            with st.form("visual_schema_form"):
+                col_s1, col_s2 = st.columns(2)
+                sim_type_input = col_s1.text_input("Simulation Type / Name", value="My_Granular_Sim", help="Used for folder grouping")
+                sim_desc_input = col_s2.text_input("Description", value="A customized generalized simulation pipeline.")
+                
+                st.markdown("#### 🌐 Global Parameters")
+                st.caption("Define variables shared across all stages (Format: `param_name: default_value` on each line)")
+                global_params_input = st.text_area("Global Parameters List", value="dt: 1.0e-6\nviscosity: 0.025\nlepton_inc: simulation_templates/lepton.inc\ndump_inc: simulation_templates/default_dump.inc.template", height=100)
+                
+                st.markdown("#### ⚡ Pipeline Stages")
+                
+                st.markdown("##### **Stage 1 (Start Stage)**")
+                col_st1_1, col_st1_2 = st.columns(2)
+                st1_id = col_st1_1.text_input("Stage 1 ID", value="start")
+                st1_tpl = col_st1_2.text_input("Input Script Template File", value="in.chain_flop.template")
+                
+                st1_params = st.text_area("Stage 1 Parameters (Format: `name: value` per line)", value="data_file: chain_data/linear_x/linear_N4.data\nrun_steps: 5000000", height=80)
+                st1_includes = st.text_area("Stage 1 Include Bindings (Format: `var_name: template_path` per line)", value="lepton_inc: {{lepton_inc}}\ndump_inc: {{dump_inc}}", height=80)
+                
+                st.markdown("##### **Stage 2 (Resume/Branch Stage)**")
+                col_st2_1, col_st2_2, col_st2_3 = st.columns(3)
+                st2_id = col_st2_1.text_input("Stage 2 ID", value="resume")
+                st2_mode = col_st2_2.selectbox("Execution Mode", ["resume", "branch", "start"], index=0)
+                st2_tpl = col_st2_3.text_input("Stage 2 Input Template File", value="in.chain_flop_resume.template")
+                
+                st2_params = st.text_area("Stage 2 Parameters", value="run_steps: 10000000", height=60)
+                st2_includes = st.text_area("Stage 2 Include Bindings", value="lepton_inc: {{lepton_inc}}\ndump_inc: {{dump_inc}}", height=60)
+                
+                save_schema_btn = st.form_submit_button("💾 Save Schema to Schemas Library", use_container_width=True)
+                
+                if save_schema_btn:
+                    if not sim_type_input:
+                        st.error("Error: Simulation Type is required.")
+                    else:
+                        try:
+                            # 1. Parse global params
+                            g_params = {}
+                            for line in global_params_input.splitlines():
+                                if ":" in line:
+                                    k, v = line.split(":", 1)
+                                    k, v = k.strip(), v.strip()
+                                    try:
+                                        if "." in v: g_params[k] = float(v)
+                                        else: g_params[k] = int(v)
+                                    except ValueError:
+                                        g_params[k] = v
+                                        
+                            # 2. Parse Stage 1
+                            s1_p = {}
+                            for line in st1_params.splitlines():
+                                if ":" in line:
+                                    k, v = line.split(":", 1)
+                                    k, v = k.strip(), v.strip()
+                                    try:
+                                        if "." in v: s1_p[k] = float(v)
+                                        else: s1_p[k] = int(v)
+                                    except ValueError:
+                                        s1_p[k] = v
+                                        
+                            s1_i = {}
+                            for line in st1_includes.splitlines():
+                                if ":" in line:
+                                    k, v = line.split(":", 1)
+                                    s1_i[k.strip()] = v.strip()
+                                    
+                            # 3. Parse Stage 2
+                            s2_p = {}
+                            for line in st2_params.splitlines():
+                                if ":" in line:
+                                    k, v = line.split(":", 1)
+                                    k, v = k.strip(), v.strip()
+                                    try:
+                                        if "." in v: s2_p[k] = float(v)
+                                        else: s2_p[k] = int(v)
+                                    except ValueError:
+                                        s2_p[k] = v
+                                        
+                            s2_i = {}
+                            for line in st2_includes.splitlines():
+                                if ":" in line:
+                                    k, v = line.split(":", 1)
+                                    s2_i[k.strip()] = v.strip()
+                                    
+                            # Construct beautiful, human-readable YAML string
+                            yaml_content = f"# Generalized LAMMPS Simulation Schema: {sim_type_input}\n"
+                            yaml_content += f"simulation_type: \"{sim_type_input}\"\n"
+                            if sim_desc_input:
+                                yaml_content += f"description: \"{sim_desc_input}\"\n"
+                                
+                            yaml_content += "\nglobal_params:\n"
+                            for k, v in g_params.items():
+                                val_str = f"\"{v}\"" if isinstance(v, str) else str(v)
+                                yaml_content += f"  {k}: {val_str}\n"
+                                
+                            yaml_content += "\nstages:\n"
+                            # Stage 1
+                            yaml_content += f"  {st1_id}:\n"
+                            yaml_content += f"    template_path: \"simulation_templates/{st1_tpl}\"\n"
+                            yaml_content += "    mode: \"start\"\n"
+                            if s1_p:
+                                yaml_content += "    params:\n"
+                                for k, v in s1_p.items():
+                                    val_str = f"\"{v}\"" if isinstance(v, str) else str(v)
+                                    yaml_content += f"      {k}: {val_str}\n"
+                            if s1_i:
+                                yaml_content += "    includes:\n"
+                                for k, v in s1_i.items():
+                                    yaml_content += f"      {k}: \"{v}\"\n"
+                            yaml_content += "    outputs:\n"
+                            yaml_content += "      restart_file: \"restart/restart.final.bin\"\n"
+                            yaml_content += "      dump_files:\n"
+                            yaml_content += "        - \"chain/chain_*.dump\"\n"
+                            yaml_content += "      log_file: \"lammps.log\"\n"
+                            
+                            # Stage 2
+                            yaml_content += f"\n  {st2_id}:\n"
+                            yaml_content += f"    template_path: \"simulation_templates/{st2_tpl}\"\n"
+                            yaml_content += f"    mode: \"{st2_mode}\"\n"
+                            if st2_mode in ["resume", "branch"]:
+                                yaml_content += f"    parent_stage: \"{st1_id}\"\n"
+                            if s2_p:
+                                yaml_content += "    params:\n"
+                                for k, v in s2_p.items():
+                                    val_str = f"\"{v}\"" if isinstance(v, str) else str(v)
+                                    yaml_content += f"      {k}: {val_str}\n"
+                            if s2_i:
+                                yaml_content += "    includes:\n"
+                                for k, v in s2_i.items():
+                                    yaml_content += f"      {k}: \"{v}\"\n"
+                            yaml_content += "    outputs:\n"
+                            yaml_content += "      restart_file: \"restart/restart.final.bin\"\n"
+                            yaml_content += "      dump_files:\n"
+                            yaml_content += "        - \"chain/chain_*.dump\"\n"
+                            yaml_content += "      log_file: \"lammps.log\"\n"
+                            
+                            # Write directly to disk
+                            schema_path = os.path.join(ROOT_DIR, "simulation_schemas", f"{sim_type_input.lower()}.yaml")
+                            with open(schema_path, "w", encoding="utf-8") as f:
+                                f.write(yaml_content)
+                                
+                            st.success(f"🎉 Success! Schema saved to: `{os.path.basename(schema_path)}`")
+                            st.toast("✓ Schema saved successfully!")
+                        except Exception as ex:
+                            st.error(f"Failed to generate YAML schema: {ex}")
+
+    elif nav == "📖 Guide":
+        st.subheader("📖 Complete Interactive User Guide")
+        st.markdown("""
+        This interactive guide documents the architecture, schema formats, command-line interfaces, 
+        and advanced auto-pilot behaviors of the **Pulse Simulation Orchestrator**.
+        """)
+        
+        st.write('<div style="text-align: center;"><img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" width="100%" style="border-radius:10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-height:250px; object-fit:cover;" /></div>', unsafe_allow_html=True)
+        
+        tab_start, tab_schema, tab_resume, tab_pilot = st.tabs([
+            "📋 Getting Started", "⚙️ Schema Syntax Guide", "🌿 Lineage & Resume Guide", "⏰ Auto-Pilot Daemon Guide"
+        ])
+        
+        with tab_start:
+            st.markdown("### 🚀 Getting Started & CLI Usage")
+            st.markdown("""
+            The **Pulse** system is a fully generalized, configuration-driven, "no-code" simulation coordinator built to design, run, scale, and trace LAMMPS computational chemistry/physics simulations.
+            
+            #### 1️⃣ Set up your environment
+            Ensure your `.env` configuration file exists at the project root with the correct paths:
+            ```bash
+            # Path to the compiled LAMMPS binary (absolute path recommended)
+            LAMMPS_EXECUTABLE=/home/guest/miniconda3/envs/gchain/bin/lmp
+            
+            # Destination path where all simulation folders and metadata are stored
+            DUMPING_YARD=/home/guest/palash/Granular-Chains-DEM-dev/dumping_yard
+            
+            # HPC PBS Queue executors (optional, defaults to system qsub/qstat)
+            QSUB_PATH=qsub
+            QSTAT_PATH=qstat
+            ```
+            
+            #### 2️⃣ Running Simulations via CLI Wizard (Interactive)
+            Start the beautiful, step-by-step interactive CLI wizard:
+            ```bash
+            python main.py
+            # OR
+            python main.py interactive
+            ```
+            The wizard will scan your available schemas, guide you through stage selection, prompt for overrides, and trigger execution!
+            
+            #### 3️⃣ Running Simulations via Automated CLI commands
+            Submit runs directly (highly suitable for HPC PBS batch scripts or daemon integrations):
+            ```bash
+            # Start a new simulation
+            python main.py run_generalized --schema simulation_schemas/chain_flop.yaml --stage start --run-name MyRun_N4 --params '{"N": 4}'
+            
+            # Resume/Branch a completed simulation
+            python main.py run_generalized --schema simulation_schemas/chain_flop.yaml --stage resume --parent-dir dumping_yard/Chain_Flop/MyRun_N4
+            ```
+            """)
+            
+        with tab_schema:
+            st.markdown("### ⚙️ Schema Syntax Guide")
+            st.markdown("""
+            A Pulse simulation schema is a YAML or JSON file containing a `simulation_type`, global parameters, and stage definitions.
+            
+            #### Core Schema Topology:
+            *   **`simulation_type`**: The high-level name of the physical simulation (e.g. `Chain_Flop` or `Hopper_Simulation`). Used for directory naming.
+            *   **`global_params`**: Dict/List of default variables shared by all templates (e.g. `dt: 1e-6`).
+            *   **`stages`**: A dictionary or list of simulation execution nodes.
+                *   `template_path`: Relative path to the input template file.
+                *   `mode`: `start` (new run), `resume` (in-place resume using parent restart bin), or `branch` (creating a new run branching from parent).
+                *   `params`: Local overrides of global parameters.
+                *   `includes`: Map of include targets that need dynamic variable rendering (e.g. `lepton_inc: simulation_templates/lepton.inc`).
+                *   `outputs`: Directory structure and file designations for standardized metadata cataloging.
+            """)
+            st.info("💡 You can design and save schemas visually under the 🛠️ Schema IDE tab!")
+            
+        with tab_resume:
+            st.markdown("### 🌿 Lineage & Resume Guide")
+            st.markdown("""
+            Every generalized run writes a standardized **`metadata.json`** file inside its output folder containing the active parameters, start timestamp, active seed, output specs, and its parent lineage.
+            
+            #### Lineage Tracking & Auto-Pilot Resumption:
+            - **Binary Restarts**: When launching a `resume` or `branch` stage, the **Generalized Engine** automatically crawls the parent's `metadata.json` output files list to find its active `.final.bin` restart binary.
+            - **No Hardcoded Paths**: The engine binds this path to `{{resume_file}}`, meaning you never have to hardcode absolute resume paths again!
+            - **Lineage Scanning**: The lineage tracker recursively traces parents, drawing your interactive parent-child ancestry tree in the **🧬 Lineage** tab!
+            """)
+            
+        with tab_pilot:
+            st.markdown("### ⏰ Auto-Pilot Daemon Guide")
+            st.markdown("""
+            The **Auto-Pilot Daemon** is a polite, background automation script that schedules and reschedules runs on the PBS cluster.
+            
+            #### Key Functions:
+            1.  **Polite Mode**: Automatically checks current cluster usage (`qstat`) and only schedules a job if the queue load is below thresholds.
+            2.  **Student Bypass**: Bypasses polite mode checks to immediately run jobs if the cluster belongs to a prioritized student/user class.
+            3.  **Autonomous Goal Pivoting**: Automatically detects when a goal transition transitions from pending `NewRoot` setups to active run states.
+            4.  **Transactional State**: Writes active queue states safely to persistent transactional logs, preventing duplicate job submissions.
+            """)
 
     # 5. System Status (Master Node only)
     if "master" in socket.gethostname():

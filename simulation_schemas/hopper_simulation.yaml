@@ -1,0 +1,81 @@
+# Generalized LAMMPS Simulation Schema: Multi-Hopper Filling & Oscillatory Flow Pipeline
+simulation_type: Hopper_Simulation
+
+global_params:
+  dt: 1.0e-6
+  viscosity: 0.000001
+  spacing: 2.0
+  n_hoppers: 4
+  z_max: 0.8
+  relax_steps: 500000
+  run_steps: 1000000
+  lepton_inc: "simulation_templates/lepton.inc"
+  dump_inc: "simulation_templates/default_dump.inc.template"
+
+stages:
+  # Stage 1: Pre-fill a grid of hoppers with relaxed chains
+  fill:
+    template_path: "simulation_templates/in.grid_hopper_fill.template"
+    mode: "start"
+    params:
+      geometry_inc: "includes/replicated_geometry.inc"
+      mol_include_file: "includes/molecules.inc"
+      insertion_file: "includes/insertion.inc"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      geometry_inc: "{{geometry_inc}}"
+      mol_include_file: "{{mol_include_file}}"
+      insertion_file: "{{insertion_file}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"
+
+  # Stage 2: Resume hopper filling from an in-progress state
+  fill_resume:
+    template_path: "simulation_templates/in.grid_hopper_fill_resume.template"
+    mode: "resume"
+    parent_stage: "fill"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      geometry_inc: "{{geometry_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"
+
+  # Stage 3: Transition filled hoppers into oscillatory flow (Branch from Filling)
+  flow:
+    template_path: "simulation_templates/in.grid_hopper_flow.template"
+    mode: "branch"
+    parent_stage: "fill"
+    params:
+      geometry_inc: "includes/replicated_geometry_flow.inc"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      geometry_inc: "{{geometry_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps_flow.log"
+
+  # Stage 4: Resume oscillatory flow simulation
+  flow_resume:
+    template_path: "simulation_templates/in.grid_hopper_flow_resume.template"
+    mode: "resume"
+    parent_stage: "flow"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      geometry_inc: "{{geometry_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps_flow.log"

@@ -1,0 +1,48 @@
+# Generalized LAMMPS Simulation Schema: Sequential Chain Dropping & Pouring
+simulation_type: Chain_Drop
+
+global_params:
+  dt: 1.0e-6
+  viscosity: 0.01
+  n_fill: 100
+  N: 4
+  n_templates: 1
+  relax_steps: 1000000
+  lepton_inc: "simulation_templates/lepton.inc"
+  dump_inc: "simulation_templates/default_dump.inc.template"
+
+stages:
+  # Stage 1: Dropping/pouring batch sequence of chains
+  drop:
+    template_path: "simulation_templates/in.chain_drop.template"
+    mode: "start"
+    params:
+      setup_inc: "includes/setup.inc"
+      mol_include_file: "includes/molecules.inc"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      setup_inc: "{{setup_inc}}"
+      mol_include_file: "{{mol_include_file}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"
+
+  # Stage 2: Resume chain drop settling/compaction
+  resume:
+    template_path: "simulation_templates/in.chain_drop_resume.template"
+    mode: "resume"
+    parent_stage: "drop"
+    params:
+      setup_inc: "includes/setup.inc"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      setup_inc: "{{setup_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+      log_file: "lammps.log"

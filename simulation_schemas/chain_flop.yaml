@@ -1,0 +1,42 @@
+# Generalized LAMMPS Simulation Schema: Chain Flop Mobility
+simulation_type: Chain_Flop
+
+global_params:
+  dt: 1.0e-6
+  viscosity: 0.025
+  N: 4
+  run_steps: 5000000
+  lepton_inc: "simulation_templates/lepton.inc"
+  dump_inc: "simulation_templates/default_dump.inc.template"
+
+stages:
+  start:
+    template_path: "simulation_templates/in.chain_flop.template"
+    mode: "start"
+    params:
+      data_file: "chain_data/linear_x/linear_N{{N}}.data"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+        - "bond/bond_*.dump"
+        - "angle/angle_*.dump"
+      log_file: "lammps.log"
+
+  resume:
+    template_path: "simulation_templates/in.chain_flop_resume.template"
+    mode: "resume"
+    parent_stage: "start"
+    includes:
+      lepton_inc: "{{lepton_inc}}"
+      dump_inc: "{{dump_inc}}"
+    outputs:
+      restart_file: "restart/restart.final.bin"
+      dump_files:
+        - "chain/chain_*.dump"
+        - "bond/bond_*.dump"
+        - "angle/angle_*.dump"
+      log_file: "lammps.log"
