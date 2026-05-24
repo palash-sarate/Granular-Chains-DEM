@@ -4,7 +4,7 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-24T19:06:36.326468"
+        "last_heartbeat": "2026-05-24T21:07:42.870293"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262": {
@@ -579,7 +579,7 @@
             "target_steps": 9000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-24T05:30:01.279456",
+            "last_submitted": "2026-05-24T19:30:01.707949",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -597,7 +597,7 @@
             "target_steps": 9000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-24T06:00:01.324538",
+            "last_submitted": "2026-05-24T20:00:01.754271",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -615,7 +615,7 @@
             "target_steps": 9000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-24T06:13:22.058758",
+            "last_submitted": "2026-05-24T20:26:11.192921",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -633,7 +633,7 @@
             "target_steps": 9000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-24T06:30:01.380800",
+            "last_submitted": "2026-05-24T20:29:39.105576",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -651,7 +651,7 @@
             "target_steps": 9000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-24T07:00:01.427030",
+            "last_submitted": "2026-05-24T20:30:01.811906",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -1005,6 +1005,38 @@
                 "walltime": "24:00:00",
                 "ppn": 16,
                 "mem": "16gb"
+            }
+        },
+        "NewRoot_fill_1779631209": {
+            "target_steps": 8000000,
+            "increment": 100000,
+            "in_place": true,
+            "last_submitted": "2026-05-24T19:43:00.937048",
+            "status": "Running",
+            "mode": "fill",
+            "polite_mode": true,
+            "params": {
+                "dt": 1e-06,
+                "viscosity": 1e-06,
+                "num_procs": 8,
+                "num_threads": 1,
+                "walltime": "24:00:00",
+                "ppn": 16,
+                "mem": "16gb",
+                "N": 48,
+                "n_fill": 300,
+                "source_dir": "chain_data/relaxed_2D_x",
+                "spacing": 0.5,
+                "n_hoppers": 1,
+                "mode": "2D_stacked",
+                "dump_file": "simulation_templates/default_dump.inc",
+                "hopper_template_data": "simulation_geometries/2D_hopper_with_orifice_cover.inc",
+                "simulation": "Hopper_Fill",
+                "no-vtk": true,
+                "geometry_vars": {
+                    "hopper_ang": 30
+                },
+                "seed": 631209
             }
         }
     }

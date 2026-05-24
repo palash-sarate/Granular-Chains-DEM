@@ -178,7 +178,34 @@ def run_manager():
         if curr_steps < target_steps:
             # Check if this run is already in queue by name
             run_name = os.path.basename(path)
-            if any(run_name in j["name"] for j in jobs):
+            
+            # Extract target seed to build the exact submitted job name
+            target_seed = str(g.get("params", {}).get("seed", ""))
+            if not target_seed:
+                import re
+                match = re.search(r'S(\d+)', run_name)
+                if match:
+                    target_seed = match.group(1)
+            
+            if target_seed:
+                expected_job_name = f"AP_{target_seed}_{run_name}"[:15]
+            else:
+                expected_job_name = f"AP_{run_name}"[:15]
+            
+            # Check for exactly the new name format, or legacy name format (which might be truncated)
+            legacy_name = f"AP_{run_name}"
+            is_running = False
+            for j in jobs:
+                j_name = j["name"]
+                if j_name == expected_job_name:
+                    is_running = True
+                    break
+                # Handle standard legacy name truncation
+                if legacy_name == j_name or (len(j_name) == 15 and legacy_name.startswith(j_name)):
+                    is_running = True
+                    break
+            
+            if is_running:
                 continue
             
             eligible.append((path, g, curr_steps))
@@ -264,7 +291,17 @@ def run_manager():
         full_command = " ".join([c for c in cmd_parts if c])
 
         # Generate PBS script
-        job_name = f"AP_{run_name}"
+        target_seed = str(overrides.get("seed", ""))
+        if not target_seed:
+            import re
+            match = re.search(r'S(\d+)', run_name)
+            if match:
+                target_seed = match.group(1)
+                
+        if target_seed:
+            job_name = f"AP_{target_seed}_{run_name}"[:15]
+        else:
+            job_name = f"AP_{run_name}"[:15]
         goal_polite = g.get("polite_mode", True)
         priority_val = -1024 if goal_polite else 0
 
