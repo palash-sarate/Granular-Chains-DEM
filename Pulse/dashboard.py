@@ -1460,9 +1460,10 @@ if st.runtime.exists():
                     mode_params["spacing"] = fc5.number_input("Hopper Spacing", value=0.5)
                     mode_params["n_hoppers"] = fc6.number_input("Number of Hoppers", value=1, step=1)
 
-                    fc7, fc8 = st.columns(2)
+                    fc7, fc8, fc9 = st.columns(3)
                     mode_params["mode"] = fc7.selectbox("Pouring Mode", ["2D_stacked", "2D_worst_case"], index=0)
                     mode_params["dump_file"] = fc8.text_input("Dump File Inc", value="simulation_templates/default_dump.inc")
+                    mode_params["hopper_template_data"] = fc9.text_input("Hopper Template", value="simulation_geometries/2D_hopper_with_orifice_cover.inc")
                     mode_params["simulation"] = "Hopper_Fill"
                     mode_params["no-vtk"] = True
 
