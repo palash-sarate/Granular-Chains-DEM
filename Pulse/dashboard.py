@@ -1794,7 +1794,7 @@ if st.runtime.exists():
             # Fetch active jobs once for real-time status updates
             active_jobs = PBSManager.get_jobs(user=user_filter)
             
-            st.markdown("#### 🚢 Fleet Active Goals")
+            # st.markdown("#### 🚢 Fleet Active Goals")
             
             # Interactive columns grid
             hdr_cols = st.columns([2.2, 1.8, 1.0, 1.2, 1.3, 0.5])
@@ -1852,6 +1852,26 @@ if st.runtime.exists():
                 # Column 1: Progress visual + details
                 row_cols[1].markdown(f"**{progress:.1f}%** ({current_steps:,} / {target:,})")
                 row_cols[1].progress(progress / 100.0)
+
+                # Editable Target Steps: allow changing target from dashboard
+                try:
+                    safe_key = f"target_input_{abs(hash(run_path))}"
+                    new_target = row_cols[1].number_input(
+                        "Target Steps",
+                        value=int(target),
+                        step=100000,
+                        key=safe_key,
+                        label_visibility="collapsed",
+                    )
+                except Exception:
+                    new_target = target
+
+                if int(new_target) != int(target):
+                    auto_data["goals"][run_path]["target_steps"] = int(new_target)
+                    save_auto_pilot(auto_data)
+                    st.toast(f"Updated target for {name} to {int(new_target):,}")
+                    time.sleep(0.5)
+                    st.rerun()
                 
                 # Determine live status dynamically
                 if current_steps >= target:

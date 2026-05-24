@@ -1,33 +1,10 @@
 {
-    "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729": {
-        "name": "Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
-        "simulation": "Hopper_Fill",
-        "N": 48,
-        "steps": 6600000,
-        "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
-        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S358667_S348132_S521842_S161014_S897208_S769729",
-        "status": "Active",
-        "params": {
-            "seed": "769729",
-            "freq": null,
-            "amp": null,
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 300,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Local",
-        "sync_time": "2026-05-17T01:23:42.366075"
-    },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
         "name": "Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S904266",
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 5600000,
+        "steps": 5900000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
         "status": "Active",
@@ -45,35 +22,12 @@
         "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505867"
     },
-    "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899": {
-        "name": "Grid_Fill_1H_S437513_S402899",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
-        "simulation": "Hopper_Fill",
-        "N": 48,
-        "steps": 7600000,
-        "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
-        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S437513_S402899",
-        "status": "Active",
-        "params": {
-            "seed": "402899",
-            "freq": null,
-            "amp": null,
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 300,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Local",
-        "sync_time": "2026-05-17T01:23:42.366132"
-    },
     "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565": {
         "name": "Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S442391",
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 5700000,
+        "steps": 7400000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565",
         "status": "Active",
@@ -96,7 +50,7 @@
         "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S694955",
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 5600000,
+        "steps": 5900000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
         "status": "Active",
@@ -165,21 +119,22 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 1000000,
+        "steps": 7800000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
-        "status": "Archived",
+        "status": "Active",
         "params": {
             "seed": "437513",
             "freq": null,
             "amp": null,
             "dt": "1e-06",
             "n_hoppers": 1,
+            "n_fill": 300,
             "geometry_vars": [
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": null
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365": {
@@ -256,10 +211,10 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 5000000,
+        "steps": 7900000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
-        "status": "Archived",
+        "status": "Active",
         "params": {
             "seed": "358667",
             "freq": null,
@@ -271,7 +226,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505968"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086": {
@@ -394,7 +349,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 400000,
+        "steps": 8664000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288",
         "status": "Active",
@@ -419,7 +374,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224",
         "status": "Active",
@@ -444,7 +399,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251",
         "status": "Active",
@@ -469,7 +424,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 400000,
+        "steps": 651000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269",
         "status": "Active",
@@ -494,7 +449,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762071",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762071",
         "status": "Active",
@@ -519,7 +474,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 400000,
+        "steps": 600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "status": "Active",
@@ -544,7 +499,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 400000,
+        "steps": 600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "status": "Active",
@@ -569,7 +524,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 400000,
+        "steps": 600000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "status": "Active",
@@ -594,7 +549,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 48,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876",
         "status": "Active",
@@ -612,7 +567,7 @@
                 }
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-17T01:23:42.366105"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733": {
@@ -620,7 +575,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733",
         "status": "Active",
@@ -646,7 +601,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860",
         "status": "Active",
@@ -672,7 +627,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 400000,
+        "steps": 700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642",
         "status": "Active",
@@ -887,7 +842,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116",
         "simulation": "Grid_Hopper_Flow",
         "N": 4,
-        "steps": 0,
+        "steps": 5300000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116_S329384",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116_S329384",
         "status": "Active",
@@ -914,7 +869,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325",
         "simulation": "Grid_Hopper_Flow",
         "N": 4,
-        "steps": 0,
+        "steps": 5300000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277",
         "status": "Active",
@@ -941,7 +896,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764",
         "simulation": "Grid_Hopper_Flow",
         "N": 12,
-        "steps": 0,
+        "steps": 7300000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764_S135240",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764_S135240",
         "status": "Active",
@@ -968,7 +923,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990",
         "simulation": "Grid_Hopper_Flow",
         "N": 24,
-        "steps": 0,
+        "steps": 8300000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119",
         "status": "Active",
@@ -995,7 +950,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S232222",
         "simulation": "Grid_Hopper_Flow",
         "N": 12,
-        "steps": 0,
+        "steps": 8500000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S232222_S113495",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S232222_S113495",
         "status": "Active",
@@ -1022,7 +977,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217",
         "simulation": "Grid_Hopper_Flow",
         "N": 4,
-        "steps": 5173000,
+        "steps": 6100000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217_S319327",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217_S319327",
         "status": "Active",
@@ -1049,7 +1004,7 @@
         "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209",
         "simulation": "Grid_Hopper_Flow",
         "N": 24,
-        "steps": 0,
+        "steps": 8300000,
         "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209_S287816",
         "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209_S287816",
         "status": "Active",
@@ -1067,6 +1022,864 @@
             "geometry_vars": [
                 {}
             ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206": {
+        "name": "Grid_Flow_1H_S676206",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 7900000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206",
+        "status": "Active",
+        "params": {
+            "seed": "676206",
+            "freq": [
+                5.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877": {
+        "name": "Grid_Flow_1H_S524877",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 7800000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877",
+        "status": "Active",
+        "params": {
+            "seed": "524877",
+            "freq": [
+                5.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206_S264867": {
+        "name": "Grid_Flow_1H_S676206_S264867",
+        "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206_S264867",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206_S264867",
+        "status": "Active",
+        "params": {
+            "seed": "264867",
+            "freq": [
+                5.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877_S451250": {
+        "name": "Grid_Flow_1H_S524877_S451250",
+        "parent": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8100000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877_S451250",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877_S451250",
+        "status": "Active",
+        "params": {
+            "seed": "451250",
+            "freq": [
+                5.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S430167": {
+        "name": "Grid_Flow_1H_S430167",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S430167",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S430167",
+        "status": "Active",
+        "params": {
+            "seed": "430167",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S461938": {
+        "name": "Grid_Flow_1H_S461938",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8000000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S461938",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S461938",
+        "status": "Active",
+        "params": {
+            "seed": "461938",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S103393": {
+        "name": "Grid_Flow_1H_S103393",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8212000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S103393",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S103393",
+        "status": "Active",
+        "params": {
+            "seed": "103393",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S283110": {
+        "name": "Grid_Flow_1H_S283110",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S283110",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S283110",
+        "status": "Active",
+        "params": {
+            "seed": "283110",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S215588": {
+        "name": "Grid_Flow_1H_S215588",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S215588",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S215588",
+        "status": "Active",
+        "params": {
+            "seed": "215588",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S965412": {
+        "name": "Grid_Flow_1H_S965412",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S965412",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S965412",
+        "status": "Active",
+        "params": {
+            "seed": "965412",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S890335": {
+        "name": "Grid_Flow_1H_S890335",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8206000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S890335",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S890335",
+        "status": "Active",
+        "params": {
+            "seed": "890335",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S546347": {
+        "name": "Grid_Flow_1H_S546347",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S546347",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S546347",
+        "status": "Active",
+        "params": {
+            "seed": "546347",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S278545": {
+        "name": "Grid_Flow_1H_S278545",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S278545",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S278545",
+        "status": "Active",
+        "params": {
+            "seed": "278545",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207": {
+        "name": "Grid_Flow_1H_S187207",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8100000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207",
+        "status": "Active",
+        "params": {
+            "seed": "187207",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S455062": {
+        "name": "Grid_Flow_1H_S455062",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S455062",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S455062",
+        "status": "Active",
+        "params": {
+            "seed": "455062",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403836": {
+        "name": "Grid_Flow_1H_S403836",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8000000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403836",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403836",
+        "status": "Active",
+        "params": {
+            "seed": "403836",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S872001": {
+        "name": "Grid_Flow_1H_S872001",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S872001",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S872001",
+        "status": "Active",
+        "params": {
+            "seed": "872001",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494": {
+        "name": "Grid_Flow_1H_S675494",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8100000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494",
+        "status": "Active",
+        "params": {
+            "seed": "675494",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S914799": {
+        "name": "Grid_Flow_1H_S914799",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S914799",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S914799",
+        "status": "Active",
+        "params": {
+            "seed": "914799",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S952623": {
+        "name": "Grid_Flow_1H_S952623",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S952623",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S952623",
+        "status": "Active",
+        "params": {
+            "seed": "952623",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S582215": {
+        "name": "Grid_Flow_1H_S582215",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S582215",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S582215",
+        "status": "Active",
+        "params": {
+            "seed": "582215",
+            "freq": [
+                20.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S722570": {
+        "name": "Grid_Flow_1H_S722570",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S722570",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S722570",
+        "status": "Active",
+        "params": {
+            "seed": "722570",
+            "freq": [
+                10.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S247996": {
+        "name": "Grid_Flow_1H_S247996",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S247996",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S247996",
+        "status": "Active",
+        "params": {
+            "seed": "247996",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S695096": {
+        "name": "Grid_Flow_1H_S695096",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S808086",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S695096",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S695096",
+        "status": "Active",
+        "params": {
+            "seed": "695096",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S923472": {
+        "name": "Grid_Flow_1H_S923472",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S240587",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 24,
+        "steps": 8200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S923472",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S923472",
+        "status": "Active",
+        "params": {
+            "seed": "923472",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S999583": {
+        "name": "Grid_Flow_1H_S999583",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S374952",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S999583",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S999583",
+        "status": "Active",
+        "params": {
+            "seed": "999583",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S193408": {
+        "name": "Grid_Flow_1H_S193408",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S437513",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8000000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S193408",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S193408",
+        "status": "Active",
+        "params": {
+            "seed": "193408",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S475822": {
+        "name": "Grid_Flow_1H_S475822",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 4,
+        "steps": 5200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S475822",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S475822",
+        "status": "Active",
+        "params": {
+            "seed": "475822",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 3600,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S718366": {
+        "name": "Grid_Flow_1H_S718366",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 48,
+        "steps": 8100000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S718366",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S718366",
+        "status": "Active",
+        "params": {
+            "seed": "718366",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 300,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S170404": {
+        "name": "Grid_Flow_1H_S170404",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S481365",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S170404",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S170404",
+        "status": "Active",
+        "params": {
+            "seed": "170404",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403643": {
+        "name": "Grid_Flow_1H_S403643",
+        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840",
+        "simulation": "Grid_Hopper_Flow",
+        "N": 12,
+        "steps": 7200000,
+        "path": "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403643",
+        "rel_path": "dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403643",
+        "status": "Active",
+        "params": {
+            "seed": "403643",
+            "freq": [
+                0.0
+            ],
+            "amp": [
+                0.001
+            ],
+            "dt": "1e-06",
+            "n_hoppers": 1,
+            "n_fill": 1200,
+            "geometry_vars": [
+                {}
+            ]
+        },
+        "sync_status": "Local",
+        "sync_time": null
+    },
+    "/Data/palash_data/dumping_yard/Test_Flop/Verify_Run": {
+        "name": "Verify_Run",
+        "parent": null,
+        "simulation": "Test_Flop",
+        "N": 0,
+        "steps": 0,
+        "path": "/Data/palash_data/dumping_yard/Test_Flop/Verify_Run",
+        "rel_path": "dumping_yard/Test_Flop/Verify_Run",
+        "status": "Active",
+        "params": {
+            "seed": null,
+            "freq": null,
+            "amp": null,
+            "dt": null,
+            "n_hoppers": 1,
+            "n_fill": null,
+            "geometry_vars": {}
         },
         "sync_status": "Local",
         "sync_time": null
