@@ -323,6 +323,11 @@ class PBSManager:
             if match:
                 parent_seed, child_seed = match.groups()
                 active_seeds.append(child_seed)
+            else:
+                # Match auto-pilot convention: AP_[Seed]_[RunName] (possibly truncated)
+                ap_match = re.match(r"^AP_(\d{3,6})_", job_name)
+                if ap_match:
+                    active_seeds.append(ap_match.group(1))
         return active_seeds
 
 

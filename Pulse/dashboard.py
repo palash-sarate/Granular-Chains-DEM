@@ -1874,9 +1874,33 @@ if st.runtime.exists():
                     st.rerun()
                 
                 # Determine live status dynamically
+                target_seed = str(goal.get("params", {}).get("seed", ""))
+                if not target_seed:
+                    import re
+                    match = re.search(r'S(\d+)', name)
+                    if match:
+                        target_seed = match.group(1)
+                
+                if target_seed:
+                    expected_job_name = f"AP_{target_seed}_{name}"[:15]
+                else:
+                    expected_job_name = f"AP_{name}"[:15]
+                
+                legacy_name = f"AP_{name}"
+                
+                is_job_running = False
+                for j in active_jobs:
+                    j_name = j.get("Job_Name", "")
+                    if j_name == expected_job_name:
+                        is_job_running = True
+                        break
+                    if legacy_name == j_name or (len(j_name) == 15 and legacy_name.startswith(j_name)):
+                        is_job_running = True
+                        break
+
                 if current_steps >= target:
                     status = "Completed"
-                elif any(name in j.get("Job_Name", "") for j in active_jobs):
+                elif is_job_running:
                     status = "Running"
                 else:
                     status = "Idle"
