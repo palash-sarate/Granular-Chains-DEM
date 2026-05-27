@@ -1753,12 +1753,14 @@ if st.runtime.exists():
             st.divider()
             st.markdown("##### Update Schedule")
             freq = st.selectbox("Select Frequency", 
-                               ["Hourly (Recommended)", "Every 30 Minutes", "Every 2 Hours", "Every 6 Hours", "Daily (Midnight)"],
+                               ["Hourly (Recommended)", "Every 30 Minutes", "Every 15 Minutes", "Every 5 Minutes", "Every 2 Hours", "Every 6 Hours", "Daily (Midnight)"],
                                index=0)
             
             cron_map = {
                 "Hourly (Recommended)": "0 * * * *",
                 "Every 30 Minutes": "*/30 * * * *",
+                "Every 15 Minutes": "*/15 * * * *",
+                "Every 5 Minutes": "*/5 * * * *",
                 "Every 2 Hours": "0 */2 * * *",
                 "Every 6 Hours": "0 */6 * * *",
                 "Daily (Midnight)": "0 0 * * *"
