@@ -237,9 +237,20 @@ class GridHopperManager:
                 print("You can generate it manually later using analysis/geometry_extractor.py")
         
         # 4. Create Consolidated Insertion File (The Chains)
+        z_start = 0.51
+        try:
+            original_commands = self._resolve_includes(Path(hopper_template_data))
+            global_overrides = normalized_geo_vars[0] if normalized_geo_vars else {}
+            vars_dict = self._evaluate_variables(original_commands, global_overrides)
+            if "converging_sec_ht" in vars_dict:
+                z_start = float(vars_dict["converging_sec_ht"])
+                print(f"[INFO] Using dynamic z_start={z_start:.4f} from geometry variable converging_sec_ht")
+        except Exception as e:
+            print(f"[WARNING] Could not parse geometry for converging_sec_ht: {e}. Falling back to z_start=0.51")
+
         insertion_file, z_max = self._generate_grid_insertion_file(
             job_dir, n_hoppers, n_fill_list, mol_ranges, seed, N_list, spacing, envelope['hoppers'], 
-            mol_bboxes=mol_bboxes, mode=mode
+            mol_bboxes=mol_bboxes, mode=mode, z_start=z_start
         )
 
         setup_duration = time.time() - t_start
@@ -903,14 +914,14 @@ class GridHopperManager:
                                       mol_ranges: Dict[int, Any], seed: int, N_list: List[int], 
                                       spacing: float, metadata: Dict[int, Any],
                                       mol_bboxes: Dict[int, Any] = None,
-                                      mode: str = "2D_stacked"):
+                                      mode: str = "2D_stacked",
+                                      z_start: float = 0.51):
         rng = random.Random(seed)
         insertion_lines = []
         
         # Internal pouring grid relative to hopper center
         # y_half from 2D_hopper.inc is 0.155
         hopper_y_half = 0.155
-        z_start = 0.51
         z_max_global = z_start
         total_inserted = 0
         

@@ -434,13 +434,13 @@ if st.runtime.exists():
         else:
             # 1. Chain Selection
             st.write("### 1. Select Lineage Chain")
-            use_manual = st.checkbox("🧩 Use Manual Path (e.g. for Archived Runs)")
+            use_manual = st.checkbox("🧩 Use Manual Path (e.g. for Archived Runs)", key="viz_use_manual")
             
             start_node = end_node = None # Initialize for safety
 
             if use_manual:
                 manual_path = st.text_input("Absolute Path to Run Directory", 
-                                           placeholder="/Data/palash_data/dumping_yard/Archived_Runs/...")
+                                           placeholder="/Data/palash_data/dumping_yard/Archived_Runs/...", key="viz_manual_path")
                 if manual_path:
                     manual_path = manual_path.strip()
                     if os.path.exists(manual_path):
@@ -459,11 +459,11 @@ if st.runtime.exists():
                 names = {p: lineage[p]['name'] for p in all_paths}
                 
                 c1, c2 = st.columns(2)
-                start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names.get(x, x), index=0)
+                start_node = c1.selectbox("Start Node", all_paths, format_func=lambda x: names.get(x, x), index=0, key="viz_start_node")
                 
                 # Filter end_node options based on descendants of start_node (including start_node itself)
                 possible_ends = [start_node] + VizManager.get_descendants(start_node, lineage)
-                end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names.get(x, x), index=len(possible_ends)-1)
+                end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names.get(x, x), index=len(possible_ends)-1, key="viz_end_node")
 
                 if end_node:
                     chain = VizManager.get_lineage_chain(start_node, end_node)
@@ -893,6 +893,146 @@ if st.runtime.exists():
 
                 st.info("💡 Note: Missing simulation data will be automatically restored from Google Drive and cleaned up after the job finishes.")
 
+                # Produced Visualisation Movies section
+                st.divider()
+                st.write("### 📥 Produced Visualisation Movies")
+                
+                viz_dir = os.path.join(ROOT_DIR, "Visualisations")
+                if os.path.exists(viz_dir):
+                    movie_files = sorted(
+                        [f for f in os.listdir(viz_dir) if f.endswith(".mp4")],
+                        key=lambda x: os.path.getmtime(os.path.join(viz_dir, x)),
+                        reverse=True
+                    )
+                    if movie_files:
+                        import pandas as pd
+                        
+                        # 1. Scrollable List showing files metadata
+                        st.write("##### 📁 Available Files")
+                        df_data = []
+                        for movie in movie_files:
+                            movie_path = os.path.join(viz_dir, movie)
+                            file_size_mb = os.path.getsize(movie_path) / (1024 * 1024)
+                            created_time = datetime.datetime.fromtimestamp(os.path.getmtime(movie_path)).strftime("%Y-%m-%d %H:%M")
+                            df_data.append({
+                                "Movie Name": movie,
+                                "Size (MB)": round(file_size_mb, 1),
+                                "Created": created_time
+                            })
+                        
+                        st.dataframe(
+                            pd.DataFrame(df_data), 
+                            use_container_width=True, 
+                            hide_index=True,
+                            height=200
+                        )
+                        
+                        # 2. Scrollable Checklist for actions
+                        if "selected_movies_history" not in st.session_state:
+                            st.session_state["selected_movies_history"] = []
+                            
+                        # Sanitize history in case movies were deleted from disk
+                        st.session_state["selected_movies_history"] = [
+                            m for m in st.session_state["selected_movies_history"] if m in movie_files
+                        ]
+                        
+                        selected_movies = []
+                        st.write("##### 🗳️ Select Movie(s) to Play or Download")
+                        with st.container(height=200):
+                            for movie in movie_files:
+                                if st.checkbox(movie, key=f"ap_movie_chk_{movie}"):
+                                    selected_movies.append(movie)
+                        
+                        # Update selection history to determine "latest selected"
+                        added = [m for m in selected_movies if m not in st.session_state["selected_movies_history"]]
+                        removed = [m for m in st.session_state["selected_movies_history"] if m not in selected_movies]
+                        new_history = [m for m in st.session_state["selected_movies_history"] if m not in removed]
+                        for m in added:
+                            new_history.append(m)
+                        st.session_state["selected_movies_history"] = new_history
+                        
+                        if selected_movies:
+                            latest_movie = new_history[-1] if new_history else selected_movies[-1]
+                            
+                            st.write("---")
+                            st.markdown(f"#### ⚙️ Actions for Selected ({len(selected_movies)} item(s))")
+                            
+                            # Play/Download columns
+                            col_dl, col_del = st.columns(2)
+                            
+                            # Download action
+                            if len(selected_movies) == 1:
+                                movie_path = os.path.join(viz_dir, latest_movie)
+                                try:
+                                    with open(movie_path, "rb") as f:
+                                        movie_bytes = f.read()
+                                    col_dl.download_button(
+                                        label=f"📥 Download {latest_movie}",
+                                        data=movie_bytes,
+                                        file_name=latest_movie,
+                                        mime="video/mp4",
+                                        use_container_width=True,
+                                        key="dl_single_movie"
+                                    )
+                                except Exception as e:
+                                    col_dl.error(f"Error reading file: {e}")
+                            else:
+                                # Multiselect ZIP download
+                                import zipfile
+                                import io
+                                try:
+                                    zip_buffer = io.BytesIO()
+                                    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                                        for movie in selected_movies:
+                                            movie_path = os.path.join(viz_dir, movie)
+                                            zip_file.write(movie_path, arcname=movie)
+                                    
+                                    col_dl.download_button(
+                                        label=f"📥 Download All Selected ({len(selected_movies)} files as ZIP)",
+                                        data=zip_buffer.getvalue(),
+                                        file_name="selected_visualisations.zip",
+                                        mime="application/zip",
+                                        use_container_width=True,
+                                        key="dl_zip_movies"
+                                    )
+                                except Exception as e:
+                                    col_dl.error(f"Error zipping files: {e}")
+                                    
+                            # Delete action
+                            if col_del.button("🗑️ Delete Selected File(s)", type="secondary", use_container_width=True, key="del_selected_btn"):
+                                st.session_state["confirm_del_selected"] = True
+                                st.rerun()
+                                
+                            if st.session_state.get("confirm_del_selected"):
+                                st.warning(f"Are you sure you want to permanently delete {len(selected_movies)} selected movie(s) from disk?")
+                                cy, cn = st.columns([1, 4])
+                                if cy.button("Yes, Delete", type="primary", key="confirm_del_sel_yes"):
+                                    for movie in selected_movies:
+                                        movie_path = os.path.join(viz_dir, movie)
+                                        if os.path.exists(movie_path):
+                                            os.remove(movie_path)
+                                        # Clear checkbox state
+                                        st.session_state.pop(f"ap_movie_chk_{movie}", None)
+                                    st.toast(f"Deleted {len(selected_movies)} movie(s).")
+                                    st.session_state.pop("confirm_del_selected", None)
+                                    st.session_state["selected_movies_history"] = []
+                                    time.sleep(0.5)
+                                    st.rerun()
+                                if cn.button("Cancel", key="confirm_del_sel_no"):
+                                    st.session_state.pop("confirm_del_selected", None)
+                                    st.rerun()
+                                    
+                            # Video Player for Latest Movie
+                            st.write(f"##### 🎥 Previewing Latest Selected: `{latest_movie}`")
+                            st.video(os.path.join(viz_dir, latest_movie))
+                        else:
+                            st.info("💡 Select one or more movies above to play or download them.")
+                    else:
+                        st.info("No produced movies found in the Visualisations folder.")
+                else:
+                    st.info("Visualisations folder not found.")
+
+
     elif nav == "🧬 Lineage":
         st.subheader("🧬 Simulation Genealogy & Lineage")
         st.markdown("Persistent history of all simulation runs and their parent-child relationships.")
@@ -1020,7 +1160,13 @@ if st.runtime.exists():
                 
                 # Base Style
                 on_disk = os.path.exists(run_id)
-                is_auto = run_id in auto_goals
+                is_auto = False
+                if run_id in auto_goals:
+                    goal = auto_goals[run_id]
+                    target = goal.get("target_steps", 0)
+                    current_steps = info.get("steps", 0)
+                    if current_steps < target:
+                        is_auto = True
                 
                 if is_auto:
                     node_label = f"🤖 {node_label}"
@@ -1645,6 +1791,7 @@ if st.runtime.exists():
                                     "status": "Idle",
                                     "mode": selected_mode,
                                     "polite_mode": polite_mode,
+                                    "paused": False,
                                     "params": {
                                         "dt": dt,
                                         "viscosity": viscosity,
@@ -1799,13 +1946,14 @@ if st.runtime.exists():
             # st.markdown("#### 🚢 Fleet Active Goals")
             
             # Interactive columns grid
-            hdr_cols = st.columns([2.2, 1.8, 1.0, 1.2, 1.3, 0.5])
+            hdr_cols = st.columns([2.0, 1.5, 0.8, 1.0, 1.0, 1.2, 0.5])
             hdr_cols[0].markdown("**Simulation Run**")
             hdr_cols[1].markdown("**Step Progress**")
             hdr_cols[2].markdown("**Status**")
             hdr_cols[3].markdown("**Polite Mode**")
-            hdr_cols[4].markdown("**Last Submitted**")
-            hdr_cols[5].markdown("**Actions**")
+            hdr_cols[4].markdown("**Paused**")
+            hdr_cols[5].markdown("**Last Submitted**")
+            hdr_cols[6].markdown("**Actions**")
             st.markdown("<hr style='margin: 0px 0px 10px 0px; border-color: rgba(49, 51, 63, 0.2);'>", unsafe_allow_html=True)
             
             for run_path, goal in list(goals.items()):
@@ -1842,7 +1990,7 @@ if st.runtime.exists():
                     mode_label = "Fill"
                 
                 # Create row
-                row_cols = st.columns([2.2, 1.8, 1.0, 1.2, 1.3, 0.5])
+                row_cols = st.columns([2.0, 1.5, 0.8, 1.0, 1.0, 1.2, 0.5])
                 
                 # Column 0: Simulation name and details
                 row_cols[0].markdown(
@@ -1900,7 +2048,10 @@ if st.runtime.exists():
                         is_job_running = True
                         break
 
-                if current_steps >= target:
+                is_paused = goal.get("paused", False)
+                if is_paused:
+                    status = "Paused"
+                elif current_steps >= target:
                     status = "Completed"
                 elif is_job_running:
                     status = "Running"
@@ -1914,6 +2065,8 @@ if st.runtime.exists():
                     status_badge = "✅ <span style='color: #aeea00; font-weight: bold;'>Completed</span>"
                 elif status == "Idle":
                     status_badge = "💤 <span style='color: #80d8ff; font-weight: bold;'>Idle</span>"
+                elif status == "Paused":
+                    status_badge = "⏸️ <span style='color: #ffb300; font-weight: bold;'>Paused</span>"
                 else:
                     status_badge = f"📋 <span>{status}</span>"
                 row_cols[2].markdown(status_badge, unsafe_allow_html=True)
@@ -1933,7 +2086,25 @@ if st.runtime.exists():
                     time.sleep(0.5)
                     st.rerun()
                 
-                # Column 4: Last Submit time
+                # Column 4: Pause/Resume toggle (interactive!)
+                new_paused = row_cols[4].toggle(
+                    "Pause",
+                    value=is_paused,
+                    key=f"pause_toggle_{run_path}",
+                    label_visibility="collapsed"
+                )
+                if new_paused != is_paused:
+                    auto_data["goals"][run_path]["paused"] = new_paused
+                    if new_paused:
+                        auto_data["goals"][run_path]["status"] = "Paused"
+                    else:
+                        auto_data["goals"][run_path]["status"] = "Idle"
+                    save_auto_pilot(auto_data)
+                    st.toast(f"{'⏸️ Paused' if new_paused else '▶️ Resumed'} {name}")
+                    time.sleep(0.5)
+                    st.rerun()
+
+                # Column 5: Last Submit time
                 last_sub = goal.get("last_submitted")
                 if last_sub:
                     try:
@@ -1943,16 +2114,38 @@ if st.runtime.exists():
                         sub_str = last_sub
                 else:
                     sub_str = "Never"
-                row_cols[4].markdown(f"<div style='padding-top: 5px;'>{sub_str}</div>", unsafe_allow_html=True)
+                row_cols[5].markdown(f"<div style='padding-top: 5px;'>{sub_str}</div>", unsafe_allow_html=True)
                 
-                # Column 5: Actions (Remove button)
-                if row_cols[5].button("❌", key=f"rm_fleet_{run_path}", help="Remove from Auto-Pilot"):
+                # Column 6: Actions (Remove button)
+                if row_cols[6].button("❌", key=f"rm_fleet_{run_path}", help="Remove from Auto-Pilot"):
                     del auto_data["goals"][run_path]
                     save_auto_pilot(auto_data)
                     st.toast(f"Removed {name} from Auto-Pilot")
                     time.sleep(0.5)
                     st.rerun()
                 
+                # Inline snapshot and notes preview expander
+                with st.expander(f"🖼️ Snapshot & Notes for {name}", expanded=False):
+                    col_note, col_snap = st.columns([1, 1])
+                    with col_note:
+                        notes_db = load_notes()
+                        current_note = notes_db.get(run_path, "")
+                        new_note = st.text_area("🗒️ Run Notes", value=current_note, height=120, key=f"ap_note_{run_path}", help="Save observations or metadata for this run.")
+                        if st.button("💾 Save Notes", key=f"ap_save_note_{run_path}"):
+                            save_note(run_path, new_note)
+                            st.toast("Notes saved!")
+                    with col_snap:
+                        try:
+                            from Pulse.snapshot_helper import generate_snapshot
+                            force_refresh = st.button("🔄 Refresh Snapshot", key=f"ap_refresh_{run_path}")
+                            snap_path = generate_snapshot(run_path, force=force_refresh)
+                            if snap_path:
+                                st.image(snap_path, caption="Latest Simulation State (Y-Z Plane)", use_container_width=True)
+                            else:
+                                st.info("No snapshot available (no dump files found).")
+                        except Exception as e:
+                            st.warning(f"Snapshot preview unavailable: {e}")
+
                 st.markdown("<hr style='margin: 5px 0px 5px 0px; border-color: rgba(49, 51, 63, 0.1);'>", unsafe_allow_html=True)
             
             if st.button("Clear Completed Goals"):

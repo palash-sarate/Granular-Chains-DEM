@@ -161,6 +161,10 @@ def run_manager():
 
     eligible = []
     for path, g in goals.items():
+        # Skip paused goals
+        if g.get("paused", False):
+            continue
+
         # A goal is polite if the global polite mode is on AND the goal's polite mode is also on (or defaults to on)
         is_goal_polite = global_polite and g.get("polite_mode", True)
         

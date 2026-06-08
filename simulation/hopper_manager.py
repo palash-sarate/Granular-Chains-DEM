@@ -126,8 +126,14 @@ class HopperManager:
         inc_file = self.prepare_molecules(source_dir, mol_dir)
         n_templates = len(list(Path(source_dir).glob("*.data")))
 
-        # Determine default drop_steps similar to run_hopper_flow
-        # drop_steps = int(5 * (1 / dt) * 1e-2)
+        # Determine dynamic z_drop from setup_inc if converging_sec_ht is present
+        z_drop = 0.51
+        if setup_inc:
+            try:
+                z_drop = self._extract_converging_sec_ht(setup_inc)
+                print(f"[INFO] Using dynamic z_drop={z_drop:.4f} from geometry variable converging_sec_ht")
+            except Exception as e:
+                print(f"[WARNING] Could not parse geometry for converging_sec_ht: {e}. Falling back to 0.51")
 
         cfg = SimulationConfig(
             template=fill_template,
@@ -147,6 +153,7 @@ class HopperManager:
                 "dt": dt,
                 "seed": seed,
                 "N": N,
+                "z_drop": z_drop,
             },
             num_procs=num_procs,
             num_threads=num_threads,
@@ -161,7 +168,7 @@ class HopperManager:
         # If using the tall template, pre-generate the insertion file via Python
         if "tall" in fill_template:
             output_dir = cfg.output_dir
-            insertion_file, z_max = self._generate_tall_insertion_file(output_dir, n_fill, n_templates, seed, N)
+            insertion_file, z_max = self._generate_tall_insertion_file(output_dir, n_fill, n_templates, seed, N, z_start=z_drop)
             cfg.extra_vars["insertion_file"] = insertion_file
             cfg.extra_vars["z_max"] = z_max
 
@@ -315,7 +322,7 @@ class HopperManager:
         self.runner.run(cfg, verbose=True, clean_dir=True)
         return cfg.output_dir
 
-    def _generate_tall_insertion_file(self, outdir: str, n_fill: int, n_templates: int, seed: int, N: int):
+    def _generate_tall_insertion_file(self, outdir: str, n_fill: int, n_templates: int, seed: int, N: int, z_start: float = 0.51):
         """
         Generates a 3D grid of insertion coordinates in a tall column via Python.
         Writes 'create_atoms' commands to a file to be included by LAMMPS.
@@ -330,7 +337,6 @@ class HopperManager:
         # Grid bounds (matched to in.hopper_fill_uniform)
         x_min, x_max = -0.08, 0.08
         y_min, y_max = -0.15, 0.15
-        z_start = 0.51
         
         x_width = x_max - x_min
         y_width = y_max - y_min
@@ -382,3 +388,64 @@ class HopperManager:
             
         print(f"Generated 3D insertion file with {count} molecules: {insertion_path} (z_max={z_max:.3f})")
         return insertion_path, z_max
+
+    def _extract_converging_sec_ht(self, setup_inc_path: str) -> float:
+        """
+        Resolves includes and evaluates variables in setup_inc_path
+        to find and return converging_sec_ht. Falls back to 0.51.
+        """
+        import os
+        import math
+        
+        if not setup_inc_path or not os.path.exists(setup_inc_path):
+            return 0.51
+            
+        def resolve_includes(file_path):
+            if not os.path.exists(file_path):
+                return []
+            lines = []
+            with open(file_path, 'r') as f:
+                for line in f:
+                    stripped = line.strip()
+                    if stripped.startswith("include"):
+                        parts = stripped.split()
+                        if len(parts) >= 2:
+                            inc_file = parts[1]
+                            inc_path = os.path.join(os.path.dirname(file_path), inc_file)
+                            if os.path.exists(inc_path):
+                                lines.extend(resolve_includes(inc_path))
+                            elif os.path.exists(inc_file):
+                                lines.extend(resolve_includes(inc_file))
+                    else:
+                        lines.append(line)
+            return lines
+
+        try:
+            commands = resolve_includes(setup_inc_path)
+            vars_dict = {"pi": math.pi}
+            for line in commands:
+                stripped = line.strip()
+                if stripped.startswith("variable"):
+                    parts = stripped.split()
+                    if len(parts) < 4:
+                        continue
+                    v_name = parts[1]
+                    v_expr = " ".join(parts[3:])
+                    v_expr = v_expr.split("#")[0].strip()
+                    
+                    for k in sorted(vars_dict.keys(), key=len, reverse=True):
+                        v = vars_dict[k]
+                        v_expr = v_expr.replace(f"${{{k}}}", str(v))
+                        
+                    try:
+                        safe_expr = v_expr.replace("sin(", "math.sin(").replace("cos(", "math.cos(").replace("tan(", "math.tan(")
+                        vars_dict[v_name] = eval(safe_expr, {"math": math, "__builtins__": None}, vars_dict)
+                    except:
+                        pass
+            if "converging_sec_ht" in vars_dict:
+                return float(vars_dict["converging_sec_ht"])
+        except Exception as e:
+            print(f"[WARNING] Error evaluating converging_sec_ht: {e}")
+            
+        return 0.51
+

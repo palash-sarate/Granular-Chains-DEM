@@ -4,19 +4,19 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-05-27T14:30:01.640762"
+        "last_heartbeat": "2026-06-08T14:25:01.673693"
     },
     "goals": {
         "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262": {
-            "target_steps": 7000000,
+            "target_steps": 6700000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T12:13:56.120329",
+            "last_submitted": "2026-06-05T03:55:01.401117",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -26,16 +26,16 @@
                 "simulation": "Hopper_Fill_Resume"
             }
         },
-        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S442391_S430735_S744817_S842756_S169565": {
-            "target_steps": 8000000,
+        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
+            "target_steps": 7000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T09:38:42.258297",
+            "last_submitted": "2026-06-08T08:50:01.175424",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -46,35 +46,16 @@
             },
             "polite_mode": true
         },
-        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
-            "target_steps": 8000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-05-26T12:13:52.239345",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill_Resume"
-            }
-        },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224": {
-            "target_steps": 5000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T12:30:02.004065",
+            "last_submitted": "2026-06-06T18:10:01.886846",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -95,77 +76,16 @@
                 "seed": 762224
             }
         },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762251": {
-            "target_steps": 7000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-05-26T13:00:01.049200",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 12,
-                "n_fill": 1200,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "hopper_ang": 30
-                },
-                "seed": 762251
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762269": {
-            "target_steps": 8000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-05-27T14:30:01.651791",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 0.001,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 24,
-                "n_fill": 600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "hopper_ang": 30
-                },
-                "seed": 762269
-            },
-            "polite_mode": false
-        },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319": {
-            "target_steps": 5000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T08:04:23.662021",
+            "last_submitted": "2026-06-08T00:20:01.386569",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -187,15 +107,15 @@
             }
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743": {
-            "target_steps": 7000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-25T13:37:29.625002",
+            "last_submitted": "2026-06-07T17:20:01.187026",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -218,15 +138,15 @@
             "polite_mode": true
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056": {
-            "target_steps": 8000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T08:29:47.855847",
+            "last_submitted": "2026-06-08T01:35:01.945910",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -245,18 +165,19 @@
                     "orifice_half": 0.025
                 },
                 "seed": 762056
-            }
+            },
+            "polite_mode": true
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762071": {
-            "target_steps": 8000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T11:00:01.842195",
+            "last_submitted": "2026-06-08T04:20:01.191038",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -278,15 +199,15 @@
             }
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642": {
-            "target_steps": 5000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T11:25:51.965338",
+            "last_submitted": "2026-06-08T05:35:01.745723",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -309,15 +230,15 @@
             }
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733": {
-            "target_steps": 7000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T11:29:50.988367",
+            "last_submitted": "2026-06-08T08:46:40.963615",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -340,15 +261,15 @@
             }
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860": {
-            "target_steps": 8000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T11:30:01.900223",
+            "last_submitted": "2026-06-08T08:46:40.969682",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -371,15 +292,15 @@
             }
         },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876": {
-            "target_steps": 8000000,
+            "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T12:00:01.946906",
+            "last_submitted": "2026-06-08T08:46:40.976322",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
                 "dt": 1e-06,
-                "viscosity": 0.001,
+                "viscosity": 1e-06,
                 "num_procs": 8,
                 "num_threads": 1,
                 "walltime": "24:00:00",
@@ -402,10 +323,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T08:30:01.591684",
+            "last_submitted": "2026-06-06T08:45:01.493050",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -422,7 +343,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T08:40:20.935824",
+            "last_submitted": "2026-06-08T03:35:01.838604",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -436,10 +357,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209_S287816": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T09:00:01.637011",
+            "last_submitted": "2026-06-06T09:05:01.665215",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -453,10 +374,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764_S135240": {
-            "target_steps": 8000000,
+            "target_steps": 8100000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T09:30:01.693833",
+            "last_submitted": "2026-06-06T09:15:01.745067",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -473,7 +394,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T10:00:01.740661",
+            "last_submitted": "2026-06-08T03:45:01.917609",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -487,10 +408,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S524877_S451250": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T10:25:36.471321",
+            "last_submitted": "2026-06-08T04:15:01.147169",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -505,10 +426,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S676206_S264867": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T10:30:01.797003",
+            "last_submitted": "2026-06-08T04:19:14.677453",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -523,10 +444,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S103393": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T13:18:39.737296",
+            "last_submitted": "2026-06-06T22:55:01.993572",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -541,10 +462,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S890335": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T13:30:01.107922",
+            "last_submitted": "2026-06-06T22:55:01.996399",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -559,10 +480,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S247996": {
-            "target_steps": 9000000,
+            "target_steps": 9400000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T13:58:22.124246",
+            "last_submitted": "2026-06-06T22:55:01.999134",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -577,10 +498,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S461938": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T14:00:01.155265",
+            "last_submitted": "2026-06-06T22:55:02.001664",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -595,10 +516,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S718366": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T15:00:01.257986",
+            "last_submitted": "2026-06-07T04:50:01.622811",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -613,10 +534,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S923472": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T15:05:19.087554",
+            "last_submitted": "2026-06-07T04:50:01.625952",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -631,10 +552,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T15:12:34.376737",
+            "last_submitted": "2026-06-07T04:50:01.628554",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -649,10 +570,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T15:30:01.313056",
+            "last_submitted": "2026-06-07T04:50:01.631118",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -667,10 +588,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S952623": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T16:11:23.575240",
+            "last_submitted": "2026-06-07T12:50:01.166838",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -685,10 +606,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S430167": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T16:18:55.116617",
+            "last_submitted": "2026-06-07T12:50:01.169990",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -703,10 +624,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S193408": {
-            "target_steps": 9000000,
+            "target_steps": 9200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T16:30:01.409878",
+            "last_submitted": "2026-06-07T12:50:01.172563",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -724,7 +645,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T17:00:01.456778",
+            "last_submitted": "2026-06-07T12:50:01.175119",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -742,7 +663,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-25T12:41:55.409162",
+            "last_submitted": "2026-06-07T14:45:02.033364",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -760,7 +681,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-25T13:00:01.483676",
+            "last_submitted": "2026-06-07T17:13:07.814510",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -778,7 +699,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-25T13:30:01.542350",
+            "last_submitted": "2026-06-07T17:15:01.143332",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -796,7 +717,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T05:00:01.227149",
+            "last_submitted": "2026-06-05T21:00:01.174844",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -814,7 +735,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T05:00:01.230200",
+            "last_submitted": "2026-06-07T17:55:01.444293",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -832,7 +753,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T05:00:01.233278",
+            "last_submitted": "2026-06-05T22:05:01.678190",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -850,7 +771,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T05:30:01.290810",
+            "last_submitted": "2026-06-07T18:00:01.488761",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -868,7 +789,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T06:03:21.000261",
+            "last_submitted": "2026-06-07T18:20:01.653712",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -883,10 +804,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S215588": {
-            "target_steps": 8000000,
+            "target_steps": 8200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T06:03:22.168008",
+            "last_submitted": "2026-06-07T18:40:01.806643",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -901,10 +822,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S965412": {
-            "target_steps": 8000000,
+            "target_steps": 8200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T06:30:01.389310",
+            "last_submitted": "2026-06-07T19:55:01.367409",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -919,10 +840,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S283110": {
-            "target_steps": 8000000,
+            "target_steps": 8200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T06:59:07.287840",
+            "last_submitted": "2026-06-07T20:10:01.493379",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -937,10 +858,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S546347": {
-            "target_steps": 8000000,
+            "target_steps": 8200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T07:00:01.435292",
+            "last_submitted": "2026-06-07T21:20:02.011382",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -955,10 +876,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403643": {
-            "target_steps": 8000000,
+            "target_steps": 8200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T07:25:01.478451",
+            "last_submitted": "2026-06-07T23:15:01.878473",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -973,10 +894,10 @@
             }
         },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S170404": {
-            "target_steps": 8000000,
+            "target_steps": 8300000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-05-26T07:30:01.493558",
+            "last_submitted": "2026-06-08T00:05:01.270290",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -988,38 +909,6 @@
                 "walltime": "24:00:00",
                 "ppn": 16,
                 "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S631209": {
-            "target_steps": 8000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-05-26T14:30:01.211776",
-            "status": "Running",
-            "mode": "fill_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 48,
-                "n_fill": 300,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "hopper_template_data": "simulation_geometries/2D_hopper_with_orifice_cover.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "hopper_ang": 30
-                },
-                "seed": 631209
             }
         }
     }
