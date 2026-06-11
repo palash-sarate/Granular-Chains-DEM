@@ -65,6 +65,12 @@ def render_visualization():
     
     lineage = PBSManager.load_lineage()
     
+    # Initialize batch queue state
+    if "viz_batch_queue" not in st.session_state:
+        st.session_state["viz_batch_queue"] = []
+    if "viz_active_job_id" not in st.session_state:
+        st.session_state["viz_active_job_id"] = None
+    
     if not lineage:
         st.info("No lineage data found. Please scan your simulations in the 'Lineage' tab first.")
     else:
@@ -101,10 +107,94 @@ def render_visualization():
             possible_ends = [start_node] + VizManager.get_descendants(start_node, lineage)
             end_node = c2.selectbox("End Node", possible_ends, format_func=lambda x: names.get(x, x), index=len(possible_ends)-1, key="viz_end_node")
 
-            if end_node:
-                chain = VizManager.get_lineage_chain(start_node, end_node)
+            # Resolve current dropdown selection chain
+            dropdown_chain = []
+            if start_node and end_node:
+                dropdown_chain = VizManager.get_lineage_chain(start_node, end_node)
+
+            # Add to queue button
+            st.write("")
+            c_add1, c_add2 = st.columns([3, 1])
+            with c_add1:
+                st.caption(f"👉 Select nodes above, then click 'Add' to queue: **{names.get(start_node, start_node)}** ➔ **{names.get(end_node, end_node)}**")
+            with c_add2:
+                if st.button("➕ Add to Queue", use_container_width=True, type="secondary"):
+                    if dropdown_chain:
+                        job_id = f"{start_node}_to_{end_node}"
+                        # Check if already exists
+                        if not any(j["id"] == job_id for j in st.session_state["viz_batch_queue"]):
+                            job = {
+                                "id": job_id,
+                                "start": start_node,
+                                "end": end_node,
+                                "chain": dropdown_chain,
+                                "name": f"{names[start_node]}_to_{names[end_node]}"
+                            }
+                            st.session_state["viz_batch_queue"].append(job)
+                            st.session_state["viz_active_job_id"] = job_id
+                            st.rerun()
+                        else:
+                            st.warning("This lineage chain is already in the batch queue.")
+                    else:
+                        st.error("No valid chain to add.")
+
+            # Queue Table UI
+            if st.session_state["viz_batch_queue"]:
+                st.write("---")
+                col_tbl_title, col_tbl_clear = st.columns([8, 2])
+                col_tbl_title.write("##### 📦 Batch Visualization Queue")
+                if col_tbl_clear.button("🗑️ Clear Queue", use_container_width=True):
+                    st.session_state["viz_batch_queue"] = []
+                    st.session_state["viz_active_job_id"] = None
+                    st.rerun()
+                
+                # Check if current active job still exists
+                active_job = None
+                for job in st.session_state["viz_batch_queue"]:
+                    if job["id"] == st.session_state["viz_active_job_id"]:
+                        active_job = job
+                        break
+                        
+                for idx, job in enumerate(st.session_state["viz_batch_queue"]):
+                    is_active = (job["id"] == st.session_state["viz_active_job_id"])
+                    
+                    col_sel, col_name, col_btn_sel, col_btn_del = st.columns([2, 5, 2, 2])
+                    
+                    with col_sel:
+                        if is_active:
+                            st.info("🔍 Inspecting")
+                        else:
+                            st.write("⏳ Queued")
+                            
+                    with col_name:
+                        st.write(f"**{job['name']}**")
+                        
+                    with col_btn_sel:
+                        if st.button("Inspect", key=f"inspect_{job['id']}_{idx}", use_container_width=True):
+                            st.session_state["viz_active_job_id"] = job["id"]
+                            st.rerun()
+                            
+                    with col_btn_del:
+                        if st.button("Delete", key=f"delete_{job['id']}_{idx}", use_container_width=True):
+                            st.session_state["viz_batch_queue"].pop(idx)
+                            if is_active:
+                                st.session_state["viz_active_job_id"] = None
+                            st.rerun()
+
+            # Resolve active variables for the rest of the dashboard
+            active_job = None
+            if st.session_state["viz_batch_queue"] and st.session_state["viz_active_job_id"]:
+                for job in st.session_state["viz_batch_queue"]:
+                    if job["id"] == st.session_state["viz_active_job_id"]:
+                        active_job = job
+                        break
+            
+            if active_job:
+                chain = active_job["chain"]
+                start_node = active_job["start"]
+                end_node = active_job["end"]
             else:
-                chain = []
+                chain = dropdown_chain
         
         if not chain:
             st.error("No valid direct lineage chain found. Select a different Start/End node.")
@@ -611,37 +701,109 @@ def render_visualization():
             st.divider()
             st.write("### 3. Execution")
             
-            # Check for existing job
-            lock_path = os.path.join(ROOT_DIR, VizManager.VIZ_LOCK)
-            is_running = False
-            job_id = ""
-            if os.path.exists(lock_path):
+            running_jobs = []
+            
+            # Check old default lock
+            old_lock = os.path.join(ROOT_DIR, VizManager.VIZ_LOCK)
+            if os.path.exists(old_lock):
                 try:
-                    with open(lock_path, "r") as f:
+                    with open(old_lock, "r") as f:
                         content = f.read().strip()
                         if content.startswith("PBS:"):
-                            job_id = content.replace("PBS:", "")
-                            is_running = True
+                            running_jobs.append({
+                                "name": "Default Movie",
+                                "job_id": content.replace("PBS:", ""),
+                                "lock_path": old_lock,
+                                "log_path": os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
+                            })
+                except: pass
+                
+            # Check dynamic locks
+            dynamic_locks = glob.glob(os.path.join(ROOT_DIR, "Pulse", "viz_job_*.lock"))
+            for lock_f in dynamic_locks:
+                try:
+                    with open(lock_f, "r") as f:
+                        content = f.read().strip()
+                        if content.startswith("PBS:"):
+                            m_base = os.path.basename(lock_f).replace("viz_job_", "").replace(".lock", "")
+                            running_jobs.append({
+                                "name": f"{m_base}.mp4",
+                                "job_id": content.replace("PBS:", ""),
+                                "lock_path": lock_f,
+                                "log_path": os.path.join(ROOT_DIR, "Pulse", f"viz_job_{m_base}.log")
+                            })
                 except: pass
 
-            if is_running:
-                st.warning(f"⚠️ **Visualization job is currently running** (PBS ID: `{job_id}`)")
-                
-                # Log Display
-                log_path = os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
-                if os.path.exists(log_path):
-                    with st.expander("📄 View Visualization Logs", expanded=True):
-                        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
-                            st.code(f.read(), language="text")
-                        if st.button("🔄 Refresh Logs"):
+            if running_jobs:
+                st.write("#### ⏳ Running Visualization Jobs")
+                for job in running_jobs:
+                    with st.container():
+                        st.warning(f"⚠️ **Job Running**: `{job['name']}` (PBS ID: `{job['job_id']}`)")
+                        if os.path.exists(job['log_path']):
+                            with st.expander(f"📄 View Logs for {job['name']}"):
+                                with open(job['log_path'], "r", encoding="utf-8", errors="replace") as f:
+                                    st.code(f.read(), language="text")
+                                if st.button("🔄 Refresh", key=f"ref_{job['job_id']}"):
+                                    st.rerun()
+                        if st.button(f"🛑 Cancel {job['name']}", key=f"can_{job['job_id']}", type="secondary"):
+                            import subprocess
+                            subprocess.run(["qdel", job['job_id']])
+                            if os.path.exists(job['lock_path']):
+                                try: os.remove(job['lock_path'])
+                                except: pass
+                            st.success(f"Cancelled job {job['job_id']}")
+                            time.sleep(1)
                             st.rerun()
+                st.divider()
 
-                if st.button("🛑 Cancel Viz Job", type="secondary"):
-                    subprocess.run(["qdel", job_id])
-                    if os.path.exists(lock_path): os.remove(lock_path)
+            if st.session_state["viz_batch_queue"]:
+                st.write("##### 📦 Batch Visualization Submission")
+                st.markdown(f"Submit visualization jobs for all **{len(st.session_state['viz_batch_queue'])}** runs currently in the queue:")
+                
+                for job in st.session_state["viz_batch_queue"]:
+                    st.markdown(f"- `{job['name']}.mp4`")
+                    
+                if st.button("🎬 Submit All Batch Visualization Jobs", type="primary", use_container_width=True):
+                    success_count = 0
+                    errors = []
+                    for job in st.session_state["viz_batch_queue"]:
+                        params = {
+                            "chain_paths": job["chain"],
+                            "output_name": f"{job['name']}.mp4",
+                            "fps": fps,
+                            "dt": dt,
+                            "show_geometry": show_geo,
+                            "selected_vtks": selected_vtk_names,
+                            "show_axes": show_axes,
+                            "show_grid": show_grid,
+                            "camera_position": st.session_state.get("viz_last_cam_pos") if framing_mode_val == "manual" else None,
+                            "offset": st.session_state["viz_scene_offset"] if framing_mode_val == "manual" else None,
+                            "resolution": st.session_state["viz_canvas_res"],
+                            "zoom": zoom if framing_mode_val == "manual" else 1.0,
+                            "viewport_bounds": viewport_bounds if framing_mode_val == "bounds" else None,
+                            "text_font_size": text_font_size,
+                            "text_x": text_x,
+                            "text_y": text_y,
+                            "axes_viewport": (axes_x, axes_y, axes_x + axes_size, axes_y + axes_size)
+                        }
+                        success, msg = VizManager.submit_viz_job(params)
+                        if success:
+                            success_count += 1
+                        else:
+                            errors.append(f"{job['name']}.mp4: {msg}")
+                            
+                    if success_count > 0:
+                        st.success(f"Successfully submitted {success_count} visualization jobs!")
+                    if errors:
+                        st.error("Some jobs failed:\n" + "\n".join(errors))
+                    
+                    if success_count > 0:
+                        st.session_state["viz_batch_queue"] = []
+                        st.session_state["viz_active_job_id"] = None
+                    time.sleep(1)
                     st.rerun()
             else:
-                output_name = st.text_input("Movie Name", value=f"{names[start_node]}_to_{names[end_node]}.mp4")
+                output_name = st.text_input("Movie Name", value=f"{names[start_node]}_to_{names[end_node]}.mp4" if (start_node and end_node) else "movie.mp4")
                 
                 if st.button("🎬 Submit Visualization Job", type="primary", use_container_width=True):
                     params = {
@@ -667,6 +829,7 @@ def render_visualization():
                     success, msg = VizManager.submit_viz_job(params)
                     if success:
                         st.success(msg)
+                        time.sleep(1)
                         st.rerun()
                     else:
                         st.error(msg)

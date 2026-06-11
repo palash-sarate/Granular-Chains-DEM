@@ -4,48 +4,9 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-06-11T14:10:01.588053"
+        "last_heartbeat": "2026-06-11T19:35:01.070470"
     },
     "goals": {
-        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262": {
-            "target_steps": 6700000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-05T03:55:01.401117",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill_Resume"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
-            "target_steps": 7000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-10T09:30:01.647949",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill_Resume"
-            },
-            "polite_mode": true
-        },
         "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224": {
             "target_steps": 2000000,
             "increment": 100000,
@@ -80,7 +41,7 @@
             "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:12.116041",
+            "last_submitted": "2026-06-11T15:00:01.969701",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -141,7 +102,7 @@
             "target_steps": 2000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:15.321388",
+            "last_submitted": "2026-06-11T15:40:01.275481",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -172,7 +133,7 @@
             "target_steps": 2200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:20.702212",
+            "last_submitted": "2026-06-11T17:55:01.301600",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -233,7 +194,7 @@
             "target_steps": 2200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:21.405809",
+            "last_submitted": "2026-06-11T18:15:01.467916",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -264,7 +225,7 @@
             "target_steps": 2200000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:22.350759",
+            "last_submitted": "2026-06-11T18:35:01.621913",
             "status": "Running",
             "mode": "fill_resume",
             "params": {
@@ -343,7 +304,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:16.296183",
+            "last_submitted": "2026-06-11T17:15:02.003874",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -394,7 +355,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-11T13:23:17.221503",
+            "last_submitted": "2026-06-11T17:35:01.150217",
             "status": "Running",
             "mode": "flow_resume",
             "params": {

@@ -1,16 +1,16 @@
 # Graph Report - Granular-Chains-DEM  (2026-06-11)
 
 ## Corpus Check
-- 117 files · ~78,851 words
+- 117 files · ~79,204 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1959 nodes · 3015 edges · 278 communities (266 shown, 12 thin omitted)
+- 1963 nodes · 3015 edges · 275 communities (264 shown, 11 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 110 edges (avg confidence: 0.51)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `92b85bc8`
+- Built from commit: `4ddd038e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -251,12 +251,9 @@
 - [[_COMMUNITY_Community 239|Community 239]]
 - [[_COMMUNITY_Community 269|Community 269]]
 - [[_COMMUNITY_Community 270|Community 270]]
-- [[_COMMUNITY_Community 271|Community 271]]
 - [[_COMMUNITY_Community 273|Community 273]]
 - [[_COMMUNITY_Community 274|Community 274]]
 - [[_COMMUNITY_Community 275|Community 275]]
-- [[_COMMUNITY_Community 279|Community 279]]
-- [[_COMMUNITY_Community 280|Community 280]]
 - [[_COMMUNITY_Community 281|Community 281]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -286,14 +283,14 @@
 ## Import Cycles
 - None detected.
 
-## Communities (278 total, 12 thin omitted)
+## Communities (275 total, 11 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
 Nodes (19): Misc, AnglePlotWindow, AtomPlotWindow, BondPlotWindow, LeptonPlotWindow, DataFrame, analysis/ts_windows.py Time-series plot windows for the Chains Simulation Viewer, Override to add mode-specific top widgets. (+11 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.29
+Cohesion: 0.28
 Nodes (44): params, params, params, params, params, params, params, params (+36 more)
 
 ### Community 2 - "Community 2"
@@ -333,16 +330,16 @@ Cohesion: 0.20
 Nodes (7): Stops the ongoing sync process (local or PBS)., Reads the latest logs from the sync log file., Returns details about the currently running sync process., SyncManager, load_viz_settings(), render_visualization(), save_viz_settings()
 
 ### Community 11 - "Community 11"
-Cohesion: 0.11
-Nodes (18): 2903, owner, status, 2929, owner, status, 2940, owner (+10 more)
+Cohesion: 0.08
+Nodes (24): 2907, owner, status, 2923, owner, status, 2936, owner (+16 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.24
 Nodes (7): get_dt_token(), get_viscosity_token(), Converts a float dt into a string token suitable for filenames.     E.g., 1e-6 -, Converts a float viscosity into a string token suitable for filenames.     E.g.,, Run a single chain-flop simulation to analyze mobility., Resume a chain-flop simulation from a restart point., Run a batch of flop simulations across multiple parameters.
 
 ### Community 13 - "Community 13"
-Cohesion: 0.13
-Nodes (9): Misc, parse_dump_file(), Public wrapper for parsing a single LAMMPS dump file., Orchestrates file/folder loading logic and OS dialogs., UI entry point for the Restart Editor., Helper to run a LAMMPS script using the project's SimulationRunner logic with MP, Converts a binary restart to a temporary dump for preview., Performs deletions and optionally resets IDs before saving a new restart binary. (+1 more)
+Cohesion: 0.16
+Nodes (7): Misc, Orchestrates file/folder loading logic and OS dialogs., UI entry point for the Restart Editor., Helper to run a LAMMPS script using the project's SimulationRunner logic with MP, Converts a binary restart to a temporary dump for preview., Performs deletions and optionally resets IDs before saving a new restart binary., SimulationLoader
 
 ### Community 14 - "Community 14"
 Cohesion: 0.18
@@ -365,16 +362,16 @@ Cohesion: 0.20
 Nodes (8): aggregate_lifecycle_metadata(), find_simulation_lineage(), Any, Finds the full lineage (ancestors and descendants) for a simulation., Merges metadata from all runs in the lineage, oldest to newest., Manages persistent metadata for a simulation folder., Loads and merges metadata, supporting migration from legacy filenames., SimulationMetadata
 
 ### Community 19 - "Community 19"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (3): Misc, PlaybackController, Manages playback state, timer, and transport controls.
 
 ### Community 20 - "Community 20"
-Cohesion: 0.20
-Nodes (12): detect_lammps_input_script(), load_lammps_geometry(), parse_lammps_geometry_script(), parse_simple_data_file(), _parse_single_dump_fast(), Auto-detect a likely LAMMPS input script in a simulation folder., Load geometry from an auto-detected LAMMPS input script., Parse geometry directly from a specific LAMMPS input script path. (+4 more)
+Cohesion: 0.15
+Nodes (15): detect_lammps_input_script(), get_parser_pool(), load_lammps_geometry(), parse_dump_file(), parse_lammps_geometry_script(), parse_simple_data_file(), _parse_single_dump_fast(), Auto-detect a likely LAMMPS input script in a simulation folder. (+7 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.20
-Nodes (7): calculate_bonds_angles_vectorized(), get_parser_pool(), DataFrame, Builds a unified timestep list by merging all directories (latest wins on overla, Returns a list of batch indices that have valid caches on disk., SimulationData, run_bench()
+Cohesion: 0.22
+Nodes (6): calculate_bonds_angles_vectorized(), DataFrame, Builds a unified timestep list by merging all directories (latest wins on overla, Returns a list of batch indices that have valid caches on disk., SimulationData, run_bench()
 
 ### Community 22 - "Community 22"
 Cohesion: 0.16
@@ -393,7 +390,7 @@ Cohesion: 0.23
 Nodes (4): Frame, Finds all methods in the orchestrator excluding private ones., SimulationLauncherController, SimulationOrchestrator
 
 ### Community 26 - "Community 26"
-Cohesion: 0.23
+Cohesion: 0.21
 Nodes (4): Plotter, Attempts to reload VTK files saved in the metadata., Manages VTK mesh loading, visibility, and scene bounds., VtkOverlayController
 
 ### Community 27 - "Community 27"
@@ -417,12 +414,12 @@ Cohesion: 0.15
 Nodes (13): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S442391, N, name, params, parent, path, rel_path, simulation (+5 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.15
-Nodes (13): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103, N, name, params, parent, path, rel_path, simulation (+5 more)
+Cohesion: 0.17
+Nodes (12): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103, N, name, params, parent, path, rel_path, simulation (+4 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.15
-Nodes (13): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898, N, name, params, parent, path, rel_path, simulation (+5 more)
+Cohesion: 0.17
+Nodes (12): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S469898, N, name, params, parent, path, rel_path, simulation (+4 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.17
@@ -497,12 +494,12 @@ Cohesion: 0.17
 Nodes (12): /Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S935840, N, name, params, parent, path, rel_path, simulation (+4 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.17
-Nodes (12): /Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262, N, name, params, parent, path, rel_path, simulation (+4 more)
+Cohesion: 0.15
+Nodes (13): /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209, N, name, params, parent, path, rel_path, simulation (+5 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.17
-Nodes (12): /Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721, N, name, params, parent, path, rel_path, simulation (+4 more)
+Cohesion: 0.22
+Nodes (9): in_place, increment, last_submitted, mode, params, polite_mode, status, target_steps (+1 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.27
@@ -600,6 +597,10 @@ Nodes (9): generate_command(), get_active_job_ids(), get_job_list(), main(), Fet
 Cohesion: 0.36
 Nodes (5): generate_lammps_input(), GeometryExtractor, main(), Path, regenerate_vtk()
 
+### Community 80 - "Community 80"
+Cohesion: 0.13
+Nodes (6): DataFrame, Plotter, Validates spacing between consecutive atoms in the chain.     Returns (is_valid,, validate_chain_spacing(), HighlightController, Manages highlight state and rendering of highlighted atoms.
+
 ### Community 81 - "Community 81"
 Cohesion: 0.31
 Nodes (9): merge_folders(), Merges source_dir (child) into target_dir (parent)., load_auto_pilot(), load_notes(), Wraps simulation names by breaking on underscores to keep nodes compact., render_lineage(), save_auto_pilot(), save_note() (+1 more)
@@ -662,7 +663,7 @@ Nodes (8): in_place, increment, last_submitted, mode, polite_mode, status, targe
 
 ### Community 96 - "Community 96"
 Cohesion: 0.25
-Nodes (8): in_place, increment, last_submitted, mode, polite_mode, status, target_steps, /Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721
+Nodes (8): in_place, increment, last_submitted, mode, polite_mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207
 
 ### Community 97 - "Community 97"
 Cohesion: 0.29
@@ -673,8 +674,8 @@ Cohesion: 0.29
 Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277
 
 ### Community 99 - "Community 99"
-Cohesion: 0.29
-Nodes (7): in_place, increment, last_submitted, status, target_steps, goals, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494
+Cohesion: 0.25
+Nodes (8): in_place, increment, last_submitted, mode, polite_mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494
 
 ### Community 100 - "Community 100"
 Cohesion: 0.29
@@ -689,8 +690,8 @@ Cohesion: 0.29
 Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116_S329384
 
 ### Community 103 - "Community 103"
-Cohesion: 0.29
-Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119
+Cohesion: 0.25
+Nodes (8): in_place, increment, last_submitted, mode, status, target_steps, goals, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119
 
 ### Community 104 - "Community 104"
 Cohesion: 0.29
@@ -722,11 +723,11 @@ Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Dat
 
 ### Community 111 - "Community 111"
 Cohesion: 0.29
-Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262
+Nodes (6): /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S815764, N, name, parent, simulation, steps
 
 ### Community 112 - "Community 112"
-Cohesion: 0.29
-Nodes (6): /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217, N, name, parent, simulation, steps
+Cohesion: 0.15
+Nodes (13): /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S850217, N, name, params, parent, path, rel_path, simulation (+5 more)
 
 ### Community 113 - "Community 113"
 Cohesion: 0.47
@@ -862,7 +863,7 @@ Nodes (3): 2928, owner, status
 
 ### Community 148 - "Community 148"
 Cohesion: 0.67
-Nodes (3): 2907, owner, status
+Nodes (3): 2903, owner, status
 
 ### Community 149 - "Community 149"
 Cohesion: 0.67
@@ -989,8 +990,8 @@ Cohesion: 0.67
 Nodes (3): 2963, owner, status
 
 ### Community 181 - "Community 181"
-Cohesion: 0.29
-Nodes (4): DataFrame, Plotter, HighlightController, Manages highlight state and rendering of highlighted atoms.
+Cohesion: 0.67
+Nodes (3): 2929, owner, status
 
 ### Community 182 - "Community 182"
 Cohesion: 0.67
@@ -1030,7 +1031,7 @@ Nodes (3): 2973, owner, status
 
 ### Community 191 - "Community 191"
 Cohesion: 0.67
-Nodes (3): 2923, owner, status
+Nodes (3): 2945, owner, status
 
 ### Community 192 - "Community 192"
 Cohesion: 0.67
@@ -1154,7 +1155,7 @@ Nodes (3): 3006, job_name, owner
 
 ### Community 222 - "Community 222"
 Cohesion: 0.67
-Nodes (3): 2936, owner, status
+Nodes (3): 2958, owner, status
 
 ### Community 223 - "Community 223"
 Cohesion: 0.67
@@ -1166,7 +1167,7 @@ Nodes (3): 3007, job_name, owner
 
 ### Community 225 - "Community 225"
 Cohesion: 0.67
-Nodes (3): 3019, job_name, owner
+Nodes (3): 3020, job_name, owner
 
 ### Community 227 - "Community 227"
 Cohesion: 0.67
@@ -1184,10 +1185,6 @@ Nodes (11): generate_snapshot(), get_latest_dump(), parse_dump_last_frame(), Fin
 Cohesion: 0.70
 Nodes (4): generate_large_dump(), parse_numpy_fromstring(), parse_pandas_current(), run_bench()
 
-### Community 271 - "Community 271"
-Cohesion: 0.67
-Nodes (3): 2964, owner, status
-
 ### Community 273 - "Community 273"
 Cohesion: 0.83
 Nodes (3): parse_numpy_fromstring(), parse_pandas_current(), run_bench()
@@ -1200,32 +1197,24 @@ Nodes (3): parse_with_dtype(), parse_without_dtype(), run_bench()
 Cohesion: 0.67
 Nodes (3): 2978, owner, status
 
-### Community 279 - "Community 279"
-Cohesion: 0.67
-Nodes (3): 2979, owner, status
-
-### Community 280 - "Community 280"
-Cohesion: 0.67
-Nodes (3): 2983, owner, status
-
 ### Community 281 - "Community 281"
 Cohesion: 0.67
 Nodes (3): 3013, job_name, owner
 
 ## Knowledge Gaps
-- **857 isolated node(s):** `viz_run_dir`, `cSpell.words`, `python.analysis.exclude`, `**/.conda`, `**/.history` (+852 more)
+- **861 isolated node(s):** `viz_run_dir`, `cSpell.words`, `python.analysis.exclude`, `**/.conda`, `**/.history` (+856 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `SimDataController` connect `Community 3` to `Community 5`, `Community 10`, `Community 80`, `Community 20`, `Community 21`, `Community 55`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
 - **Why does `SimulationOrchestrator` connect `Community 84` to `Community 2`, `Community 4`, `Community 8`, `Community 9`, `Community 12`, `Community 16`, `Community 55`, `Community 56`, `Community 25`, `Community 59`, `Community 61`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
-- **Why does `GridHopperManager` connect `Community 2` to `Community 5`, `Community 7`, `Community 10`, `Community 79`, `Community 16`, `Community 84`, `Community 61`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+- **Why does `SimulationRunner` connect `Community 16` to `Community 2`, `Community 5`, `Community 9`, `Community 10`, `Community 17`, `Community 20`, `Community 84`, `Community 59`, `Community 61`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Are the 20 inferred relationships involving `SimulationRunner` (e.g. with `GridHopperManager` and `Any`) actually correct?**
   _`SimulationRunner` has 20 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `ViewerApp` (e.g. with `SimulationLauncherController` and `SimulationOrchestrator`) actually correct?**

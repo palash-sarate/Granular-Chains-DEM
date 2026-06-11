@@ -1,50 +1,4 @@
 {
-    "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721": {
-        "name": "Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S904266",
-        "simulation": "Hopper_Fill",
-        "N": 24,
-        "steps": 7100000,
-        "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
-        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S904266_S944243_S153340_S131626_S155721",
-        "status": "Active",
-        "params": {
-            "seed": "155721",
-            "freq": null,
-            "amp": null,
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 600,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Local",
-        "sync_time": "2026-05-16T01:17:35.505867"
-    },
-    "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262": {
-        "name": "Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
-        "parent": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S694955",
-        "simulation": "Hopper_Fill",
-        "N": 12,
-        "steps": 6700000,
-        "path": "/Data/palash_data/dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
-        "rel_path": "dumping_yard/Hopper_Fill_Resume/Grid_Fill_1H_S694955_S950784_S371727_S801731_S381262",
-        "status": "Active",
-        "params": {
-            "seed": "381262",
-            "freq": null,
-            "amp": null,
-            "dt": "1e-06",
-            "n_hoppers": 1,
-            "n_fill": 1200,
-            "geometry_vars": [
-                {}
-            ]
-        },
-        "sync_status": "Local",
-        "sync_time": "2026-05-17T01:23:42.366060"
-    },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S468103": {
         "name": "Grid_Fill_1H_S468103",
         "parent": null,
@@ -165,10 +119,10 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 4000000,
+        "steps": 7100000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S904266",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S904266",
-        "status": "Archived",
+        "status": "Active",
         "params": {
             "seed": "904266",
             "freq": null,
@@ -180,7 +134,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505907"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S358667": {
@@ -303,10 +257,10 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 4000000,
+        "steps": 6700000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S694955",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S694955",
-        "status": "Archived",
+        "status": "Active",
         "params": {
             "seed": "694955",
             "freq": null,
@@ -318,7 +272,7 @@
                 {}
             ]
         },
-        "sync_status": "Synced",
+        "sync_status": "Local",
         "sync_time": "2026-05-16T01:17:35.505957"
     },
     "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762288": {
@@ -451,7 +405,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 24,
-        "steps": 1900000,
+        "steps": 1901000,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056",
         "status": "Active",
@@ -476,7 +430,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 12,
-        "steps": 1900000,
+        "steps": 1956100,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743",
         "status": "Active",
@@ -501,7 +455,7 @@
         "parent": null,
         "simulation": "Hopper_Fill",
         "N": 4,
-        "steps": 1900000,
+        "steps": 1920300,
         "path": "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "rel_path": "dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319",
         "status": "Active",

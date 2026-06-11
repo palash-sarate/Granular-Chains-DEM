@@ -84,7 +84,10 @@ class VizManager:
     @staticmethod
     def submit_viz_job(params: Dict):
         """Submits the movie generation process as a PBS job."""
-        log_path = os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)
+        output_name = params.get('output_name', "movie.mp4")
+        movie_base = os.path.splitext(output_name)[0]
+        
+        log_path = os.path.join(ROOT_DIR, "Pulse", f"viz_job_{movie_base}.log")
         if os.path.exists(log_path):
             try: os.remove(log_path)
             except: pass
@@ -92,12 +95,12 @@ class VizManager:
         os.makedirs(os.path.join(ROOT_DIR, VizManager.VIZ_DIR), exist_ok=True)
         
         job_script = f"""#!/bin/bash
-#PBS -N Viz_Movie
+#PBS -N Viz_{movie_base[:10]}
 #PBS -q workq
 #PBS -l nodes=master:ppn=16
 #PBS -l walltime=12:00:00
 #PBS -j oe
-#PBS -o {os.path.join(ROOT_DIR, VizManager.VIZ_JOB_LOG)}
+#PBS -o {log_path}
 
 cd $PBS_O_WORKDIR
 export PYTHONPATH=$PYTHONPATH:$PBS_O_WORKDIR
@@ -110,19 +113,21 @@ fi
 
 python Pulse/viz_manager.py --params '{json.dumps(params)}'
 """
-        script_path = os.path.join(ROOT_DIR, "Pulse/temp_viz.pbs")
+        script_path = os.path.join(ROOT_DIR, "Pulse", f"temp_viz_{movie_base}.pbs")
         with open(script_path, "w") as f: f.write(job_script)
         
         try:
             result = subprocess.run(["qsub", script_path], capture_output=True, text=True, check=True)
             job_id = result.stdout.strip()
-            lock_path = os.path.join(ROOT_DIR, VizManager.VIZ_LOCK)
+            lock_path = os.path.join(ROOT_DIR, "Pulse", f"viz_job_{movie_base}.lock")
             with open(lock_path, "w") as f: f.write(f"PBS:{job_id}")
-            return True, f"Visualization job submitted: {job_id}"
+            return True, f"Visualization job '{output_name}' submitted: {job_id}"
         except Exception as e:
             return False, f"Failed to submit Viz job: {e}"
         finally:
-            if os.path.exists(script_path): os.remove(script_path)
+            if os.path.exists(script_path):
+                try: os.remove(script_path)
+                except: pass
 
     @staticmethod
     def generate_preview(params: Dict) -> Optional[str]:
@@ -259,7 +264,8 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
 
         movie_dir = os.path.join(ROOT_DIR, VizManager.VIZ_DIR)
         os.makedirs(movie_dir, exist_ok=True)
-        frames_dir = os.path.join(movie_dir, "temp_frames")
+        movie_base = os.path.splitext(output_name)[0]
+        frames_dir = os.path.join(movie_dir, f"temp_frames_{movie_base}")
         if os.path.exists(frames_dir):
             import shutil
             shutil.rmtree(frames_dir)
@@ -338,9 +344,16 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
             print(f"FFmpeg failed: {e}")
         
         # Cleanup
+        try:
+            import shutil
+            if os.path.exists(frames_dir):
+                shutil.rmtree(frames_dir)
+        except: pass
+
         if restored_paths:
             SyncManager.free_restored_space(restored_paths)
-        lock_path = os.path.join(ROOT_DIR, VizManager.VIZ_LOCK)
+            
+        lock_path = os.path.join(ROOT_DIR, "Pulse", f"viz_job_{movie_base}.lock")
         if os.path.exists(lock_path): os.remove(lock_path)
 
 if __name__ == "__main__":
