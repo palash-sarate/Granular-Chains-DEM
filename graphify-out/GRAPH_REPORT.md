@@ -1,16 +1,16 @@
-# Graph Report - Granular-Chains-DEM  (2026-06-11)
+# Graph Report - Granular-Chains-DEM  (2026-06-12)
 
 ## Corpus Check
-- 117 files · ~79,204 words
+- 126 files · ~82,323 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1963 nodes · 3015 edges · 275 communities (264 shown, 11 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 110 edges (avg confidence: 0.51)
+- 2007 nodes · 3104 edges · 274 communities (264 shown, 10 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 115 edges (avg confidence: 0.51)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4ddd038e`
+- Built from commit: `4375fec7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -136,7 +136,6 @@
 - [[_COMMUNITY_Community 118|Community 118]]
 - [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 121|Community 121]]
-- [[_COMMUNITY_Community 122|Community 122]]
 - [[_COMMUNITY_Community 123|Community 123]]
 - [[_COMMUNITY_Community 124|Community 124]]
 - [[_COMMUNITY_Community 125|Community 125]]
@@ -249,7 +248,6 @@
 - [[_COMMUNITY_Community 234|Community 234]]
 - [[_COMMUNITY_Community 235|Community 235]]
 - [[_COMMUNITY_Community 239|Community 239]]
-- [[_COMMUNITY_Community 269|Community 269]]
 - [[_COMMUNITY_Community 270|Community 270]]
 - [[_COMMUNITY_Community 273|Community 273]]
 - [[_COMMUNITY_Community 274|Community 274]]
@@ -257,10 +255,10 @@
 - [[_COMMUNITY_Community 281|Community 281]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `SimulationRunner` - 44 edges
-2. `ViewerApp` - 39 edges
-3. `GridHopperManager` - 39 edges
-4. `PBSManager` - 37 edges
+1. `SimulationRunner` - 46 edges
+2. `PBSManager` - 42 edges
+3. `GridHopperManager` - 42 edges
+4. `ViewerApp` - 39 edges
 5. `SimulationConfig` - 36 edges
 6. `SimulationOrchestrator` - 34 edges
 7. `SimDataController` - 33 edges
@@ -283,7 +281,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (275 total, 11 thin omitted)
+## Communities (274 total, 10 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -306,7 +304,7 @@ Cohesion: 0.07
 Nodes (8): Standardizes data retrieval for highlighter/export during both normal and previe, Callback from renderer when an atom is clicked., Loads multiple selected folders as a single composite simulation., Callback when a restart file is loaded for editing., Syncs the selection from Restart Editor to the main Highlighter., run(), ViewerApp, BaseTk
 
 ### Community 5 - "Community 5"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (12): load_notes(), Wraps simulation names by breaking on underscores to keep nodes compact., A simple directory picker for Streamlit., save_note(), st_directory_picker(), wrap_sim_name(), Estimates simulation ETA by treating 'target' as the number of steps          to, SimulationMonitor (+4 more)
 
 ### Community 6 - "Community 6"
@@ -314,8 +312,8 @@ Cohesion: 0.09
 Nodes (13): DataFrame, Plotter, Transitions the camera to a standard axis view while keeping focal context., Identify atom under the mouse click., Update the max extents of the axes to include particles and all loaded VTKs, the, Redraw axes based on current persistent bounds., Render a specific timestep from batches or the preview dataset., Called during camera/actor interaction. (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.10
-Nodes (14): PBSManager, Parses the output of qstat -f into a list of dictionaries., Extracts utilization metrics from job data., Submits a job and returns the Job ID., Runs tracejob and parses the resource usage summary. Uses cache if provided., Attempts to find recently completed jobs for a user.         Since qstat -x is o, Scans a range of Job IDs and updates metadata., Removes a job from the metadata cache. (+6 more)
+Cohesion: 0.09
+Nodes (15): PBSManager, Parses the output of qstat -f into a list of dictionaries., Extracts utilization metrics from job data., Submits a job and returns the Job ID., Runs tracejob and parses the resource usage summary. Uses cache if provided., Attempts to find recently completed jobs for a user.         Since qstat -x is o, Scans a range of Job IDs and updates metadata., Removes a job from the metadata cache. (+7 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.15
@@ -326,12 +324,12 @@ Cohesion: 0.29
 Nodes (6): LibraryGenerator, Path, SimulationRunner, Generates a library for multiple N values in a single parallel pool., Task for a single simulation run, suitable for parallel execution., Generates a library of relaxed chain states for a single N.
 
 ### Community 10 - "Community 10"
-Cohesion: 0.20
-Nodes (7): Stops the ongoing sync process (local or PBS)., Reads the latest logs from the sync log file., Returns details about the currently running sync process., SyncManager, load_viz_settings(), render_visualization(), save_viz_settings()
+Cohesion: 0.07
+Nodes (22): Creates a standardized PyVista plotter., Parses a LAMMPS dump file and returns a pandas DataFrame., Populates a PyVista plotter with geometry, particles, and scene decorators., A unified rendering controller for PyVista simulations.     Supports both intera, UnifiedRenderer, Stops the ongoing sync process (local or PBS)., Reads the latest logs from the sync log file., Returns details about the currently running sync process. (+14 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.08
-Nodes (24): 2907, owner, status, 2923, owner, status, 2936, owner (+16 more)
+Cohesion: 0.67
+Nodes (3): 2907, owner, status
 
 ### Community 12 - "Community 12"
 Cohesion: 0.24
@@ -358,28 +356,28 @@ Cohesion: 0.20
 Nodes (8): Creates the necessary output directories., Runs the simulation using the provided configuration.         If template_path i, Resumes the simulation from a restart file., Detects hardware and applies optimal acceleration flags to the command., Detect supported packages from lmp -h., Detect if local machine has an NVIDIA GPU via nvidia-smi., Generates a LAMMPS input script by replacing variables in a template          wi, SimulationConfig
 
 ### Community 18 - "Community 18"
-Cohesion: 0.20
-Nodes (8): aggregate_lifecycle_metadata(), find_simulation_lineage(), Any, Finds the full lineage (ancestors and descendants) for a simulation., Merges metadata from all runs in the lineage, oldest to newest., Manages persistent metadata for a simulation folder., Loads and merges metadata, supporting migration from legacy filenames., SimulationMetadata
+Cohesion: 0.19
+Nodes (8): PipelineEngine, Loads status and detects dead PBS jobs for a run., Loads global status and detects dead PBS jobs., Traverses the DAG to find all stages depending directly or transitively on start, Submits a pipeline stage as a PBS job, supporting dependencies., Submits the global pipeline stage as a PBS job., Triggers execution from the start_stage, automatically queueing dependencies top, DataFrame
 
 ### Community 19 - "Community 19"
 Cohesion: 0.22
 Nodes (3): Misc, PlaybackController, Manages playback state, timer, and transport controls.
 
 ### Community 20 - "Community 20"
-Cohesion: 0.15
-Nodes (15): detect_lammps_input_script(), get_parser_pool(), load_lammps_geometry(), parse_dump_file(), parse_lammps_geometry_script(), parse_simple_data_file(), _parse_single_dump_fast(), Auto-detect a likely LAMMPS input script in a simulation folder. (+7 more)
+Cohesion: 0.05
+Nodes (37): aggregate_lifecycle_metadata(), calculate_bonds_angles_vectorized(), detect_lammps_input_script(), find_simulation_lineage(), get_parser_pool(), load_lammps_geometry(), parse_dump_file(), parse_lammps_geometry_script() (+29 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.22
-Nodes (6): calculate_bonds_angles_vectorized(), DataFrame, Builds a unified timestep list by merging all directories (latest wins on overla, Returns a list of batch indices that have valid caches on disk., SimulationData, run_bench()
+Cohesion: 0.26
+Nodes (11): generate_snapshot(), get_latest_dump(), parse_dump_last_frame(), Finds the most recent dump file in the 'chain' directory., Efficiently parses only the LAST frame of a LAMMPS dump file., Generates a PNG snapshot of the simulation state., load_auto_pilot(), load_notes() (+3 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.16
 Nodes (6): ProgressBar, Recursively set the state of all child widgets., A reusable progress bar window that can be modal (blocking interaction with pare, Update progress bar value (0 to maximum)., Update the message text., Close the progress bar and release grab.
 
 ### Community 23 - "Community 23"
-Cohesion: 0.14
-Nodes (8): Generates a single frame preview image using UnifiedRenderer., Generates a high-resolution PNG snapshot using the movie rendering pipeline., The actual rendering logic executed on the compute node., Finds all nodes that are descendants of the start_path., Resolves the full path of runs between two nodes in the lineage., Scans the chain and returns a list of all available frames., Submits the movie generation process as a PBS job., VizManager
+Cohesion: 0.31
+Nodes (9): merge_folders(), Merges source_dir (child) into target_dir (parent)., load_auto_pilot(), load_notes(), Wraps simulation names by breaking on underscores to keep nodes compact., render_lineage(), save_auto_pilot(), save_note() (+1 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.14
@@ -501,6 +499,10 @@ Nodes (13): /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S794209
 Cohesion: 0.22
 Nodes (9): in_place, increment, last_submitted, mode, params, polite_mode, status, target_steps (+1 more)
 
+### Community 54 - "Community 54"
+Cohesion: 0.36
+Nodes (5): generate_lammps_input(), GeometryExtractor, main(), Path, regenerate_vtk()
+
 ### Community 56 - "Community 56"
 Cohesion: 0.27
 Nodes (3): ETAEstimator, Estimate remaining time for a looped job using exponential smoothing.      Usage, Call after completing `completed` items (1-based count).          Estimates the
@@ -526,8 +528,8 @@ Cohesion: 0.12
 Nodes (10): SimulationRunner, HopperManager, Create a filled hopper state from relaxed chain files and save data+restart., Converts all .data files in source_dir to .mol files in mol_dir.         Generat, Resume a hopper fill simulation from a restart file and add more chains., Run an oscillating hopper flow starting from a saved data or restart file., Generates a 3D grid of insertion coordinates in a tall column via Python., Resolves includes and evaluates variables in setup_inc_path         to find and (+2 more)
 
 ### Community 62 - "Community 62"
-Cohesion: 0.14
-Nodes (8): Loads the simulation lineage data., Returns a list of seeds currently running in PBS jobs., Saves simulation lineage data., The main sync logic: Zip, Move, Update Lineage, and Cleanup., Gets a list of jobs, optionally filtered by user., Downloads a run back from Drive and extracts it., Clears local folders for runs that are confirmed synced on Drive.         This i, Checks if a sync process is currently running (locally or on PBS).
+Cohesion: 0.11
+Nodes (15): get_max_step(), get_params_from_in_file(), get_seed_from_name(), Finds the maximum timestep reached in the run efficiently using shell streams., Parses dt, freq, and amp from the LAMMPS input file., Extracts seed from name like Grid_Fill_..._S123456., Scans the dumping yard and updates the lineage JSON with ancestral inheritance., scan_dumping_yard() (+7 more)
 
 ### Community 63 - "Community 63"
 Cohesion: 0.20
@@ -594,20 +596,20 @@ Cohesion: 0.31
 Nodes (9): generate_command(), get_active_job_ids(), get_job_list(), main(), Fetch current active job IDs for the user., Takes a list of job configurations, generates PBS scripts, and optionally submit, Define your parametric study here.      Selects the job generation logic based o, safe_print() (+1 more)
 
 ### Community 79 - "Community 79"
-Cohesion: 0.36
-Nodes (5): generate_lammps_input(), GeometryExtractor, main(), Path, regenerate_vtk()
-
-### Community 80 - "Community 80"
 Cohesion: 0.13
 Nodes (6): DataFrame, Plotter, Validates spacing between consecutive atoms in the chain.     Returns (is_valid,, validate_chain_spacing(), HighlightController, Manages highlight state and rendering of highlighted atoms.
 
+### Community 80 - "Community 80"
+Cohesion: 0.67
+Nodes (3): 2945, owner, status
+
 ### Community 81 - "Community 81"
-Cohesion: 0.31
-Nodes (9): merge_folders(), Merges source_dir (child) into target_dir (parent)., load_auto_pilot(), load_notes(), Wraps simulation names by breaking on underscores to keep nodes compact., render_lineage(), save_auto_pilot(), save_note() (+1 more)
+Cohesion: 0.20
+Nodes (6): AutoPilotManager, Starts the sync process in a background thread., Submits the sync process as a PBS job., Checks if a sync process is currently running (locally or on PBS)., Checks if the auto_pilot_manager.py script is currently executing., Triggers a manual run of the auto-pilot manager in the background.
 
 ### Community 82 - "Community 82"
-Cohesion: 0.31
-Nodes (8): get_max_step(), get_params_from_in_file(), get_seed_from_name(), Finds the maximum timestep reached in the run efficiently using shell streams., Parses dt, freq, and amp from the LAMMPS input file., Extracts seed from name like Grid_Fill_..._S123456., Scans the dumping yard and updates the lineage JSON with ancestral inheritance., scan_dumping_yard()
+Cohesion: 0.53
+Nodes (4): run_pool_time_durations(), load_status(), main(), save_status()
 
 ### Community 83 - "Community 83"
 Cohesion: 0.22
@@ -618,8 +620,8 @@ Cohesion: 0.14
 Nodes (10): main(), test_unique_mol_dirs(), Any, Generate a library of relaxed chain states for future hopper insertions., Runs a massive batch relaxation using a single grid-based simulation.         Th, Main entry point for grid-based batch hopper filling.         Packs multiple hop, Resumes a grid hopper filling simulation from a restart file., Transitions a filling simulation to a flow simulation with oscillation. (+2 more)
 
 ### Community 85 - "Community 85"
-Cohesion: 0.25
-Nodes (5): Creates a standardized PyVista plotter., Parses a LAMMPS dump file and returns a pandas DataFrame., Populates a PyVista plotter with geometry, particles, and scene decorators., A unified rendering controller for PyVista simulations.     Supports both intera, UnifiedRenderer
+Cohesion: 0.67
+Nodes (3): 2923, owner, status
 
 ### Community 86 - "Community 86"
 Cohesion: 0.25
@@ -670,8 +672,8 @@ Cohesion: 0.29
 Nodes (6): settings, cron_interval_minutes, enabled, last_heartbeat, max_concurrent, polite_mode
 
 ### Community 98 - "Community 98"
-Cohesion: 0.29
-Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277
+Cohesion: 0.25
+Nodes (8): in_place, increment, last_submitted, mode, status, target_steps, goals, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S313325_S869277
 
 ### Community 99 - "Community 99"
 Cohesion: 0.25
@@ -690,8 +692,8 @@ Cohesion: 0.29
 Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S930116_S329384
 
 ### Community 103 - "Community 103"
-Cohesion: 0.25
-Nodes (8): in_place, increment, last_submitted, mode, status, target_steps, goals, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119
+Cohesion: 0.29
+Nodes (7): in_place, increment, last_submitted, mode, status, target_steps, /Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119
 
 ### Community 104 - "Community 104"
 Cohesion: 0.29
@@ -746,8 +748,8 @@ Cohesion: 0.40
 Nodes (5): 3030, cpupercent, cput, mem, ncpus
 
 ### Community 117 - "Community 117"
-Cohesion: 0.25
-Nodes (5): AutoPilotManager, Starts the sync process in a background thread., Submits the sync process as a PBS job., Checks if the auto_pilot_manager.py script is currently executing., Triggers a manual run of the auto-pilot manager in the background.
+Cohesion: 0.67
+Nodes (3): 2936, owner, status
 
 ### Community 118 - "Community 118"
 Cohesion: 0.83
@@ -760,10 +762,6 @@ Nodes (3): get_max_step(), Finds the maximum timestep reached in the run by scan
 ### Community 121 - "Community 121"
 Cohesion: 0.67
 Nodes (3): 2900, owner, status
-
-### Community 122 - "Community 122"
-Cohesion: 0.67
-Nodes (3): 2901, owner, status
 
 ### Community 123 - "Community 123"
 Cohesion: 0.67
@@ -862,8 +860,8 @@ Cohesion: 0.67
 Nodes (3): 2928, owner, status
 
 ### Community 148 - "Community 148"
-Cohesion: 0.67
-Nodes (3): 2903, owner, status
+Cohesion: 0.11
+Nodes (18): 2901, owner, status, 2903, owner, status, 2929, owner (+10 more)
 
 ### Community 149 - "Community 149"
 Cohesion: 0.67
@@ -871,7 +869,7 @@ Nodes (3): 2930, owner, status
 
 ### Community 150 - "Community 150"
 Cohesion: 0.67
-Nodes (3): 2931, owner, status
+Nodes (3): 2964, owner, status
 
 ### Community 151 - "Community 151"
 Cohesion: 0.67
@@ -967,7 +965,7 @@ Nodes (3): 2957, owner, status
 
 ### Community 175 - "Community 175"
 Cohesion: 0.67
-Nodes (3): 2968, owner, status
+Nodes (3): 2979, owner, status
 
 ### Community 176 - "Community 176"
 Cohesion: 0.67
@@ -991,7 +989,7 @@ Nodes (3): 2963, owner, status
 
 ### Community 181 - "Community 181"
 Cohesion: 0.67
-Nodes (3): 2929, owner, status
+Nodes (3): 2931, owner, status
 
 ### Community 182 - "Community 182"
 Cohesion: 0.67
@@ -1007,7 +1005,7 @@ Nodes (3): 2967, owner, status
 
 ### Community 185 - "Community 185"
 Cohesion: 0.67
-Nodes (3): 2974, owner, status
+Nodes (3): 2983, owner, status
 
 ### Community 186 - "Community 186"
 Cohesion: 0.67
@@ -1031,7 +1029,7 @@ Nodes (3): 2973, owner, status
 
 ### Community 191 - "Community 191"
 Cohesion: 0.67
-Nodes (3): 2945, owner, status
+Nodes (3): 2968, owner, status
 
 ### Community 192 - "Community 192"
 Cohesion: 0.67
@@ -1143,7 +1141,7 @@ Nodes (3): 3003, job_name, owner
 
 ### Community 219 - "Community 219"
 Cohesion: 0.67
-Nodes (3): 3004, job_name, owner
+Nodes (3): 3019, job_name, owner
 
 ### Community 220 - "Community 220"
 Cohesion: 0.67
@@ -1155,7 +1153,7 @@ Nodes (3): 3006, job_name, owner
 
 ### Community 222 - "Community 222"
 Cohesion: 0.67
-Nodes (3): 2958, owner, status
+Nodes (3): 2974, owner, status
 
 ### Community 223 - "Community 223"
 Cohesion: 0.67
@@ -1163,11 +1161,11 @@ Nodes (3): 3009, job_name, owner
 
 ### Community 224 - "Community 224"
 Cohesion: 0.67
-Nodes (3): 3007, job_name, owner
+Nodes (3): 3004, job_name, owner
 
 ### Community 225 - "Community 225"
 Cohesion: 0.67
-Nodes (3): 3020, job_name, owner
+Nodes (3): 3007, job_name, owner
 
 ### Community 227 - "Community 227"
 Cohesion: 0.67
@@ -1176,10 +1174,6 @@ Nodes (3): 3021, job_name, owner
 ### Community 228 - "Community 228"
 Cohesion: 0.67
 Nodes (3): 3022, job_name, owner
-
-### Community 269 - "Community 269"
-Cohesion: 0.26
-Nodes (11): generate_snapshot(), get_latest_dump(), parse_dump_last_frame(), Finds the most recent dump file in the 'chain' directory., Efficiently parses only the LAST frame of a LAMMPS dump file., Generates a PNG snapshot of the simulation state., load_auto_pilot(), load_notes() (+3 more)
 
 ### Community 270 - "Community 270"
 Cohesion: 0.70
@@ -1204,22 +1198,22 @@ Nodes (3): 3013, job_name, owner
 ## Knowledge Gaps
 - **861 isolated node(s):** `viz_run_dir`, `cSpell.words`, `python.analysis.exclude`, `**/.conda`, `**/.history` (+856 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `SimDataController` connect `Community 3` to `Community 5`, `Community 10`, `Community 80`, `Community 20`, `Community 21`, `Community 55`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `SimDataController` connect `Community 3` to `Community 5`, `Community 10`, `Community 79`, `Community 20`, `Community 55`?**
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `PBSManager` connect `Community 7` to `Community 2`, `Community 3`, `Community 5`, `Community 10`, `Community 16`, `Community 18`, `Community 83`, `Community 20`, `Community 21`, `Community 23`, `Community 61`, `Community 62`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Why does `SimulationOrchestrator` connect `Community 84` to `Community 2`, `Community 4`, `Community 8`, `Community 9`, `Community 12`, `Community 16`, `Community 55`, `Community 56`, `Community 25`, `Community 59`, `Community 61`?**
-  _High betweenness centrality (0.019) - this node is a cross-community bridge._
-- **Why does `SimulationRunner` connect `Community 16` to `Community 2`, `Community 5`, `Community 9`, `Community 10`, `Community 17`, `Community 20`, `Community 84`, `Community 59`, `Community 61`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Are the 20 inferred relationships involving `SimulationRunner` (e.g. with `GridHopperManager` and `Any`) actually correct?**
-  _`SimulationRunner` has 20 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Are the 21 inferred relationships involving `SimulationRunner` (e.g. with `VizManager` and `GridHopperManager`) actually correct?**
+  _`SimulationRunner` has 21 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 9 inferred relationships involving `PBSManager` (e.g. with `PipelineEngine` and `DataFrame`) actually correct?**
+  _`PBSManager` has 9 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 10 inferred relationships involving `GridHopperManager` (e.g. with `VizManager` and `MockRunner`) actually correct?**
+  _`GridHopperManager` has 10 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `ViewerApp` (e.g. with `SimulationLauncherController` and `SimulationOrchestrator`) actually correct?**
   _`ViewerApp` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 9 inferred relationships involving `GridHopperManager` (e.g. with `MockRunner` and `GeometryExtractor`) actually correct?**
-  _`GridHopperManager` has 9 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `PBSManager` (e.g. with `VizManager` and `GridHopperManager`) actually correct?**
-  _`PBSManager` has 7 INFERRED edges - model-reasoned connections that need verification._

@@ -308,7 +308,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "pulse_auto_pilot_goals",
-      "community": 103,
+      "community": 98,
       "norm_label": "goals"
     },
     {
@@ -2865,7 +2865,7 @@
       "label": "render_system_status()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L228",
+      "source_location": "L232",
       "_origin": "ast",
       "id": "pulse_dashboard_render_system_status",
       "community": 5,
@@ -6206,7 +6206,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_lineage_tracker",
-      "community": 82,
+      "community": 62,
       "norm_label": "lineage_tracker.py"
     },
     {
@@ -6216,7 +6216,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_get_max_step",
-      "community": 82,
+      "community": 62,
       "norm_label": "get_max_step()"
     },
     {
@@ -6226,7 +6226,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_get_params_from_in_file",
-      "community": 82,
+      "community": 62,
       "norm_label": "get_params_from_in_file()"
     },
     {
@@ -6236,7 +6236,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_get_seed_from_name",
-      "community": 82,
+      "community": 62,
       "norm_label": "get_seed_from_name()"
     },
     {
@@ -6246,7 +6246,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_scan_dumping_yard",
-      "community": 82,
+      "community": 62,
       "norm_label": "scan_dumping_yard()"
     },
     {
@@ -6256,7 +6256,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_rationale_12",
-      "community": 82,
+      "community": 62,
       "norm_label": "finds the maximum timestep reached in the run efficiently using shell streams."
     },
     {
@@ -6266,7 +6266,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_rationale_29",
-      "community": 82,
+      "community": 62,
       "norm_label": "parses dt, freq, and amp from the lammps input file."
     },
     {
@@ -6276,7 +6276,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_rationale_49",
-      "community": 82,
+      "community": 62,
       "norm_label": "extracts seed from name like grid_fill_..._s123456."
     },
     {
@@ -6286,7 +6286,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "pulse_lineage_tracker_rationale_59",
-      "community": 82,
+      "community": 62,
       "norm_label": "scans the dumping yard and updates the lineage json with ancestral inheritance."
     },
     {
@@ -6296,7 +6296,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_merge_runs",
-      "community": 81,
+      "community": 23,
       "norm_label": "merge_runs.py"
     },
     {
@@ -6306,7 +6306,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "pulse_merge_runs_merge_folders",
-      "community": 81,
+      "community": 23,
       "norm_label": "merge_folders()"
     },
     {
@@ -6316,7 +6316,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "pulse_merge_runs_rationale_9",
-      "community": 81,
+      "community": 23,
       "norm_label": "merges source_dir (child) into target_dir (parent)."
     },
     {
@@ -6348,6 +6348,386 @@
       "id": "pulse_migrate_paths_refactor_metadata_files",
       "community": 120,
       "norm_label": "refactor_metadata_files()"
+    },
+    {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_init",
+      "community": 226,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "load_atoms.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_load_atoms",
+      "community": 20,
+      "norm_label": "load_atoms.py"
+    },
+    {
+      "label": "run_load_atoms()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "pipeline_load_atoms_run_load_atoms",
+      "community": 20,
+      "norm_label": "run_load_atoms()"
+    },
+    {
+      "label": "mass_flow_rate.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/mass_flow_rate.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_mass_flow_rate",
+      "community": 20,
+      "norm_label": "mass_flow_rate.py"
+    },
+    {
+      "label": "run_mass_flow_rate()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/mass_flow_rate.py",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "pipeline_mass_flow_rate_run_mass_flow_rate",
+      "community": 20,
+      "norm_label": "run_mass_flow_rate()"
+    },
+    {
+      "label": "pipeline_engine.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine",
+      "community": 7,
+      "norm_label": "pipeline_engine.py"
+    },
+    {
+      "label": "PipelineEngine",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine",
+      "community": 18,
+      "norm_label": "pipelineengine"
+    },
+    {
+      "label": ".get_status_path()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_status_path",
+      "community": 18,
+      "norm_label": ".get_status_path()"
+    },
+    {
+      "label": ".load_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_load_status",
+      "community": 18,
+      "norm_label": ".load_status()"
+    },
+    {
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "pulse_pipeline_pipeline_engine_py_dataframe",
+      "community": 18,
+      "norm_label": "dataframe"
+    },
+    {
+      "label": ".save_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_save_status",
+      "community": 18,
+      "norm_label": ".save_status()"
+    },
+    {
+      "label": ".get_global_status_path()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
+      "community": 18,
+      "norm_label": ".get_global_status_path()"
+    },
+    {
+      "label": ".load_global_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_load_global_status",
+      "community": 18,
+      "norm_label": ".load_global_status()"
+    },
+    {
+      "label": ".save_global_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_save_global_status",
+      "community": 18,
+      "norm_label": ".save_global_status()"
+    },
+    {
+      "label": ".get_run_pipeline_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
+      "community": 18,
+      "norm_label": ".get_run_pipeline_status()"
+    },
+    {
+      "label": ".get_global_pipeline_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L134",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
+      "community": 18,
+      "norm_label": ".get_global_pipeline_status()"
+    },
+    {
+      "label": ".get_downstream_stages()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L165",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages",
+      "community": 18,
+      "norm_label": ".get_downstream_stages()"
+    },
+    {
+      "label": ".submit_stage_job()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L178",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
+      "community": 18,
+      "norm_label": ".submit_stage_job()"
+    },
+    {
+      "label": ".submit_global_stage_job()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L239",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
+      "community": 18,
+      "norm_label": ".submit_global_stage_job()"
+    },
+    {
+      "label": ".trigger_pipeline()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L296",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
+      "community": 18,
+      "norm_label": ".trigger_pipeline()"
+    },
+    {
+      "label": "Loads status and detects dead PBS jobs for a run.",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L104",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_104",
+      "community": 18,
+      "norm_label": "loads status and detects dead pbs jobs for a run."
+    },
+    {
+      "label": "Loads global status and detects dead PBS jobs.",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L135",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_135",
+      "community": 18,
+      "norm_label": "loads global status and detects dead pbs jobs."
+    },
+    {
+      "label": "Traverses the DAG to find all stages depending directly or transitively on start",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L166",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_166",
+      "community": 18,
+      "norm_label": "traverses the dag to find all stages depending directly or transitively on start"
+    },
+    {
+      "label": "Submits a pipeline stage as a PBS job, supporting dependencies.",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L179",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_179",
+      "community": 18,
+      "norm_label": "submits a pipeline stage as a pbs job, supporting dependencies."
+    },
+    {
+      "label": "Submits the global pipeline stage as a PBS job.",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L240",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_240",
+      "community": 18,
+      "norm_label": "submits the global pipeline stage as a pbs job."
+    },
+    {
+      "label": "Triggers execution from the start_stage, automatically queueing dependencies top",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L297",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_297",
+      "community": 18,
+      "norm_label": "triggers execution from the start_stage, automatically queueing dependencies top"
+    },
+    {
+      "label": "pool_time_durations.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pool_time_durations.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_pool_time_durations",
+      "community": 82,
+      "norm_label": "pool_time_durations.py"
+    },
+    {
+      "label": "run_pool_time_durations()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pool_time_durations.py",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "pipeline_pool_time_durations_run_pool_time_durations",
+      "community": 82,
+      "norm_label": "run_pool_time_durations()"
+    },
+    {
+      "label": "run_global_stage.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_run_global_stage",
+      "community": 82,
+      "norm_label": "run_global_stage.py"
+    },
+    {
+      "label": "load_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "pipeline_run_global_stage_load_status",
+      "community": 82,
+      "norm_label": "load_status()"
+    },
+    {
+      "label": "save_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "pipeline_run_global_stage_save_status",
+      "community": 82,
+      "norm_label": "save_status()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "pipeline_run_global_stage_main",
+      "community": 82,
+      "norm_label": "main()"
+    },
+    {
+      "label": "run_stage.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_run_stage",
+      "community": 20,
+      "norm_label": "run_stage.py"
+    },
+    {
+      "label": "load_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "pipeline_run_stage_load_status",
+      "community": 20,
+      "norm_label": "load_status()"
+    },
+    {
+      "label": "save_status()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "pipeline_run_stage_save_status",
+      "community": 20,
+      "norm_label": "save_status()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "pipeline_run_stage_main",
+      "community": 20,
+      "norm_label": "main()"
+    },
+    {
+      "label": "time_duration.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/time_duration.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_time_duration",
+      "community": 20,
+      "norm_label": "time_duration.py"
+    },
+    {
+      "label": "run_time_duration()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/time_duration.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "pipeline_time_duration_run_time_duration",
+      "community": 20,
+      "norm_label": "run_time_duration()"
     },
     {
       "label": "pulse.py",
@@ -6446,7 +6826,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_pulse_core",
-      "community": 10,
+      "community": 7,
       "norm_label": "pulse_core.py"
     },
     {
@@ -6656,7 +7036,7 @@
       "source_location": "L510",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync",
-      "community": 117,
+      "community": 81,
       "norm_label": ".start_sync()"
     },
     {
@@ -6666,7 +7046,7 @@
       "source_location": "L533",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync_pbs",
-      "community": 117,
+      "community": 81,
       "norm_label": ".start_sync_pbs()"
     },
     {
@@ -6706,7 +7086,7 @@
       "source_location": "L881",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_is_running",
-      "community": 62,
+      "community": 81,
       "norm_label": ".is_running()"
     },
     {
@@ -6746,7 +7126,7 @@
       "source_location": "L973",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager",
-      "community": 117,
+      "community": 81,
       "norm_label": "autopilotmanager"
     },
     {
@@ -6756,7 +7136,7 @@
       "source_location": "L977",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_is_running",
-      "community": 117,
+      "community": 81,
       "norm_label": ".is_running()"
     },
     {
@@ -6766,7 +7146,7 @@
       "source_location": "L989",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_trigger_manual",
-      "community": 117,
+      "community": 81,
       "norm_label": ".trigger_manual()"
     },
     {
@@ -6936,7 +7316,7 @@
       "source_location": "L511",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_511",
-      "community": 117,
+      "community": 81,
       "norm_label": "starts the sync process in a background thread."
     },
     {
@@ -6946,7 +7326,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_534",
-      "community": 117,
+      "community": 81,
       "norm_label": "submits the sync process as a pbs job."
     },
     {
@@ -6986,7 +7366,7 @@
       "source_location": "L882",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_882",
-      "community": 62,
+      "community": 81,
       "norm_label": "checks if a sync process is currently running (locally or on pbs)."
     },
     {
@@ -7026,7 +7406,7 @@
       "source_location": "L978",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_978",
-      "community": 117,
+      "community": 81,
       "norm_label": "checks if the auto_pilot_manager.py script is currently executing."
     },
     {
@@ -7036,7 +7416,7 @@
       "source_location": "L990",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_990",
-      "community": 117,
+      "community": 81,
       "norm_label": "triggers a manual run of the auto-pilot manager in the background."
     },
     {
@@ -7046,7 +7426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_pulse_metadata",
-      "community": 11,
+      "community": 148,
       "norm_label": "pulse_metadata.json"
     },
     {
@@ -7886,7 +8266,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901",
-      "community": 122,
+      "community": 148,
       "norm_label": "2901"
     },
     {
@@ -7896,7 +8276,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901_owner",
-      "community": 122,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -7906,7 +8286,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901_status",
-      "community": 122,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -8546,7 +8926,7 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923",
-      "community": 11,
+      "community": 85,
       "norm_label": "2923"
     },
     {
@@ -8556,7 +8936,7 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_owner",
-      "community": 11,
+      "community": 85,
       "norm_label": "owner"
     },
     {
@@ -8566,7 +8946,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_status",
-      "community": 11,
+      "community": 85,
       "norm_label": "status"
     },
     {
@@ -8726,7 +9106,7 @@
       "source_location": "L206",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929",
-      "community": 181,
+      "community": 148,
       "norm_label": "2929"
     },
     {
@@ -8736,7 +9116,7 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_owner",
-      "community": 181,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -8746,7 +9126,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_status",
-      "community": 181,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -8786,7 +9166,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931",
-      "community": 150,
+      "community": 181,
       "norm_label": "2931"
     },
     {
@@ -8796,7 +9176,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931_owner",
-      "community": 150,
+      "community": 181,
       "norm_label": "owner"
     },
     {
@@ -8806,7 +9186,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931_status",
-      "community": 150,
+      "community": 181,
       "norm_label": "status"
     },
     {
@@ -8936,7 +9316,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936",
-      "community": 11,
+      "community": 117,
       "norm_label": "2936"
     },
     {
@@ -8946,7 +9326,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_owner",
-      "community": 11,
+      "community": 117,
       "norm_label": "owner"
     },
     {
@@ -8956,7 +9336,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_status",
-      "community": 11,
+      "community": 117,
       "norm_label": "status"
     },
     {
@@ -9056,7 +9436,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940",
-      "community": 11,
+      "community": 148,
       "norm_label": "2940"
     },
     {
@@ -9066,7 +9446,7 @@
       "source_location": "L251",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940_owner",
-      "community": 11,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -9076,7 +9456,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940_status",
-      "community": 11,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -9206,7 +9586,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945",
-      "community": 191,
+      "community": 80,
       "norm_label": "2945"
     },
     {
@@ -9216,7 +9596,7 @@
       "source_location": "L271",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945_owner",
-      "community": 191,
+      "community": 80,
       "norm_label": "owner"
     },
     {
@@ -9226,7 +9606,7 @@
       "source_location": "L272",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945_status",
-      "community": 191,
+      "community": 80,
       "norm_label": "status"
     },
     {
@@ -9596,7 +9976,7 @@
       "source_location": "L322",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958",
-      "community": 222,
+      "community": 148,
       "norm_label": "2958"
     },
     {
@@ -9606,7 +9986,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_owner",
-      "community": 222,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -9616,7 +9996,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_status",
-      "community": 222,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -9776,7 +10156,7 @@
       "source_location": "L346",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2964",
-      "community": 11,
+      "community": 150,
       "norm_label": "2964"
     },
     {
@@ -9786,7 +10166,7 @@
       "source_location": "L347",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2964_owner",
-      "community": 11,
+      "community": 150,
       "norm_label": "owner"
     },
     {
@@ -9796,7 +10176,7 @@
       "source_location": "L348",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2964_status",
-      "community": 11,
+      "community": 150,
       "norm_label": "status"
     },
     {
@@ -9896,7 +10276,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968",
-      "community": 175,
+      "community": 191,
       "norm_label": "2968"
     },
     {
@@ -9906,7 +10286,7 @@
       "source_location": "L363",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_owner",
-      "community": 175,
+      "community": 191,
       "norm_label": "owner"
     },
     {
@@ -9916,7 +10296,7 @@
       "source_location": "L364",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_status",
-      "community": 175,
+      "community": 191,
       "norm_label": "status"
     },
     {
@@ -10076,7 +10456,7 @@
       "source_location": "L386",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974",
-      "community": 185,
+      "community": 222,
       "norm_label": "2974"
     },
     {
@@ -10086,7 +10466,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_owner",
-      "community": 185,
+      "community": 222,
       "norm_label": "owner"
     },
     {
@@ -10096,7 +10476,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_status",
-      "community": 185,
+      "community": 222,
       "norm_label": "status"
     },
     {
@@ -10226,7 +10606,7 @@
       "source_location": "L406",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979",
-      "community": 11,
+      "community": 175,
       "norm_label": "2979"
     },
     {
@@ -10236,7 +10616,7 @@
       "source_location": "L407",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_owner",
-      "community": 11,
+      "community": 175,
       "norm_label": "owner"
     },
     {
@@ -10246,7 +10626,7 @@
       "source_location": "L408",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_status",
-      "community": 11,
+      "community": 175,
       "norm_label": "status"
     },
     {
@@ -10346,7 +10726,7 @@
       "source_location": "L422",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983",
-      "community": 11,
+      "community": 185,
       "norm_label": "2983"
     },
     {
@@ -10356,7 +10736,7 @@
       "source_location": "L423",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_owner",
-      "community": 11,
+      "community": 185,
       "norm_label": "owner"
     },
     {
@@ -10366,7 +10746,7 @@
       "source_location": "L424",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_status",
-      "community": 11,
+      "community": 185,
       "norm_label": "status"
     },
     {
@@ -10976,7 +11356,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004",
-      "community": 219,
+      "community": 224,
       "norm_label": "3004"
     },
     {
@@ -10986,7 +11366,7 @@
       "source_location": "L507",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004_owner",
-      "community": 219,
+      "community": 224,
       "norm_label": "owner"
     },
     {
@@ -10996,7 +11376,7 @@
       "source_location": "L508",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004_job_name",
-      "community": 219,
+      "community": 224,
       "norm_label": "job_name"
     },
     {
@@ -11066,7 +11446,7 @@
       "source_location": "L518",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007",
-      "community": 224,
+      "community": 225,
       "norm_label": "3007"
     },
     {
@@ -11076,7 +11456,7 @@
       "source_location": "L519",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_owner",
-      "community": 224,
+      "community": 225,
       "norm_label": "owner"
     },
     {
@@ -11086,7 +11466,7 @@
       "source_location": "L520",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_job_name",
-      "community": 224,
+      "community": 225,
       "norm_label": "job_name"
     },
     {
@@ -11186,7 +11566,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3019",
-      "community": 11,
+      "community": 219,
       "norm_label": "3019"
     },
     {
@@ -11196,7 +11576,7 @@
       "source_location": "L535",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3019_owner",
-      "community": 11,
+      "community": 219,
       "norm_label": "owner"
     },
     {
@@ -11206,7 +11586,7 @@
       "source_location": "L536",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3019_job_name",
-      "community": 11,
+      "community": 219,
       "norm_label": "job_name"
     },
     {
@@ -11216,7 +11596,7 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020",
-      "community": 225,
+      "community": 148,
       "norm_label": "3020"
     },
     {
@@ -11226,7 +11606,7 @@
       "source_location": "L539",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_owner",
-      "community": 225,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -11236,7 +11616,7 @@
       "source_location": "L540",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_job_name",
-      "community": 225,
+      "community": 148,
       "norm_label": "job_name"
     },
     {
@@ -12056,7 +12436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_run_sync_job",
-      "community": 10,
+      "community": 7,
       "norm_label": "run_sync_job.py"
     },
     {
@@ -12066,7 +12446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_snapshot_helper",
-      "community": 269,
+      "community": 21,
       "norm_label": "snapshot_helper.py"
     },
     {
@@ -12076,7 +12456,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_get_latest_dump",
-      "community": 269,
+      "community": 21,
       "norm_label": "get_latest_dump()"
     },
     {
@@ -12086,7 +12466,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_parse_dump_last_frame",
-      "community": 269,
+      "community": 21,
       "norm_label": "parse_dump_last_frame()"
     },
     {
@@ -12096,7 +12476,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_generate_snapshot",
-      "community": 269,
+      "community": 21,
       "norm_label": "generate_snapshot()"
     },
     {
@@ -12106,7 +12486,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_rationale_12",
-      "community": 269,
+      "community": 21,
       "norm_label": "finds the most recent dump file in the 'chain' directory."
     },
     {
@@ -12116,7 +12496,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_rationale_30",
-      "community": 269,
+      "community": 21,
       "norm_label": "efficiently parses only the last frame of a lammps dump file."
     },
     {
@@ -12126,7 +12506,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "pulse_snapshot_helper_rationale_63",
-      "community": 269,
+      "community": 21,
       "norm_label": "generates a png snapshot of the simulation state."
     },
     {
@@ -12186,7 +12566,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_autopilot",
-      "community": 269,
+      "community": 21,
       "norm_label": "autopilot.py"
     },
     {
@@ -12196,7 +12576,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "views_autopilot_load_auto_pilot",
-      "community": 269,
+      "community": 21,
       "norm_label": "load_auto_pilot()"
     },
     {
@@ -12206,7 +12586,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "views_autopilot_save_auto_pilot",
-      "community": 269,
+      "community": 21,
       "norm_label": "save_auto_pilot()"
     },
     {
@@ -12216,7 +12596,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "views_autopilot_load_notes",
-      "community": 269,
+      "community": 21,
       "norm_label": "load_notes()"
     },
     {
@@ -12226,7 +12606,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "views_autopilot_save_note",
-      "community": 269,
+      "community": 21,
       "norm_label": "save_note()"
     },
     {
@@ -12236,7 +12616,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "views_autopilot_render_autopilot",
-      "community": 269,
+      "community": 21,
       "norm_label": "render_autopilot()"
     },
     {
@@ -12306,7 +12686,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_lineage",
-      "community": 81,
+      "community": 23,
       "norm_label": "lineage.py"
     },
     {
@@ -12316,7 +12696,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "views_lineage_load_notes",
-      "community": 81,
+      "community": 23,
       "norm_label": "load_notes()"
     },
     {
@@ -12326,7 +12706,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "views_lineage_save_note",
-      "community": 81,
+      "community": 23,
       "norm_label": "save_note()"
     },
     {
@@ -12336,7 +12716,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "views_lineage_load_auto_pilot",
-      "community": 81,
+      "community": 23,
       "norm_label": "load_auto_pilot()"
     },
     {
@@ -12346,7 +12726,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "views_lineage_save_auto_pilot",
-      "community": 81,
+      "community": 23,
       "norm_label": "save_auto_pilot()"
     },
     {
@@ -12356,7 +12736,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "views_lineage_wrap_sim_name",
-      "community": 81,
+      "community": 23,
       "norm_label": "wrap_sim_name()"
     },
     {
@@ -12366,7 +12746,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "views_lineage_render_lineage",
-      "community": 81,
+      "community": 23,
       "norm_label": "render_lineage()"
     },
     {
@@ -12376,8 +12756,28 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "views_lineage_rationale_44",
-      "community": 81,
+      "community": 23,
       "norm_label": "wraps simulation names by breaking on underscores to keep nodes compact."
+    },
+    {
+      "label": "results.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_results",
+      "community": 7,
+      "norm_label": "results.py"
+    },
+    {
+      "label": "render_results()",
+      "file_type": "code",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "views_results_render_results",
+      "community": 7,
+      "norm_label": "render_results()"
     },
     {
       "label": "sync.py",
@@ -12386,7 +12786,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_sync",
-      "community": 10,
+      "community": 5,
       "norm_label": "sync.py"
     },
     {
@@ -12566,7 +12966,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager",
-      "community": 23,
+      "community": 10,
       "norm_label": "vizmanager"
     },
     {
@@ -12576,7 +12976,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_get_descendants",
-      "community": 23,
+      "community": 10,
       "norm_label": ".get_descendants()"
     },
     {
@@ -12586,7 +12986,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_get_lineage_chain",
-      "community": 23,
+      "community": 10,
       "norm_label": ".get_lineage_chain()"
     },
     {
@@ -12596,47 +12996,67 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_get_chain_frames",
-      "community": 23,
+      "community": 10,
       "norm_label": ".get_chain_frames()"
+    },
+    {
+      "label": ".get_geometry_mesh_names_for_run()",
+      "file_type": "code",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "pulse_viz_manager_vizmanager_get_geometry_mesh_names_for_run",
+      "community": 10,
+      "norm_label": ".get_geometry_mesh_names_for_run()"
+    },
+    {
+      "label": ".generate_vtks_for_run()",
+      "file_type": "code",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L128",
+      "_origin": "ast",
+      "id": "pulse_viz_manager_vizmanager_generate_vtks_for_run",
+      "community": 10,
+      "norm_label": ".generate_vtks_for_run()"
     },
     {
       "label": ".submit_viz_job()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L85",
+      "source_location": "L207",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_submit_viz_job",
-      "community": 23,
+      "community": 10,
       "norm_label": ".submit_viz_job()"
     },
     {
       "label": ".generate_preview()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L133",
+      "source_location": "L255",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_generate_preview",
-      "community": 23,
+      "community": 10,
       "norm_label": ".generate_preview()"
     },
     {
       "label": ".generate_high_res_snapshot()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L188",
+      "source_location": "L310",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_generate_high_res_snapshot",
-      "community": 23,
+      "community": 10,
       "norm_label": ".generate_high_res_snapshot()"
     },
     {
       "label": ".run_rendering()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L250",
+      "source_location": "L390",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_run_rendering",
-      "community": 23,
+      "community": 10,
       "norm_label": ".run_rendering()"
     },
     {
@@ -12646,7 +13066,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "pulse_viz_manager_rationale_26",
-      "community": 23,
+      "community": 10,
       "norm_label": "finds all nodes that are descendants of the start_path."
     },
     {
@@ -12656,7 +13076,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "pulse_viz_manager_rationale_47",
-      "community": 23,
+      "community": 10,
       "norm_label": "resolves the full path of runs between two nodes in the lineage."
     },
     {
@@ -12666,47 +13086,67 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "pulse_viz_manager_rationale_63",
-      "community": 23,
+      "community": 10,
       "norm_label": "scans the chain and returns a list of all available frames."
     },
     {
-      "label": "Submits the movie generation process as a PBS job.",
+      "label": "Parses the .inc file for a simulation run to find all geometry visualization lay",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
       "source_location": "L86",
       "_origin": "ast",
       "id": "pulse_viz_manager_rationale_86",
-      "community": 23,
+      "community": 10,
+      "norm_label": "parses the .inc file for a simulation run to find all geometry visualization lay"
+    },
+    {
+      "label": "Runs the LAMMPS + OVITO geometry extractor to generate mesh VTKs on demand.",
+      "file_type": "rationale",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L129",
+      "_origin": "ast",
+      "id": "pulse_viz_manager_rationale_129",
+      "community": 10,
+      "norm_label": "runs the lammps + ovito geometry extractor to generate mesh vtks on demand."
+    },
+    {
+      "label": "Submits the movie generation process as a PBS job.",
+      "file_type": "rationale",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L208",
+      "_origin": "ast",
+      "id": "pulse_viz_manager_rationale_208",
+      "community": 10,
       "norm_label": "submits the movie generation process as a pbs job."
     },
     {
       "label": "Generates a single frame preview image using UnifiedRenderer.",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L134",
+      "source_location": "L256",
       "_origin": "ast",
-      "id": "pulse_viz_manager_rationale_134",
-      "community": 23,
+      "id": "pulse_viz_manager_rationale_256",
+      "community": 10,
       "norm_label": "generates a single frame preview image using unifiedrenderer."
     },
     {
       "label": "Generates a high-resolution PNG snapshot using the movie rendering pipeline.",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L189",
+      "source_location": "L311",
       "_origin": "ast",
-      "id": "pulse_viz_manager_rationale_189",
-      "community": 23,
+      "id": "pulse_viz_manager_rationale_311",
+      "community": 10,
       "norm_label": "generates a high-resolution png snapshot using the movie rendering pipeline."
     },
     {
       "label": "The actual rendering logic executed on the compute node.",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L251",
+      "source_location": "L391",
       "_origin": "ast",
-      "id": "pulse_viz_manager_rationale_251",
-      "community": 23,
+      "id": "pulse_viz_manager_rationale_391",
+      "community": 10,
       "norm_label": "the actual rendering logic executed on the compute node."
     },
     {
@@ -12866,7 +13306,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_init",
-      "community": 80,
+      "community": 79,
       "norm_label": "__init__.py"
     },
     {
@@ -12996,7 +13436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_highlighter",
-      "community": 80,
+      "community": 79,
       "norm_label": "highlighter.py"
     },
     {
@@ -13006,7 +13446,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller",
-      "community": 80,
+      "community": 79,
       "norm_label": "highlightcontroller"
     },
     {
@@ -13016,7 +13456,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_init",
-      "community": 80,
+      "community": 79,
       "norm_label": ".__init__()"
     },
     {
@@ -13026,7 +13466,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "analysis_controllers_highlighter_py_plotter",
-      "community": 80,
+      "community": 79,
       "norm_label": "plotter"
     },
     {
@@ -13036,7 +13476,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_clear",
-      "community": 80,
+      "community": 79,
       "norm_label": ".clear()"
     },
     {
@@ -13046,7 +13486,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_apply",
-      "community": 80,
+      "community": 79,
       "norm_label": ".apply()"
     },
     {
@@ -13056,7 +13496,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_render_highlights",
-      "community": 80,
+      "community": 79,
       "norm_label": ".render_highlights()"
     },
     {
@@ -13066,7 +13506,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "analysis_controllers_highlighter_py_dataframe",
-      "community": 80,
+      "community": 79,
       "norm_label": "dataframe"
     },
     {
@@ -13076,7 +13516,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "controllers_highlighter_rationale_8",
-      "community": 80,
+      "community": 79,
       "norm_label": "manages highlight state and rendering of highlighted atoms."
     },
     {
@@ -13276,7 +13716,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_movie_exporter",
-      "community": 80,
+      "community": 79,
       "norm_label": "movie_exporter.py"
     },
     {
@@ -13466,7 +13906,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_playback",
-      "community": 80,
+      "community": 79,
       "norm_label": "playback.py"
     },
     {
@@ -13616,7 +14056,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_renderer",
-      "community": 80,
+      "community": 79,
       "norm_label": "renderer.py"
     },
     {
@@ -14176,7 +14616,7 @@
       "source_location": "L122",
       "_origin": "ast",
       "id": "controllers_sim_data_simdatacontroller_load_folder",
-      "community": 3,
+      "community": 20,
       "norm_label": ".load_folder()"
     },
     {
@@ -14566,7 +15006,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_unified_renderer",
-      "community": 85,
+      "community": 10,
       "norm_label": "unified_renderer.py"
     },
     {
@@ -14576,7 +15016,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer",
-      "community": 85,
+      "community": 10,
       "norm_label": "unifiedrenderer"
     },
     {
@@ -14586,7 +15026,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_setup_plotter",
-      "community": 85,
+      "community": 10,
       "norm_label": ".setup_plotter()"
     },
     {
@@ -14596,7 +15036,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_parse_lammps_dump",
-      "community": 85,
+      "community": 10,
       "norm_label": ".parse_lammps_dump()"
     },
     {
@@ -14606,7 +15046,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_apply_scene",
-      "community": 85,
+      "community": 10,
       "norm_label": ".apply_scene()"
     },
     {
@@ -14616,7 +15056,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_9",
-      "community": 85,
+      "community": 10,
       "norm_label": "a unified rendering controller for pyvista simulations.     supports both intera"
     },
     {
@@ -14626,7 +15066,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_19",
-      "community": 85,
+      "community": 10,
       "norm_label": "creates a standardized pyvista plotter."
     },
     {
@@ -14636,7 +15076,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_26",
-      "community": 85,
+      "community": 10,
       "norm_label": "parses a lammps dump file and returns a pandas dataframe."
     },
     {
@@ -14646,7 +15086,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_55",
-      "community": 85,
+      "community": 10,
       "norm_label": "populates a pyvista plotter with geometry, particles, and scene decorators."
     },
     {
@@ -14816,7 +15256,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "analysis_data_manager_calculate_bonds_angles_vectorized",
-      "community": 21,
+      "community": 20,
       "norm_label": "calculate_bonds_angles_vectorized()"
     },
     {
@@ -14826,7 +15266,7 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "analysis_data_manager_find_simulation_lineage",
-      "community": 18,
+      "community": 20,
       "norm_label": "find_simulation_lineage()"
     },
     {
@@ -14836,7 +15276,7 @@
       "source_location": "L273",
       "_origin": "ast",
       "id": "analysis_data_manager_aggregate_lifecycle_metadata",
-      "community": 18,
+      "community": 20,
       "norm_label": "aggregate_lifecycle_metadata()"
     },
     {
@@ -14886,7 +15326,7 @@
       "source_location": "L330",
       "_origin": "ast",
       "id": "analysis_data_manager_py_dataframe",
-      "community": 21,
+      "community": 20,
       "norm_label": "dataframe"
     },
     {
@@ -14916,7 +15356,7 @@
       "source_location": "L497",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata",
-      "community": 18,
+      "community": 20,
       "norm_label": "simulationmetadata"
     },
     {
@@ -14926,7 +15366,7 @@
       "source_location": "L499",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_init",
-      "community": 18,
+      "community": 20,
       "norm_label": ".__init__()"
     },
     {
@@ -14936,7 +15376,7 @@
       "source_location": "L505",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_load",
-      "community": 18,
+      "community": 20,
       "norm_label": ".load()"
     },
     {
@@ -14946,7 +15386,7 @@
       "source_location": "L523",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_save",
-      "community": 18,
+      "community": 20,
       "norm_label": ".save()"
     },
     {
@@ -14956,7 +15396,7 @@
       "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_get",
-      "community": 18,
+      "community": 20,
       "norm_label": ".get()"
     },
     {
@@ -14966,7 +15406,7 @@
       "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_py_any",
-      "community": 18,
+      "community": 20,
       "norm_label": "any"
     },
     {
@@ -14976,7 +15416,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_set",
-      "community": 18,
+      "community": 20,
       "norm_label": ".set()"
     },
     {
@@ -14986,7 +15426,7 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_update",
-      "community": 18,
+      "community": 20,
       "norm_label": ".update()"
     },
     {
@@ -14996,7 +15436,7 @@
       "source_location": "L542",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_getitem",
-      "community": 18,
+      "community": 20,
       "norm_label": ".__getitem__()"
     },
     {
@@ -15006,7 +15446,7 @@
       "source_location": "L545",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_setitem",
-      "community": 18,
+      "community": 20,
       "norm_label": ".__setitem__()"
     },
     {
@@ -15016,7 +15456,7 @@
       "source_location": "L548",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata",
-      "community": 21,
+      "community": 20,
       "norm_label": "simulationdata"
     },
     {
@@ -15026,7 +15466,7 @@
       "source_location": "L549",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_init",
-      "community": 18,
+      "community": 20,
       "norm_label": ".__init__()"
     },
     {
@@ -15036,7 +15476,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_cache_file",
-      "community": 21,
+      "community": 20,
       "norm_label": "._get_cache_file()"
     },
     {
@@ -15046,7 +15486,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_metadata",
-      "community": 21,
+      "community": 20,
       "norm_label": ".load_metadata()"
     },
     {
@@ -15056,7 +15496,7 @@
       "source_location": "L626",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_available_cached_batches",
-      "community": 21,
+      "community": 20,
       "norm_label": ".get_available_cached_batches()"
     },
     {
@@ -15066,7 +15506,7 @@
       "source_location": "L639",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_count",
-      "community": 21,
+      "community": 20,
       "norm_label": ".get_batch_count()"
     },
     {
@@ -15076,7 +15516,7 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_index_for_timestep",
-      "community": 21,
+      "community": 20,
       "norm_label": ".get_batch_index_for_timestep()"
     },
     {
@@ -15086,7 +15526,7 @@
       "source_location": "L650",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_batch",
-      "community": 21,
+      "community": 20,
       "norm_label": ".load_batch()"
     },
     {
@@ -15096,7 +15536,7 @@
       "source_location": "L701",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_atoms_at_timestep",
-      "community": 21,
+      "community": 20,
       "norm_label": ".get_atoms_at_timestep()"
     },
     {
@@ -15106,7 +15546,7 @@
       "source_location": "L708",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_data",
-      "community": 21,
+      "community": 20,
       "norm_label": ".load_data()"
     },
     {
@@ -15116,7 +15556,7 @@
       "source_location": "L714",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_is_batch_cache_valid",
-      "community": 21,
+      "community": 20,
       "norm_label": "._is_batch_cache_valid()"
     },
     {
@@ -15126,7 +15566,7 @@
       "source_location": "L721",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_step",
-      "community": 21,
+      "community": 20,
       "norm_label": "._get_step()"
     },
     {
@@ -15136,7 +15576,7 @@
       "source_location": "L725",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_parse_dump_list",
-      "community": 21,
+      "community": 20,
       "norm_label": "._parse_dump_list()"
     },
     {
@@ -15146,7 +15586,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_153",
-      "community": 18,
+      "community": 20,
       "norm_label": "finds the full lineage (ancestors and descendants) for a simulation."
     },
     {
@@ -15156,7 +15596,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_274",
-      "community": 18,
+      "community": 20,
       "norm_label": "merges metadata from all runs in the lineage, oldest to newest."
     },
     {
@@ -15226,7 +15666,7 @@
       "source_location": "L498",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_498",
-      "community": 18,
+      "community": 20,
       "norm_label": "manages persistent metadata for a simulation folder."
     },
     {
@@ -15236,7 +15676,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_506",
-      "community": 18,
+      "community": 20,
       "norm_label": "loads and merges metadata, supporting migration from legacy filenames."
     },
     {
@@ -15246,7 +15686,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_592",
-      "community": 21,
+      "community": 20,
       "norm_label": "builds a unified timestep list by merging all directories (latest wins on overla"
     },
     {
@@ -15256,7 +15696,7 @@
       "source_location": "L627",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_627",
-      "community": 21,
+      "community": 20,
       "norm_label": "returns a list of batch indices that have valid caches on disk."
     },
     {
@@ -15266,7 +15706,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_geometry_extractor",
-      "community": 79,
+      "community": 54,
       "norm_label": "geometry_extractor.py"
     },
     {
@@ -15276,7 +15716,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_generate_lammps_input",
-      "community": 79,
+      "community": 54,
       "norm_label": "generate_lammps_input()"
     },
     {
@@ -15286,7 +15726,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_geometryextractor",
-      "community": 79,
+      "community": 54,
       "norm_label": "geometryextractor"
     },
     {
@@ -15296,7 +15736,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_geometryextractor_init",
-      "community": 79,
+      "community": 54,
       "norm_label": ".__init__()"
     },
     {
@@ -15306,7 +15746,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_geometryextractor_extract",
-      "community": 79,
+      "community": 54,
       "norm_label": ".extract()"
     },
     {
@@ -15316,7 +15756,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_py_path",
-      "community": 79,
+      "community": 54,
       "norm_label": "path"
     },
     {
@@ -15326,7 +15766,7 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "analysis_geometry_extractor_main",
-      "community": 79,
+      "community": 54,
       "norm_label": "main()"
     },
     {
@@ -15336,7 +15776,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_lammps_parser",
-      "community": 54,
+      "community": 20,
       "norm_label": "lammps_parser.py"
     },
     {
@@ -15346,7 +15786,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser",
-      "community": 54,
+      "community": 20,
       "norm_label": "lammpsparser"
     },
     {
@@ -15356,7 +15796,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_init",
-      "community": 54,
+      "community": 20,
       "norm_label": ".__init__()"
     },
     {
@@ -15366,7 +15806,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse",
-      "community": 54,
+      "community": 20,
       "norm_label": ".parse()"
     },
     {
@@ -15376,7 +15816,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_file",
-      "community": 54,
+      "community": 20,
       "norm_label": "._parse_file()"
     },
     {
@@ -15386,7 +15826,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_resolve_include_target",
-      "community": 54,
+      "community": 20,
       "norm_label": "._resolve_include_target()"
     },
     {
@@ -15396,7 +15836,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_variable",
-      "community": 54,
+      "community": 20,
       "norm_label": "._parse_variable()"
     },
     {
@@ -15406,7 +15846,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_timestep",
-      "community": 54,
+      "community": 20,
       "norm_label": "._parse_timestep()"
     },
     {
@@ -15416,7 +15856,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_create_box",
-      "community": 54,
+      "community": 20,
       "norm_label": "._parse_create_box()"
     },
     {
@@ -15426,7 +15866,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_get_geometry",
-      "community": 54,
+      "community": 20,
       "norm_label": ".get_geometry()"
     },
     {
@@ -15436,7 +15876,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "analysis_lammps_parser_rationale_59",
-      "community": 54,
+      "community": 20,
       "norm_label": "resolve `include` path tokens to a concrete file path.          supports:"
     },
     {
@@ -16526,7 +16966,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_utilities",
-      "community": 80,
+      "community": 79,
       "norm_label": "utilities.py"
     },
     {
@@ -16566,7 +17006,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "analysis_utilities_validate_chain_spacing",
-      "community": 80,
+      "community": 79,
       "norm_label": "validate_chain_spacing()"
     },
     {
@@ -16666,7 +17106,7 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "analysis_utilities_main",
-      "community": 80,
+      "community": 79,
       "norm_label": "main()"
     },
     {
@@ -16706,7 +17146,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_51",
-      "community": 80,
+      "community": 79,
       "norm_label": "validates spacing between consecutive atoms in the chain.     returns (is_valid,"
     },
     {
@@ -17076,7 +17516,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_regenerate_vtk",
-      "community": 79,
+      "community": 54,
       "norm_label": "regenerate_vtk.py"
     },
     {
@@ -17086,7 +17526,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "scratch_regenerate_vtk_regenerate_vtk",
-      "community": 79,
+      "community": 54,
       "norm_label": "regenerate_vtk()"
     },
     {
@@ -17136,7 +17576,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_run_actual_bench",
-      "community": 21,
+      "community": 20,
       "norm_label": "run_actual_bench.py"
     },
     {
@@ -17146,7 +17586,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "scratch_run_actual_bench_run_bench",
-      "community": 21,
+      "community": 20,
       "norm_label": "run_bench()"
     },
     {
@@ -19920,9 +20360,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L533",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals",
-      "target": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207"
     },
     {
       "relation": "contains",
@@ -20060,9 +20500,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L551",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals",
-      "target": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623"
     },
     {
       "relation": "contains",
@@ -20420,9 +20860,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L542",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_dt",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_dt"
     },
     {
       "relation": "contains",
@@ -20470,9 +20910,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L524",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_dt",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_dt"
     },
     {
       "relation": "contains",
@@ -20650,9 +21090,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L543",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_viscosity",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_viscosity"
     },
     {
       "relation": "contains",
@@ -20700,9 +21140,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L525",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_viscosity",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_viscosity"
     },
     {
       "relation": "contains",
@@ -20880,9 +21320,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L544",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_num_procs",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_num_procs"
     },
     {
       "relation": "contains",
@@ -20930,9 +21370,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L526",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_num_procs",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_num_procs"
     },
     {
       "relation": "contains",
@@ -21110,9 +21550,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L545",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_num_threads",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_num_threads"
     },
     {
       "relation": "contains",
@@ -21160,9 +21600,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L527",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_num_threads",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_num_threads"
     },
     {
       "relation": "contains",
@@ -21340,9 +21780,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L546",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_walltime",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_walltime"
     },
     {
       "relation": "contains",
@@ -21390,9 +21830,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L528",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_walltime",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_walltime"
     },
     {
       "relation": "contains",
@@ -21570,9 +22010,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L547",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_ppn",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_ppn"
     },
     {
       "relation": "contains",
@@ -21620,9 +22060,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L529",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_ppn",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_ppn"
     },
     {
       "relation": "contains",
@@ -21800,9 +22240,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L548",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "target": "pulse_auto_pilot_params_mem",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_mem"
     },
     {
       "relation": "contains",
@@ -21850,9 +22290,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L530",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "target": "pulse_auto_pilot_params_mem",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_params_mem"
     },
     {
       "relation": "contains",
@@ -24520,9 +24960,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L521",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_mode"
     },
     {
       "relation": "contains",
@@ -24530,9 +24970,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L523",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_params"
     },
     {
       "relation": "contains",
@@ -24540,9 +24980,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L522",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_polite_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s675494_polite_mode"
     },
     {
       "relation": "contains",
@@ -24570,9 +25010,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L536",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_in_place",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_in_place"
     },
     {
       "relation": "contains",
@@ -24580,9 +25020,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L535",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_increment",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_increment"
     },
     {
       "relation": "contains",
@@ -24590,9 +25030,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L537",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_last_submitted",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_last_submitted"
     },
     {
       "relation": "contains",
@@ -24600,9 +25040,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L539",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_mode"
     },
     {
       "relation": "contains",
@@ -24610,9 +25050,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L541",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_params"
     },
     {
       "relation": "contains",
@@ -24620,9 +25060,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L540",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_polite_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_polite_mode"
     },
     {
       "relation": "contains",
@@ -24630,9 +25070,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L538",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_status",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_status"
     },
     {
       "relation": "contains",
@@ -24640,9 +25080,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L534",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_target_steps",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s187207_target_steps"
     },
     {
       "relation": "contains",
@@ -24650,9 +25090,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L554",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_in_place",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_in_place"
     },
     {
       "relation": "contains",
@@ -24660,9 +25100,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L553",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_increment",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_increment"
     },
     {
       "relation": "contains",
@@ -24670,9 +25110,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L555",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_last_submitted",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_last_submitted"
     },
     {
       "relation": "contains",
@@ -24680,9 +25120,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L557",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_mode"
     },
     {
       "relation": "contains",
@@ -24690,9 +25130,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L559",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_params",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_params"
     },
     {
       "relation": "contains",
@@ -24700,9 +25140,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L558",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_polite_mode",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_polite_mode"
     },
     {
       "relation": "contains",
@@ -24710,9 +25150,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L556",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_status",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_status"
     },
     {
       "relation": "contains",
@@ -24720,9 +25160,9 @@
       "source_file": "Pulse/auto_pilot.json",
       "source_location": "L552",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_auto_pilot_goals_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623",
-      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_target_steps",
-      "confidence_score": 1.0
+      "target": "pulse_auto_pilot_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s952623_target_steps"
     },
     {
       "relation": "contains",
@@ -25304,6 +25744,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_results_render_results"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
       "source_location": "L220",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -25368,9 +25819,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L609",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209"
     },
     {
       "relation": "contains",
@@ -25378,9 +25829,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L636",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764"
     },
     {
       "relation": "contains",
@@ -25818,9 +26269,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L619",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_seed",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_seed"
     },
     {
       "relation": "contains",
@@ -25828,9 +26279,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L592",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_seed",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_seed"
     },
     {
       "relation": "contains",
@@ -26068,9 +26519,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L620",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_freq",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_freq"
     },
     {
       "relation": "contains",
@@ -26078,9 +26529,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L593",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_freq",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_freq"
     },
     {
       "relation": "contains",
@@ -26318,9 +26769,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L623",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_amp",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_amp"
     },
     {
       "relation": "contains",
@@ -26328,9 +26779,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L596",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_amp",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_amp"
     },
     {
       "relation": "contains",
@@ -26568,9 +27019,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L626",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_dt",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_dt"
     },
     {
       "relation": "contains",
@@ -26578,9 +27029,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L599",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_dt",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_dt"
     },
     {
       "relation": "contains",
@@ -26818,9 +27269,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L627",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_n_hoppers",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_n_hoppers"
     },
     {
       "relation": "contains",
@@ -26828,9 +27279,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L600",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_n_hoppers",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_n_hoppers"
     },
     {
       "relation": "contains",
@@ -27068,9 +27519,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L628",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_n_fill",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_n_fill"
     },
     {
       "relation": "contains",
@@ -27078,9 +27529,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L601",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_n_fill",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_n_fill"
     },
     {
       "relation": "contains",
@@ -27318,9 +27769,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L629",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "target": "pulse_lineage_params_geometry_vars",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_geometry_vars"
     },
     {
       "relation": "contains",
@@ -27328,9 +27779,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L602",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "target": "pulse_lineage_params_geometry_vars",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_params_geometry_vars"
     },
     {
       "relation": "contains",
@@ -30118,9 +30569,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L591",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_params"
     },
     {
       "relation": "contains",
@@ -30138,9 +30589,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L588",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_path",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_path"
     },
     {
       "relation": "contains",
@@ -30148,9 +30599,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L589",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_rel_path",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_rel_path"
     },
     {
       "relation": "contains",
@@ -30168,9 +30619,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L590",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_status",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_status"
     },
     {
       "relation": "contains",
@@ -30188,9 +30639,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L606",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_sync_status",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_sync_status"
     },
     {
       "relation": "contains",
@@ -30198,9 +30649,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L607",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_sync_time",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s850217_sync_time"
     },
     {
       "relation": "contains",
@@ -30208,9 +30659,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L613",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_n",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_n"
     },
     {
       "relation": "contains",
@@ -30218,9 +30669,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L610",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_name",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_name"
     },
     {
       "relation": "contains",
@@ -30228,9 +30679,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L618",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_params"
     },
     {
       "relation": "contains",
@@ -30238,9 +30689,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L611",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_parent",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_parent"
     },
     {
       "relation": "contains",
@@ -30248,9 +30699,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L615",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_path",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_path"
     },
     {
       "relation": "contains",
@@ -30258,9 +30709,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L616",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_rel_path",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_rel_path"
     },
     {
       "relation": "contains",
@@ -30268,9 +30719,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L612",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_simulation",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_simulation"
     },
     {
       "relation": "contains",
@@ -30278,9 +30729,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L617",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_status",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_status"
     },
     {
       "relation": "contains",
@@ -30288,9 +30739,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L614",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_steps",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_steps"
     },
     {
       "relation": "contains",
@@ -30298,9 +30749,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L633",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_sync_status",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_sync_status"
     },
     {
       "relation": "contains",
@@ -30308,9 +30759,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L634",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_sync_time",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s794209_sync_time"
     },
     {
       "relation": "contains",
@@ -30318,9 +30769,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L640",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_n",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_n"
     },
     {
       "relation": "contains",
@@ -30328,9 +30779,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L637",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_name",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_name"
     },
     {
       "relation": "contains",
@@ -30338,9 +30789,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L638",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_parent",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_parent"
     },
     {
       "relation": "contains",
@@ -30348,9 +30799,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L639",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_simulation",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_simulation"
     },
     {
       "relation": "contains",
@@ -30358,9 +30809,9 @@
       "source_file": "Pulse/lineage.json",
       "source_location": "L641",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764",
-      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_steps",
-      "confidence_score": 1.0
+      "target": "pulse_lineage_data_palash_data_dumping_yard_grid_hopper_flow_grid_flow_1h_s815764_steps"
     },
     {
       "relation": "contains",
@@ -30596,6 +31047,723 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_atoms",
+      "target": "analysis_data_manager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_atoms",
+      "target": "analysis_data_manager_simulationdata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_atoms",
+      "target": "pipeline_load_atoms_run_load_atoms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_atoms_run_load_atoms",
+      "target": "analysis_data_manager_simulationdata"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_load_atoms_run_load_atoms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_load_atoms_run_load_atoms"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/mass_flow_rate.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_mass_flow_rate",
+      "target": "pipeline_mass_flow_rate_run_mass_flow_rate"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_mass_flow_rate_run_mass_flow_rate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_mass_flow_rate_run_mass_flow_rate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine",
+      "target": "pipeline_pipeline_engine_pipelineengine"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_global_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_global_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_status"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L240",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_stage_job"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L297",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L5",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_results",
+      "target": "pipeline_pipeline_engine_pipelineengine"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_load_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_save_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_status"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_load_status",
+      "target": "pulse_pipeline_pipeline_engine_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_status"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_load_global_status",
+      "target": "pulse_pipeline_pipeline_engine_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_save_global_status",
+      "target": "pulse_pipeline_pipeline_engine_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_save_status",
+      "target": "pulse_pipeline_pipeline_engine_py_dataframe"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L5",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "pulse_pipeline_pipeline_engine_py_dataframe",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L224",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_load_global_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_save_global_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_global_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L277",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
+      "target": "pipeline_pipeline_engine_pipelineengine_load_global_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L161",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_global_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L281",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
+      "target": "pipeline_pipeline_engine_pipelineengine_save_global_status"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_104",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_135",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L299",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_166",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L327",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_stage_job"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_179",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L240",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_240",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L297",
+      "weight": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_297",
+      "target": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pool_time_durations.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pool_time_durations",
+      "target": "pipeline_pool_time_durations_run_pool_time_durations"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage",
+      "target": "pipeline_pool_time_durations_run_pool_time_durations"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage_main",
+      "target": "pipeline_pool_time_durations_run_pool_time_durations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage",
+      "target": "pipeline_run_global_stage_load_status"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage",
+      "target": "pipeline_run_global_stage_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage",
+      "target": "pipeline_run_global_stage_save_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage_main",
+      "target": "pipeline_run_global_stage_load_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_global_stage.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_global_stage_main",
+      "target": "pipeline_run_global_stage_save_status"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_run_stage_load_status"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_run_stage_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_run_stage_save_status"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_time_duration_run_time_duration"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_run_stage_load_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_run_stage_save_status"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_time_duration_run_time_duration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/time_duration.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_time_duration",
+      "target": "pipeline_time_duration_run_time_duration"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/time_duration.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_time_duration",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse.py",
       "source_location": "L8",
       "weight": 1.0,
@@ -30820,6 +31988,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_lineage",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_results",
       "target": "pulse_pulse_core"
     },
     {
@@ -31171,6 +32350,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_lineage_render_lineage",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_results",
       "target": "pulse_pulse_core_pbsmanager"
     },
     {
@@ -37439,6 +38629,16 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/results.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_results",
+      "target": "views_results_render_results"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "Pulse/views/sync.py",
       "source_location": "L5",
       "weight": 1.0,
@@ -37768,6 +38968,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager",
+      "target": "analysis_geometry_extractor_geometryextractor"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
       "source_location": "L15",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -37783,6 +38994,38 @@
       "confidence_score": 1.0,
       "source": "pulse_viz_manager",
       "target": "pulse_viz_manager_vizmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L132",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager",
+      "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L133",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager",
+      "target": "simulation_runner_simulationrunner"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L134",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "pulse_viz_manager_vizmanager",
+      "target": "analysis_geometry_extractor_geometryextractor"
     },
     {
       "relation": "uses",
@@ -37818,6 +39061,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
+      "source_location": "L128",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager",
+      "target": "pulse_viz_manager_vizmanager_generate_vtks_for_run"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
       "source_location": "L62",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -37833,6 +39086,16 @@
       "confidence_score": 1.0,
       "source": "pulse_viz_manager_vizmanager",
       "target": "pulse_viz_manager_vizmanager_get_descendants"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager",
+      "target": "pulse_viz_manager_vizmanager_get_geometry_mesh_names_for_run"
     },
     {
       "relation": "method",
@@ -37863,6 +39126,26 @@
       "confidence_score": 1.0,
       "source": "pulse_viz_manager_vizmanager",
       "target": "pulse_viz_manager_vizmanager_submit_viz_job"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L132",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "pulse_viz_manager_vizmanager",
+      "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L133",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "pulse_viz_manager_vizmanager",
+      "target": "simulation_runner_simulationrunner"
     },
     {
       "relation": "rationale_for",
@@ -37913,36 +39196,132 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pulse_viz_manager_rationale_86",
+      "target": "pulse_viz_manager_vizmanager_get_geometry_mesh_names_for_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L332",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager_generate_high_res_snapshot",
+      "target": "pulse_viz_manager_vizmanager_get_geometry_mesh_names_for_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L429",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager_run_rendering",
+      "target": "pulse_viz_manager_vizmanager_get_geometry_mesh_names_for_run"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L129",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_rationale_129",
+      "target": "pulse_viz_manager_vizmanager_generate_vtks_for_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L340",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager_generate_high_res_snapshot",
+      "target": "pulse_viz_manager_vizmanager_generate_vtks_for_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "pulse_viz_manager_vizmanager_generate_vtks_for_run",
+      "target": "analysis_geometry_extractor_geometryextractor"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "pulse_viz_manager_vizmanager_generate_vtks_for_run",
+      "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L438",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_vizmanager_run_rendering",
+      "target": "pulse_viz_manager_vizmanager_generate_vtks_for_run"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L208",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_rationale_208",
       "target": "pulse_viz_manager_vizmanager_submit_viz_job"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L134",
+      "source_location": "L86",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_viz_manager_rationale_134",
+      "source": "pulse_viz_manager_rationale_86",
+      "target": "pulse_viz_manager_vizmanager_submit_viz_job"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_manager.py",
+      "source_location": "L256",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_manager_rationale_256",
       "target": "pulse_viz_manager_vizmanager_generate_preview"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L189",
+      "source_location": "L311",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_viz_manager_rationale_189",
+      "source": "pulse_viz_manager_rationale_311",
       "target": "pulse_viz_manager_vizmanager_generate_high_res_snapshot"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L251",
+      "source_location": "L391",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_viz_manager_rationale_251",
+      "source": "pulse_viz_manager_rationale_391",
       "target": "pulse_viz_manager_vizmanager_run_rendering"
     },
     {
@@ -50472,5 +51851,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4ddd038eb644d8537172e31d872cd94ab6b0ebb0"
+  "built_at_commit": "4375fec7c5e2ac7fe99731ea7f5b482f30f55855"
 }

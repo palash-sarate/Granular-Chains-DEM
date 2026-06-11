@@ -436,14 +436,21 @@ def render_visualization():
             with col2:
                 st.write("**Visual Elements**")
                 
-                # Discover all available VTKs in the chain
-                all_chain_vtks = []
-                for p in chain:
-                    geo_dir = os.path.join(p, "Geometry_vtk")
-                    if os.path.exists(geo_dir):
-                        all_chain_vtks.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
+                # Discover expected VTK mesh names from .inc files of the chain and queued batch runs
+                scan_paths = []
+                if st.session_state.get("viz_batch_queue"):
+                    for job in st.session_state["viz_batch_queue"]:
+                        scan_paths.extend(job["chain"])
+                if chain:
+                    scan_paths.extend(chain)
                 
-                vtk_basenames = sorted(list(set([os.path.basename(v) for v in all_chain_vtks])))
+                scan_paths = list(dict.fromkeys(scan_paths))
+                
+                expected_mesh_names = []
+                for p in scan_paths:
+                    expected_mesh_names.extend(VizManager.get_geometry_mesh_names_for_run(p))
+                
+                vtk_basenames = sorted(list(set(expected_mesh_names)))
                 selected_vtk_names = st.multiselect("Visible Geometry Layers", vtk_basenames, default=vtk_basenames)
                 
                 show_geo = st.checkbox("Show Geometry (Global)", value=True)

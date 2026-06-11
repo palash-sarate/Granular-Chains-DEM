@@ -82,6 +82,128 @@ class VizManager:
         return frames
 
     @staticmethod
+    def get_geometry_mesh_names_for_run(run_path: str) -> List[str]:
+        """Parses the .inc file for a simulation run to find all geometry visualization layers."""
+        import json
+        import glob
+        
+        meta_names = ["grid_metadata.json", "metadata.json", "sim_metadata.json"]
+        meta = None
+        for name in meta_names:
+            p = os.path.join(run_path, name)
+            if os.path.exists(p):
+                try:
+                    with open(p, 'r') as f:
+                        meta = json.load(f)
+                        break
+                except:
+                    pass
+        if not meta:
+            return []
+            
+        inc_name = meta.get("geometry_inc", "replicated_geometry.inc")
+        inc_path = os.path.join(run_path, os.path.basename(inc_name))
+        
+        # Fall back to template dir if not local yet
+        if not os.path.exists(inc_path):
+            template_dir = meta.get("hopper_template_data")
+            if template_dir:
+                inc_path = os.path.join(template_dir, os.path.basename(inc_name))
+                if not os.path.exists(inc_path):
+                    # Fallback to any inc in template dir
+                    inc_files = glob.glob(os.path.join(template_dir, "*.inc"))
+                    if inc_files:
+                        inc_path = inc_files[0]
+                        
+        if os.path.exists(inc_path):
+            try:
+                with open(inc_path, "r") as f:
+                    detected = [line.split()[1] for line in f if line.strip().startswith("region") and "_vis" in line]
+                return sorted(list(set([f"{label}_mesh.vtk" for label in detected])))
+            except:
+                pass
+        return []
+
+    @staticmethod
+    def generate_vtks_for_run(run_path: str, target_regions: List[str] = None) -> bool:
+        """Runs the LAMMPS + OVITO geometry extractor to generate mesh VTKs on demand."""
+        from pathlib import Path
+        import json
+        from simulation.grid_hopper_manager import GridHopperManager
+        from simulation.runner import SimulationRunner
+        from analysis.geometry_extractor import GeometryExtractor
+
+        meta_names = ["grid_metadata.json", "metadata.json", "sim_metadata.json"]
+        meta_path = None
+        for name in meta_names:
+            test_p = os.path.join(run_path, name)
+            if os.path.exists(test_p):
+                meta_path = test_p
+                break
+        
+        if not meta_path:
+            print(f"[VizManager] Metadata not found for {run_path}. Cannot generate geometry.")
+            return False
+
+        try:
+            with open(meta_path, 'r') as f:
+                meta = json.load(f)
+            
+            inc_name = meta.get("geometry_inc", "replicated_geometry.inc")
+            inc_path = os.path.join(run_path, os.path.basename(inc_name))
+            
+            if not os.path.exists(inc_path):
+                # Generate replicated geometry if needed
+                runner = SimulationRunner(lammps_executable="lmp")
+                mgr = GridHopperManager(runner)
+                mgr._generate_replicated_geometry(
+                    setup_path=Path(meta["hopper_template_data"]),
+                    n_hoppers=len(meta["metadata"]),
+                    spacing=meta["spacing"],
+                    job_dir=Path(run_path),
+                    normalized_geo_vars=meta["geometry_vars"],
+                    inc_name=os.path.basename(inc_name)
+                )
+            
+            geo_vtk_dir = os.path.join(run_path, "Geometry_vtk")
+            os.makedirs(geo_vtk_dir, exist_ok=True)
+            
+            # If target_regions is not specified, parse it from .inc file
+            if not target_regions:
+                with open(inc_path, "r") as f:
+                    detected = [line.split()[1] for line in f if line.strip().startswith("region") and "_vis" in line]
+                target_regions = detected
+            
+            if not target_regions:
+                target_regions = ["simbox"]
+                
+            extractor = GeometryExtractor(lammps_cmd="lmp")
+            env = meta.get("envelope", {})
+            bounds = [env['total_bounds']['x'][0], env['total_bounds']['x'][1],
+                      env['total_bounds']['y'][0], env['total_bounds']['y'][1],
+                      env['total_bounds']['z'][0], env['total_bounds']['z'][1]] if 'total_bounds' in env else None
+            
+            lattice_spacing = 0.002
+            recon_radius = None
+            
+            extractor.extract(
+                inc_file=Path(inc_path),
+                outdir=Path(geo_vtk_dir),
+                auto_vis=False,
+                regions=target_regions,
+                combined=False,
+                bounds=bounds,
+                spacing=lattice_spacing,
+                radius=recon_radius
+            )
+            return True
+        except Exception as e:
+            print(f"[VizManager] Failed to generate VTKs for {run_path}: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+    @staticmethod
     def submit_viz_job(params: Dict):
         """Submits the movie generation process as a PBS job."""
         output_name = params.get('output_name', "movie.mp4")
@@ -194,11 +316,29 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
         
         plotter = UnifiedRenderer.setup_plotter(off_screen=True, window_size=res)
         
-        # Collect VTKs
+        # Collect VTKs (generating on-demand if missing)
         vtk_files = []
         selected_names = params.get('selected_vtks', [])
         chain_paths = params.get('chain_paths', [])
         for p in chain_paths:
+            regions_to_generate = []
+            if selected_names:
+                for name in selected_names:
+                    region = name.replace("_mesh.vtk", "")
+                    vtk_path = os.path.join(p, "Geometry_vtk", name)
+                    if not os.path.exists(vtk_path):
+                        regions_to_generate.append(region)
+            else:
+                expected_meshes = VizManager.get_geometry_mesh_names_for_run(p)
+                for name in expected_meshes:
+                    region = name.replace("_mesh.vtk", "")
+                    vtk_path = os.path.join(p, "Geometry_vtk", name)
+                    if not os.path.exists(vtk_path):
+                        regions_to_generate.append(region)
+            
+            if regions_to_generate:
+                VizManager.generate_vtks_for_run(p, regions_to_generate)
+            
             geo_dir = os.path.join(p, "Geometry_vtk")
             if os.path.exists(geo_dir):
                 vtks_in_dir = glob.glob(os.path.join(geo_dir, "*.vtk"))
@@ -274,8 +414,29 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
         frames = VizManager.get_chain_frames(chain_paths)
         if not frames: return
 
+        # Collect VTKs (generating on-demand if missing)
         vtk_files = []
+        selected_names = params.get('selected_vtks', [])
         for p in chain_paths:
+            regions_to_generate = []
+            if selected_names:
+                for name in selected_names:
+                    region = name.replace("_mesh.vtk", "")
+                    vtk_path = os.path.join(p, "Geometry_vtk", name)
+                    if not os.path.exists(vtk_path):
+                        regions_to_generate.append(region)
+            else:
+                expected_meshes = VizManager.get_geometry_mesh_names_for_run(p)
+                for name in expected_meshes:
+                    region = name.replace("_mesh.vtk", "")
+                    vtk_path = os.path.join(p, "Geometry_vtk", name)
+                    if not os.path.exists(vtk_path):
+                        regions_to_generate.append(region)
+            
+            if regions_to_generate:
+                print(f"Generating missing VTK meshes for {p}: {regions_to_generate}")
+                VizManager.generate_vtks_for_run(p, regions_to_generate)
+            
             geo_dir = os.path.join(p, "Geometry_vtk")
             if os.path.exists(geo_dir):
                 vtk_files.extend(glob.glob(os.path.join(geo_dir, "*.vtk")))
