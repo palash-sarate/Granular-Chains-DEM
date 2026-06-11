@@ -49,7 +49,9 @@ class UnifiedRenderer:
                     grid_color='gray',
                     camera_state=None,
                     offset=None,
-                    zoom=1.0):
+                    zoom=1.0,
+                    viewport_bounds=None,
+                    axes_viewport=None):
         """
         Populates a PyVista plotter with geometry, particles, and scene decorators.
         
@@ -59,6 +61,7 @@ class UnifiedRenderer:
             dump_path: Path to .dump particle file
             camera_state: Optional camera position/focal point
             zoom: Zoom factor (applied via camera.zoom)
+            viewport_bounds: Optional list [ymin, ymax, zmin, zmax] to set bounds of frame
         """
         
         # 1. Add Geometry
@@ -106,13 +109,39 @@ class UnifiedRenderer:
 
         # 3. Decorators
         if show_axes:
-            plotter.add_axes()
+            if axes_viewport is not None:
+                plotter.add_axes(viewport=axes_viewport)
+            else:
+                plotter.add_axes(viewport=(0, 0, 0.1, 0.1))
             
         if show_grid:
             plotter.show_grid(color=grid_color, font_size=10)
 
         # 4. Camera
-        if camera_state:
+        if viewport_bounds is not None:
+            try:
+                plotter.view_yz()
+                if len(viewport_bounds) == 4:
+                    ymin, ymax, zmin, zmax = viewport_bounds
+                    ymin, ymax = min(ymin, ymax), max(ymin, ymax)
+                    zmin, zmax = min(zmin, zmax), max(zmin, zmax)
+                    
+                    y_center = (ymin + ymax) / 2.0
+                    z_center = (zmin + zmax) / 2.0
+                    
+                    # Exact orthographic framing using parallel projection
+                    plotter.enable_parallel_projection()
+                    plotter.camera.position = (5.0, y_center, z_center)
+                    plotter.camera.focal_point = (0.0, y_center, z_center)
+                    plotter.camera.up = (0.0, 0.0, 1.0)
+                    plotter.camera.parallel_scale = (zmax - zmin) / 2.0
+                else:
+                    plotter.reset_camera(bounds=viewport_bounds)
+            except Exception as e:
+                print(f"Error setting viewport bounds: {e}")
+                plotter.view_yz()
+                plotter.reset_camera()
+        elif camera_state:
             try:
                 # Normalize camera state to list of lists (PyVista/stpyvista compatibility)
                 norm_cam = [list(x) if isinstance(x, (list, tuple)) else x for x in camera_state]

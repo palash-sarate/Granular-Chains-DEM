@@ -153,6 +153,7 @@ def main():
     p_grid_h.add_argument("--no-vtk", action="store_false", dest="generate_vtk", help="Skip VTK mesh generation")
     p_grid_h.set_defaults(generate_vtk=True)
     p_grid_h.add_argument("--geometry_vars", type=str, help="JSON string for per-hopper geometry variables")
+    p_grid_h.add_argument("--lepton_vars", type=str, help="JSON string for lepton parameter overrides")
     p_grid_h.add_argument("--seed", type=int, default=None)
     p_grid_h.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
 
@@ -171,6 +172,7 @@ def main():
     p_res_grid.add_argument("--simulation", default=None)
     p_res_grid.add_argument("--seed", type=int, default=None)
     p_res_grid.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
+    p_res_grid.add_argument("--lepton_vars", type=str, help="JSON string for lepton parameter overrides")
 
     # 11. run_grid_hopper_flow
     p_flow = subparsers.add_parser("run_grid_hopper_flow", help="Transition filled hoppers to oscillatory flow")
@@ -190,6 +192,7 @@ def main():
     p_flow.add_argument("--template", default="in.grid_hopper_flow")
     p_flow.add_argument("--seed", type=int, default=None)
     p_flow.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
+    p_flow.add_argument("--lepton_vars", type=str, help="JSON string for lepton parameter overrides")
 
     # 12. resume_grid_hopper_flow
     p_res_flow = subparsers.add_parser("resume_grid_hopper_flow", help="Resume a grid flow simulation")
@@ -206,6 +209,7 @@ def main():
     p_res_flow.add_argument("--simulation", default=None)
     p_res_flow.add_argument("--seed", type=int, default=None)
     p_res_flow.add_argument("--inplace", action="store_true", help="Resume simulation in the same folder as parent")
+    p_res_flow.add_argument("--lepton_vars", type=str, help="JSON string for lepton parameter overrides")
 
     args = parser.parse_args()
     
@@ -217,6 +221,16 @@ def main():
     # Remove metadata
     cmd_args.pop("command", None)
     cmd_args.pop("lammps_exe", None)
+    
+    # Parse lepton_vars JSON
+    if cmd_args.get("lepton_vars"):
+        try:
+            cmd_args["lepton_vars"] = json.loads(cmd_args["lepton_vars"])
+        except Exception as e:
+            print(f"Error parsing --lepton_vars JSON: {e}")
+            sys.exit(1)
+    else:
+        cmd_args["lepton_vars"] = None
     
     # Special parsing
     if cmd_name == "run_flop_batch":

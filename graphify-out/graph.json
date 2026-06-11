@@ -2822,80 +2822,10 @@
       "norm_label": "save_auto_pilot()"
     },
     {
-      "label": "render_active_queue()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L188",
-      "_origin": "ast",
-      "id": "pulse_dashboard_render_active_queue",
-      "community": 5,
-      "norm_label": "render_active_queue()"
-    },
-    {
-      "label": "update_progress()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L273",
-      "_origin": "ast",
-      "id": "pulse_dashboard_update_progress",
-      "community": 5,
-      "norm_label": "update_progress()"
-    },
-    {
-      "label": "render_eta_section()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L341",
-      "_origin": "ast",
-      "id": "pulse_dashboard_render_eta_section",
-      "community": 5,
-      "norm_label": "render_eta_section()"
-    },
-    {
-      "label": "format_run()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L1416",
-      "_origin": "ast",
-      "id": "pulse_dashboard_format_run",
-      "community": 5,
-      "norm_label": "format_run()"
-    },
-    {
-      "label": "get_depth()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L1477",
-      "_origin": "ast",
-      "id": "pulse_dashboard_get_depth",
-      "community": 5,
-      "norm_label": "get_depth()"
-    },
-    {
-      "label": "is_descendant()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L1490",
-      "_origin": "ast",
-      "id": "pulse_dashboard_is_descendant",
-      "community": 5,
-      "norm_label": "is_descendant()"
-    },
-    {
-      "label": "render_sync_logs()",
-      "file_type": "code",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L2214",
-      "_origin": "ast",
-      "id": "pulse_dashboard_render_sync_logs",
-      "community": 5,
-      "norm_label": "render_sync_logs()"
-    },
-    {
       "label": "render_system_status()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L2248",
+      "source_location": "L228",
       "_origin": "ast",
       "id": "pulse_dashboard_render_system_status",
       "community": 5,
@@ -6326,7 +6256,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_merge_runs",
-      "community": 5,
+      "community": 81,
       "norm_label": "merge_runs.py"
     },
     {
@@ -6336,7 +6266,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "pulse_merge_runs_merge_folders",
-      "community": 5,
+      "community": 81,
       "norm_label": "merge_folders()"
     },
     {
@@ -6346,7 +6276,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "pulse_merge_runs_rationale_9",
-      "community": 5,
+      "community": 81,
       "norm_label": "merges source_dir (child) into target_dir (parent)."
     },
     {
@@ -6656,7 +6586,7 @@
       "source_location": "L385",
       "_origin": "ast",
       "id": "pulse_pulse_core_simulationmonitor",
-      "community": 10,
+      "community": 5,
       "norm_label": "simulationmonitor"
     },
     {
@@ -6666,7 +6596,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "pulse_pulse_core_simulationmonitor_estimate_eta",
-      "community": 10,
+      "community": 5,
       "norm_label": ".estimate_eta()"
     },
     {
@@ -6686,7 +6616,7 @@
       "source_location": "L510",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync",
-      "community": 181,
+      "community": 117,
       "norm_label": ".start_sync()"
     },
     {
@@ -6696,7 +6626,7 @@
       "source_location": "L533",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync_pbs",
-      "community": 181,
+      "community": 117,
       "norm_label": ".start_sync_pbs()"
     },
     {
@@ -6776,7 +6706,7 @@
       "source_location": "L973",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager",
-      "community": 181,
+      "community": 117,
       "norm_label": "autopilotmanager"
     },
     {
@@ -6786,7 +6716,7 @@
       "source_location": "L977",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_is_running",
-      "community": 181,
+      "community": 117,
       "norm_label": ".is_running()"
     },
     {
@@ -6796,7 +6726,7 @@
       "source_location": "L989",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_trigger_manual",
-      "community": 181,
+      "community": 117,
       "norm_label": ".trigger_manual()"
     },
     {
@@ -6956,7 +6886,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_388",
-      "community": 10,
+      "community": 5,
       "norm_label": "estimates simulation eta by treating 'target' as the number of steps          to"
     },
     {
@@ -6966,7 +6896,7 @@
       "source_location": "L511",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_511",
-      "community": 181,
+      "community": 117,
       "norm_label": "starts the sync process in a background thread."
     },
     {
@@ -6976,7 +6906,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_534",
-      "community": 181,
+      "community": 117,
       "norm_label": "submits the sync process as a pbs job."
     },
     {
@@ -7056,7 +6986,7 @@
       "source_location": "L978",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_978",
-      "community": 181,
+      "community": 117,
       "norm_label": "checks if the auto_pilot_manager.py script is currently executing."
     },
     {
@@ -7066,7 +6996,7 @@
       "source_location": "L990",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_990",
-      "community": 181,
+      "community": 117,
       "norm_label": "triggers a manual run of the auto-pilot manager in the background."
     },
     {
@@ -7976,7 +7906,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2903",
-      "community": 124,
+      "community": 11,
       "norm_label": "2903"
     },
     {
@@ -7986,7 +7916,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2903_owner",
-      "community": 124,
+      "community": 11,
       "norm_label": "owner"
     },
     {
@@ -7996,7 +7926,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2903_status",
-      "community": 124,
+      "community": 11,
       "norm_label": "status"
     },
     {
@@ -8096,7 +8026,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907",
-      "community": 11,
+      "community": 148,
       "norm_label": "2907"
     },
     {
@@ -8106,7 +8036,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907_owner",
-      "community": 11,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -8116,7 +8046,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907_status",
-      "community": 11,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -8576,7 +8506,7 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923",
-      "community": 11,
+      "community": 191,
       "norm_label": "2923"
     },
     {
@@ -8586,7 +8516,7 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_owner",
-      "community": 11,
+      "community": 191,
       "norm_label": "owner"
     },
     {
@@ -8596,7 +8526,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_status",
-      "community": 11,
+      "community": 191,
       "norm_label": "status"
     },
     {
@@ -8666,7 +8596,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2926",
-      "community": 145,
+      "community": 199,
       "norm_label": "2926"
     },
     {
@@ -8676,7 +8606,7 @@
       "source_location": "L195",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2926_owner",
-      "community": 145,
+      "community": 199,
       "norm_label": "owner"
     },
     {
@@ -8686,7 +8616,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2926_status",
-      "community": 145,
+      "community": 199,
       "norm_label": "status"
     },
     {
@@ -8756,7 +8686,7 @@
       "source_location": "L206",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929",
-      "community": 148,
+      "community": 11,
       "norm_label": "2929"
     },
     {
@@ -8766,7 +8696,7 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_owner",
-      "community": 148,
+      "community": 11,
       "norm_label": "owner"
     },
     {
@@ -8776,7 +8706,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_status",
-      "community": 148,
+      "community": 11,
       "norm_label": "status"
     },
     {
@@ -8966,7 +8896,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936",
-      "community": 11,
+      "community": 222,
       "norm_label": "2936"
     },
     {
@@ -8976,7 +8906,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_owner",
-      "community": 11,
+      "community": 222,
       "norm_label": "owner"
     },
     {
@@ -8986,7 +8916,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_status",
-      "community": 11,
+      "community": 222,
       "norm_label": "status"
     },
     {
@@ -9626,7 +9556,7 @@
       "source_location": "L322",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958",
-      "community": 175,
+      "community": 11,
       "norm_label": "2958"
     },
     {
@@ -9636,7 +9566,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_owner",
-      "community": 175,
+      "community": 11,
       "norm_label": "owner"
     },
     {
@@ -9646,7 +9576,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_status",
-      "community": 175,
+      "community": 11,
       "norm_label": "status"
     },
     {
@@ -9926,7 +9856,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968",
-      "community": 185,
+      "community": 175,
       "norm_label": "2968"
     },
     {
@@ -9936,7 +9866,7 @@
       "source_location": "L363",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_owner",
-      "community": 185,
+      "community": 175,
       "norm_label": "owner"
     },
     {
@@ -9946,7 +9876,7 @@
       "source_location": "L364",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_status",
-      "community": 185,
+      "community": 175,
       "norm_label": "status"
     },
     {
@@ -10106,7 +10036,7 @@
       "source_location": "L386",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974",
-      "community": 191,
+      "community": 185,
       "norm_label": "2974"
     },
     {
@@ -10116,7 +10046,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_owner",
-      "community": 191,
+      "community": 185,
       "norm_label": "owner"
     },
     {
@@ -10126,7 +10056,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_status",
-      "community": 191,
+      "community": 185,
       "norm_label": "status"
     },
     {
@@ -10226,7 +10156,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2978",
-      "community": 195,
+      "community": 275,
       "norm_label": "2978"
     },
     {
@@ -10236,7 +10166,7 @@
       "source_location": "L403",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2978_owner",
-      "community": 195,
+      "community": 275,
       "norm_label": "owner"
     },
     {
@@ -10246,7 +10176,7 @@
       "source_location": "L404",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2978_status",
-      "community": 195,
+      "community": 275,
       "norm_label": "status"
     },
     {
@@ -10256,7 +10186,7 @@
       "source_location": "L406",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979",
-      "community": 162,
+      "community": 279,
       "norm_label": "2979"
     },
     {
@@ -10266,7 +10196,7 @@
       "source_location": "L407",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_owner",
-      "community": 162,
+      "community": 279,
       "norm_label": "owner"
     },
     {
@@ -10276,7 +10206,7 @@
       "source_location": "L408",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_status",
-      "community": 162,
+      "community": 279,
       "norm_label": "status"
     },
     {
@@ -10376,7 +10306,7 @@
       "source_location": "L422",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983",
-      "community": 11,
+      "community": 280,
       "norm_label": "2983"
     },
     {
@@ -10386,7 +10316,7 @@
       "source_location": "L423",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_owner",
-      "community": 11,
+      "community": 280,
       "norm_label": "owner"
     },
     {
@@ -10396,7 +10326,7 @@
       "source_location": "L424",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_status",
-      "community": 11,
+      "community": 280,
       "norm_label": "status"
     },
     {
@@ -10406,7 +10336,7 @@
       "source_location": "L426",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984",
-      "community": 199,
+      "community": 145,
       "norm_label": "2984"
     },
     {
@@ -10416,7 +10346,7 @@
       "source_location": "L427",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984_owner",
-      "community": 199,
+      "community": 145,
       "norm_label": "owner"
     },
     {
@@ -10426,7 +10356,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984_status",
-      "community": 199,
+      "community": 145,
       "norm_label": "status"
     },
     {
@@ -11096,7 +11026,7 @@
       "source_location": "L518",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007",
-      "community": 222,
+      "community": 224,
       "norm_label": "3007"
     },
     {
@@ -11106,7 +11036,7 @@
       "source_location": "L519",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_owner",
-      "community": 222,
+      "community": 224,
       "norm_label": "owner"
     },
     {
@@ -11116,7 +11046,7 @@
       "source_location": "L520",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_job_name",
-      "community": 222,
+      "community": 224,
       "norm_label": "job_name"
     },
     {
@@ -11126,7 +11056,7 @@
       "source_location": "L522",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008",
-      "community": 11,
+      "community": 195,
       "norm_label": "3008"
     },
     {
@@ -11136,7 +11066,7 @@
       "source_location": "L523",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008_owner",
-      "community": 11,
+      "community": 195,
       "norm_label": "owner"
     },
     {
@@ -11146,7 +11076,7 @@
       "source_location": "L524",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008_job_name",
-      "community": 11,
+      "community": 195,
       "norm_label": "job_name"
     },
     {
@@ -11186,7 +11116,7 @@
       "source_location": "L530",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3013",
-      "community": 224,
+      "community": 281,
       "norm_label": "3013"
     },
     {
@@ -11196,7 +11126,7 @@
       "source_location": "L531",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3013_owner",
-      "community": 224,
+      "community": 281,
       "norm_label": "owner"
     },
     {
@@ -11206,7 +11136,7 @@
       "source_location": "L532",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3013_job_name",
-      "community": 224,
+      "community": 281,
       "norm_label": "job_name"
     },
     {
@@ -11246,7 +11176,7 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020",
-      "community": 226,
+      "community": 11,
       "norm_label": "3020"
     },
     {
@@ -11256,7 +11186,7 @@
       "source_location": "L539",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_owner",
-      "community": 226,
+      "community": 11,
       "norm_label": "owner"
     },
     {
@@ -11266,7 +11196,7 @@
       "source_location": "L540",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_job_name",
-      "community": 226,
+      "community": 11,
       "norm_label": "job_name"
     },
     {
@@ -12160,6 +12090,316 @@
       "norm_label": "generates a png snapshot of the simulation state."
     },
     {
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/__init__.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_init",
+      "community": 272,
+      "norm_label": "__init__.py"
+    },
+    {
+      "label": "active_queue.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/active_queue.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_active_queue",
+      "community": 7,
+      "norm_label": "active_queue.py"
+    },
+    {
+      "label": "render_active_queue()",
+      "file_type": "code",
+      "source_file": "Pulse/views/active_queue.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "views_active_queue_render_active_queue",
+      "community": 7,
+      "norm_label": "render_active_queue()"
+    },
+    {
+      "label": "analysis.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_analysis",
+      "community": 3,
+      "norm_label": "analysis.py"
+    },
+    {
+      "label": "render_analysis()",
+      "file_type": "code",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "views_analysis_render_analysis",
+      "community": 3,
+      "norm_label": "render_analysis()"
+    },
+    {
+      "label": "autopilot.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_autopilot",
+      "community": 269,
+      "norm_label": "autopilot.py"
+    },
+    {
+      "label": "load_auto_pilot()",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "views_autopilot_load_auto_pilot",
+      "community": 269,
+      "norm_label": "load_auto_pilot()"
+    },
+    {
+      "label": "save_auto_pilot()",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "views_autopilot_save_auto_pilot",
+      "community": 269,
+      "norm_label": "save_auto_pilot()"
+    },
+    {
+      "label": "load_notes()",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "views_autopilot_load_notes",
+      "community": 269,
+      "norm_label": "load_notes()"
+    },
+    {
+      "label": "save_note()",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "views_autopilot_save_note",
+      "community": 269,
+      "norm_label": "save_note()"
+    },
+    {
+      "label": "render_autopilot()",
+      "file_type": "code",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "views_autopilot_render_autopilot",
+      "community": 269,
+      "norm_label": "render_autopilot()"
+    },
+    {
+      "label": "eta.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_eta",
+      "community": 5,
+      "norm_label": "eta.py"
+    },
+    {
+      "label": "st_directory_picker()",
+      "file_type": "code",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "views_eta_st_directory_picker",
+      "community": 5,
+      "norm_label": "st_directory_picker()"
+    },
+    {
+      "label": "render_eta()",
+      "file_type": "code",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L40",
+      "_origin": "ast",
+      "id": "views_eta_render_eta",
+      "community": 5,
+      "norm_label": "render_eta()"
+    },
+    {
+      "label": "A simple directory picker for Streamlit.",
+      "file_type": "rationale",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "views_eta_rationale_6",
+      "community": 5,
+      "norm_label": "a simple directory picker for streamlit."
+    },
+    {
+      "label": "history.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/history.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_history",
+      "community": 7,
+      "norm_label": "history.py"
+    },
+    {
+      "label": "render_history()",
+      "file_type": "code",
+      "source_file": "Pulse/views/history.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "views_history_render_history",
+      "community": 7,
+      "norm_label": "render_history()"
+    },
+    {
+      "label": "lineage.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_lineage",
+      "community": 81,
+      "norm_label": "lineage.py"
+    },
+    {
+      "label": "load_notes()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "views_lineage_load_notes",
+      "community": 81,
+      "norm_label": "load_notes()"
+    },
+    {
+      "label": "save_note()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "views_lineage_save_note",
+      "community": 81,
+      "norm_label": "save_note()"
+    },
+    {
+      "label": "load_auto_pilot()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "views_lineage_load_auto_pilot",
+      "community": 81,
+      "norm_label": "load_auto_pilot()"
+    },
+    {
+      "label": "save_auto_pilot()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "views_lineage_save_auto_pilot",
+      "community": 81,
+      "norm_label": "save_auto_pilot()"
+    },
+    {
+      "label": "wrap_sim_name()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "views_lineage_wrap_sim_name",
+      "community": 81,
+      "norm_label": "wrap_sim_name()"
+    },
+    {
+      "label": "render_lineage()",
+      "file_type": "code",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "views_lineage_render_lineage",
+      "community": 81,
+      "norm_label": "render_lineage()"
+    },
+    {
+      "label": "Wraps simulation names by breaking on underscores to keep nodes compact.",
+      "file_type": "rationale",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "views_lineage_rationale_44",
+      "community": 81,
+      "norm_label": "wraps simulation names by breaking on underscores to keep nodes compact."
+    },
+    {
+      "label": "sync.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/sync.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_sync",
+      "community": 10,
+      "norm_label": "sync.py"
+    },
+    {
+      "label": "render_sync()",
+      "file_type": "code",
+      "source_file": "Pulse/views/sync.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "views_sync_render_sync",
+      "community": 5,
+      "norm_label": "render_sync()"
+    },
+    {
+      "label": "visualization.py",
+      "file_type": "code",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "views_visualization",
+      "community": 10,
+      "norm_label": "visualization.py"
+    },
+    {
+      "label": "load_viz_settings()",
+      "file_type": "code",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "views_visualization_load_viz_settings",
+      "community": 10,
+      "norm_label": "load_viz_settings()"
+    },
+    {
+      "label": "save_viz_settings()",
+      "file_type": "code",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "views_visualization_save_viz_settings",
+      "community": 10,
+      "norm_label": "save_viz_settings()"
+    },
+    {
+      "label": "render_visualization()",
+      "file_type": "code",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "views_visualization_render_visualization",
+      "community": 10,
+      "norm_label": "render_visualization()"
+    },
+    {
       "label": "visualiser.py",
       "file_type": "code",
       "source_file": "Pulse/visualiser.py",
@@ -12343,7 +12583,7 @@
       "label": ".generate_high_res_snapshot()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L180",
+      "source_location": "L183",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_generate_high_res_snapshot",
       "community": 23,
@@ -12353,7 +12593,7 @@
       "label": ".run_rendering()",
       "file_type": "code",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L237",
+      "source_location": "L245",
       "_origin": "ast",
       "id": "pulse_viz_manager_vizmanager_run_rendering",
       "community": 23,
@@ -12413,9 +12653,9 @@
       "label": "Generates a high-resolution PNG snapshot using the movie rendering pipeline.",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L181",
+      "source_location": "L184",
       "_origin": "ast",
-      "id": "pulse_viz_manager_rationale_181",
+      "id": "pulse_viz_manager_rationale_184",
       "community": 23,
       "norm_label": "generates a high-resolution png snapshot using the movie rendering pipeline."
     },
@@ -12423,9 +12663,9 @@
       "label": "The actual rendering logic executed on the compute node.",
       "file_type": "rationale",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L238",
+      "source_location": "L246",
       "_origin": "ast",
-      "id": "pulse_viz_manager_rationale_238",
+      "id": "pulse_viz_manager_rationale_246",
       "community": 23,
       "norm_label": "the actual rendering logic executed on the compute node."
     },
@@ -12488,6 +12728,86 @@
       "id": "pulse_viz_settings_height",
       "community": 114,
       "norm_label": "height"
+    },
+    {
+      "label": "framing_mode",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_framing_mode",
+      "community": 114,
+      "norm_label": "framing_mode"
+    },
+    {
+      "label": "viewport_bounds",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_viewport_bounds",
+      "community": 114,
+      "norm_label": "viewport_bounds"
+    },
+    {
+      "label": "text_font_size",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_text_font_size",
+      "community": 114,
+      "norm_label": "text_font_size"
+    },
+    {
+      "label": "text_x",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_text_x",
+      "community": 114,
+      "norm_label": "text_x"
+    },
+    {
+      "label": "text_y",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_text_y",
+      "community": 114,
+      "norm_label": "text_y"
+    },
+    {
+      "label": "axes_size",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_axes_size",
+      "community": 114,
+      "norm_label": "axes_size"
+    },
+    {
+      "label": "axes_x",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_axes_x",
+      "community": 114,
+      "norm_label": "axes_x"
+    },
+    {
+      "label": "axes_y",
+      "file_type": "code",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pulse_viz_settings_axes_y",
+      "community": 114,
+      "norm_label": "axes_y"
     },
     {
       "label": "__init__.py",
@@ -12646,7 +12966,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller",
-      "community": 85,
+      "community": 181,
       "norm_label": "highlightcontroller"
     },
     {
@@ -12656,7 +12976,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_init",
-      "community": 85,
+      "community": 181,
       "norm_label": ".__init__()"
     },
     {
@@ -12666,7 +12986,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "analysis_controllers_highlighter_py_plotter",
-      "community": 85,
+      "community": 181,
       "norm_label": "plotter"
     },
     {
@@ -12676,7 +12996,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_clear",
-      "community": 85,
+      "community": 181,
       "norm_label": ".clear()"
     },
     {
@@ -12686,7 +13006,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_apply",
-      "community": 85,
+      "community": 181,
       "norm_label": ".apply()"
     },
     {
@@ -12696,7 +13016,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "controllers_highlighter_highlightcontroller_render_highlights",
-      "community": 85,
+      "community": 181,
       "norm_label": ".render_highlights()"
     },
     {
@@ -12706,7 +13026,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "analysis_controllers_highlighter_py_dataframe",
-      "community": 85,
+      "community": 181,
       "norm_label": "dataframe"
     },
     {
@@ -12716,7 +13036,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "controllers_highlighter_rationale_8",
-      "community": 85,
+      "community": 181,
       "norm_label": "manages highlight state and rendering of highlighted atoms."
     },
     {
@@ -12726,7 +13046,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_loader",
-      "community": 20,
+      "community": 13,
       "norm_label": "loader.py"
     },
     {
@@ -13106,7 +13426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_playback",
-      "community": 80,
+      "community": 19,
       "norm_label": "playback.py"
     },
     {
@@ -14066,7 +14386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_simulation_launcher",
-      "community": 25,
+      "community": 84,
       "norm_label": "simulation_launcher.py"
     },
     {
@@ -14206,7 +14526,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_unified_renderer",
-      "community": 81,
+      "community": 85,
       "norm_label": "unified_renderer.py"
     },
     {
@@ -14216,7 +14536,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer",
-      "community": 81,
+      "community": 85,
       "norm_label": "unifiedrenderer"
     },
     {
@@ -14226,7 +14546,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_setup_plotter",
-      "community": 81,
+      "community": 85,
       "norm_label": ".setup_plotter()"
     },
     {
@@ -14236,7 +14556,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_parse_lammps_dump",
-      "community": 81,
+      "community": 85,
       "norm_label": ".parse_lammps_dump()"
     },
     {
@@ -14246,7 +14566,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_apply_scene",
-      "community": 81,
+      "community": 85,
       "norm_label": ".apply_scene()"
     },
     {
@@ -14256,7 +14576,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_9",
-      "community": 81,
+      "community": 85,
       "norm_label": "a unified rendering controller for pyvista simulations.     supports both intera"
     },
     {
@@ -14266,7 +14586,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_19",
-      "community": 81,
+      "community": 85,
       "norm_label": "creates a standardized pyvista plotter."
     },
     {
@@ -14276,17 +14596,17 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_26",
-      "community": 81,
+      "community": 85,
       "norm_label": "parses a lammps dump file and returns a pandas dataframe."
     },
     {
       "label": "Populates a PyVista plotter with geometry, particles, and scene decorators.",
       "file_type": "rationale",
       "source_file": "analysis/controllers/unified_renderer.py",
-      "source_location": "L53",
+      "source_location": "L55",
       "_origin": "ast",
-      "id": "controllers_unified_renderer_rationale_53",
-      "community": 81,
+      "id": "controllers_unified_renderer_rationale_55",
+      "community": 85,
       "norm_label": "populates a pyvista plotter with geometry, particles, and scene decorators."
     },
     {
@@ -14440,10 +14760,30 @@
       "norm_label": "data_manager.py"
     },
     {
+      "label": "get_parser_pool()",
+      "file_type": "code",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "analysis_data_manager_get_parser_pool",
+      "community": 21,
+      "norm_label": "get_parser_pool()"
+    },
+    {
+      "label": "calculate_bonds_angles_vectorized()",
+      "file_type": "code",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "analysis_data_manager_calculate_bonds_angles_vectorized",
+      "community": 21,
+      "norm_label": "calculate_bonds_angles_vectorized()"
+    },
+    {
       "label": "find_simulation_lineage()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L14",
+      "source_location": "L152",
       "_origin": "ast",
       "id": "analysis_data_manager_find_simulation_lineage",
       "community": 18,
@@ -14453,7 +14793,7 @@
       "label": "aggregate_lifecycle_metadata()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L135",
+      "source_location": "L273",
       "_origin": "ast",
       "id": "analysis_data_manager_aggregate_lifecycle_metadata",
       "community": 18,
@@ -14463,7 +14803,7 @@
       "label": "detect_lammps_input_script()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L156",
+      "source_location": "L294",
       "_origin": "ast",
       "id": "analysis_data_manager_detect_lammps_input_script",
       "community": 20,
@@ -14473,7 +14813,7 @@
       "label": "load_lammps_geometry()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L173",
+      "source_location": "L311",
       "_origin": "ast",
       "id": "analysis_data_manager_load_lammps_geometry",
       "community": 20,
@@ -14483,7 +14823,7 @@
       "label": "parse_lammps_geometry_script()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L185",
+      "source_location": "L323",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_lammps_geometry_script",
       "community": 20,
@@ -14493,7 +14833,7 @@
       "label": "parse_simple_data_file()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L192",
+      "source_location": "L330",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_simple_data_file",
       "community": 20,
@@ -14503,7 +14843,7 @@
       "label": "DataFrame",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L192",
+      "source_location": "L330",
       "_origin": "ast",
       "id": "analysis_data_manager_py_dataframe",
       "community": 21,
@@ -14513,17 +14853,17 @@
       "label": "parse_dump_file()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L293",
+      "source_location": "L431",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_dump_file",
-      "community": 20,
+      "community": 13,
       "norm_label": "parse_dump_file()"
     },
     {
       "label": "_parse_single_dump_fast()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L304",
+      "source_location": "L442",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_single_dump_fast",
       "community": 20,
@@ -14533,7 +14873,7 @@
       "label": "SimulationMetadata",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L359",
+      "source_location": "L497",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata",
       "community": 18,
@@ -14543,7 +14883,7 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L361",
+      "source_location": "L499",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_init",
       "community": 18,
@@ -14553,7 +14893,7 @@
       "label": ".load()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L367",
+      "source_location": "L505",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_load",
       "community": 18,
@@ -14563,7 +14903,7 @@
       "label": ".save()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L385",
+      "source_location": "L523",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_save",
       "community": 18,
@@ -14573,7 +14913,7 @@
       "label": ".get()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L393",
+      "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_get",
       "community": 18,
@@ -14583,7 +14923,7 @@
       "label": "Any",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L393",
+      "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_py_any",
       "community": 18,
@@ -14593,7 +14933,7 @@
       "label": ".set()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L396",
+      "source_location": "L534",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_set",
       "community": 18,
@@ -14603,7 +14943,7 @@
       "label": ".update()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L400",
+      "source_location": "L538",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_update",
       "community": 18,
@@ -14613,7 +14953,7 @@
       "label": ".__getitem__()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L404",
+      "source_location": "L542",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_getitem",
       "community": 18,
@@ -14623,7 +14963,7 @@
       "label": ".__setitem__()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L407",
+      "source_location": "L545",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_setitem",
       "community": 18,
@@ -14633,7 +14973,7 @@
       "label": "SimulationData",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L410",
+      "source_location": "L548",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata",
       "community": 21,
@@ -14643,7 +14983,7 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L411",
+      "source_location": "L549",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_init",
       "community": 18,
@@ -14653,7 +14993,7 @@
       "label": "._get_cache_file()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L450",
+      "source_location": "L588",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_cache_file",
       "community": 21,
@@ -14663,7 +15003,7 @@
       "label": ".load_metadata()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L453",
+      "source_location": "L591",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_metadata",
       "community": 21,
@@ -14673,7 +15013,7 @@
       "label": ".get_available_cached_batches()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L488",
+      "source_location": "L626",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_available_cached_batches",
       "community": 21,
@@ -14683,7 +15023,7 @@
       "label": ".get_batch_count()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L503",
+      "source_location": "L639",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_count",
       "community": 21,
@@ -14693,7 +15033,7 @@
       "label": ".get_batch_index_for_timestep()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L506",
+      "source_location": "L642",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_index_for_timestep",
       "community": 21,
@@ -14703,7 +15043,7 @@
       "label": ".load_batch()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L514",
+      "source_location": "L650",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_batch",
       "community": 21,
@@ -14713,7 +15053,7 @@
       "label": ".get_atoms_at_timestep()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L568",
+      "source_location": "L701",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_atoms_at_timestep",
       "community": 21,
@@ -14723,7 +15063,7 @@
       "label": ".load_data()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L575",
+      "source_location": "L708",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_data",
       "community": 21,
@@ -14733,7 +15073,7 @@
       "label": "._is_batch_cache_valid()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L581",
+      "source_location": "L714",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_is_batch_cache_valid",
       "community": 21,
@@ -14743,7 +15083,7 @@
       "label": "._get_step()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L588",
+      "source_location": "L721",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_step",
       "community": 21,
@@ -14753,7 +15093,7 @@
       "label": "._parse_dump_list()",
       "file_type": "code",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L592",
+      "source_location": "L725",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_parse_dump_list",
       "community": 21,
@@ -14763,9 +15103,9 @@
       "label": "Finds the full lineage (ancestors and descendants) for a simulation.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L15",
+      "source_location": "L153",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_15",
+      "id": "analysis_data_manager_rationale_153",
       "community": 18,
       "norm_label": "finds the full lineage (ancestors and descendants) for a simulation."
     },
@@ -14773,9 +15113,9 @@
       "label": "Merges metadata from all runs in the lineage, oldest to newest.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L136",
+      "source_location": "L274",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_136",
+      "id": "analysis_data_manager_rationale_274",
       "community": 18,
       "norm_label": "merges metadata from all runs in the lineage, oldest to newest."
     },
@@ -14783,9 +15123,9 @@
       "label": "Auto-detect a likely LAMMPS input script in a simulation folder.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L157",
+      "source_location": "L295",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_157",
+      "id": "analysis_data_manager_rationale_295",
       "community": 20,
       "norm_label": "auto-detect a likely lammps input script in a simulation folder."
     },
@@ -14793,9 +15133,9 @@
       "label": "Load geometry from an auto-detected LAMMPS input script.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L174",
+      "source_location": "L312",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_174",
+      "id": "analysis_data_manager_rationale_312",
       "community": 20,
       "norm_label": "load geometry from an auto-detected lammps input script."
     },
@@ -14803,9 +15143,9 @@
       "label": "Parse geometry directly from a specific LAMMPS input script path.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L186",
+      "source_location": "L324",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_186",
+      "id": "analysis_data_manager_rationale_324",
       "community": 20,
       "norm_label": "parse geometry directly from a specific lammps input script path."
     },
@@ -14813,9 +15153,9 @@
       "label": "Parses a single LAMMPS data file, identifying columns by heuristics or manual ma",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L193",
+      "source_location": "L331",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_193",
+      "id": "analysis_data_manager_rationale_331",
       "community": 20,
       "norm_label": "parses a single lammps data file, identifying columns by heuristics or manual ma"
     },
@@ -14823,19 +15163,19 @@
       "label": "Public wrapper for parsing a single LAMMPS dump file.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L294",
+      "source_location": "L432",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_294",
-      "community": 20,
+      "id": "analysis_data_manager_rationale_432",
+      "community": 13,
       "norm_label": "public wrapper for parsing a single lammps dump file."
     },
     {
       "label": "Optimized parsing of a single LAMMPS dump file using the C engine.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L305",
+      "source_location": "L443",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_305",
+      "id": "analysis_data_manager_rationale_443",
       "community": 20,
       "norm_label": "optimized parsing of a single lammps dump file using the c engine."
     },
@@ -14843,9 +15183,9 @@
       "label": "Manages persistent metadata for a simulation folder.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L360",
+      "source_location": "L498",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_360",
+      "id": "analysis_data_manager_rationale_498",
       "community": 18,
       "norm_label": "manages persistent metadata for a simulation folder."
     },
@@ -14853,9 +15193,9 @@
       "label": "Loads and merges metadata, supporting migration from legacy filenames.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L368",
+      "source_location": "L506",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_368",
+      "id": "analysis_data_manager_rationale_506",
       "community": 18,
       "norm_label": "loads and merges metadata, supporting migration from legacy filenames."
     },
@@ -14863,9 +15203,9 @@
       "label": "Builds a unified timestep list by merging all directories (latest wins on overla",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L454",
+      "source_location": "L592",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_454",
+      "id": "analysis_data_manager_rationale_592",
       "community": 21,
       "norm_label": "builds a unified timestep list by merging all directories (latest wins on overla"
     },
@@ -14873,9 +15213,9 @@
       "label": "Returns a list of batch indices that have valid caches on disk.",
       "file_type": "rationale",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L489",
+      "source_location": "L627",
       "_origin": "ast",
-      "id": "analysis_data_manager_rationale_489",
+      "id": "analysis_data_manager_rationale_627",
       "community": 21,
       "norm_label": "returns a list of batch indices that have valid caches on disk."
     },
@@ -15776,7 +16116,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_get_current_rendering_data",
-      "community": 272,
+      "community": 4,
       "norm_label": "._get_current_rendering_data()"
     },
     {
@@ -15816,7 +16156,7 @@
       "source_location": "L589",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_batch_ready",
-      "community": 117,
+      "community": 162,
       "norm_label": "._on_batch_ready()"
     },
     {
@@ -15826,7 +16166,7 @@
       "source_location": "L594",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_batch_ready_safe",
-      "community": 117,
+      "community": 162,
       "norm_label": "._on_batch_ready_safe()"
     },
     {
@@ -15836,7 +16176,7 @@
       "source_location": "L608",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_refresh_current_view",
-      "community": 117,
+      "community": 162,
       "norm_label": "._refresh_current_view()"
     },
     {
@@ -15936,7 +16276,7 @@
       "source_location": "L688",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_clear_highlight_ui",
-      "community": 270,
+      "community": 4,
       "norm_label": "._clear_highlight_ui()"
     },
     {
@@ -16006,7 +16346,7 @@
       "source_location": "L760",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_restart_editor_open",
-      "community": 270,
+      "community": 4,
       "norm_label": "._on_restart_editor_open()"
     },
     {
@@ -16026,7 +16366,7 @@
       "source_location": "L775",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_autosize_and_center",
-      "community": 270,
+      "community": 4,
       "norm_label": "._autosize_and_center()"
     },
     {
@@ -16086,7 +16426,7 @@
       "source_location": "L473",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_473",
-      "community": 272,
+      "community": 4,
       "norm_label": "standardizes data retrieval for highlighter/export during both normal and previe"
     },
     {
@@ -16096,7 +16436,7 @@
       "source_location": "L590",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_590",
-      "community": 117,
+      "community": 162,
       "norm_label": "callback from data controller when a background batch is loaded."
     },
     {
@@ -16126,7 +16466,7 @@
       "source_location": "L761",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_761",
-      "community": 270,
+      "community": 4,
       "norm_label": "callback when a restart file is loaded for editing."
     },
     {
@@ -16156,7 +16496,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "analysis_utilities_get_dt_token",
-      "community": 61,
+      "community": 12,
       "norm_label": "get_dt_token()"
     },
     {
@@ -16176,7 +16516,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "analysis_utilities_get_viscosity_token",
-      "community": 61,
+      "community": 12,
       "norm_label": "get_viscosity_token()"
     },
     {
@@ -16296,7 +16636,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_10",
-      "community": 61,
+      "community": 12,
       "norm_label": "converts a float dt into a string token suitable for filenames.     e.g., 1e-6 -"
     },
     {
@@ -16316,7 +16656,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_39",
-      "community": 61,
+      "community": 12,
       "norm_label": "converts a float viscosity into a string token suitable for filenames.     e.g.,"
     },
     {
@@ -16506,7 +16846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "main",
-      "community": 12,
+      "community": 84,
       "norm_label": "main.py"
     },
     {
@@ -16516,7 +16856,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "main_main",
-      "community": 12,
+      "community": 84,
       "norm_label": "main()"
     },
     {
@@ -16570,6 +16910,46 @@
       "norm_label": "cleanup()"
     },
     {
+      "label": "dump_parse_bench.py",
+      "file_type": "code",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scratch_dump_parse_bench",
+      "community": 273,
+      "norm_label": "dump_parse_bench.py"
+    },
+    {
+      "label": "parse_pandas_current()",
+      "file_type": "code",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "scratch_dump_parse_bench_parse_pandas_current",
+      "community": 273,
+      "norm_label": "parse_pandas_current()"
+    },
+    {
+      "label": "parse_numpy_fromstring()",
+      "file_type": "code",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "scratch_dump_parse_bench_parse_numpy_fromstring",
+      "community": 273,
+      "norm_label": "parse_numpy_fromstring()"
+    },
+    {
+      "label": "run_bench()",
+      "file_type": "code",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "scratch_dump_parse_bench_run_bench",
+      "community": 273,
+      "norm_label": "run_bench()"
+    },
+    {
       "label": "extract_benchmarks.py",
       "file_type": "code",
       "source_file": "scratch/extract_benchmarks.py",
@@ -16598,6 +16978,56 @@
       "id": "scratch_extract_benchmarks_main",
       "community": 229,
       "norm_label": "main()"
+    },
+    {
+      "label": "large_dump_bench.py",
+      "file_type": "code",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scratch_large_dump_bench",
+      "community": 270,
+      "norm_label": "large_dump_bench.py"
+    },
+    {
+      "label": "generate_large_dump()",
+      "file_type": "code",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "scratch_large_dump_bench_generate_large_dump",
+      "community": 270,
+      "norm_label": "generate_large_dump()"
+    },
+    {
+      "label": "parse_pandas_current()",
+      "file_type": "code",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "scratch_large_dump_bench_parse_pandas_current",
+      "community": 270,
+      "norm_label": "parse_pandas_current()"
+    },
+    {
+      "label": "parse_numpy_fromstring()",
+      "file_type": "code",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "scratch_large_dump_bench_parse_numpy_fromstring",
+      "community": 270,
+      "norm_label": "parse_numpy_fromstring()"
+    },
+    {
+      "label": "run_bench()",
+      "file_type": "code",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "scratch_large_dump_bench_run_bench",
+      "community": 270,
+      "norm_label": "run_bench()"
     },
     {
       "label": "regenerate_vtk.py",
@@ -16660,6 +17090,26 @@
       "norm_label": "finds the maximum timestep reached in the run by scanning dump files."
     },
     {
+      "label": "run_actual_bench.py",
+      "file_type": "code",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scratch_run_actual_bench",
+      "community": 21,
+      "norm_label": "run_actual_bench.py"
+    },
+    {
+      "label": "run_bench()",
+      "file_type": "code",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "scratch_run_actual_bench_run_bench",
+      "community": 21,
+      "norm_label": "run_bench()"
+    },
+    {
       "label": "submit_flexible.py",
       "file_type": "code",
       "source_file": "scratch/submit_flexible.py",
@@ -16693,7 +17143,7 @@
       "label": "get_active_job_ids()",
       "file_type": "code",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L247",
+      "source_location": "L248",
       "_origin": "ast",
       "id": "scratch_submit_flexible_get_active_job_ids",
       "community": 78,
@@ -16703,7 +17153,7 @@
       "label": "safe_print()",
       "file_type": "code",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L268",
+      "source_location": "L269",
       "_origin": "ast",
       "id": "scratch_submit_flexible_safe_print",
       "community": 78,
@@ -16713,7 +17163,7 @@
       "label": "submit_jobs()",
       "file_type": "code",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L274",
+      "source_location": "L275",
       "_origin": "ast",
       "id": "scratch_submit_flexible_submit_jobs",
       "community": 78,
@@ -16723,7 +17173,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L358",
+      "source_location": "L359",
       "_origin": "ast",
       "id": "scratch_submit_flexible_main",
       "community": 78,
@@ -16743,9 +17193,9 @@
       "label": "Fetch current active job IDs for the user.",
       "file_type": "rationale",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L248",
+      "source_location": "L249",
       "_origin": "ast",
-      "id": "scratch_submit_flexible_rationale_248",
+      "id": "scratch_submit_flexible_rationale_249",
       "community": 78,
       "norm_label": "fetch current active job ids for the user."
     },
@@ -16753,9 +17203,9 @@
       "label": "Takes a list of job configurations, generates PBS scripts, and optionally submit",
       "file_type": "rationale",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L275",
+      "source_location": "L276",
       "_origin": "ast",
-      "id": "scratch_submit_flexible_rationale_275",
+      "id": "scratch_submit_flexible_rationale_276",
       "community": 78,
       "norm_label": "takes a list of job configurations, generates pbs scripts, and optionally submit"
     },
@@ -16766,7 +17216,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_test_fix",
-      "community": 12,
+      "community": 84,
       "norm_label": "test_fix.py"
     },
     {
@@ -16776,7 +17226,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "scratch_test_fix_test_unique_mol_dirs",
-      "community": 12,
+      "community": 84,
       "norm_label": "test_unique_mol_dirs()"
     },
     {
@@ -16870,6 +17320,36 @@
       "norm_label": "test_resume_geometry_regeneration()"
     },
     {
+      "label": "test_vec.py",
+      "file_type": "code",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scratch_test_vec",
+      "community": 20,
+      "norm_label": "test_vec.py"
+    },
+    {
+      "label": "calculate_angle()",
+      "file_type": "code",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "scratch_test_vec_calculate_angle",
+      "community": 20,
+      "norm_label": "calculate_angle()"
+    },
+    {
+      "label": "run_test()",
+      "file_type": "code",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "scratch_test_vec_run_test",
+      "community": 20,
+      "norm_label": "run_test()"
+    },
+    {
       "label": "test_vedo.py",
       "file_type": "code",
       "source_file": "scratch/test_vedo.py",
@@ -16878,6 +17358,46 @@
       "id": "scratch_test_vedo",
       "community": 247,
       "norm_label": "test_vedo.py"
+    },
+    {
+      "label": "to_numeric_bench.py",
+      "file_type": "code",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scratch_to_numeric_bench",
+      "community": 274,
+      "norm_label": "to_numeric_bench.py"
+    },
+    {
+      "label": "parse_without_dtype()",
+      "file_type": "code",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "scratch_to_numeric_bench_parse_without_dtype",
+      "community": 274,
+      "norm_label": "parse_without_dtype()"
+    },
+    {
+      "label": "parse_with_dtype()",
+      "file_type": "code",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "scratch_to_numeric_bench_parse_with_dtype",
+      "community": 274,
+      "norm_label": "parse_with_dtype()"
+    },
+    {
+      "label": "run_bench()",
+      "file_type": "code",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "scratch_to_numeric_bench_run_bench",
+      "community": 274,
+      "norm_label": "run_bench()"
     },
     {
       "label": "track_particle.py",
@@ -17216,7 +17736,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "simulation_config_simulationconfig_compute_output_dir",
-      "community": 16,
+      "community": 124,
       "norm_label": ".compute_output_dir()"
     },
     {
@@ -17226,7 +17746,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "simulation_config_simulationconfig_output_dir",
-      "community": 16,
+      "community": 124,
       "norm_label": ".output_dir()"
     },
     {
@@ -17256,7 +17776,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "simulation_config_rationale_61",
-      "community": 16,
+      "community": 124,
       "norm_label": "statically computes the output directory path."
     },
     {
@@ -17266,7 +17786,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "simulation_config_rationale_66",
-      "community": 16,
+      "community": 124,
       "norm_label": "constructs the output directory path from simulation and run, or uses override i"
     },
     {
@@ -17306,7 +17826,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_init",
-      "community": 9,
+      "community": 61,
       "norm_label": ".__init__()"
     },
     {
@@ -17316,7 +17836,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_py_simulationrunner",
-      "community": 9,
+      "community": 61,
       "norm_label": "simulationrunner"
     },
     {
@@ -17383,7 +17903,7 @@
       "label": ".resume_grid_filling()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L323",
+      "source_location": "L329",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_filling",
       "community": 2,
@@ -17393,7 +17913,7 @@
       "label": ".run_grid_flow()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L455",
+      "source_location": "L470",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_run_grid_flow",
       "community": 2,
@@ -17403,7 +17923,7 @@
       "label": ".resume_grid_flow()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L587",
+      "source_location": "L611",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_flow",
       "community": 2,
@@ -17413,7 +17933,7 @@
       "label": "._generate_replicated_geometry()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L711",
+      "source_location": "L744",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_generate_replicated_geometry",
       "community": 2,
@@ -17423,7 +17943,7 @@
       "label": "._evaluate_variables()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L874",
+      "source_location": "L907",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_evaluate_variables",
       "community": 2,
@@ -17433,7 +17953,7 @@
       "label": "._generate_grid_insertion_file()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L913",
+      "source_location": "L946",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_generate_grid_insertion_file",
       "community": 2,
@@ -17443,7 +17963,7 @@
       "label": "._reset_sync_status()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1063",
+      "source_location": "L1096",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_reset_sync_status",
       "community": 2,
@@ -17453,7 +17973,7 @@
       "label": ".split_grid_results()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1075",
+      "source_location": "L1108",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_split_grid_results",
       "community": 2,
@@ -17463,7 +17983,7 @@
       "label": "._parse_data_file()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1134",
+      "source_location": "L1167",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_parse_data_file",
       "community": 2,
@@ -17473,7 +17993,7 @@
       "label": "._write_data()",
       "file_type": "code",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1153",
+      "source_location": "L1186",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager_gridhoppermanager_write_data",
       "community": 2,
@@ -17503,9 +18023,9 @@
       "label": "Resumes a grid filling simulation from a restart file.",
       "file_type": "rationale",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L333",
+      "source_location": "L340",
       "_origin": "ast",
-      "id": "simulation_grid_hopper_manager_rationale_333",
+      "id": "simulation_grid_hopper_manager_rationale_340",
       "community": 2,
       "norm_label": "resumes a grid filling simulation from a restart file."
     },
@@ -17513,9 +18033,9 @@
       "label": "Takes a filled grid state and starts the flow simulation (opens orifices + oscil",
       "file_type": "rationale",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L466",
+      "source_location": "L482",
       "_origin": "ast",
-      "id": "simulation_grid_hopper_manager_rationale_466",
+      "id": "simulation_grid_hopper_manager_rationale_482",
       "community": 2,
       "norm_label": "takes a filled grid state and starts the flow simulation (opens orifices + oscil"
     },
@@ -17523,9 +18043,9 @@
       "label": "Resumes a grid flow simulation from a restart file.",
       "file_type": "rationale",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L597",
+      "source_location": "L622",
       "_origin": "ast",
-      "id": "simulation_grid_hopper_manager_rationale_597",
+      "id": "simulation_grid_hopper_manager_rationale_622",
       "community": 2,
       "norm_label": "resumes a grid flow simulation from a restart file."
     },
@@ -17533,9 +18053,9 @@
       "label": "Parses and evaluates LAMMPS-style variables from a list of command lines.",
       "file_type": "rationale",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L875",
+      "source_location": "L908",
       "_origin": "ast",
-      "id": "simulation_grid_hopper_manager_rationale_875",
+      "id": "simulation_grid_hopper_manager_rationale_908",
       "community": 2,
       "norm_label": "parses and evaluates lammps-style variables from a list of command lines."
     },
@@ -17543,9 +18063,9 @@
       "label": "Resets the sync status in lineage.json to Local.",
       "file_type": "rationale",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1064",
+      "source_location": "L1097",
       "_origin": "ast",
-      "id": "simulation_grid_hopper_manager_rationale_1064",
+      "id": "simulation_grid_hopper_manager_rationale_1097",
       "community": 2,
       "norm_label": "resets the sync status in lineage.json to local."
     },
@@ -17686,7 +18206,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager",
-      "community": 84,
+      "community": 16,
       "norm_label": "hoppergridmanager"
     },
     {
@@ -17696,7 +18216,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_init",
-      "community": 84,
+      "community": 16,
       "norm_label": ".__init__()"
     },
     {
@@ -17706,7 +18226,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_simulationrunner",
-      "community": 84,
+      "community": 16,
       "norm_label": "simulationrunner"
     },
     {
@@ -17716,7 +18236,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_create_hopper_grid_data",
-      "community": 84,
+      "community": 16,
       "norm_label": ".create_hopper_grid_data()"
     },
     {
@@ -17726,7 +18246,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_path",
-      "community": 84,
+      "community": 16,
       "norm_label": "path"
     },
     {
@@ -17736,7 +18256,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_any",
-      "community": 84,
+      "community": 16,
       "norm_label": "any"
     },
     {
@@ -17746,7 +18266,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_parse_data_file",
-      "community": 84,
+      "community": 16,
       "norm_label": "._parse_data_file()"
     },
     {
@@ -17756,7 +18276,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_write_data",
-      "community": 84,
+      "community": 16,
       "norm_label": "._write_data()"
     },
     {
@@ -17766,7 +18286,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_rationale_17",
-      "community": 84,
+      "community": 16,
       "norm_label": "clones a base hopper geometry into a 3d grid.                  returns:"
     },
     {
@@ -17786,7 +18306,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager",
-      "community": 9,
+      "community": 61,
       "norm_label": "hoppermanager"
     },
     {
@@ -17796,7 +18316,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_init",
-      "community": 9,
+      "community": 61,
       "norm_label": ".__init__()"
     },
     {
@@ -17806,7 +18326,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "simulation_hopper_manager_py_simulationrunner",
-      "community": 9,
+      "community": 16,
       "norm_label": "simulationrunner"
     },
     {
@@ -17816,7 +18336,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_prepare_molecules",
-      "community": 9,
+      "community": 61,
       "norm_label": ".prepare_molecules()"
     },
     {
@@ -17826,7 +18346,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_run_hopper_flow",
-      "community": 9,
+      "community": 61,
       "norm_label": ".run_hopper_flow()"
     },
     {
@@ -17836,7 +18356,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_generate_filled_state",
-      "community": 9,
+      "community": 61,
       "norm_label": ".generate_filled_state()"
     },
     {
@@ -17846,7 +18366,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_resume_filled_state",
-      "community": 9,
+      "community": 61,
       "norm_label": ".resume_filled_state()"
     },
     {
@@ -17856,7 +18376,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_run_flow_from_saved",
-      "community": 9,
+      "community": 61,
       "norm_label": ".run_flow_from_saved()"
     },
     {
@@ -17866,7 +18386,7 @@
       "source_location": "L325",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_generate_tall_insertion_file",
-      "community": 9,
+      "community": 61,
       "norm_label": "._generate_tall_insertion_file()"
     },
     {
@@ -17876,7 +18396,7 @@
       "source_location": "L392",
       "_origin": "ast",
       "id": "simulation_hopper_manager_hoppermanager_extract_converging_sec_ht",
-      "community": 9,
+      "community": 61,
       "norm_label": "._extract_converging_sec_ht()"
     },
     {
@@ -17886,7 +18406,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_14",
-      "community": 9,
+      "community": 61,
       "norm_label": "converts all .data files in source_dir to .mol files in mol_dir.         generat"
     },
     {
@@ -17896,7 +18416,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_112",
-      "community": 9,
+      "community": 61,
       "norm_label": "create a filled hopper state from relaxed chain files and save data+restart."
     },
     {
@@ -17906,7 +18426,7 @@
       "source_location": "L189",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_189",
-      "community": 9,
+      "community": 61,
       "norm_label": "resume a hopper fill simulation from a restart file and add more chains."
     },
     {
@@ -17916,7 +18436,7 @@
       "source_location": "L296",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_296",
-      "community": 9,
+      "community": 61,
       "norm_label": "run an oscillating hopper flow starting from a saved data or restart file."
     },
     {
@@ -17926,7 +18446,7 @@
       "source_location": "L326",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_326",
-      "community": 9,
+      "community": 61,
       "norm_label": "generates a 3d grid of insertion coordinates in a tall column via python."
     },
     {
@@ -17936,7 +18456,7 @@
       "source_location": "L393",
       "_origin": "ast",
       "id": "simulation_hopper_manager_rationale_393",
-      "community": 9,
+      "community": 61,
       "norm_label": "resolves includes and evaluates variables in setup_inc_path         to find and"
     },
     {
@@ -17956,7 +18476,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "simulation_library_generator_librarygenerator",
-      "community": 12,
+      "community": 9,
       "norm_label": "librarygenerator"
     },
     {
@@ -17966,7 +18486,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_library_generator_librarygenerator_init",
-      "community": 12,
+      "community": 9,
       "norm_label": ".__init__()"
     },
     {
@@ -17976,7 +18496,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_library_generator_py_simulationrunner",
-      "community": 12,
+      "community": 9,
       "norm_label": "simulationrunner"
     },
     {
@@ -17986,7 +18506,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "simulation_library_generator_librarygenerator_run_single_state_task",
-      "community": 12,
+      "community": 9,
       "norm_label": ".run_single_state_task()"
     },
     {
@@ -17996,7 +18516,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "simulation_library_generator_py_path",
-      "community": 12,
+      "community": 9,
       "norm_label": "path"
     },
     {
@@ -18006,7 +18526,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "simulation_library_generator_librarygenerator_generate_library",
-      "community": 12,
+      "community": 9,
       "norm_label": ".generate_library()"
     },
     {
@@ -18016,7 +18536,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "simulation_library_generator_librarygenerator_generate_batch_library",
-      "community": 12,
+      "community": 9,
       "norm_label": ".generate_batch_library()"
     },
     {
@@ -18026,7 +18546,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "simulation_library_generator_rationale_23",
-      "community": 12,
+      "community": 9,
       "norm_label": "task for a single simulation run, suitable for parallel execution."
     },
     {
@@ -18036,7 +18556,7 @@
       "source_location": "L77",
       "_origin": "ast",
       "id": "simulation_library_generator_rationale_77",
-      "community": 12,
+      "community": 9,
       "norm_label": "generates a library of relaxed chain states for a single n."
     },
     {
@@ -18046,7 +18566,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "simulation_library_generator_rationale_104",
-      "community": 12,
+      "community": 9,
       "norm_label": "generates a library for multiple n values in a single parallel pool."
     },
     {
@@ -18116,7 +18636,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "simulation_orchestrator",
-      "community": 12,
+      "community": 84,
       "norm_label": "orchestrator.py"
     },
     {
@@ -18126,7 +18646,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator",
-      "community": 12,
+      "community": 84,
       "norm_label": "simulationorchestrator"
     },
     {
@@ -18136,7 +18656,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_init",
-      "community": 12,
+      "community": 84,
       "norm_label": ".__init__()"
     },
     {
@@ -18146,7 +18666,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_hopper_fill",
-      "community": 9,
+      "community": 61,
       "norm_label": ".run_hopper_fill()"
     },
     {
@@ -18156,7 +18676,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_hopper_fill",
-      "community": 9,
+      "community": 61,
       "norm_label": ".resume_hopper_fill()"
     },
     {
@@ -18166,7 +18686,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_flop_simulation",
-      "community": 61,
+      "community": 12,
       "norm_label": ".run_flop_simulation()"
     },
     {
@@ -18176,7 +18696,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_flop_simulation",
-      "community": 61,
+      "community": 12,
       "norm_label": ".resume_flop_simulation()"
     },
     {
@@ -18186,7 +18706,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_generate_relaxed_library",
-      "community": 12,
+      "community": 84,
       "norm_label": ".generate_relaxed_library()"
     },
     {
@@ -18196,7 +18716,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "simulation_orchestrator_py_any",
-      "community": 12,
+      "community": 84,
       "norm_label": "any"
     },
     {
@@ -18216,7 +18736,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_flop_batch",
-      "community": 61,
+      "community": 12,
       "norm_label": ".run_flop_batch()"
     },
     {
@@ -18226,7 +18746,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_grid_batch_relaxation",
-      "community": 12,
+      "community": 84,
       "norm_label": ".run_grid_batch_relaxation()"
     },
     {
@@ -18236,37 +18756,37 @@
       "source_location": "L328",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_grid_hopper_filling",
-      "community": 12,
+      "community": 84,
       "norm_label": ".run_grid_hopper_filling()"
     },
     {
       "label": ".resume_grid_hopper_filling()",
       "file_type": "code",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L380",
+      "source_location": "L382",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_filling",
-      "community": 12,
+      "community": 84,
       "norm_label": ".resume_grid_hopper_filling()"
     },
     {
       "label": ".run_grid_hopper_flow()",
       "file_type": "code",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L420",
+      "source_location": "L424",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_grid_hopper_flow",
-      "community": 12,
+      "community": 84,
       "norm_label": ".run_grid_hopper_flow()"
     },
     {
       "label": ".resume_grid_hopper_flow()",
       "file_type": "code",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L459",
+      "source_location": "L465",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_flow",
-      "community": 12,
+      "community": 84,
       "norm_label": ".resume_grid_hopper_flow()"
     },
     {
@@ -18276,7 +18796,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_36",
-      "community": 9,
+      "community": 61,
       "norm_label": "pre-fill a hopper with relaxed molecular chains."
     },
     {
@@ -18286,7 +18806,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_83",
-      "community": 9,
+      "community": 61,
       "norm_label": "resume filling a hopper from a binary restart file."
     },
     {
@@ -18296,7 +18816,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_110",
-      "community": 61,
+      "community": 12,
       "norm_label": "run a single chain-flop simulation to analyze mobility."
     },
     {
@@ -18306,7 +18826,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_136",
-      "community": 61,
+      "community": 12,
       "norm_label": "resume a chain-flop simulation from a restart point."
     },
     {
@@ -18316,7 +18836,7 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_169",
-      "community": 12,
+      "community": 84,
       "norm_label": "generate a library of relaxed chain states for future hopper insertions."
     },
     {
@@ -18336,7 +18856,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_217",
-      "community": 61,
+      "community": 12,
       "norm_label": "run a batch of flop simulations across multiple parameters."
     },
     {
@@ -18346,47 +18866,47 @@
       "source_location": "L266",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_266",
-      "community": 12,
+      "community": 84,
       "norm_label": "runs a massive batch relaxation using a single grid-based simulation.         th"
     },
     {
       "label": "Main entry point for grid-based batch hopper filling.         Packs multiple hop",
       "file_type": "rationale",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L344",
+      "source_location": "L345",
       "_origin": "ast",
-      "id": "simulation_orchestrator_rationale_344",
-      "community": 12,
+      "id": "simulation_orchestrator_rationale_345",
+      "community": 84,
       "norm_label": "main entry point for grid-based batch hopper filling.         packs multiple hop"
     },
     {
       "label": "Resumes a grid hopper filling simulation from a restart file.",
       "file_type": "rationale",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L391",
+      "source_location": "L394",
       "_origin": "ast",
-      "id": "simulation_orchestrator_rationale_391",
-      "community": 12,
+      "id": "simulation_orchestrator_rationale_394",
+      "community": 84,
       "norm_label": "resumes a grid hopper filling simulation from a restart file."
     },
     {
       "label": "Transitions a filling simulation to a flow simulation with oscillation.",
       "file_type": "rationale",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L431",
+      "source_location": "L436",
       "_origin": "ast",
-      "id": "simulation_orchestrator_rationale_431",
-      "community": 12,
+      "id": "simulation_orchestrator_rationale_436",
+      "community": 84,
       "norm_label": "transitions a filling simulation to a flow simulation with oscillation."
     },
     {
       "label": "Resumes a grid hopper flow simulation.",
       "file_type": "rationale",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L469",
+      "source_location": "L476",
       "_origin": "ast",
-      "id": "simulation_orchestrator_rationale_469",
-      "community": 12,
+      "id": "simulation_orchestrator_rationale_476",
+      "community": 84,
       "norm_label": "resumes a grid hopper flow simulation."
     },
     {
@@ -18406,7 +18926,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "simulation_runner_simulationrunner",
-      "community": 17,
+      "community": 16,
       "norm_label": "simulationrunner"
     },
     {
@@ -18416,7 +18936,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "simulation_runner_simulationrunner_init",
-      "community": 17,
+      "community": 16,
       "norm_label": ".__init__()"
     },
     {
@@ -24422,36 +24942,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L1410",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_format_run"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L1471",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_get_depth"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L1484",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_is_descendant"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
       "source_location": "L175",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -24477,36 +24967,6 @@
       "confidence_score": 1.0,
       "source": "pulse_dashboard",
       "target": "pulse_dashboard_load_viz_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L188",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_render_active_queue"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L341",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_render_eta_section"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L2183",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_render_sync_logs"
     },
     {
       "relation": "contains",
@@ -24557,16 +25017,6 @@
       "confidence_score": 1.0,
       "source": "pulse_dashboard",
       "target": "pulse_dashboard_st_directory_picker"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L273",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "pulse_dashboard_update_progress"
     },
     {
       "relation": "contains",
@@ -24744,6 +25194,94 @@
       "target": "simulation_runner_simulationrunner"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L187",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_active_queue_render_active_queue"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L197",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_analysis_render_analysis"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L215",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_autopilot_render_autopilot"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_eta_render_eta"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L192",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_history_render_history"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_lineage_render_lineage"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_sync_render_sync"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/dashboard.py",
+      "source_location": "L205",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_dashboard",
+      "target": "views_visualization_render_visualization"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -24772,17 +25310,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pulse_dashboard_rationale_94",
-      "target": "pulse_dashboard_st_directory_picker"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
-      "source_location": "L358",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard_render_eta_section",
       "target": "pulse_dashboard_st_directory_picker"
     },
     {
@@ -29931,6 +30458,28 @@
       "target": "pulse_lineage_tracker_scan_dumping_yard"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L150",
+      "weight": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "pulse_lineage_tracker_scan_dumping_yard"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "pulse_lineage_tracker_scan_dumping_yard"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/merge_runs.py",
@@ -29959,6 +30508,28 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pulse_merge_runs_rationale_9",
+      "target": "pulse_merge_runs_merge_folders"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L522",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "pulse_merge_runs_merge_folders"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L535",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
       "target": "pulse_merge_runs_merge_folders"
     },
     {
@@ -30143,6 +30714,94 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pulse_viz_manager",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/active_queue.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_active_queue",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_analysis",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/history.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_history",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/sync.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_sync",
+      "target": "pulse_pulse_core"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
       "target": "pulse_pulse_core"
     },
     {
@@ -30406,6 +31065,83 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "simulation_hopper_manager_py_simulationrunner",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/active_queue.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_active_queue",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_analysis",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/history.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_history",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "pulse_pulse_core_pbsmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
       "target": "pulse_pulse_core_pbsmanager"
     },
     {
@@ -30789,6 +31525,17 @@
       "target": "pulse_pulse_core_simulationmonitor_estimate_eta"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta",
+      "target": "pulse_pulse_core_simulationmonitor"
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
@@ -30972,6 +31719,39 @@
       "target": "pulse_pulse_core_syncmanager"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "pulse_pulse_core_syncmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/sync.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_sync",
+      "target": "pulse_pulse_core_syncmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "pulse_pulse_core_syncmanager"
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
@@ -31113,6 +31893,17 @@
       "confidence_score": 1.0,
       "source": "pulse_pulse_core_autopilotmanager",
       "target": "pulse_pulse_core_autopilotmanager_trigger_manual"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "pulse_pulse_core_autopilotmanager"
     },
     {
       "relation": "calls",
@@ -36231,6 +37022,567 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L359",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "pulse_snapshot_helper_generate_snapshot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L361",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "pulse_snapshot_helper_generate_snapshot"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L566",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "pulse_snapshot_helper_generate_snapshot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L568",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "pulse_snapshot_helper_generate_snapshot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/active_queue.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_active_queue",
+      "target": "views_active_queue_render_active_queue"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_analysis",
+      "target": "controllers_sim_data_simdatacontroller"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_analysis",
+      "target": "views_analysis_render_analysis"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/analysis.py",
+      "source_location": "L89",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_analysis_render_analysis",
+      "target": "controllers_sim_data_simdatacontroller"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "views_autopilot_load_auto_pilot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "views_autopilot_load_notes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "views_autopilot_render_autopilot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "views_autopilot_save_auto_pilot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot",
+      "target": "views_autopilot_save_note"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "views_autopilot_load_auto_pilot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L97",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "views_autopilot_save_auto_pilot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L351",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "views_autopilot_load_notes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_save_note",
+      "target": "views_autopilot_load_notes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/autopilot.py",
+      "source_location": "L355",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_autopilot_render_autopilot",
+      "target": "views_autopilot_save_note"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta",
+      "target": "views_eta_render_eta"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta",
+      "target": "views_eta_st_directory_picker"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta_rationale_6",
+      "target": "views_eta_st_directory_picker"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/eta.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_eta_render_eta",
+      "target": "views_eta_st_directory_picker"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/history.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_history",
+      "target": "views_history_render_history"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_load_auto_pilot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_load_notes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L58",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_render_lineage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_save_auto_pilot"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_save_note"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage",
+      "target": "views_lineage_wrap_sim_name"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L555",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "views_lineage_load_notes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_save_note",
+      "target": "views_lineage_load_notes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L559",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "views_lineage_save_note"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "views_lineage_load_auto_pilot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L393",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "views_lineage_save_auto_pilot"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_rationale_44",
+      "target": "views_lineage_wrap_sim_name"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/lineage.py",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_lineage_render_lineage",
+      "target": "views_lineage_wrap_sim_name"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/sync.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_sync",
+      "target": "views_sync_render_sync"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L253",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "analysis_geometry_extractor_geometryextractor"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "controllers_highlighter_highlightcontroller"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "controllers_sim_data_simdatacontroller"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "controllers_unified_renderer_unifiedrenderer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "pulse_viz_manager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "pulse_viz_manager_vizmanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L251",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L252",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "simulation_runner_simulationrunner"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "views_visualization_load_viz_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "views_visualization_render_visualization"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization",
+      "target": "views_visualization_save_viz_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization_render_visualization",
+      "target": "views_visualization_load_viz_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization_render_visualization",
+      "target": "views_visualization_save_viz_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L291",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization_render_visualization",
+      "target": "analysis_geometry_extractor_geometryextractor"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L276",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization_render_visualization",
+      "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/views/visualization.py",
+      "source_location": "L275",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_visualization_render_visualization",
+      "target": "simulation_runner_simulationrunner"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "Pulse/visualiser.py",
       "source_location": "L9",
       "weight": 1.0,
@@ -36537,21 +37889,51 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L181",
+      "source_location": "L184",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_viz_manager_rationale_181",
+      "source": "pulse_viz_manager_rationale_184",
       "target": "pulse_viz_manager_vizmanager_generate_high_res_snapshot"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/viz_manager.py",
-      "source_location": "L238",
+      "source_location": "L246",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_viz_manager_rationale_238",
+      "source": "pulse_viz_manager_rationale_246",
       "target": "pulse_viz_manager_vizmanager_run_rendering"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_axes_size",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_axes_x",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_axes_y",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -36562,6 +37944,16 @@
       "confidence_score": 1.0,
       "source": "pulse_viz_settings",
       "target": "pulse_viz_settings_camera"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_framing_mode"
     },
     {
       "relation": "contains",
@@ -36582,6 +37974,46 @@
       "confidence_score": 1.0,
       "source": "pulse_viz_settings",
       "target": "pulse_viz_settings_offset"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_text_font_size"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_text_x"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_text_y"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/viz_settings.json",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pulse_viz_settings",
+      "target": "pulse_viz_settings_viewport_bounds"
     },
     {
       "relation": "contains",
@@ -39847,10 +41279,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/controllers/unified_renderer.py",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "controllers_unified_renderer_rationale_53",
+      "source": "controllers_unified_renderer_rationale_55",
       "target": "controllers_unified_renderer_unifiedrenderer_apply_scene"
     },
     {
@@ -40086,6 +41518,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "analysis_data_manager",
+      "target": "analysis_data_manager_calculate_bonds_angles_vectorized"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "analysis/data_manager.py",
       "source_location": "L156",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -40101,6 +41543,16 @@
       "confidence_score": 1.0,
       "source": "analysis_data_manager",
       "target": "analysis_data_manager_find_simulation_lineage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "analysis_data_manager",
+      "target": "analysis_data_manager_get_parser_pool"
     },
     {
       "relation": "contains",
@@ -40195,6 +41647,61 @@
       "target": "analysis_lammps_parser_lammpsparser"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_run_actual_bench",
+      "target": "analysis_data_manager"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec",
+      "target": "analysis_data_manager"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L728",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "analysis_data_manager_simulationdata_parse_dump_list",
+      "target": "analysis_data_manager_get_parser_pool"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L24",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "analysis_data_manager_calculate_bonds_angles_vectorized",
+      "target": "analysis_data_manager_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "analysis/data_manager.py",
+      "source_location": "L673",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "analysis_data_manager_simulationdata_load_batch",
+      "target": "analysis_data_manager_calculate_bonds_angles_vectorized"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -40220,10 +41727,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L15",
+      "source_location": "L153",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_15",
+      "source": "analysis_data_manager_rationale_153",
       "target": "analysis_data_manager_find_simulation_lineage"
     },
     {
@@ -40263,10 +41770,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L136",
+      "source_location": "L274",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_136",
+      "source": "analysis_data_manager_rationale_274",
       "target": "analysis_data_manager_aggregate_lifecycle_metadata"
     },
     {
@@ -40295,10 +41802,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L157",
+      "source_location": "L295",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_157",
+      "source": "analysis_data_manager_rationale_295",
       "target": "analysis_data_manager_detect_lammps_input_script"
     },
     {
@@ -40316,10 +41823,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L174",
+      "source_location": "L312",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_174",
+      "source": "analysis_data_manager_rationale_312",
       "target": "analysis_data_manager_load_lammps_geometry"
     },
     {
@@ -40337,10 +41844,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L186",
+      "source_location": "L324",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_186",
+      "source": "analysis_data_manager_rationale_324",
       "target": "analysis_data_manager_parse_lammps_geometry_script"
     },
     {
@@ -40358,10 +41865,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L193",
+      "source_location": "L331",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_193",
+      "source": "analysis_data_manager_rationale_331",
       "target": "analysis_data_manager_parse_simple_data_file"
     },
     {
@@ -40455,30 +41962,52 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L294",
+      "source_location": "L432",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_294",
+      "source": "analysis_data_manager_rationale_432",
       "target": "analysis_data_manager_parse_dump_file"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L305",
+      "source_location": "L443",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_305",
+      "source": "analysis_data_manager_rationale_443",
+      "target": "analysis_data_manager_parse_single_dump_fast"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec",
+      "target": "analysis_data_manager_parse_single_dump_fast"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec_run_test",
       "target": "analysis_data_manager_parse_single_dump_fast"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L360",
+      "source_location": "L498",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_360",
+      "source": "analysis_data_manager_rationale_498",
       "target": "analysis_data_manager_simulationmetadata"
     },
     {
@@ -40597,10 +42126,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L368",
+      "source_location": "L506",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_368",
+      "source": "analysis_data_manager_rationale_506",
       "target": "analysis_data_manager_simulationmetadata_load"
     },
     {
@@ -40876,6 +42405,28 @@
       "target": "analysis_lammps_parser_lammpsparser"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_run_actual_bench",
+      "target": "analysis_data_manager_simulationdata"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_run_actual_bench_run_bench",
+      "target": "analysis_data_manager_simulationdata"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -40901,10 +42452,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L454",
+      "source_location": "L592",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_454",
+      "source": "analysis_data_manager_rationale_592",
       "target": "analysis_data_manager_simulationdata_load_metadata"
     },
     {
@@ -40933,10 +42484,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "analysis/data_manager.py",
-      "source_location": "L489",
+      "source_location": "L627",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "analysis_data_manager_rationale_489",
+      "source": "analysis_data_manager_rationale_627",
       "target": "analysis_data_manager_simulationdata_get_available_cached_batches"
     },
     {
@@ -43810,6 +45361,58 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_dump_parse_bench",
+      "target": "scratch_dump_parse_bench_parse_numpy_fromstring"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_dump_parse_bench",
+      "target": "scratch_dump_parse_bench_parse_pandas_current"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_dump_parse_bench",
+      "target": "scratch_dump_parse_bench_run_bench"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_dump_parse_bench_run_bench",
+      "target": "scratch_dump_parse_bench_parse_pandas_current"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/dump_parse_bench.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_dump_parse_bench_run_bench",
+      "target": "scratch_dump_parse_bench_parse_numpy_fromstring"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "scratch/extract_benchmarks.py",
       "source_location": "L66",
       "weight": 1.0,
@@ -43837,6 +45440,79 @@
       "confidence_score": 1.0,
       "source": "scratch_extract_benchmarks_main",
       "target": "scratch_extract_benchmarks_parse_lammps_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench",
+      "target": "scratch_large_dump_bench_generate_large_dump"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench",
+      "target": "scratch_large_dump_bench_parse_numpy_fromstring"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench",
+      "target": "scratch_large_dump_bench_parse_pandas_current"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench",
+      "target": "scratch_large_dump_bench_run_bench"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench_run_bench",
+      "target": "scratch_large_dump_bench_generate_large_dump"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L86",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench_run_bench",
+      "target": "scratch_large_dump_bench_parse_pandas_current"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/large_dump_bench.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_large_dump_bench_run_bench",
+      "target": "scratch_large_dump_bench_parse_numpy_fromstring"
     },
     {
       "relation": "contains",
@@ -43888,6 +45564,16 @@
       "confidence_score": 1.0,
       "source": "scratch_repair_split_runs_repair",
       "target": "scratch_repair_split_runs_get_max_step"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/run_actual_bench.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_run_actual_bench",
+      "target": "scratch_run_actual_bench_run_bench"
     },
     {
       "relation": "contains",
@@ -43985,10 +45671,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L248",
+      "source_location": "L249",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "scratch_submit_flexible_rationale_248",
+      "source": "scratch_submit_flexible_rationale_249",
       "target": "scratch_submit_flexible_get_active_job_ids"
     },
     {
@@ -44028,10 +45714,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "scratch/submit_flexible.py",
-      "source_location": "L275",
+      "source_location": "L276",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "scratch_submit_flexible_rationale_275",
+      "source": "scratch_submit_flexible_rationale_276",
       "target": "scratch_submit_flexible_submit_jobs"
     },
     {
@@ -44335,6 +46021,89 @@
       "confidence_score": 1.0,
       "source": "scratch_test_resume_fix_test_resume_geometry_regeneration",
       "target": "simulation_grid_hopper_manager_gridhoppermanager"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec",
+      "target": "scratch_test_vec_calculate_angle"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec",
+      "target": "scratch_test_vec_run_test"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/test_vec.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_test_vec_run_test",
+      "target": "scratch_test_vec_calculate_angle"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_to_numeric_bench",
+      "target": "scratch_to_numeric_bench_parse_with_dtype"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_to_numeric_bench",
+      "target": "scratch_to_numeric_bench_parse_without_dtype"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_to_numeric_bench",
+      "target": "scratch_to_numeric_bench_run_bench"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_to_numeric_bench_run_bench",
+      "target": "scratch_to_numeric_bench_parse_without_dtype"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scratch/to_numeric_bench.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scratch_to_numeric_bench_run_bench",
+      "target": "scratch_to_numeric_bench_parse_with_dtype"
     },
     {
       "relation": "contains",
@@ -46241,6 +48010,28 @@
     },
     {
       "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "simulation/grid_hopper_manager.py",
+      "source_location": "L329",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_filling",
+      "target": "simulation_grid_hopper_manager_py_any"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "simulation/grid_hopper_manager.py",
+      "source_location": "L611",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_flow",
+      "target": "simulation_grid_hopper_manager_py_any"
+    },
+    {
+      "relation": "references",
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
@@ -46318,10 +48109,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L333",
+      "source_location": "L340",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_grid_hopper_manager_rationale_333",
+      "source": "simulation_grid_hopper_manager_rationale_340",
       "target": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_filling"
     },
     {
@@ -46361,10 +48152,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L466",
+      "source_location": "L482",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_grid_hopper_manager_rationale_466",
+      "source": "simulation_grid_hopper_manager_rationale_482",
       "target": "simulation_grid_hopper_manager_gridhoppermanager_run_grid_flow"
     },
     {
@@ -46404,10 +48195,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L597",
+      "source_location": "L622",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_grid_hopper_manager_rationale_597",
+      "source": "simulation_grid_hopper_manager_rationale_622",
       "target": "simulation_grid_hopper_manager_gridhoppermanager_resume_grid_flow"
     },
     {
@@ -46425,20 +48216,20 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L875",
+      "source_location": "L908",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_grid_hopper_manager_rationale_875",
+      "source": "simulation_grid_hopper_manager_rationale_908",
       "target": "simulation_grid_hopper_manager_gridhoppermanager_evaluate_variables"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/grid_hopper_manager.py",
-      "source_location": "L1064",
+      "source_location": "L1097",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_grid_hopper_manager_rationale_1064",
+      "source": "simulation_grid_hopper_manager_rationale_1097",
       "target": "simulation_grid_hopper_manager_gridhoppermanager_reset_sync_status"
     },
     {
@@ -47879,6 +49670,28 @@
     },
     {
       "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "simulation/orchestrator.py",
+      "source_location": "L382",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_filling",
+      "target": "simulation_orchestrator_py_any"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "simulation/orchestrator.py",
+      "source_location": "L465",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_flow",
+      "target": "simulation_orchestrator_py_any"
+    },
+    {
+      "relation": "references",
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "simulation/orchestrator.py",
@@ -47944,40 +49757,40 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L344",
+      "source_location": "L345",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_orchestrator_rationale_344",
+      "source": "simulation_orchestrator_rationale_345",
       "target": "simulation_orchestrator_simulationorchestrator_run_grid_hopper_filling"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L391",
+      "source_location": "L394",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_orchestrator_rationale_391",
+      "source": "simulation_orchestrator_rationale_394",
       "target": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_filling"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L431",
+      "source_location": "L436",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_orchestrator_rationale_431",
+      "source": "simulation_orchestrator_rationale_436",
       "target": "simulation_orchestrator_simulationorchestrator_run_grid_hopper_flow"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "simulation/orchestrator.py",
-      "source_location": "L469",
+      "source_location": "L476",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "simulation_orchestrator_rationale_469",
+      "source": "simulation_orchestrator_rationale_476",
       "target": "simulation_orchestrator_simulationorchestrator_resume_grid_hopper_flow"
     },
     {
@@ -48619,5 +50432,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f445d1de9764dd264a206853deb3dd8ced829b03"
+  "built_at_commit": "92b85bc88b6657c1f4ad7bb2b5c6b09de5d661e5"
 }

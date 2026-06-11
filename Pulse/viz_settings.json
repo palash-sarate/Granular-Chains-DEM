@@ -1,1 +1,1 @@
-{"offset": [0.0, 0.0, -0.05], "zoom": 1.0, "camera": null, "width": 1280, "height": 1280}
+{"offset": [0.0, 0.0, 0.0], "zoom": 1.0, "camera": null, "width": 2160, "height": 3840, "framing_mode": "bounds", "viewport_bounds": [-0.15, 0.15, -0.41, 0.35], "text_font_size": 28, "text_x": 20, "text_y": 80, "axes_size": 0.1, "axes_x": 0.0, "axes_y": 0.0}

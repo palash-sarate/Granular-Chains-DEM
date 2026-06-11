@@ -214,7 +214,8 @@ def generate_command(config):
         "fill": "run_grid_hopper_filling",
         "fill_resume": "resume_grid_hopper_filling",
         "flow": "run_grid_hopper_flow",
-        "flow_resume": "resume_grid_hopper_flow"
+        "flow_resume": "resume_grid_hopper_flow",
+        "calibration": "resume_grid_hopper_filling"
     }
     
     command_name = mapping.get(cmd_type, cmd_type)

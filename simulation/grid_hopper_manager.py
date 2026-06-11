@@ -118,7 +118,8 @@ class GridHopperManager:
                          simulation: str = "Hopper_Fill",
                          template: str = "in.grid_hopper_fill",
                          generate_vtk: bool = True,
-                         geometry_vars: Dict[str, Any] = None):
+                         geometry_vars: Dict[str, Any] = None,
+                         lepton_vars: Dict[str, Any] = None):
         t_start = time.time()
         print(f"[INFO] Grid filling simulation started. VTK Generation: {generate_vtk}")
         # 1. Normalize N and n_fill into lists
@@ -256,6 +257,22 @@ class GridHopperManager:
         setup_duration = time.time() - t_start
 
         # 4. Configure & Run Simulation
+        fill_extra_vars = {
+            "geometry_inc": geometry_inc,
+            "mol_include_file": inc_file,
+            "insertion_file": insertion_file,
+            "z_max": z_max,
+            "relax_steps": relax_steps,
+            "dt": dt,
+            "seed": seed,
+            "N": N_list[0],
+            "viscosity": viscosity,
+            "n_hoppers": n_hoppers,
+            "spacing": spacing
+        }
+        if lepton_vars:
+            fill_extra_vars.update(lepton_vars)
+
         config = SimulationConfig(
             template=template,
             simulation=simulation,
@@ -263,19 +280,7 @@ class GridHopperManager:
             data_file=None, # No data file, we use create_box
             lepton_file=lepton_file,
             dump_file=dump_file,
-            extra_vars={
-                "geometry_inc": geometry_inc,
-                "mol_include_file": inc_file,
-                "insertion_file": insertion_file,
-                "z_max": z_max,
-                "relax_steps": relax_steps,
-                "dt": dt,
-                "seed": seed,
-                "N": N_list[0],
-                "viscosity": viscosity,
-                "n_hoppers": n_hoppers,
-                "spacing": spacing
-            },
+            extra_vars=fill_extra_vars,
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos
@@ -294,6 +299,7 @@ class GridHopperManager:
                 "n_fill": n_fill_list,
                 "spacing": spacing,
                 "geometry_vars": normalized_geo_vars,
+                "lepton_vars": lepton_vars if lepton_vars else {},
                 "geometry_inc": geometry_inc,
                 "simulation": simulation,
                 "relaxed_sources": relaxed_sources,
@@ -329,7 +335,8 @@ class GridHopperManager:
                            template: str = "in.grid_hopper_fill_resume",
                            simulation: str = None,
                            seed: int = 42,
-                           inplace: bool = False):
+                           inplace: bool = False,
+                           lepton_vars: Dict[str, Any] = None):
         """
         Resumes a grid filling simulation from a restart file.
         """
@@ -409,6 +416,10 @@ class GridHopperManager:
         
         # Metadata Inheritance: Copy and Update with Lineage
         new_meta = meta_raw.copy()
+        if lepton_vars is None:
+            lepton_vars = meta_raw.get("lepton_vars", {})
+        new_meta["lepton_vars"] = lepton_vars
+
         if not inplace:
             new_meta["source_dir"] = str(prev_job_dir.absolute()).replace("\\", "/")
             new_meta["run_name"] = run_name
@@ -424,6 +435,16 @@ class GridHopperManager:
         with open(new_job_dir / "grid_metadata.json", 'w') as f:
             json.dump(new_meta, f, indent=4)
         
+        resume_extra_vars = {
+            "restart_path": str(restart_p).replace("\\", "/"),
+            "geometry_inc": local_geometry_inc.replace("\\", "/"),
+            "relax_steps": relax_steps,
+            "dt": dt,
+            "viscosity": viscosity
+        }
+        if lepton_vars:
+            resume_extra_vars.update(lepton_vars)
+
         config = SimulationConfig(
             template="in.grid_hopper_fill_resume",
             simulation=simulation,
@@ -432,13 +453,7 @@ class GridHopperManager:
             lepton_file=lepton_file,
             dump_file=dump_file,
             outdir_override=str(new_job_dir),
-            extra_vars={
-                "restart_path": str(restart_p).replace("\\", "/"),
-                "geometry_inc": local_geometry_inc.replace("\\", "/"),
-                "relax_steps": relax_steps,
-                "dt": dt,
-                "viscosity": viscosity
-            },
+            extra_vars=resume_extra_vars,
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos
@@ -462,7 +477,8 @@ class GridHopperManager:
                       simulation: str = "Grid_Hopper_Flow",
                       template: str = "in.grid_hopper_flow",
                       seed: int = 12345,
-                      inplace: bool = False):
+                      inplace: bool = False,
+                      lepton_vars: Dict[str, Any] = None):
         """
         Takes a filled grid state and starts the flow simulation (opens orifices + oscillation).
         """
@@ -524,6 +540,10 @@ class GridHopperManager:
 
         # 4. Save New Metadata
         new_meta = meta_raw.copy()
+        if lepton_vars is None:
+            lepton_vars = meta_raw.get("lepton_vars", {})
+        new_meta["lepton_vars"] = lepton_vars
+
         new_meta["freq"] = freq_list
         new_meta["amp"] = amp_list
         new_meta["osc_dir"] = osc_dir
@@ -554,6 +574,17 @@ class GridHopperManager:
             else:
                 raise FileNotFoundError(f"No restart file found in {source_p / 'restart'}")
 
+        flow_extra_vars = {
+            "restart_path": str(restart_path).replace("\\", "/"),
+            "geometry_inc": geometry_flow_inc.replace("\\", "/"),
+            "run_steps": run_steps,
+            "dt": dt,
+            "viscosity": viscosity,
+            "seed": seed
+        }
+        if lepton_vars:
+            flow_extra_vars.update(lepton_vars)
+
         config = SimulationConfig(
             template=template,
             simulation=simulation,
@@ -562,14 +593,7 @@ class GridHopperManager:
             lepton_file=lepton_file,
             dump_file=dump_file,
             outdir_override=str(job_dir),
-            extra_vars={
-                "restart_path": str(restart_path).replace("\\", "/"),
-                "geometry_inc": geometry_flow_inc.replace("\\", "/"),
-                "run_steps": run_steps,
-                "dt": dt,
-                "viscosity": viscosity,
-                "seed": seed
-            },
+            extra_vars=flow_extra_vars,
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos
@@ -593,7 +617,8 @@ class GridHopperManager:
                          template: str = "in.grid_hopper_flow_resume",
                          simulation: str = None,
                          seed: int = 42,
-                         inplace: bool = False):
+                         inplace: bool = False,
+                         lepton_vars: Dict[str, Any] = None):
         """
         Resumes a grid flow simulation from a restart file.
         """
@@ -666,6 +691,10 @@ class GridHopperManager:
         
         # Inherit Metadata and Update Lineage
         new_meta = meta_raw.copy()
+        if lepton_vars is None:
+            lepton_vars = meta_raw.get("lepton_vars", {})
+        new_meta["lepton_vars"] = lepton_vars
+
         if not inplace:
             new_meta["source_dir"] = str(job_dir.absolute()).replace("\\", "/")
             new_meta["run_name"] = run_name
@@ -680,6 +709,16 @@ class GridHopperManager:
         with open(new_job_dir / "grid_metadata.json", 'w') as f:
             json.dump(new_meta, f, indent=4)
 
+        flow_resume_extra_vars = {
+            "restart_path": str(restart_p).replace("\\", "/"),
+            "geometry_inc": local_geometry_inc.replace("\\", "/"),
+            "run_steps": run_steps,
+            "dt": dt,
+            "viscosity": viscosity
+        }
+        if lepton_vars:
+            flow_resume_extra_vars.update(lepton_vars)
+
         config = SimulationConfig(
             template=template,
             simulation=simulation,
@@ -688,13 +727,7 @@ class GridHopperManager:
             lepton_file=lepton_file,
             dump_file=dump_file,
             outdir_override=str(new_job_dir),
-            extra_vars={
-                "restart_path": str(restart_p).replace("\\", "/"),
-                "geometry_inc": local_geometry_inc.replace("\\", "/"),
-                "run_steps": run_steps,
-                "dt": dt,
-                "viscosity": viscosity
-            },
+            extra_vars=flow_resume_extra_vars,
             num_procs=num_procs,
             num_threads=num_threads,
             use_kokkos=use_kokkos

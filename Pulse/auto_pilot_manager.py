@@ -232,7 +232,8 @@ def run_manager():
             "fill": "run_grid_hopper_filling",
             "fill_resume": "resume_grid_hopper_filling",
             "flow": "run_grid_hopper_flow",
-            "flow_resume": "resume_grid_hopper_flow"
+            "flow_resume": "resume_grid_hopper_flow",
+            "calibration": "resume_grid_hopper_filling"
         }
         cmd_name = mapping.get(mode, mode)
         
@@ -246,12 +247,12 @@ def run_manager():
             # Flow study takes source_dir
             cmd_parts.extend(["--source_dir", path])
         else:
-            # Resumes take restart_path
+            # Resumes/Calibrations take restart_path
             cmd_parts.extend(["--restart_path", path])
 
         cmd_parts.extend([
-            "--relax_steps" if "fill" in mode else "--run_steps", str(g.get("increment") or 100000),
-            "--inplace" if g.get("in_place", True) else ""
+            "--relax_steps" if ("fill" in mode or mode == "calibration") else "--run_steps", str(g.get("increment") or 100000),
+            "--inplace" if (g.get("in_place", True) and mode != "calibration") else ""
         ])
         
         # Ensure a unique seed for NewRoot jobs if not already present
@@ -268,13 +269,13 @@ def run_manager():
         # Add any overrides (dt, viscosity, num_procs, etc.)
         # Exclude PBS-specific params and setup-only params for resumes/flows
         skip_params = {"walltime", "ppn", "mem"}
-        if "resume" in mode or "flow" in mode:
+        if "resume" in mode or "flow" in mode or mode == "calibration":
             # These are handled by the restart file or source_dir
             skip_params.update({
                 "N", "n_fill", "spacing", "n_hoppers", "mode", 
                 "source_dir", "no-vtk", "geometry_vars", "hopper_template_data"
             })
-            if "resume" in mode:
+            if "resume" in mode or mode == "calibration":
                 skip_params.add("restart_path")
             elif mode == "flow":
                 # When starting a new flow from a fill, we want to pivot to the 

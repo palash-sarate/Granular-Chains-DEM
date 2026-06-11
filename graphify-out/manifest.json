@@ -35,13 +35,13 @@
     "semantic_hash": ""
   },
   "Pulse/auto_pilot.json": {
-    "mtime": 1780905601.2622898,
-    "ast_hash": "79b534f1f631a70c74a58bfae5f86e4a",
+    "mtime": 1781164412.589407,
+    "ast_hash": "5937a10ac7cb5bb7d7eaf628d35736e1",
     "semantic_hash": ""
   },
   "Pulse/auto_pilot_manager.py": {
-    "mtime": 1780905310.2571037,
-    "ast_hash": "f154ff21b8f4f65d5ef08f6d1719e97b",
+    "mtime": 1781126311.0715637,
+    "ast_hash": "c2c0ebb7097844324b9527cefa13e192",
     "semantic_hash": ""
   },
   "Pulse/batch_restore.py": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "Pulse/dashboard.py": {
-    "mtime": 1780905709.908613,
-    "ast_hash": "9658b2d918afc1ad459670df6f886302",
+    "mtime": 1781127653.5115077,
+    "ast_hash": "1138c2fc161e05a59ece3aa997bec4b1",
     "semantic_hash": ""
   },
   "Pulse/download_drive.ps1": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "Pulse/lineage.json": {
-    "mtime": 1780905562.9555283,
-    "ast_hash": "06737a5ed746c38e0ee10acda5c51632",
+    "mtime": 1781164414.198396,
+    "ast_hash": "f82a7185983bb81eb71e7998a8b4e1ba",
     "semantic_hash": ""
   },
   "Pulse/lineage_notes.json": {
@@ -125,13 +125,13 @@
     "semantic_hash": ""
   },
   "Pulse/viz_manager.py": {
-    "mtime": 1778964805.4238124,
-    "ast_hash": "d64400342945d6a08114f737336b7316",
+    "mtime": 1781158146.3970451,
+    "ast_hash": "48cabfa67bd06038b31f89e6ceaffde7",
     "semantic_hash": ""
   },
   "Pulse/viz_settings.json": {
-    "mtime": 1780328249.6186101,
-    "ast_hash": "f834474a699c1aaf4b18c6e74be3412c",
+    "mtime": 1781158185.2407796,
+    "ast_hash": "cd27339c67578ef279b48c658b7d0cc4",
     "semantic_hash": ""
   },
   "analysis/__init__.py": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "analysis/controllers/unified_renderer.py": {
-    "mtime": 1779006478.8905964,
-    "ast_hash": "11ef4978235884487d01197344d77a5c",
+    "mtime": 1781157995.0460799,
+    "ast_hash": "8ce4f7df642da1a6352b9c0910590219",
     "semantic_hash": ""
   },
   "analysis/controllers/vtk_overlay.py": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "analysis/data_manager.py": {
-    "mtime": 1777715962.582447,
-    "ast_hash": "5f233d6800c535a1dc792c443d453212",
+    "mtime": 1781130727.7599556,
+    "ast_hash": "a9390ebe8582fee348bc1dbd815cbe8b",
     "semantic_hash": ""
   },
   "analysis/geometry_extractor.py": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "main.py": {
-    "mtime": 1779630387.445267,
-    "ast_hash": "1dfea3ce54939b303f62aa36ac489c83",
+    "mtime": 1781126294.4206855,
+    "ast_hash": "f71c66a8fc6786caa1cf3d1367dee7b1",
     "semantic_hash": ""
   },
   "scratch/check_env.py": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "scratch/submit_flexible.py": {
-    "mtime": 1778968638.7777689,
-    "ast_hash": "f1b08d1f4e22b8a6e1ad91f08476da34",
+    "mtime": 1781126385.2650204,
+    "ast_hash": "be3e0c91f53bd720c37d229a5fa47ec4",
     "semantic_hash": ""
   },
   "scratch/test_fix.py": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "simulation/grid_hopper_manager.py": {
-    "mtime": 1780904970.560226,
-    "ast_hash": "c9de5261cc480576c98862d6abed3af8",
+    "mtime": 1781126259.66794,
+    "ast_hash": "f272b8ae0d8cbf61adc8ecc557ba8177",
     "semantic_hash": ""
   },
   "simulation/grid_manager.py": {
@@ -390,8 +390,8 @@
     "semantic_hash": ""
   },
   "simulation/orchestrator.py": {
-    "mtime": 1778968638.7777689,
-    "ast_hash": "a22d510a47f92ff3883581e635b14af9",
+    "mtime": 1781126275.501824,
+    "ast_hash": "ba6187fe7f555429ab6adfef243a0dbd",
     "semantic_hash": ""
   },
   "simulation/runner.py": {
@@ -470,8 +470,8 @@
     "semantic_hash": ""
   },
   "simulation_templates/lepton.inc": {
-    "mtime": 1777070378.4078553,
-    "ast_hash": "a2020948b10ea5175cfbbb6e307ef8f4",
+    "mtime": 1781164414.9303908,
+    "ast_hash": "099dbe03299f8405f37e8623cf203711",
     "semantic_hash": ""
   },
   "simulation_templates/quiet_dump.inc": {
@@ -572,6 +572,76 @@
   "usefull_cmds.md": {
     "mtime": 1777889695.5849435,
     "ast_hash": "bf027e9b871656f641fc3fc8d18ca250",
+    "semantic_hash": ""
+  },
+  "Pulse/views/__init__.py": {
+    "mtime": 1781127200.8846934,
+    "ast_hash": "f5612461bb2146ed24749d86aceb567b",
+    "semantic_hash": ""
+  },
+  "Pulse/views/active_queue.py": {
+    "mtime": 1781127206.569649,
+    "ast_hash": "6904f178f2feb59bf33caabb797edc18",
+    "semantic_hash": ""
+  },
+  "Pulse/views/analysis.py": {
+    "mtime": 1781154621.6354766,
+    "ast_hash": "5632282564f205004938ad1629b54327",
+    "semantic_hash": ""
+  },
+  "Pulse/views/autopilot.py": {
+    "mtime": 1781127293.661969,
+    "ast_hash": "cbd7c19da2aab3dad2c161e336b0f539",
+    "semantic_hash": ""
+  },
+  "Pulse/views/eta.py": {
+    "mtime": 1781127232.185449,
+    "ast_hash": "d78822645bcc4a29a0a090552e2d948d",
+    "semantic_hash": ""
+  },
+  "Pulse/views/history.py": {
+    "mtime": 1781127214.5775864,
+    "ast_hash": "eae81e63aeed6e23598027009a7bc968",
+    "semantic_hash": ""
+  },
+  "Pulse/views/lineage.py": {
+    "mtime": 1781127278.7470853,
+    "ast_hash": "82373fedb90e8f0efe260c1f858dd872",
+    "semantic_hash": ""
+  },
+  "Pulse/views/sync.py": {
+    "mtime": 1781127303.0548956,
+    "ast_hash": "c258e24b0b5d4dbbf73015a7c576d435",
+    "semantic_hash": ""
+  },
+  "Pulse/views/visualization.py": {
+    "mtime": 1781158122.6252077,
+    "ast_hash": "0bda7a653b345152c34e21ef5530e699",
+    "semantic_hash": ""
+  },
+  "scratch/dump_parse_bench.py": {
+    "mtime": 1781130640.8934612,
+    "ast_hash": "ac6479f493f38e9fcf0cc8d6b15f466a",
+    "semantic_hash": ""
+  },
+  "scratch/large_dump_bench.py": {
+    "mtime": 1781130653.6043873,
+    "ast_hash": "1eb3b5b91423a9a41403dca00d522999",
+    "semantic_hash": ""
+  },
+  "scratch/run_actual_bench.py": {
+    "mtime": 1781130749.0608315,
+    "ast_hash": "bb0da832373ea542a3be04c935b5c5d1",
+    "semantic_hash": ""
+  },
+  "scratch/test_vec.py": {
+    "mtime": 1781130163.8195949,
+    "ast_hash": "5f44229f075a69f210c6f52f654d4869",
+    "semantic_hash": ""
+  },
+  "scratch/to_numeric_bench.py": {
+    "mtime": 1781130679.607236,
+    "ast_hash": "02141f19f7158d134e1b44d40b806a10",
     "semantic_hash": ""
   }
 }

@@ -340,7 +340,8 @@ class SimulationOrchestrator:
                                 template: str = "in.grid_hopper_fill",
                                 generate_vtk: bool = True,
                                 geometry_vars: Dict[str, Any] = None,
-                                inplace: bool = False):
+                                inplace: bool = False,
+                                lepton_vars: Dict[str, Any] = None):
         """
         Main entry point for grid-based batch hopper filling.
         Packs multiple hoppers into one simulation box for faster generation.
@@ -374,7 +375,8 @@ class SimulationOrchestrator:
             simulation=simulation,
             template=template,
             generate_vtk=generate_vtk,
-            geometry_vars=geometry_vars
+            geometry_vars=geometry_vars,
+            lepton_vars=lepton_vars
         )
 
     def resume_grid_hopper_filling(self, restart_path: str, relax_steps: int = 500000,
@@ -387,7 +389,8 @@ class SimulationOrchestrator:
                                   template: str = "in.grid_hopper_fill_resume",
                                   simulation: Optional[str] = None,
                                   seed: Optional[int] = None,
-                                  inplace: bool = False):
+                                  inplace: bool = False,
+                                  lepton_vars: Dict[str, Any] = None):
         """
         Resumes a grid hopper filling simulation from a restart file.
         """
@@ -414,7 +417,8 @@ class SimulationOrchestrator:
             template=template,
             simulation=simulation,
             seed=seed,
-            inplace=inplace
+            inplace=inplace,
+            lepton_vars=lepton_vars
         )
 
     def run_grid_hopper_flow(self, source_dir: str, run_steps: int = 1000000,
@@ -427,7 +431,8 @@ class SimulationOrchestrator:
                              simulation: str = "Grid_Hopper_Flow",
                              template: str = "in.grid_hopper_flow",
                              seed: Optional[int] = None,
-                             inplace: bool = False):
+                             inplace: bool = False,
+                             lepton_vars: Dict[str, Any] = None):
         """
         Transitions a filling simulation to a flow simulation with oscillation.
         """
@@ -453,7 +458,8 @@ class SimulationOrchestrator:
             simulation=simulation,
             template=template,
             seed=seed,
-            inplace=inplace
+            inplace=inplace,
+            lepton_vars=lepton_vars
         )
 
     def resume_grid_hopper_flow(self, restart_path: str, run_steps: int = 1000000,
@@ -465,7 +471,8 @@ class SimulationOrchestrator:
                                 template: str = "in.grid_hopper_flow_resume",
                                 simulation: str = None,
                                 seed: Optional[int] = None,
-                                inplace: bool = False):
+                                inplace: bool = False,
+                                lepton_vars: Dict[str, Any] = None):
         """
         Resumes a grid hopper flow simulation.
         """
@@ -490,5 +497,6 @@ class SimulationOrchestrator:
             template=template,
             simulation=simulation,
             seed=seed,
-            inplace=inplace
+            inplace=inplace,
+            lepton_vars=lepton_vars
         )

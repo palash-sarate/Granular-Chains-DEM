@@ -10,6 +10,144 @@ from typing import Optional, Tuple, Any, Dict
 from concurrent.futures import ProcessPoolExecutor
 from analysis.lammps_parser import LammpsParser
 
+_PARSER_POOL = None
+
+def get_parser_pool():
+    global _PARSER_POOL
+    if _PARSER_POOL is None:
+        import multiprocessing
+        _PARSER_POOL = ProcessPoolExecutor(max_workers=min(multiprocessing.cpu_count(), 16))
+    return _PARSER_POOL
+
+def calculate_bonds_angles_vectorized(df_atoms):
+    if df_atoms is None or df_atoms.empty:
+        return pd.DataFrame(), pd.DataFrame()
+        
+    df_reset = df_atoms.reset_index() if df_atoms.index.names[0] is not None else df_atoms.copy()
+    
+    # Ensure critical columns exist
+    for col in ['timestep', 'id', 'mol', 'x', 'y', 'z']:
+        if col not in df_reset.columns:
+            return pd.DataFrame(), pd.DataFrame()
+            
+    df_sorted = df_reset.sort_values(by=['timestep', 'mol', 'id'])
+    
+    timesteps = df_sorted['timestep'].unique()
+    if len(timesteps) == 0:
+        return pd.DataFrame(), pd.DataFrame()
+        
+    sample_ts = timesteps[0]
+    df_sample = df_sorted[df_sorted['timestep'] == sample_ts]
+    mols_sample = df_sample['mol'].values
+    if len(mols_sample) == 0:
+        return pd.DataFrame(), pd.DataFrame()
+    unique_mols, counts = np.unique(mols_sample, return_counts=True)
+    N = counts[0]
+    num_chains = len(unique_mols)
+    
+    expected_rows = len(timesteps) * num_chains * N
+    
+    if len(df_sorted) == expected_rows:
+        coords = df_sorted[['x', 'y', 'z']].values
+        pos = coords.reshape((len(timesteps), num_chains, N, 3))
+        
+        bonds = pos[:, :, 1:, :] - pos[:, :, :-1, :] # Shape: (T, M, N-1, 3)
+        dists = np.linalg.norm(bonds, axis=3) # Shape: (T, M, N-1)
+        
+        b1 = bonds[:, :, :-1, :] # Shape: (T, M, N-2, 3)
+        b2 = bonds[:, :, 1:, :]  # Shape: (T, M, N-2, 3)
+        dot_prod = np.sum(-b1 * b2, axis=3) # Shape: (T, M, N-2)
+        norm_b1 = np.linalg.norm(b1, axis=3)
+        norm_b2 = np.linalg.norm(b2, axis=3)
+        cos_theta = dot_prod / (norm_b1 * norm_b2 + 1e-16)
+        cos_theta = np.clip(cos_theta, -1.0, 1.0)
+        theta = np.arccos(cos_theta) # Shape: (T, M, N-2) in radians
+        
+        bond_ids = np.arange(1, num_chains * (N - 1) + 1)
+        out_bond_ids = np.tile(bond_ids, len(timesteps))
+        out_bond_ts = np.repeat(timesteps, len(bond_ids))
+        
+        df_bonds = pd.DataFrame({
+            'timestep': out_bond_ts,
+            'id': out_bond_ids,
+            'dist': dists.flatten(),
+            'energy': 0.0,
+            'force': 0.0
+        })
+        df_bonds.set_index(['timestep', 'id'], inplace=True)
+        df_bonds.sort_index(inplace=True)
+        
+        angle_ids = np.arange(1, num_chains * (N - 2) + 1)
+        out_angle_ids = np.tile(angle_ids, len(timesteps))
+        out_angle_ts = np.repeat(timesteps, len(angle_ids))
+        
+        df_angles = pd.DataFrame({
+            'timestep': out_angle_ts,
+            'id': out_angle_ids,
+            'theta': theta.flatten(), # radians
+            'energy': 0.0
+        })
+        df_angles.set_index(['timestep', 'id'], inplace=True)
+        df_angles.sort_index(inplace=True)
+        
+    else:
+        bond_list = []
+        angle_list = []
+        for ts, df_ts in df_sorted.groupby('timestep'):
+            mols_ts = df_ts['mol'].values
+            unique_mols_ts, counts_ts = np.unique(mols_ts, return_counts=True)
+            if len(counts_ts) == 0:
+                continue
+            N_ts = counts_ts[0]
+            num_chains_ts = len(unique_mols_ts)
+            
+            if len(df_ts) == num_chains_ts * N_ts:
+                coords = df_ts[['x', 'y', 'z']].values.reshape((num_chains_ts, N_ts, 3))
+                
+                bonds = coords[:, 1:, :] - coords[:, :-1, :]
+                dists = np.linalg.norm(bonds, axis=2)
+                bond_ids = np.arange(1, num_chains_ts * (N_ts - 1) + 1)
+                
+                df_b_ts = pd.DataFrame({
+                    'timestep': ts,
+                    'id': bond_ids,
+                    'dist': dists.flatten(),
+                    'energy': 0.0,
+                    'force': 0.0
+                })
+                bond_list.append(df_b_ts)
+                
+                b1 = bonds[:, :-1, :]
+                b2 = bonds[:, 1:, :]
+                dot_prod = np.sum(-b1 * b2, axis=2)
+                norm_b1 = np.linalg.norm(b1, axis=2)
+                norm_b2 = np.linalg.norm(b2, axis=2)
+                cos_theta = dot_prod / (norm_b1 * norm_b2 + 1e-16)
+                cos_theta = np.clip(cos_theta, -1.0, 1.0)
+                theta = np.arccos(cos_theta)
+                angle_ids = np.arange(1, num_chains_ts * (N_ts - 2) + 1)
+                
+                df_a_ts = pd.DataFrame({
+                    'timestep': ts,
+                    'id': angle_ids,
+                    'theta': theta.flatten(),
+                    'energy': 0.0
+                })
+                angle_list.append(df_a_ts)
+                
+        if bond_list:
+            df_bonds = pd.concat(bond_list).set_index(['timestep', 'id']).sort_index()
+        else:
+            df_bonds = pd.DataFrame()
+            
+        if angle_list:
+            df_angles = pd.concat(angle_list).set_index(['timestep', 'id']).sort_index()
+        else:
+            df_angles = pd.DataFrame()
+            
+    return df_bonds, df_angles
+
+
 
 def find_simulation_lineage(sim_dir: str) -> list:
     """Finds the full lineage (ancestors and descendants) for a simulation."""
@@ -492,9 +630,7 @@ class SimulationData:
         for i in range(batch_count):
             start_idx = i * self.batch_size
             end_idx = start_idx + self.batch_size
-            batch_files = self.atom_files[start_idx:end_idx] + \
-                          self.bond_files[start_idx:end_idx] + \
-                          self.angle_files[start_idx:end_idx]
+            batch_files = self.atom_files[start_idx:end_idx]
             if self._is_batch_cache_valid(i, batch_files):
                 available.append(i)
         self.cached_batches = set(available)
@@ -524,11 +660,9 @@ class SimulationData:
         end_idx = start_idx + self.batch_size
 
         batch_atoms_files = self.atom_files[start_idx:end_idx]
-        batch_bonds_files = self.bond_files[start_idx:end_idx]
-        batch_angles_files = self.angle_files[start_idx:end_idx]
 
         loaded_data = None
-        if not force_reload and self._is_batch_cache_valid(batch_idx, batch_atoms_files + batch_bonds_files + batch_angles_files):
+        if not force_reload and self._is_batch_cache_valid(batch_idx, batch_atoms_files):
             try:
                 with open(cache_file, 'rb') as f:
                     loaded_data = pickle.load(f)
@@ -536,8 +670,7 @@ class SimulationData:
 
         if loaded_data is None:
             batch_atoms = self._parse_dump_list(batch_atoms_files)
-            batch_bonds = self._parse_dump_list(batch_bonds_files)
-            batch_angles = self._parse_dump_list(batch_angles_files)
+            batch_bonds, batch_angles = calculate_bonds_angles_vectorized(batch_atoms)
             
             loaded_data = {'atoms': batch_atoms, 'bonds': batch_bonds, 'angles': batch_angles}
             try:
@@ -592,8 +725,8 @@ class SimulationData:
     def _parse_dump_list(self, dump_files):
         valid_files = [f for f in dump_files if f]
         if not valid_files: return pd.DataFrame()
-        with ProcessPoolExecutor() as executor:
-            all_frames = list(executor.map(_parse_single_dump_fast, valid_files))
+        executor = get_parser_pool()
+        all_frames = list(executor.map(_parse_single_dump_fast, valid_files))
         all_frames = [f for f in all_frames if f is not None and not f.empty]
         if not all_frames: return pd.DataFrame()
         try:

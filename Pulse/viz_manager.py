@@ -167,7 +167,10 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
             show_axes=params.get('show_axes', True),
             show_grid=params.get('show_grid', False),
             camera_state=params.get('camera_position'),
-            zoom=params.get('zoom', 1.0)
+            offset=params.get('offset'),
+            zoom=params.get('zoom', 1.0),
+            viewport_bounds=params.get('viewport_bounds'),
+            axes_viewport=params.get('axes_viewport')
         )
 
         preview_path = os.path.join(ROOT_DIR, VizManager.VIZ_DIR, "preview.png")
@@ -221,11 +224,16 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
             show_grid=params.get('show_grid', False),
             camera_state=params.get('camera_position'),
             offset=offset,
-            zoom=zoom
+            zoom=zoom,
+            viewport_bounds=params.get('viewport_bounds'),
+            axes_viewport=params.get('axes_viewport')
         )
         
-        # Add Overlay
-        plotter.add_text(f"{f_ts*dt:.3f}s", position='upper_left', font_size=12, color='red')
+        # Add Overlay (using exact pixel positioning to prevent scaling with resolution)
+        t_font = params.get('text_font_size', 14)
+        t_x = params.get('text_x', 20)
+        t_y = params.get('text_y', 40)
+        plotter.add_text(f"{f_ts*dt:.3f}s", position=(t_x, res[1] - t_y), font_size=t_font, color='red')
         
         snapshot_path = os.path.join(ROOT_DIR, VizManager.VIZ_DIR, f"snapshot_{f_ts}.png")
         os.makedirs(os.path.dirname(snapshot_path), exist_ok=True)
@@ -306,9 +314,15 @@ python Pulse/viz_manager.py --params '{json.dumps(params)}'
                 show_grid=params.get('show_grid', False),
                 camera_state=params.get('camera_position'),
                 offset=offset,
-                zoom=params.get('zoom', 1.0)
+                zoom=params.get('zoom', 1.0),
+                viewport_bounds=params.get('viewport_bounds'),
+                axes_viewport=params.get('axes_viewport')
             )
-            plotter.add_text(f"{f_ts*dt:.3f}s\nFrame: {i}", position='upper_left', font_size=10, color='red')
+            # Use exact pixel positioning to prevent scaling with resolution
+            t_font = params.get('text_font_size', 14)
+            t_x = params.get('text_x', 20)
+            t_y = params.get('text_y', 40)
+            plotter.add_text(f"{f_ts*dt:.3f}s\nFrame: {i}", position=(t_x, res[1] - t_y - t_font), font_size=t_font, color='red')
             plotter.screenshot(os.path.join(frames_dir, f"frame_{i:06d}.png"))
             if i % 10 == 0: print(f"Rendered {i}/{len(frames)} frames...")
 
