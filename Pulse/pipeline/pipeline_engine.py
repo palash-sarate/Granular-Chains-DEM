@@ -10,18 +10,23 @@ class PipelineEngine:
     # Key: Stage Name
     # Value: Dict of dependencies, description, and relative output file path
     RUN_PIPELINE = {
-        "load_atoms": {
+        "load_data": {
             "dependencies": [],
             "description": "Loads raw dumps and creates simplified atomic coordinate cache.",
-            "output_file": "load_atoms.parquet"
+            "output_file": "load_data.parquet"
+        },
+        "bond_angle_calc": {
+            "dependencies": ["load_data"],
+            "description": "Calculates bond lengths and bond angles from coordinates.",
+            "output_file": ["bonds.parquet", "angles.parquet"]
         },
         "time_duration": {
-            "dependencies": ["load_atoms"],
+            "dependencies": ["load_data"],
             "description": "Finds the timestep and duration at which the hopper becomes completely empty.",
             "output_file": "time_duration.parquet"
         },
         "mass_flow_rate": {
-            "dependencies": ["load_atoms"],
+            "dependencies": ["load_data"],
             "description": "Calculates number of beads and total mass in the hopper per timestep.",
             "output_file": "mass_flow_rate.parquet"
         }
@@ -38,11 +43,36 @@ class PipelineEngine:
     @staticmethod
     def get_status_path(run_path: str) -> str:
         return os.path.join(run_path, "results_pipeline", "pipeline_status.parquet")
+ 
+    @staticmethod
+    def get_applicable_stages(run_path: str) -> List[str]:
+        """Returns the list of stage names that apply to this run type."""
+        from Pulse.pulse_core import PBSManager
+        lineage = PBSManager.load_lineage()
         
+        resolved_path = os.path.realpath(run_path)
+        run_info = (
+            lineage.get(resolved_path) or 
+            lineage.get(os.path.abspath(run_path)) or 
+            lineage.get(run_path) or 
+            {}
+        )
+        
+        sim_type = run_info.get("simulation", "")
+        if not sim_type:
+            # Fallback string check on path to determine if it is a Flow run
+            if "Flow" in run_path or "flow" in run_path.lower():
+                sim_type = "Hopper_Flow"
+                
+        if "Flow" in sim_type:
+            return list(PipelineEngine.RUN_PIPELINE.keys())
+        else:
+            return ["load_data", "bond_angle_calc"]
+
     @staticmethod
     def load_status(run_path: str) -> pd.DataFrame:
         status_path = PipelineEngine.get_status_path(run_path)
-        stages = list(PipelineEngine.RUN_PIPELINE.keys())
+        stages = PipelineEngine.get_applicable_stages(run_path)
         if os.path.exists(status_path):
             try:
                 df = pd.read_parquet(status_path)
@@ -69,7 +99,7 @@ class PipelineEngine:
 
     @staticmethod
     def get_global_status_path() -> str:
-        return os.path.join(ROOT_DIR, "Results_Pipeline", "pipeline_status.parquet")
+        return os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline", "pipeline_status.parquet")
 
     @staticmethod
     def load_global_status() -> pd.DataFrame:
@@ -104,7 +134,7 @@ class PipelineEngine:
         """Loads status and detects dead PBS jobs for a run."""
         df = PipelineEngine.load_status(run_path)
         changed = False
-        stages = list(PipelineEngine.RUN_PIPELINE.keys())
+        stages = PipelineEngine.get_applicable_stages(run_path)
         
         status_dict = {}
         for stage in stages:
@@ -238,7 +268,7 @@ python Pulse/pipeline/run_stage.py --run '{run_path}' --stage '{stage_name}'
     @staticmethod
     def submit_global_stage_job(stage_name: str, run_paths: List[str]) -> str:
         """Submits the global pipeline stage as a PBS job."""
-        global_dir = os.path.join(ROOT_DIR, "Results_Pipeline")
+        global_dir = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline")
         os.makedirs(global_dir, exist_ok=True)
         log_path = os.path.join(global_dir, f"job_{stage_name}.log")
         
@@ -295,7 +325,12 @@ python Pulse/pipeline/run_global_stage.py --stage '{stage_name}' --runs {runs_ar
     @staticmethod
     def trigger_pipeline(run_path: str, start_stage: str) -> Dict[str, str]:
         """Triggers execution from the start_stage, automatically queueing dependencies topologically."""
-        to_execute = [start_stage] + PipelineEngine.get_downstream_stages(start_stage)
+        applicable_stages = PipelineEngine.get_applicable_stages(run_path)
+        if start_stage not in applicable_stages:
+            raise ValueError(f"Stage '{start_stage}' is not applicable for this run type.")
+            
+        raw_execute = [start_stage] + PipelineEngine.get_downstream_stages(start_stage)
+        to_execute = [s for s in raw_execute if s in applicable_stages]
         
         execution_order = []
         visited = set()

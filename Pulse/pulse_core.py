@@ -743,6 +743,25 @@ python Pulse/run_sync_job.py --user {user}
                     else:
                         log_msg(f"Upload failed with code {proc.returncode}")
                 
+                # Mirror Global Results Pipeline Directory
+                global_pipeline_dir = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline")
+                if os.path.exists(global_pipeline_dir):
+                    log_msg("Mirroring Global Results Pipeline directory to Google Drive...")
+                    rclone_cmd = [
+                        "rclone", "copy", global_pipeline_dir,
+                        "gdrive:Granular-Chains-DEM/Results_Pipeline",
+                        "--transfers", "8",
+                        "--buffer-size", "64M"
+                    ]
+                    try:
+                        res = subprocess.run(rclone_cmd, capture_output=True, text=True, timeout=300)
+                        if res.returncode == 0:
+                            log_msg("Global Results Pipeline mirror successful.")
+                        else:
+                            log_msg(f"Global Results Pipeline mirror failed with code {res.returncode}: {res.stderr}")
+                    except Exception as e:
+                        log_msg(f"Warning: Failed to mirror Global Results Pipeline: {e}")
+                
                 # 6. Smart Cleanup (Refined Logic)
                 if not os.path.exists(stop_path):
                     log_msg("Starting Smart Cleanup...")

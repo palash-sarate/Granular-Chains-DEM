@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "Pulse/auto_pilot.json": {
-    "mtime": 1781202901.1636965,
-    "ast_hash": "19c98e6641f4094764c0c8dc9e9d1dfb",
+    "mtime": 1781211601.2841809,
+    "ast_hash": "2230629bf83c455721c1604171f9b058",
     "semantic_hash": ""
   },
   "Pulse/auto_pilot_manager.py": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "Pulse/dashboard.py": {
-    "mtime": 1781202740.3228076,
-    "ast_hash": "e2e0a697ad1e6cb415d9c1711efa37d7",
+    "mtime": 1781208360.1420515,
+    "ast_hash": "e30083f5fe56e11f2c097eca28ba8b51",
     "semantic_hash": ""
   },
   "Pulse/download_drive.ps1": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "Pulse/lineage.json": {
-    "mtime": 1781200803.4771433,
-    "ast_hash": "9946ac4495320232e005125da8532c3c",
+    "mtime": 1781211126.7846775,
+    "ast_hash": "a5311d594ed7b604b73ecc9daed9b96e",
     "semantic_hash": ""
   },
   "Pulse/lineage_notes.json": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "Pulse/pulse_core.py": {
-    "mtime": 1779868744.4880323,
-    "ast_hash": "ee28fb89c2acb865f164bb7ecd14fbb5",
+    "mtime": 1781211617.3560627,
+    "ast_hash": "1539c19ac89c41215053993ef9b085d1",
     "semantic_hash": ""
   },
   "Pulse/pulse_metadata.json": {
@@ -177,11 +177,6 @@
   "analysis/controllers/restart_editor.py": {
     "mtime": 1776441559.2082987,
     "ast_hash": "61617bde55ae750fe865b9c9538dc6a1",
-    "semantic_hash": ""
-  },
-  "analysis/controllers/sim_data.py": {
-    "mtime": 1778240767.5374591,
-    "ast_hash": "6d41bb766ab0cc99b24d55d776d592e7",
     "semantic_hash": ""
   },
   "analysis/controllers/simulation_launcher.py": {
@@ -584,11 +579,6 @@
     "ast_hash": "6904f178f2feb59bf33caabb797edc18",
     "semantic_hash": ""
   },
-  "Pulse/views/analysis.py": {
-    "mtime": 1781154621.6354766,
-    "ast_hash": "5632282564f205004938ad1629b54327",
-    "semantic_hash": ""
-  },
   "Pulse/views/autopilot.py": {
     "mtime": 1781127293.661969,
     "ast_hash": "cbd7c19da2aab3dad2c161e336b0f539",
@@ -649,19 +639,14 @@
     "ast_hash": "9ca81f67f9e09d6762818dc42e8eda2d",
     "semantic_hash": ""
   },
-  "Pulse/pipeline/load_atoms.py": {
-    "mtime": 1781202839.6821213,
-    "ast_hash": "f3a3823de60bae001c0cf58907b6698f",
-    "semantic_hash": ""
-  },
   "Pulse/pipeline/mass_flow_rate.py": {
     "mtime": 1781202934.388467,
     "ast_hash": "8e20d45205e8b6565154f98cf372dc22",
     "semantic_hash": ""
   },
   "Pulse/pipeline/pipeline_engine.py": {
-    "mtime": 1781202925.9145257,
-    "ast_hash": "77d9da1d77ab29b48ce9d2fc376fa10a",
+    "mtime": 1781208332.0672581,
+    "ast_hash": "2bb8fddb9c61f3bb99f4cafd888dde28",
     "semantic_hash": ""
   },
   "Pulse/pipeline/pool_time_durations.py": {
@@ -670,13 +655,13 @@
     "semantic_hash": ""
   },
   "Pulse/pipeline/run_global_stage.py": {
-    "mtime": 1781202947.2143786,
-    "ast_hash": "9fcdbd9e5f6f7b0b69973b77900696f0",
+    "mtime": 1781207217.4974337,
+    "ast_hash": "093729464dbd7aaed680d42de1355738",
     "semantic_hash": ""
   },
   "Pulse/pipeline/run_stage.py": {
-    "mtime": 1781202943.4404047,
-    "ast_hash": "e2ba106845c444b052f15ac28a22e44f",
+    "mtime": 1781208339.4802036,
+    "ast_hash": "e5421a7b7b19f31b5ebdba0d93600db3",
     "semantic_hash": ""
   },
   "Pulse/pipeline/time_duration.py": {
@@ -685,8 +670,18 @@
     "semantic_hash": ""
   },
   "Pulse/views/results.py": {
-    "mtime": 1781202952.5373418,
-    "ast_hash": "15c8a446419532857866e7aa6f54f7fd",
+    "mtime": 1781210935.2720885,
+    "ast_hash": "f1a7e8d5d6c177dc897e3b3bb614db26",
+    "semantic_hash": ""
+  },
+  "Pulse/pipeline/load_data.py": {
+    "mtime": 1781208317.8123631,
+    "ast_hash": "47dac42d664c7f1191e4d50fde175419",
+    "semantic_hash": ""
+  },
+  "Pulse/pipeline/bond_angle_calc.py": {
+    "mtime": 1781208324.334315,
+    "ast_hash": "2b783c3818487d7ddbc83c2c73bd704d",
     "semantic_hash": ""
   }
 }

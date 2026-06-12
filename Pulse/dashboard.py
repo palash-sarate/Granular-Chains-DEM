@@ -32,7 +32,6 @@ if ROOT_DIR not in sys.path:
 
 from Pulse.pulse_core import PBSManager, SimulationMonitor, SyncManager, AutoPilotManager
 import streamlit.components.v1 as components
-from analysis.controllers.sim_data import SimDataController
 from analysis.controllers.renderer import SimulationRenderer
 from analysis.controllers.highlighter import HighlightController
 from stpyvista import stpyvista
@@ -146,7 +145,7 @@ if st.runtime.exists():
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row; justify-content: center; gap: 20px;} div.row-widget.stRadio label{background: #f0f2f6; padding: 10px 20px; border-radius: 5px; cursor: pointer;} div.row-widget.stRadio div[role="radiogroup"] > label[data-baseweb="radio"]{background: #f0f2f6; border: 1px solid #ddd;}</style>', unsafe_allow_html=True)
     
     # --- Navigation Persistence ---
-    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "📈 Analysis", "🧪 Results", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
+    pages = ["📊 Active Queue", "🧬 Lineage", "🤖 Auto-Pilot", "🎬 Visualization", "🧪 Results", "⏱️ ETA", "🕰️ History", "🔄 Sync"]
     
     # Initialize from URL or default
     query_nav = st.query_params.get("tab", pages[0])
@@ -192,10 +191,6 @@ if st.runtime.exists():
         from Pulse.views.history import render_history
         render_history(user_filter)
 
-
-    elif nav == "📈 Analysis":
-        from Pulse.views.analysis import render_analysis
-        render_analysis()
 
     elif nav == "🧪 Results":
         from Pulse.views.results import render_results

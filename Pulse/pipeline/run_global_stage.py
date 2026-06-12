@@ -35,7 +35,7 @@ def main():
     parser.add_argument("--runs", type=str, nargs="+", required=True, help="List of run directories to pool")
     args = parser.parse_args()
     
-    global_dir = os.path.join(ROOT_DIR, "Results_Pipeline")
+    global_dir = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline")
     os.makedirs(global_dir, exist_ok=True)
     
     status_path = os.path.join(global_dir, "pipeline_status.parquet")

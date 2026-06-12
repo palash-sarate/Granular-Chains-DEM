@@ -308,7 +308,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "pulse_auto_pilot_goals",
-      "community": 98,
+      "community": 103,
       "norm_label": "goals"
     },
     {
@@ -2785,7 +2785,7 @@
       "label": "load_notes()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L52",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "pulse_dashboard_load_notes",
       "community": 5,
@@ -2795,7 +2795,7 @@
       "label": "save_note()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L59",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "pulse_dashboard_save_note",
       "community": 5,
@@ -2805,7 +2805,7 @@
       "label": "load_viz_settings()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L65",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "pulse_dashboard_load_viz_settings",
       "community": 5,
@@ -2815,7 +2815,7 @@
       "label": "save_viz_settings()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L72",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "pulse_dashboard_save_viz_settings",
       "community": 5,
@@ -2825,7 +2825,7 @@
       "label": "wrap_sim_name()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L78",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "pulse_dashboard_wrap_sim_name",
       "community": 5,
@@ -2835,7 +2835,7 @@
       "label": "st_directory_picker()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L93",
+      "source_location": "L92",
       "_origin": "ast",
       "id": "pulse_dashboard_st_directory_picker",
       "community": 5,
@@ -2845,7 +2845,7 @@
       "label": "load_auto_pilot()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L175",
+      "source_location": "L174",
       "_origin": "ast",
       "id": "pulse_dashboard_load_auto_pilot",
       "community": 5,
@@ -2855,7 +2855,7 @@
       "label": "save_auto_pilot()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L182",
+      "source_location": "L181",
       "_origin": "ast",
       "id": "pulse_dashboard_save_auto_pilot",
       "community": 5,
@@ -2865,7 +2865,7 @@
       "label": "render_system_status()",
       "file_type": "code",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L232",
+      "source_location": "L227",
       "_origin": "ast",
       "id": "pulse_dashboard_render_system_status",
       "community": 5,
@@ -2875,9 +2875,9 @@
       "label": "Wraps simulation names by breaking on underscores to keep nodes compact.",
       "file_type": "rationale",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L79",
+      "source_location": "L78",
       "_origin": "ast",
-      "id": "pulse_dashboard_rationale_79",
+      "id": "pulse_dashboard_rationale_78",
       "community": 5,
       "norm_label": "wraps simulation names by breaking on underscores to keep nodes compact."
     },
@@ -2885,9 +2885,9 @@
       "label": "A simple directory picker for Streamlit.",
       "file_type": "rationale",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L94",
+      "source_location": "L93",
       "_origin": "ast",
-      "id": "pulse_dashboard_rationale_94",
+      "id": "pulse_dashboard_rationale_93",
       "community": 5,
       "norm_label": "a simple directory picker for streamlit."
     },
@@ -6360,24 +6360,44 @@
       "norm_label": "__init__.py"
     },
     {
-      "label": "load_atoms.py",
+      "label": "bond_angle_calc.py",
       "file_type": "code",
-      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "pipeline_load_atoms",
-      "community": 20,
-      "norm_label": "load_atoms.py"
+      "id": "pipeline_bond_angle_calc",
+      "community": 11,
+      "norm_label": "bond_angle_calc.py"
     },
     {
-      "label": "run_load_atoms()",
+      "label": "run_bond_angle_calc()",
       "file_type": "code",
-      "source_file": "Pulse/pipeline/load_atoms.py",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "pipeline_bond_angle_calc_run_bond_angle_calc",
+      "community": 11,
+      "norm_label": "run_bond_angle_calc()"
+    },
+    {
+      "label": "load_data.py",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/load_data.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pipeline_load_data",
+      "community": 11,
+      "norm_label": "load_data.py"
+    },
+    {
+      "label": "run_load_data()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/load_data.py",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "pipeline_load_atoms_run_load_atoms",
-      "community": 20,
-      "norm_label": "run_load_atoms()"
+      "id": "pipeline_load_data_run_load_data",
+      "community": 11,
+      "norm_label": "run_load_data()"
     },
     {
       "label": "mass_flow_rate.py",
@@ -6386,7 +6406,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pipeline_mass_flow_rate",
-      "community": 20,
+      "community": 11,
       "norm_label": "mass_flow_rate.py"
     },
     {
@@ -6396,7 +6416,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "pipeline_mass_flow_rate_run_mass_flow_rate",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_mass_flow_rate()"
     },
     {
@@ -6406,7 +6426,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine",
-      "community": 7,
+      "community": 5,
       "norm_label": "pipeline_engine.py"
     },
     {
@@ -6423,17 +6443,27 @@
       "label": ".get_status_path()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L39",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_get_status_path",
       "community": 18,
       "norm_label": ".get_status_path()"
     },
     {
+      "label": ".get_applicable_stages()",
+      "file_type": "code",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages",
+      "community": 18,
+      "norm_label": ".get_applicable_stages()"
+    },
+    {
       "label": ".load_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L43",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_load_status",
       "community": 18,
@@ -6443,7 +6473,7 @@
       "label": "DataFrame",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L43",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "pulse_pipeline_pipeline_engine_py_dataframe",
       "community": 18,
@@ -6453,7 +6483,7 @@
       "label": ".save_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L65",
+      "source_location": "L95",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_save_status",
       "community": 18,
@@ -6463,7 +6493,7 @@
       "label": ".get_global_status_path()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L71",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
       "community": 18,
@@ -6473,7 +6503,7 @@
       "label": ".load_global_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L75",
+      "source_location": "L105",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_load_global_status",
       "community": 18,
@@ -6483,7 +6513,7 @@
       "label": ".save_global_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L97",
+      "source_location": "L127",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_save_global_status",
       "community": 18,
@@ -6493,7 +6523,7 @@
       "label": ".get_run_pipeline_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L103",
+      "source_location": "L133",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
       "community": 18,
@@ -6503,7 +6533,7 @@
       "label": ".get_global_pipeline_status()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L134",
+      "source_location": "L164",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
       "community": 18,
@@ -6513,7 +6543,7 @@
       "label": ".get_downstream_stages()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L165",
+      "source_location": "L195",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages",
       "community": 18,
@@ -6523,7 +6553,7 @@
       "label": ".submit_stage_job()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L178",
+      "source_location": "L208",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
       "community": 18,
@@ -6533,7 +6563,7 @@
       "label": ".submit_global_stage_job()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L239",
+      "source_location": "L269",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
       "community": 18,
@@ -6543,19 +6573,29 @@
       "label": ".trigger_pipeline()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L296",
+      "source_location": "L326",
       "_origin": "ast",
       "id": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
       "community": 18,
       "norm_label": ".trigger_pipeline()"
     },
     {
+      "label": "Returns the list of stage names that apply to this run type.",
+      "file_type": "rationale",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "pipeline_pipeline_engine_rationale_49",
+      "community": 18,
+      "norm_label": "returns the list of stage names that apply to this run type."
+    },
+    {
       "label": "Loads status and detects dead PBS jobs for a run.",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L104",
+      "source_location": "L134",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_104",
+      "id": "pipeline_pipeline_engine_rationale_134",
       "community": 18,
       "norm_label": "loads status and detects dead pbs jobs for a run."
     },
@@ -6563,9 +6603,9 @@
       "label": "Loads global status and detects dead PBS jobs.",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L135",
+      "source_location": "L165",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_135",
+      "id": "pipeline_pipeline_engine_rationale_165",
       "community": 18,
       "norm_label": "loads global status and detects dead pbs jobs."
     },
@@ -6573,9 +6613,9 @@
       "label": "Traverses the DAG to find all stages depending directly or transitively on start",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L166",
+      "source_location": "L196",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_166",
+      "id": "pipeline_pipeline_engine_rationale_196",
       "community": 18,
       "norm_label": "traverses the dag to find all stages depending directly or transitively on start"
     },
@@ -6583,9 +6623,9 @@
       "label": "Submits a pipeline stage as a PBS job, supporting dependencies.",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L179",
+      "source_location": "L209",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_179",
+      "id": "pipeline_pipeline_engine_rationale_209",
       "community": 18,
       "norm_label": "submits a pipeline stage as a pbs job, supporting dependencies."
     },
@@ -6593,9 +6633,9 @@
       "label": "Submits the global pipeline stage as a PBS job.",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L240",
+      "source_location": "L270",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_240",
+      "id": "pipeline_pipeline_engine_rationale_270",
       "community": 18,
       "norm_label": "submits the global pipeline stage as a pbs job."
     },
@@ -6603,9 +6643,9 @@
       "label": "Triggers execution from the start_stage, automatically queueing dependencies top",
       "file_type": "rationale",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L297",
+      "source_location": "L327",
       "_origin": "ast",
-      "id": "pipeline_pipeline_engine_rationale_297",
+      "id": "pipeline_pipeline_engine_rationale_327",
       "community": 18,
       "norm_label": "triggers execution from the start_stage, automatically queueing dependencies top"
     },
@@ -6676,37 +6716,17 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pipeline_run_stage",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_stage.py"
-    },
-    {
-      "label": "load_status()",
-      "file_type": "code",
-      "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "pipeline_run_stage_load_status",
-      "community": 20,
-      "norm_label": "load_status()"
-    },
-    {
-      "label": "save_status()",
-      "file_type": "code",
-      "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "pipeline_run_stage_save_status",
-      "community": 20,
-      "norm_label": "save_status()"
     },
     {
       "label": "main()",
       "file_type": "code",
       "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L34",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "pipeline_run_stage_main",
-      "community": 20,
+      "community": 11,
       "norm_label": "main()"
     },
     {
@@ -6716,7 +6736,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pipeline_time_duration",
-      "community": 20,
+      "community": 11,
       "norm_label": "time_duration.py"
     },
     {
@@ -6726,7 +6746,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "pipeline_time_duration_run_time_duration",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_time_duration()"
     },
     {
@@ -6736,7 +6756,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_pulse",
-      "community": 83,
+      "community": 5,
       "norm_label": "pulse.py"
     },
     {
@@ -6746,7 +6766,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "pulse_pulse_status",
-      "community": 83,
+      "community": 5,
       "norm_label": "status()"
     },
     {
@@ -6756,7 +6776,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "pulse_pulse_submit",
-      "community": 83,
+      "community": 5,
       "norm_label": "submit()"
     },
     {
@@ -6766,7 +6786,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "pulse_pulse_delete",
-      "community": 83,
+      "community": 5,
       "norm_label": "delete()"
     },
     {
@@ -6776,7 +6796,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "pulse_pulse_dashboard",
-      "community": 83,
+      "community": 5,
       "norm_label": "dashboard()"
     },
     {
@@ -6786,7 +6806,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "pulse_pulse_rationale_19",
-      "community": 83,
+      "community": 5,
       "norm_label": "show the status of jobs in a beautiful table."
     },
     {
@@ -6796,7 +6816,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "pulse_pulse_rationale_51",
-      "community": 83,
+      "community": 5,
       "norm_label": "submit a pbs script with pre-flight checks."
     },
     {
@@ -6806,7 +6826,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "pulse_pulse_rationale_64",
-      "community": 83,
+      "community": 5,
       "norm_label": "delete a specific job."
     },
     {
@@ -6816,7 +6836,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "pulse_pulse_rationale_75",
-      "community": 83,
+      "community": 5,
       "norm_label": "launch the pulse web dashboard."
     },
     {
@@ -6826,7 +6846,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_pulse_core",
-      "community": 7,
+      "community": 5,
       "norm_label": "pulse_core.py"
     },
     {
@@ -6836,7 +6856,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager",
-      "community": 7,
+      "community": 5,
       "norm_label": "pbsmanager"
     },
     {
@@ -6866,7 +6886,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_load_metadata",
-      "community": 7,
+      "community": 85,
       "norm_label": ".load_metadata()"
     },
     {
@@ -6876,7 +6896,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_save_metadata",
-      "community": 7,
+      "community": 85,
       "norm_label": ".save_metadata()"
     },
     {
@@ -6886,7 +6906,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_format_mem",
-      "community": 7,
+      "community": 85,
       "norm_label": ".format_mem()"
     },
     {
@@ -6906,7 +6926,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_parse_qstat_f",
-      "community": 7,
+      "community": 85,
       "norm_label": ".parse_qstat_f()"
     },
     {
@@ -6916,7 +6936,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_get_utilization",
-      "community": 7,
+      "community": 5,
       "norm_label": ".get_utilization()"
     },
     {
@@ -6926,7 +6946,7 @@
       "source_location": "L171",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_submit_job",
-      "community": 7,
+      "community": 5,
       "norm_label": ".submit_job()"
     },
     {
@@ -6936,7 +6956,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_delete_job",
-      "community": 7,
+      "community": 5,
       "norm_label": ".delete_job()"
     },
     {
@@ -6946,7 +6966,7 @@
       "source_location": "L190",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_trace_job",
-      "community": 7,
+      "community": 85,
       "norm_label": ".trace_job()"
     },
     {
@@ -6956,7 +6976,7 @@
       "source_location": "L233",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_get_job_history",
-      "community": 7,
+      "community": 85,
       "norm_label": ".get_job_history()"
     },
     {
@@ -6966,7 +6986,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_scan_range",
-      "community": 7,
+      "community": 85,
       "norm_label": ".scan_range()"
     },
     {
@@ -6976,7 +6996,7 @@
       "source_location": "L306",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_delete_cached_job",
-      "community": 7,
+      "community": 85,
       "norm_label": ".delete_cached_job()"
     },
     {
@@ -6996,7 +7016,7 @@
       "source_location": "L336",
       "_origin": "ast",
       "id": "pulse_pulse_core_pbsmanager_get_node_temperatures",
-      "community": 7,
+      "community": 5,
       "norm_label": ".get_node_temperatures()"
     },
     {
@@ -7026,7 +7046,7 @@
       "source_location": "L503",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager",
-      "community": 10,
+      "community": 7,
       "norm_label": "syncmanager"
     },
     {
@@ -7036,7 +7056,7 @@
       "source_location": "L510",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync",
-      "community": 81,
+      "community": 7,
       "norm_label": ".start_sync()"
     },
     {
@@ -7046,7 +7066,7 @@
       "source_location": "L533",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_start_sync_pbs",
-      "community": 81,
+      "community": 7,
       "norm_label": ".start_sync_pbs()"
     },
     {
@@ -7063,7 +7083,7 @@
       "label": ".restore_run()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L818",
+      "source_location": "L837",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_restore_run",
       "community": 62,
@@ -7073,7 +7093,7 @@
       "label": ".free_restored_space()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L864",
+      "source_location": "L883",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_free_restored_space",
       "community": 62,
@@ -7083,70 +7103,70 @@
       "label": ".is_running()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L881",
+      "source_location": "L900",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_is_running",
-      "community": 81,
+      "community": 7,
       "norm_label": ".is_running()"
     },
     {
       "label": ".stop_sync()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L916",
+      "source_location": "L935",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_stop_sync",
-      "community": 10,
+      "community": 7,
       "norm_label": ".stop_sync()"
     },
     {
       "label": ".get_logs()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L944",
+      "source_location": "L963",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_get_logs",
-      "community": 10,
+      "community": 7,
       "norm_label": ".get_logs()"
     },
     {
       "label": ".get_running_info()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L958",
+      "source_location": "L977",
       "_origin": "ast",
       "id": "pulse_pulse_core_syncmanager_get_running_info",
-      "community": 10,
+      "community": 7,
       "norm_label": ".get_running_info()"
     },
     {
       "label": "AutoPilotManager",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L973",
+      "source_location": "L992",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager",
-      "community": 81,
+      "community": 7,
       "norm_label": "autopilotmanager"
     },
     {
       "label": ".is_running()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L977",
+      "source_location": "L996",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_is_running",
-      "community": 81,
+      "community": 7,
       "norm_label": ".is_running()"
     },
     {
       "label": ".trigger_manual()",
       "file_type": "code",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L989",
+      "source_location": "L1008",
       "_origin": "ast",
       "id": "pulse_pulse_core_autopilotmanager_trigger_manual",
-      "community": 81,
+      "community": 7,
       "norm_label": ".trigger_manual()"
     },
     {
@@ -7176,7 +7196,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_39",
-      "community": 7,
+      "community": 85,
       "norm_label": "loads persistent job metadata."
     },
     {
@@ -7186,7 +7206,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_50",
-      "community": 7,
+      "community": 85,
       "norm_label": "saves job metadata to file."
     },
     {
@@ -7196,7 +7216,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_57",
-      "community": 7,
+      "community": 85,
       "norm_label": "converts a memory string (e.g. 1339240kb) to a human-readable format (mb/gb)."
     },
     {
@@ -7216,7 +7236,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_118",
-      "community": 7,
+      "community": 85,
       "norm_label": "parses the output of qstat -f into a list of dictionaries."
     },
     {
@@ -7226,7 +7246,7 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_162",
-      "community": 7,
+      "community": 5,
       "norm_label": "extracts utilization metrics from job data."
     },
     {
@@ -7236,7 +7256,7 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_172",
-      "community": 7,
+      "community": 5,
       "norm_label": "submits a job and returns the job id."
     },
     {
@@ -7246,7 +7266,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_191",
-      "community": 7,
+      "community": 85,
       "norm_label": "runs tracejob and parses the resource usage summary. uses cache if provided."
     },
     {
@@ -7256,7 +7276,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_234",
-      "community": 7,
+      "community": 85,
       "norm_label": "attempts to find recently completed jobs for a user.         since qstat -x is o"
     },
     {
@@ -7266,7 +7286,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_275",
-      "community": 7,
+      "community": 85,
       "norm_label": "scans a range of job ids and updates metadata."
     },
     {
@@ -7276,7 +7296,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_307",
-      "community": 7,
+      "community": 85,
       "norm_label": "removes a job from the metadata cache."
     },
     {
@@ -7296,7 +7316,7 @@
       "source_location": "L337",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_337",
-      "community": 7,
+      "community": 5,
       "norm_label": "fetches cpu and gpu temperatures from the system."
     },
     {
@@ -7316,7 +7336,7 @@
       "source_location": "L511",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_511",
-      "community": 81,
+      "community": 7,
       "norm_label": "starts the sync process in a background thread."
     },
     {
@@ -7326,7 +7346,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "pulse_pulse_core_rationale_534",
-      "community": 81,
+      "community": 7,
       "norm_label": "submits the sync process as a pbs job."
     },
     {
@@ -7343,9 +7363,9 @@
       "label": "Downloads a run back from Drive and extracts it.",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L819",
+      "source_location": "L838",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_819",
+      "id": "pulse_pulse_core_rationale_838",
       "community": 62,
       "norm_label": "downloads a run back from drive and extracts it."
     },
@@ -7353,9 +7373,9 @@
       "label": "Clears local folders for runs that are confirmed synced on Drive.         This i",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L865",
+      "source_location": "L884",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_865",
+      "id": "pulse_pulse_core_rationale_884",
       "community": 62,
       "norm_label": "clears local folders for runs that are confirmed synced on drive.         this i"
     },
@@ -7363,60 +7383,60 @@
       "label": "Checks if a sync process is currently running (locally or on PBS).",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L882",
+      "source_location": "L901",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_882",
-      "community": 81,
+      "id": "pulse_pulse_core_rationale_901",
+      "community": 7,
       "norm_label": "checks if a sync process is currently running (locally or on pbs)."
     },
     {
       "label": "Stops the ongoing sync process (local or PBS).",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L917",
+      "source_location": "L936",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_917",
-      "community": 10,
+      "id": "pulse_pulse_core_rationale_936",
+      "community": 7,
       "norm_label": "stops the ongoing sync process (local or pbs)."
     },
     {
       "label": "Reads the latest logs from the sync log file.",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L945",
+      "source_location": "L964",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_945",
-      "community": 10,
+      "id": "pulse_pulse_core_rationale_964",
+      "community": 7,
       "norm_label": "reads the latest logs from the sync log file."
     },
     {
       "label": "Returns details about the currently running sync process.",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L959",
+      "source_location": "L978",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_959",
-      "community": 10,
+      "id": "pulse_pulse_core_rationale_978",
+      "community": 7,
       "norm_label": "returns details about the currently running sync process."
     },
     {
       "label": "Checks if the auto_pilot_manager.py script is currently executing.",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L978",
+      "source_location": "L997",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_978",
-      "community": 81,
+      "id": "pulse_pulse_core_rationale_997",
+      "community": 7,
       "norm_label": "checks if the auto_pilot_manager.py script is currently executing."
     },
     {
       "label": "Triggers a manual run of the auto-pilot manager in the background.",
       "file_type": "rationale",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L990",
+      "source_location": "L1009",
       "_origin": "ast",
-      "id": "pulse_pulse_core_rationale_990",
-      "community": 81,
+      "id": "pulse_pulse_core_rationale_1009",
+      "community": 7,
       "norm_label": "triggers a manual run of the auto-pilot manager in the background."
     },
     {
@@ -8266,7 +8286,7 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901",
-      "community": 148,
+      "community": 145,
       "norm_label": "2901"
     },
     {
@@ -8276,7 +8296,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901_owner",
-      "community": 148,
+      "community": 145,
       "norm_label": "owner"
     },
     {
@@ -8286,7 +8306,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2901_status",
-      "community": 148,
+      "community": 145,
       "norm_label": "status"
     },
     {
@@ -8446,7 +8466,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907",
-      "community": 11,
+      "community": 224,
       "norm_label": "2907"
     },
     {
@@ -8456,7 +8476,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907_owner",
-      "community": 11,
+      "community": 224,
       "norm_label": "owner"
     },
     {
@@ -8466,7 +8486,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2907_status",
-      "community": 11,
+      "community": 224,
       "norm_label": "status"
     },
     {
@@ -8926,7 +8946,7 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923",
-      "community": 85,
+      "community": 55,
       "norm_label": "2923"
     },
     {
@@ -8936,7 +8956,7 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_owner",
-      "community": 85,
+      "community": 55,
       "norm_label": "owner"
     },
     {
@@ -8946,7 +8966,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2923_status",
-      "community": 85,
+      "community": 55,
       "norm_label": "status"
     },
     {
@@ -9106,7 +9126,7 @@
       "source_location": "L206",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929",
-      "community": 148,
+      "community": 175,
       "norm_label": "2929"
     },
     {
@@ -9116,7 +9136,7 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_owner",
-      "community": 148,
+      "community": 175,
       "norm_label": "owner"
     },
     {
@@ -9126,7 +9146,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2929_status",
-      "community": 148,
+      "community": 175,
       "norm_label": "status"
     },
     {
@@ -9166,7 +9186,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931",
-      "community": 181,
+      "community": 148,
       "norm_label": "2931"
     },
     {
@@ -9176,7 +9196,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931_owner",
-      "community": 181,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -9186,7 +9206,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2931_status",
-      "community": 181,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -9316,7 +9336,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936",
-      "community": 117,
+      "community": 83,
       "norm_label": "2936"
     },
     {
@@ -9326,7 +9346,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_owner",
-      "community": 117,
+      "community": 83,
       "norm_label": "owner"
     },
     {
@@ -9336,7 +9356,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2936_status",
-      "community": 117,
+      "community": 83,
       "norm_label": "status"
     },
     {
@@ -9436,7 +9456,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940",
-      "community": 148,
+      "community": 117,
       "norm_label": "2940"
     },
     {
@@ -9446,7 +9466,7 @@
       "source_location": "L251",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940_owner",
-      "community": 148,
+      "community": 117,
       "norm_label": "owner"
     },
     {
@@ -9456,7 +9476,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2940_status",
-      "community": 148,
+      "community": 117,
       "norm_label": "status"
     },
     {
@@ -9586,7 +9606,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945",
-      "community": 80,
+      "community": 122,
       "norm_label": "2945"
     },
     {
@@ -9596,7 +9616,7 @@
       "source_location": "L271",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945_owner",
-      "community": 80,
+      "community": 122,
       "norm_label": "owner"
     },
     {
@@ -9606,7 +9626,7 @@
       "source_location": "L272",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2945_status",
-      "community": 80,
+      "community": 122,
       "norm_label": "status"
     },
     {
@@ -9976,7 +9996,7 @@
       "source_location": "L322",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958",
-      "community": 148,
+      "community": 185,
       "norm_label": "2958"
     },
     {
@@ -9986,7 +10006,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_owner",
-      "community": 148,
+      "community": 185,
       "norm_label": "owner"
     },
     {
@@ -9996,7 +10016,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2958_status",
-      "community": 148,
+      "community": 185,
       "norm_label": "status"
     },
     {
@@ -10276,7 +10296,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968",
-      "community": 191,
+      "community": 148,
       "norm_label": "2968"
     },
     {
@@ -10286,7 +10306,7 @@
       "source_location": "L363",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_owner",
-      "community": 191,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -10296,7 +10316,7 @@
       "source_location": "L364",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2968_status",
-      "community": 191,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -10456,7 +10476,7 @@
       "source_location": "L386",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974",
-      "community": 222,
+      "community": 148,
       "norm_label": "2974"
     },
     {
@@ -10466,7 +10486,7 @@
       "source_location": "L387",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_owner",
-      "community": 222,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -10476,7 +10496,7 @@
       "source_location": "L388",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2974_status",
-      "community": 222,
+      "community": 148,
       "norm_label": "status"
     },
     {
@@ -10606,7 +10626,7 @@
       "source_location": "L406",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979",
-      "community": 175,
+      "community": 276,
       "norm_label": "2979"
     },
     {
@@ -10616,7 +10636,7 @@
       "source_location": "L407",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_owner",
-      "community": 175,
+      "community": 276,
       "norm_label": "owner"
     },
     {
@@ -10626,7 +10646,7 @@
       "source_location": "L408",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2979_status",
-      "community": 175,
+      "community": 276,
       "norm_label": "status"
     },
     {
@@ -10726,7 +10746,7 @@
       "source_location": "L422",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983",
-      "community": 185,
+      "community": 124,
       "norm_label": "2983"
     },
     {
@@ -10736,7 +10756,7 @@
       "source_location": "L423",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_owner",
-      "community": 185,
+      "community": 124,
       "norm_label": "owner"
     },
     {
@@ -10746,7 +10766,7 @@
       "source_location": "L424",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2983_status",
-      "community": 185,
+      "community": 124,
       "norm_label": "status"
     },
     {
@@ -10756,7 +10776,7 @@
       "source_location": "L426",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984",
-      "community": 145,
+      "community": 277,
       "norm_label": "2984"
     },
     {
@@ -10766,7 +10786,7 @@
       "source_location": "L427",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984_owner",
-      "community": 145,
+      "community": 277,
       "norm_label": "owner"
     },
     {
@@ -10776,7 +10796,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_2984_status",
-      "community": 145,
+      "community": 277,
       "norm_label": "status"
     },
     {
@@ -11356,7 +11376,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004",
-      "community": 224,
+      "community": 148,
       "norm_label": "3004"
     },
     {
@@ -11366,7 +11386,7 @@
       "source_location": "L507",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004_owner",
-      "community": 224,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -11376,7 +11396,7 @@
       "source_location": "L508",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3004_job_name",
-      "community": 224,
+      "community": 148,
       "norm_label": "job_name"
     },
     {
@@ -11446,7 +11466,7 @@
       "source_location": "L518",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007",
-      "community": 225,
+      "community": 148,
       "norm_label": "3007"
     },
     {
@@ -11456,7 +11476,7 @@
       "source_location": "L519",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_owner",
-      "community": 225,
+      "community": 148,
       "norm_label": "owner"
     },
     {
@@ -11466,7 +11486,7 @@
       "source_location": "L520",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3007_job_name",
-      "community": 225,
+      "community": 148,
       "norm_label": "job_name"
     },
     {
@@ -11476,7 +11496,7 @@
       "source_location": "L522",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008",
-      "community": 195,
+      "community": 162,
       "norm_label": "3008"
     },
     {
@@ -11486,7 +11506,7 @@
       "source_location": "L523",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008_owner",
-      "community": 195,
+      "community": 162,
       "norm_label": "owner"
     },
     {
@@ -11496,7 +11516,7 @@
       "source_location": "L524",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3008_job_name",
-      "community": 195,
+      "community": 162,
       "norm_label": "job_name"
     },
     {
@@ -11596,7 +11616,7 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020",
-      "community": 148,
+      "community": 269,
       "norm_label": "3020"
     },
     {
@@ -11606,7 +11626,7 @@
       "source_location": "L539",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_owner",
-      "community": 148,
+      "community": 269,
       "norm_label": "owner"
     },
     {
@@ -11616,7 +11636,7 @@
       "source_location": "L540",
       "_origin": "ast",
       "id": "pulse_pulse_metadata_3020_job_name",
-      "community": 148,
+      "community": 269,
       "norm_label": "job_name"
     },
     {
@@ -12526,7 +12546,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_active_queue",
-      "community": 7,
+      "community": 5,
       "norm_label": "active_queue.py"
     },
     {
@@ -12536,28 +12556,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "views_active_queue_render_active_queue",
-      "community": 7,
+      "community": 5,
       "norm_label": "render_active_queue()"
-    },
-    {
-      "label": "analysis.py",
-      "file_type": "code",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "views_analysis",
-      "community": 3,
-      "norm_label": "analysis.py"
-    },
-    {
-      "label": "render_analysis()",
-      "file_type": "code",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "views_analysis_render_analysis",
-      "community": 3,
-      "norm_label": "render_analysis()"
     },
     {
       "label": "autopilot.py",
@@ -12666,7 +12666,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_history",
-      "community": 7,
+      "community": 5,
       "norm_label": "history.py"
     },
     {
@@ -12676,7 +12676,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "views_history_render_history",
-      "community": 7,
+      "community": 5,
       "norm_label": "render_history()"
     },
     {
@@ -12766,7 +12766,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_results",
-      "community": 7,
+      "community": 5,
       "norm_label": "results.py"
     },
     {
@@ -12776,7 +12776,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "views_results_render_results",
-      "community": 7,
+      "community": 5,
       "norm_label": "render_results()"
     },
     {
@@ -12806,7 +12806,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_visualization",
-      "community": 10,
+      "community": 54,
       "norm_label": "visualization.py"
     },
     {
@@ -12816,7 +12816,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "views_visualization_load_viz_settings",
-      "community": 10,
+      "community": 54,
       "norm_label": "load_viz_settings()"
     },
     {
@@ -12826,7 +12826,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "views_visualization_save_viz_settings",
-      "community": 10,
+      "community": 54,
       "norm_label": "save_viz_settings()"
     },
     {
@@ -12836,7 +12836,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "views_visualization_render_visualization",
-      "community": 10,
+      "community": 54,
       "norm_label": "render_visualization()"
     },
     {
@@ -12956,7 +12956,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pulse_viz_manager",
-      "community": 10,
+      "community": 5,
       "norm_label": "viz_manager.py"
     },
     {
@@ -13306,7 +13306,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_init",
-      "community": 79,
+      "community": 195,
       "norm_label": "__init__.py"
     },
     {
@@ -13436,7 +13436,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_highlighter",
-      "community": 79,
+      "community": 195,
       "norm_label": "highlighter.py"
     },
     {
@@ -13526,7 +13526,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_loader",
-      "community": 20,
+      "community": 11,
       "norm_label": "loader.py"
     },
     {
@@ -13716,7 +13716,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_movie_exporter",
-      "community": 79,
+      "community": 14,
       "norm_label": "movie_exporter.py"
     },
     {
@@ -13906,7 +13906,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_playback",
-      "community": 79,
+      "community": 195,
       "norm_label": "playback.py"
     },
     {
@@ -14056,7 +14056,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_renderer",
-      "community": 79,
+      "community": 195,
       "norm_label": "renderer.py"
     },
     {
@@ -14500,366 +14500,6 @@
       "norm_label": "finalizes all deletions and re-indexes the output file for a clean result."
     },
     {
-      "label": "sim_data.py",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "controllers_sim_data",
-      "community": 20,
-      "norm_label": "sim_data.py"
-    },
-    {
-      "label": "SimDataController",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller",
-      "community": 3,
-      "norm_label": "simdatacontroller"
-    },
-    {
-      "label": ".df()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L12",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_df",
-      "community": 3,
-      "norm_label": ".df()"
-    },
-    {
-      "label": "DataFrame",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L12",
-      "_origin": "ast",
-      "id": "analysis_controllers_sim_data_py_dataframe",
-      "community": 3,
-      "norm_label": "dataframe"
-    },
-    {
-      "label": ".df_mi()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L27",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_df_mi",
-      "community": 3,
-      "norm_label": ".df_mi()"
-    },
-    {
-      "label": ".df_bonds()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L40",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_df_bonds",
-      "community": 3,
-      "norm_label": ".df_bonds()"
-    },
-    {
-      "label": ".df_angles()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L54",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_df_angles",
-      "community": 3,
-      "norm_label": ".df_angles()"
-    },
-    {
-      "label": ".metadata()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L67",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_metadata",
-      "community": 3,
-      "norm_label": ".metadata()"
-    },
-    {
-      "label": ".writable_metadata()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L74",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_writable_metadata",
-      "community": 3,
-      "norm_label": ".writable_metadata()"
-    },
-    {
-      "label": ".__init__()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L80",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_init",
-      "community": 3,
-      "norm_label": ".__init__()"
-    },
-    {
-      "label": ".stop_caching()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_stop_caching",
-      "community": 3,
-      "norm_label": ".stop_caching()"
-    },
-    {
-      "label": ".load_folder()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L122",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_load_folder",
-      "community": 20,
-      "norm_label": ".load_folder()"
-    },
-    {
-      "label": ".load_dump_files()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L177",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_load_dump_files",
-      "community": 3,
-      "norm_label": ".load_dump_files()"
-    },
-    {
-      "label": ".load_data_file()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L199",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_load_data_file",
-      "community": 3,
-      "norm_label": ".load_data_file()"
-    },
-    {
-      "label": ".load_dataframe()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L214",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_load_dataframe",
-      "community": 3,
-      "norm_label": ".load_dataframe()"
-    },
-    {
-      "label": ".request_batch_for_timestep()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L249",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_request_batch_for_timestep",
-      "community": 3,
-      "norm_label": ".request_batch_for_timestep()"
-    },
-    {
-      "label": ".cache_all_remaining()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L256",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_cache_all_remaining",
-      "community": 3,
-      "norm_label": ".cache_all_remaining()"
-    },
-    {
-      "label": "._worker_loop()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L270",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_worker_loop",
-      "community": 3,
-      "norm_label": "._worker_loop()"
-    },
-    {
-      "label": "._parse_single_dump()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L292",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_parse_single_dump",
-      "community": 3,
-      "norm_label": "._parse_single_dump()"
-    },
-    {
-      "label": ".get_atom_data_at_timestep()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L309",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_get_atom_data_at_timestep",
-      "community": 3,
-      "norm_label": ".get_atom_data_at_timestep()"
-    },
-    {
-      "label": ".get_time_at_timestep()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L328",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_get_time_at_timestep",
-      "community": 3,
-      "norm_label": ".get_time_at_timestep()"
-    },
-    {
-      "label": ".get_frame_data()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L344",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_get_frame_data",
-      "community": 3,
-      "norm_label": ".get_frame_data()"
-    },
-    {
-      "label": ".get_bond_data_at_timestep()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L347",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_get_bond_data_at_timestep",
-      "community": 3,
-      "norm_label": ".get_bond_data_at_timestep()"
-    },
-    {
-      "label": ".get_angle_data_at_timestep()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L361",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_get_angle_data_at_timestep",
-      "community": 3,
-      "norm_label": ".get_angle_data_at_timestep()"
-    },
-    {
-      "label": ".normalize_dropped_path()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L375",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_normalize_dropped_path",
-      "community": 3,
-      "norm_label": ".normalize_dropped_path()"
-    },
-    {
-      "label": ".resolve_sim_root()",
-      "file_type": "code",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L384",
-      "_origin": "ast",
-      "id": "controllers_sim_data_simdatacontroller_resolve_sim_root",
-      "community": 3,
-      "norm_label": ".resolve_sim_root()"
-    },
-    {
-      "label": "Manages loading, parsing, and caching of simulation data.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_10",
-      "community": 3,
-      "norm_label": "manages loading, parsing, and caching of simulation data."
-    },
-    {
-      "label": "Lazy-fused monolithic atoms DataFrame.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_13",
-      "community": 3,
-      "norm_label": "lazy-fused monolithic atoms dataframe."
-    },
-    {
-      "label": "Lazy-fused MultiIndex atoms DataFrame.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_28",
-      "community": 3,
-      "norm_label": "lazy-fused multiindex atoms dataframe."
-    },
-    {
-      "label": "Lazy-fused monolithic bonds DataFrame.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L41",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_41",
-      "community": 3,
-      "norm_label": "lazy-fused monolithic bonds dataframe."
-    },
-    {
-      "label": "Lazy-fused monolithic angles DataFrame.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L55",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_55",
-      "community": 3,
-      "norm_label": "lazy-fused monolithic angles dataframe."
-    },
-    {
-      "label": "Aggregated read-only metadata for the entire simulation history.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L68",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_68",
-      "community": 3,
-      "norm_label": "aggregated read-only metadata for the entire simulation history."
-    },
-    {
-      "label": "The writable SimulationMetadata object for the current folder.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L75",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_75",
-      "community": 3,
-      "norm_label": "the writable simulationmetadata object for the current folder."
-    },
-    {
-      "label": "Clears the queue and stops background processing.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L111",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_111",
-      "community": 3,
-      "norm_label": "clears the queue and stops background processing."
-    },
-    {
-      "label": "Queues all remaining batches for background loading/caching.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L257",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_257",
-      "community": 3,
-      "norm_label": "queues all remaining batches for background loading/caching."
-    },
-    {
-      "label": "Returns the physical simulation time (seconds) for a given integer timestep.",
-      "file_type": "rationale",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L329",
-      "_origin": "ast",
-      "id": "controllers_sim_data_rationale_329",
-      "community": 3,
-      "norm_label": "returns the physical simulation time (seconds) for a given integer timestep."
-    },
-    {
       "label": "simulation_launcher.py",
       "file_type": "code",
       "source_file": "analysis/controllers/simulation_launcher.py",
@@ -15006,7 +14646,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_unified_renderer",
-      "community": 10,
+      "community": 80,
       "norm_label": "unified_renderer.py"
     },
     {
@@ -15016,7 +14656,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer",
-      "community": 10,
+      "community": 80,
       "norm_label": "unifiedrenderer"
     },
     {
@@ -15026,7 +14666,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_setup_plotter",
-      "community": 10,
+      "community": 80,
       "norm_label": ".setup_plotter()"
     },
     {
@@ -15036,7 +14676,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_parse_lammps_dump",
-      "community": 10,
+      "community": 80,
       "norm_label": ".parse_lammps_dump()"
     },
     {
@@ -15046,7 +14686,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "controllers_unified_renderer_unifiedrenderer_apply_scene",
-      "community": 10,
+      "community": 80,
       "norm_label": ".apply_scene()"
     },
     {
@@ -15056,7 +14696,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_9",
-      "community": 10,
+      "community": 80,
       "norm_label": "a unified rendering controller for pyvista simulations.     supports both intera"
     },
     {
@@ -15066,7 +14706,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_19",
-      "community": 10,
+      "community": 80,
       "norm_label": "creates a standardized pyvista plotter."
     },
     {
@@ -15076,7 +14716,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_26",
-      "community": 10,
+      "community": 80,
       "norm_label": "parses a lammps dump file and returns a pandas dataframe."
     },
     {
@@ -15086,7 +14726,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "controllers_unified_renderer_rationale_55",
-      "community": 10,
+      "community": 80,
       "norm_label": "populates a pyvista plotter with geometry, particles, and scene decorators."
     },
     {
@@ -15096,7 +14736,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "controllers_vtk_overlay",
-      "community": 26,
+      "community": 195,
       "norm_label": "vtk_overlay.py"
     },
     {
@@ -15236,7 +14876,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_data_manager",
-      "community": 20,
+      "community": 11,
       "norm_label": "data_manager.py"
     },
     {
@@ -15246,7 +14886,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "analysis_data_manager_get_parser_pool",
-      "community": 20,
+      "community": 11,
       "norm_label": "get_parser_pool()"
     },
     {
@@ -15256,7 +14896,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "analysis_data_manager_calculate_bonds_angles_vectorized",
-      "community": 20,
+      "community": 11,
       "norm_label": "calculate_bonds_angles_vectorized()"
     },
     {
@@ -15266,7 +14906,7 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "analysis_data_manager_find_simulation_lineage",
-      "community": 20,
+      "community": 11,
       "norm_label": "find_simulation_lineage()"
     },
     {
@@ -15276,7 +14916,7 @@
       "source_location": "L273",
       "_origin": "ast",
       "id": "analysis_data_manager_aggregate_lifecycle_metadata",
-      "community": 20,
+      "community": 11,
       "norm_label": "aggregate_lifecycle_metadata()"
     },
     {
@@ -15286,7 +14926,7 @@
       "source_location": "L294",
       "_origin": "ast",
       "id": "analysis_data_manager_detect_lammps_input_script",
-      "community": 20,
+      "community": 11,
       "norm_label": "detect_lammps_input_script()"
     },
     {
@@ -15296,7 +14936,7 @@
       "source_location": "L311",
       "_origin": "ast",
       "id": "analysis_data_manager_load_lammps_geometry",
-      "community": 20,
+      "community": 11,
       "norm_label": "load_lammps_geometry()"
     },
     {
@@ -15306,7 +14946,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_lammps_geometry_script",
-      "community": 20,
+      "community": 11,
       "norm_label": "parse_lammps_geometry_script()"
     },
     {
@@ -15316,7 +14956,7 @@
       "source_location": "L330",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_simple_data_file",
-      "community": 20,
+      "community": 11,
       "norm_label": "parse_simple_data_file()"
     },
     {
@@ -15326,7 +14966,7 @@
       "source_location": "L330",
       "_origin": "ast",
       "id": "analysis_data_manager_py_dataframe",
-      "community": 20,
+      "community": 11,
       "norm_label": "dataframe"
     },
     {
@@ -15336,7 +14976,7 @@
       "source_location": "L431",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_dump_file",
-      "community": 20,
+      "community": 11,
       "norm_label": "parse_dump_file()"
     },
     {
@@ -15346,7 +14986,7 @@
       "source_location": "L442",
       "_origin": "ast",
       "id": "analysis_data_manager_parse_single_dump_fast",
-      "community": 20,
+      "community": 11,
       "norm_label": "_parse_single_dump_fast()"
     },
     {
@@ -15356,7 +14996,7 @@
       "source_location": "L497",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata",
-      "community": 20,
+      "community": 11,
       "norm_label": "simulationmetadata"
     },
     {
@@ -15366,7 +15006,7 @@
       "source_location": "L499",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_init",
-      "community": 20,
+      "community": 11,
       "norm_label": ".__init__()"
     },
     {
@@ -15376,7 +15016,7 @@
       "source_location": "L505",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_load",
-      "community": 20,
+      "community": 11,
       "norm_label": ".load()"
     },
     {
@@ -15386,7 +15026,7 @@
       "source_location": "L523",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_save",
-      "community": 20,
+      "community": 11,
       "norm_label": ".save()"
     },
     {
@@ -15396,7 +15036,7 @@
       "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_get",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get()"
     },
     {
@@ -15406,7 +15046,7 @@
       "source_location": "L531",
       "_origin": "ast",
       "id": "analysis_data_manager_py_any",
-      "community": 20,
+      "community": 11,
       "norm_label": "any"
     },
     {
@@ -15416,7 +15056,7 @@
       "source_location": "L534",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_set",
-      "community": 20,
+      "community": 11,
       "norm_label": ".set()"
     },
     {
@@ -15426,7 +15066,7 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_update",
-      "community": 20,
+      "community": 11,
       "norm_label": ".update()"
     },
     {
@@ -15436,7 +15076,7 @@
       "source_location": "L542",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_getitem",
-      "community": 20,
+      "community": 11,
       "norm_label": ".__getitem__()"
     },
     {
@@ -15446,7 +15086,7 @@
       "source_location": "L545",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationmetadata_setitem",
-      "community": 20,
+      "community": 11,
       "norm_label": ".__setitem__()"
     },
     {
@@ -15456,7 +15096,7 @@
       "source_location": "L548",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata",
-      "community": 20,
+      "community": 11,
       "norm_label": "simulationdata"
     },
     {
@@ -15466,7 +15106,7 @@
       "source_location": "L549",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_init",
-      "community": 20,
+      "community": 11,
       "norm_label": ".__init__()"
     },
     {
@@ -15476,7 +15116,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_cache_file",
-      "community": 20,
+      "community": 11,
       "norm_label": "._get_cache_file()"
     },
     {
@@ -15486,7 +15126,7 @@
       "source_location": "L591",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_metadata",
-      "community": 20,
+      "community": 11,
       "norm_label": ".load_metadata()"
     },
     {
@@ -15496,7 +15136,7 @@
       "source_location": "L626",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_available_cached_batches",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get_available_cached_batches()"
     },
     {
@@ -15506,7 +15146,7 @@
       "source_location": "L639",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_count",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get_batch_count()"
     },
     {
@@ -15516,7 +15156,7 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_batch_index_for_timestep",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get_batch_index_for_timestep()"
     },
     {
@@ -15526,7 +15166,7 @@
       "source_location": "L650",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_batch",
-      "community": 20,
+      "community": 11,
       "norm_label": ".load_batch()"
     },
     {
@@ -15536,7 +15176,7 @@
       "source_location": "L701",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_atoms_at_timestep",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get_atoms_at_timestep()"
     },
     {
@@ -15546,7 +15186,7 @@
       "source_location": "L708",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_load_data",
-      "community": 20,
+      "community": 11,
       "norm_label": ".load_data()"
     },
     {
@@ -15556,7 +15196,7 @@
       "source_location": "L714",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_is_batch_cache_valid",
-      "community": 20,
+      "community": 11,
       "norm_label": "._is_batch_cache_valid()"
     },
     {
@@ -15566,7 +15206,7 @@
       "source_location": "L721",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_get_step",
-      "community": 20,
+      "community": 11,
       "norm_label": "._get_step()"
     },
     {
@@ -15576,7 +15216,7 @@
       "source_location": "L725",
       "_origin": "ast",
       "id": "analysis_data_manager_simulationdata_parse_dump_list",
-      "community": 20,
+      "community": 11,
       "norm_label": "._parse_dump_list()"
     },
     {
@@ -15586,7 +15226,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_153",
-      "community": 20,
+      "community": 11,
       "norm_label": "finds the full lineage (ancestors and descendants) for a simulation."
     },
     {
@@ -15596,7 +15236,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_274",
-      "community": 20,
+      "community": 11,
       "norm_label": "merges metadata from all runs in the lineage, oldest to newest."
     },
     {
@@ -15606,7 +15246,7 @@
       "source_location": "L295",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_295",
-      "community": 20,
+      "community": 11,
       "norm_label": "auto-detect a likely lammps input script in a simulation folder."
     },
     {
@@ -15616,7 +15256,7 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_312",
-      "community": 20,
+      "community": 11,
       "norm_label": "load geometry from an auto-detected lammps input script."
     },
     {
@@ -15626,7 +15266,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_324",
-      "community": 20,
+      "community": 11,
       "norm_label": "parse geometry directly from a specific lammps input script path."
     },
     {
@@ -15636,7 +15276,7 @@
       "source_location": "L331",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_331",
-      "community": 20,
+      "community": 11,
       "norm_label": "parses a single lammps data file, identifying columns by heuristics or manual ma"
     },
     {
@@ -15646,7 +15286,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_432",
-      "community": 20,
+      "community": 11,
       "norm_label": "public wrapper for parsing a single lammps dump file."
     },
     {
@@ -15656,7 +15296,7 @@
       "source_location": "L443",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_443",
-      "community": 20,
+      "community": 11,
       "norm_label": "optimized parsing of a single lammps dump file using the c engine."
     },
     {
@@ -15666,7 +15306,7 @@
       "source_location": "L498",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_498",
-      "community": 20,
+      "community": 11,
       "norm_label": "manages persistent metadata for a simulation folder."
     },
     {
@@ -15676,7 +15316,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_506",
-      "community": 20,
+      "community": 11,
       "norm_label": "loads and merges metadata, supporting migration from legacy filenames."
     },
     {
@@ -15686,7 +15326,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_592",
-      "community": 20,
+      "community": 11,
       "norm_label": "builds a unified timestep list by merging all directories (latest wins on overla"
     },
     {
@@ -15696,7 +15336,7 @@
       "source_location": "L627",
       "_origin": "ast",
       "id": "analysis_data_manager_rationale_627",
-      "community": 20,
+      "community": 11,
       "norm_label": "returns a list of batch indices that have valid caches on disk."
     },
     {
@@ -15776,7 +15416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_lammps_parser",
-      "community": 20,
+      "community": 11,
       "norm_label": "lammps_parser.py"
     },
     {
@@ -15786,7 +15426,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser",
-      "community": 20,
+      "community": 11,
       "norm_label": "lammpsparser"
     },
     {
@@ -15796,7 +15436,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_init",
-      "community": 20,
+      "community": 11,
       "norm_label": ".__init__()"
     },
     {
@@ -15806,7 +15446,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse",
-      "community": 20,
+      "community": 11,
       "norm_label": ".parse()"
     },
     {
@@ -15816,7 +15456,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_file",
-      "community": 20,
+      "community": 11,
       "norm_label": "._parse_file()"
     },
     {
@@ -15826,7 +15466,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_resolve_include_target",
-      "community": 20,
+      "community": 11,
       "norm_label": "._resolve_include_target()"
     },
     {
@@ -15836,7 +15476,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_variable",
-      "community": 20,
+      "community": 11,
       "norm_label": "._parse_variable()"
     },
     {
@@ -15846,7 +15486,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_timestep",
-      "community": 20,
+      "community": 11,
       "norm_label": "._parse_timestep()"
     },
     {
@@ -15856,7 +15496,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_parse_create_box",
-      "community": 20,
+      "community": 11,
       "norm_label": "._parse_create_box()"
     },
     {
@@ -15866,7 +15506,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "analysis_lammps_parser_lammpsparser_get_geometry",
-      "community": 20,
+      "community": 11,
       "norm_label": ".get_geometry()"
     },
     {
@@ -15876,7 +15516,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "analysis_lammps_parser_rationale_59",
-      "community": 20,
+      "community": 11,
       "norm_label": "resolve `include` path tokens to a concrete file path.          supports:"
     },
     {
@@ -16466,7 +16106,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_ui_viewer",
-      "community": 55,
+      "community": 84,
       "norm_label": "ui_viewer.py"
     },
     {
@@ -16476,7 +16116,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "analysis_ui_viewer_columnmapdialog",
-      "community": 55,
+      "community": 25,
       "norm_label": "columnmapdialog"
     },
     {
@@ -16486,7 +16126,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "analysis_ui_viewer_columnmapdialog_init",
-      "community": 55,
+      "community": 25,
       "norm_label": ".__init__()"
     },
     {
@@ -16496,7 +16136,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "analysis_ui_viewer_columnmapdialog_center_window",
-      "community": 55,
+      "community": 25,
       "norm_label": "._center_window()"
     },
     {
@@ -16506,7 +16146,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "analysis_ui_viewer_columnmapdialog_on_apply",
-      "community": 55,
+      "community": 25,
       "norm_label": "._on_apply()"
     },
     {
@@ -16516,7 +16156,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "analysis_ui_viewer_hoppercalculatorcontroller",
-      "community": 55,
+      "community": 25,
       "norm_label": "hoppercalculatorcontroller"
     },
     {
@@ -16526,7 +16166,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "analysis_ui_viewer_hoppercalculatorcontroller_init",
-      "community": 55,
+      "community": 25,
       "norm_label": ".__init__()"
     },
     {
@@ -16536,7 +16176,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "analysis_ui_viewer_hoppercalculatorcontroller_calculate",
-      "community": 55,
+      "community": 25,
       "norm_label": ".calculate()"
     },
     {
@@ -16566,7 +16206,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_init",
-      "community": 55,
+      "community": 25,
       "norm_label": ".__init__()"
     },
     {
@@ -16596,7 +16236,7 @@
       "source_location": "L472",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_get_current_rendering_data",
-      "community": 4,
+      "community": 181,
       "norm_label": "._get_current_rendering_data()"
     },
     {
@@ -16636,7 +16276,7 @@
       "source_location": "L589",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_batch_ready",
-      "community": 162,
+      "community": 271,
       "norm_label": "._on_batch_ready()"
     },
     {
@@ -16646,7 +16286,7 @@
       "source_location": "L594",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_batch_ready_safe",
-      "community": 162,
+      "community": 271,
       "norm_label": "._on_batch_ready_safe()"
     },
     {
@@ -16656,7 +16296,7 @@
       "source_location": "L608",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_refresh_current_view",
-      "community": 162,
+      "community": 271,
       "norm_label": "._refresh_current_view()"
     },
     {
@@ -16746,7 +16386,7 @@
       "source_location": "L671",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_apply_highlight_ui",
-      "community": 4,
+      "community": 20,
       "norm_label": "._apply_highlight_ui()"
     },
     {
@@ -16756,7 +16396,7 @@
       "source_location": "L688",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_clear_highlight_ui",
-      "community": 4,
+      "community": 12,
       "norm_label": "._clear_highlight_ui()"
     },
     {
@@ -16786,7 +16426,7 @@
       "source_location": "L712",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_ask_column_mapping",
-      "community": 55,
+      "community": 4,
       "norm_label": "._ask_column_mapping()"
     },
     {
@@ -16796,7 +16436,7 @@
       "source_location": "L717",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_atom_picked",
-      "community": 4,
+      "community": 191,
       "norm_label": "._on_atom_picked()"
     },
     {
@@ -16816,7 +16456,7 @@
       "source_location": "L742",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_load_lifecycle_selection_ui",
-      "community": 4,
+      "community": 222,
       "norm_label": "._on_load_lifecycle_selection_ui()"
     },
     {
@@ -16826,7 +16466,7 @@
       "source_location": "L760",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_on_restart_editor_open",
-      "community": 4,
+      "community": 12,
       "norm_label": "._on_restart_editor_open()"
     },
     {
@@ -16836,7 +16476,7 @@
       "source_location": "L768",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_sync_restart_selection",
-      "community": 4,
+      "community": 20,
       "norm_label": "._sync_restart_selection()"
     },
     {
@@ -16846,7 +16486,7 @@
       "source_location": "L775",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_autosize_and_center",
-      "community": 4,
+      "community": 12,
       "norm_label": "._autosize_and_center()"
     },
     {
@@ -16856,7 +16496,7 @@
       "source_location": "L796",
       "_origin": "ast",
       "id": "analysis_ui_viewer_viewerapp_load_ui_state",
-      "community": 55,
+      "community": 4,
       "norm_label": "._load_ui_state()"
     },
     {
@@ -16906,7 +16546,7 @@
       "source_location": "L473",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_473",
-      "community": 4,
+      "community": 181,
       "norm_label": "standardizes data retrieval for highlighter/export during both normal and previe"
     },
     {
@@ -16916,7 +16556,7 @@
       "source_location": "L590",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_590",
-      "community": 162,
+      "community": 271,
       "norm_label": "callback from data controller when a background batch is loaded."
     },
     {
@@ -16926,7 +16566,7 @@
       "source_location": "L718",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_718",
-      "community": 4,
+      "community": 191,
       "norm_label": "callback from renderer when an atom is clicked."
     },
     {
@@ -16936,7 +16576,7 @@
       "source_location": "L743",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_743",
-      "community": 4,
+      "community": 222,
       "norm_label": "loads multiple selected folders as a single composite simulation."
     },
     {
@@ -16946,7 +16586,7 @@
       "source_location": "L761",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_761",
-      "community": 4,
+      "community": 12,
       "norm_label": "callback when a restart file is loaded for editing."
     },
     {
@@ -16956,7 +16596,7 @@
       "source_location": "L769",
       "_origin": "ast",
       "id": "analysis_ui_viewer_rationale_769",
-      "community": 4,
+      "community": 20,
       "norm_label": "syncs the selection from restart editor to the main highlighter."
     },
     {
@@ -16966,7 +16606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "analysis_utilities",
-      "community": 79,
+      "community": 195,
       "norm_label": "utilities.py"
     },
     {
@@ -16976,7 +16616,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "analysis_utilities_get_dt_token",
-      "community": 12,
+      "community": 81,
       "norm_label": "get_dt_token()"
     },
     {
@@ -16996,7 +16636,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "analysis_utilities_get_viscosity_token",
-      "community": 12,
+      "community": 81,
       "norm_label": "get_viscosity_token()"
     },
     {
@@ -17006,7 +16646,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "analysis_utilities_validate_chain_spacing",
-      "community": 79,
+      "community": 195,
       "norm_label": "validate_chain_spacing()"
     },
     {
@@ -17106,7 +16746,7 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "analysis_utilities_main",
-      "community": 79,
+      "community": 195,
       "norm_label": "main()"
     },
     {
@@ -17116,7 +16756,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_10",
-      "community": 12,
+      "community": 81,
       "norm_label": "converts a float dt into a string token suitable for filenames.     e.g., 1e-6 -"
     },
     {
@@ -17136,7 +16776,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_39",
-      "community": 12,
+      "community": 81,
       "norm_label": "converts a float viscosity into a string token suitable for filenames.     e.g.,"
     },
     {
@@ -17146,7 +16786,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "analysis_utilities_rationale_51",
-      "community": 79,
+      "community": 195,
       "norm_label": "validates spacing between consecutive atoms in the chain.     returns (is_valid,"
     },
     {
@@ -17576,7 +17216,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_run_actual_bench",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_actual_bench.py"
     },
     {
@@ -17586,7 +17226,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "scratch_run_actual_bench_run_bench",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_bench()"
     },
     {
@@ -17746,7 +17386,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_test_grid_insertion",
-      "community": 16,
+      "community": 61,
       "norm_label": "test_grid_insertion.py"
     },
     {
@@ -17756,7 +17396,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "scratch_test_grid_insertion_main",
-      "community": 16,
+      "community": 61,
       "norm_label": "main()"
     },
     {
@@ -17806,7 +17446,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scratch_test_vec",
-      "community": 20,
+      "community": 11,
       "norm_label": "test_vec.py"
     },
     {
@@ -17816,7 +17456,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "scratch_test_vec_calculate_angle",
-      "community": 20,
+      "community": 11,
       "norm_label": "calculate_angle()"
     },
     {
@@ -17826,7 +17466,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "scratch_test_vec_run_test",
-      "community": 20,
+      "community": 11,
       "norm_label": "run_test()"
     },
     {
@@ -18216,7 +17856,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "simulation_config_simulationconfig_compute_output_dir",
-      "community": 124,
+      "community": 16,
       "norm_label": ".compute_output_dir()"
     },
     {
@@ -18226,7 +17866,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "simulation_config_simulationconfig_output_dir",
-      "community": 124,
+      "community": 16,
       "norm_label": ".output_dir()"
     },
     {
@@ -18256,7 +17896,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "simulation_config_rationale_61",
-      "community": 124,
+      "community": 16,
       "norm_label": "statically computes the output directory path."
     },
     {
@@ -18266,7 +17906,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "simulation_config_rationale_66",
-      "community": 124,
+      "community": 16,
       "norm_label": "constructs the output directory path from simulation and run, or uses override i"
     },
     {
@@ -18286,7 +17926,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "simulation_grid_hopper_manager",
-      "community": 16,
+      "community": 61,
       "norm_label": "grid_hopper_manager.py"
     },
     {
@@ -18686,7 +18326,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager",
-      "community": 16,
+      "community": 3,
       "norm_label": "hoppergridmanager"
     },
     {
@@ -18696,7 +18336,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_init",
-      "community": 16,
+      "community": 3,
       "norm_label": ".__init__()"
     },
     {
@@ -18706,7 +18346,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_simulationrunner",
-      "community": 16,
+      "community": 3,
       "norm_label": "simulationrunner"
     },
     {
@@ -18716,7 +18356,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_create_hopper_grid_data",
-      "community": 16,
+      "community": 3,
       "norm_label": ".create_hopper_grid_data()"
     },
     {
@@ -18726,7 +18366,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_path",
-      "community": 16,
+      "community": 3,
       "norm_label": "path"
     },
     {
@@ -18736,7 +18376,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_py_any",
-      "community": 16,
+      "community": 3,
       "norm_label": "any"
     },
     {
@@ -18746,7 +18386,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_parse_data_file",
-      "community": 16,
+      "community": 3,
       "norm_label": "._parse_data_file()"
     },
     {
@@ -18756,7 +18396,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_hoppergridmanager_write_data",
-      "community": 16,
+      "community": 3,
       "norm_label": "._write_data()"
     },
     {
@@ -18766,7 +18406,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "simulation_hopper_grid_manager_rationale_17",
-      "community": 16,
+      "community": 3,
       "norm_label": "clones a base hopper geometry into a 3d grid.                  returns:"
     },
     {
@@ -18776,7 +18416,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "simulation_hopper_manager",
-      "community": 16,
+      "community": 61,
       "norm_label": "hopper_manager.py"
     },
     {
@@ -18806,7 +18446,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "simulation_hopper_manager_py_simulationrunner",
-      "community": 16,
+      "community": 61,
       "norm_label": "simulationrunner"
     },
     {
@@ -19056,7 +18696,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "simulation_molecule_converter",
-      "community": 16,
+      "community": 61,
       "norm_label": "molecule_converter.py"
     },
     {
@@ -19066,7 +18706,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "simulation_molecule_converter_parse_lammps_data",
-      "community": 16,
+      "community": 61,
       "norm_label": "parse_lammps_data()"
     },
     {
@@ -19076,7 +18716,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "simulation_molecule_converter_write_molecule_file",
-      "community": 16,
+      "community": 61,
       "norm_label": "write_molecule_file()"
     },
     {
@@ -19086,7 +18726,7 @@
       "source_location": "L188",
       "_origin": "ast",
       "id": "simulation_molecule_converter_convert_data_to_molecule",
-      "community": 16,
+      "community": 61,
       "norm_label": "convert_data_to_molecule()"
     },
     {
@@ -19096,7 +18736,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "simulation_molecule_converter_rationale_6",
-      "community": 16,
+      "community": 61,
       "norm_label": "parses a lammps data file (atom_style hybrid sphere angle/molecular).     return"
     },
     {
@@ -19106,7 +18746,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "simulation_molecule_converter_rationale_100",
-      "community": 16,
+      "community": 61,
       "norm_label": "writes a lammps molecule file from the parsed data.     centers the molecule at"
     },
     {
@@ -19146,7 +18786,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_hopper_fill",
-      "community": 61,
+      "community": 84,
       "norm_label": ".run_hopper_fill()"
     },
     {
@@ -19156,7 +18796,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_hopper_fill",
-      "community": 61,
+      "community": 84,
       "norm_label": ".resume_hopper_fill()"
     },
     {
@@ -19166,7 +18806,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_flop_simulation",
-      "community": 12,
+      "community": 81,
       "norm_label": ".run_flop_simulation()"
     },
     {
@@ -19176,7 +18816,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_resume_flop_simulation",
-      "community": 12,
+      "community": 81,
       "norm_label": ".resume_flop_simulation()"
     },
     {
@@ -19216,7 +18856,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "simulation_orchestrator_simulationorchestrator_run_flop_batch",
-      "community": 12,
+      "community": 81,
       "norm_label": ".run_flop_batch()"
     },
     {
@@ -19276,7 +18916,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_36",
-      "community": 61,
+      "community": 84,
       "norm_label": "pre-fill a hopper with relaxed molecular chains."
     },
     {
@@ -19286,7 +18926,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_83",
-      "community": 61,
+      "community": 84,
       "norm_label": "resume filling a hopper from a binary restart file."
     },
     {
@@ -19296,7 +18936,7 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_110",
-      "community": 12,
+      "community": 81,
       "norm_label": "run a single chain-flop simulation to analyze mobility."
     },
     {
@@ -19306,7 +18946,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_136",
-      "community": 12,
+      "community": 81,
       "norm_label": "resume a chain-flop simulation from a restart point."
     },
     {
@@ -19336,7 +18976,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "simulation_orchestrator_rationale_217",
-      "community": 12,
+      "community": 81,
       "norm_label": "run a batch of flop simulations across multiple parameters."
     },
     {
@@ -19406,7 +19046,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "simulation_runner_simulationrunner",
-      "community": 16,
+      "community": 17,
       "norm_label": "simulationrunner"
     },
     {
@@ -19416,7 +19056,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "simulation_runner_simulationrunner_init",
-      "community": 16,
+      "community": 17,
       "norm_label": ".__init__()"
     },
     {
@@ -25401,17 +25041,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L35",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
       "source_location": "L50",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -25689,17 +25318,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L197",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_dashboard",
-      "target": "views_analysis_render_analysis"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/dashboard.py",
       "source_location": "L215",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -25787,20 +25405,20 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L79",
+      "source_location": "L78",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_dashboard_rationale_79",
+      "source": "pulse_dashboard_rationale_78",
       "target": "pulse_dashboard_wrap_sim_name"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/dashboard.py",
-      "source_location": "L94",
+      "source_location": "L93",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pulse_dashboard_rationale_94",
+      "source": "pulse_dashboard_rationale_93",
       "target": "pulse_dashboard_st_directory_picker"
     },
     {
@@ -31047,43 +30665,108 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/load_atoms.py",
-      "source_location": "L5",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
+      "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pipeline_load_atoms",
+      "source": "pipeline_bond_angle_calc",
       "target": "analysis_data_manager"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/load_atoms.py",
-      "source_location": "L5",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
+      "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pipeline_load_atoms",
-      "target": "analysis_data_manager_simulationdata"
+      "source": "pipeline_bond_angle_calc",
+      "target": "analysis_data_manager_calculate_bonds_angles_vectorized"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/load_atoms.py",
-      "source_location": "L7",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
+      "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pipeline_load_atoms",
-      "target": "pipeline_load_atoms_run_load_atoms"
+      "source": "pipeline_bond_angle_calc",
+      "target": "pipeline_bond_angle_calc_run_bond_angle_calc"
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/load_atoms.py",
-      "source_location": "L9",
+      "source_file": "Pulse/pipeline/bond_angle_calc.py",
+      "source_location": "L11",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "pipeline_load_atoms_run_load_atoms",
+      "source": "pipeline_bond_angle_calc_run_bond_angle_calc",
+      "target": "analysis_data_manager_calculate_bonds_angles_vectorized"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_bond_angle_calc_run_bond_angle_calc"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage_main",
+      "target": "pipeline_bond_angle_calc_run_bond_angle_calc"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_data.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_data",
+      "target": "analysis_data_manager"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_data.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_data",
+      "target": "analysis_data_manager_simulationdata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_data.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_data",
+      "target": "pipeline_load_data_run_load_data"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/load_data.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_load_data_run_load_data",
       "target": "analysis_data_manager_simulationdata"
     },
     {
@@ -31091,22 +30774,22 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L53",
+      "source_location": "L38",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pipeline_run_stage",
-      "target": "pipeline_load_atoms_run_load_atoms"
+      "target": "pipeline_load_data_run_load_data"
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L55",
+      "source_location": "L40",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pipeline_run_stage_main",
-      "target": "pipeline_load_atoms_run_load_atoms"
+      "target": "pipeline_load_data_run_load_data"
     },
     {
       "relation": "contains",
@@ -31176,6 +30859,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L166",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -31198,9 +30891,9 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path"
     },
     {
       "relation": "method",
@@ -31218,9 +30911,9 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path"
     },
     {
       "relation": "method",
@@ -31306,6 +30999,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/run_stage.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_run_stage",
+      "target": "pipeline_pipeline_engine_pipelineengine"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "Pulse/views/results.py",
       "source_location": "L10",
       "weight": 1.0,
@@ -31320,9 +31024,9 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine_load_status",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path"
     },
     {
       "relation": "calls",
@@ -31331,9 +31035,52 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine_save_status",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_status_path"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_load_status",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L310",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pipeline/pipeline_engine.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_49",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_applicable_stages"
     },
     {
       "relation": "calls",
@@ -31440,9 +31187,9 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine_load_global_status",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path"
     },
     {
       "relation": "calls",
@@ -31451,9 +31198,9 @@
       "source_file": "Pulse/pipeline/pipeline_engine.py",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pipeline_pipeline_engine_pipelineengine_save_global_status",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path",
-      "confidence_score": 1.0
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_status_path"
     },
     {
       "relation": "calls",
@@ -31503,21 +31250,21 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L104",
+      "source_location": "L134",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_104",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_134",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_run_pipeline_status"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L135",
+      "source_location": "L165",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_135",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_165",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_global_pipeline_status"
     },
     {
       "relation": "calls",
@@ -31534,11 +31281,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L166",
+      "source_location": "L196",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_166",
-      "target": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_196",
+      "target": "pipeline_pipeline_engine_pipelineengine_get_downstream_stages"
     },
     {
       "relation": "calls",
@@ -31555,31 +31302,31 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L179",
+      "source_location": "L209",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_179",
-      "target": "pipeline_pipeline_engine_pipelineengine_submit_stage_job",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_209",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_stage_job"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L240",
+      "source_location": "L270",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_240",
-      "target": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_270",
+      "target": "pipeline_pipeline_engine_pipelineengine_submit_global_stage_job"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/pipeline_engine.py",
-      "source_location": "L297",
+      "source_location": "L327",
       "weight": 1.0,
-      "source": "pipeline_pipeline_engine_rationale_297",
-      "target": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline",
-      "confidence_score": 1.0
+      "confidence_score": 1.0,
+      "source": "pipeline_pipeline_engine_rationale_327",
+      "target": "pipeline_pipeline_engine_pipelineengine_trigger_pipeline"
     },
     {
       "relation": "contains",
@@ -31669,31 +31416,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pipeline_run_stage",
-      "target": "pipeline_run_stage_load_status"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/run_stage.py",
       "source_location": "L34",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pipeline_run_stage",
       "target": "pipeline_run_stage_main"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pipeline_run_stage",
-      "target": "pipeline_run_stage_save_status"
     },
     {
       "relation": "imports",
@@ -31705,28 +31432,6 @@
       "confidence_score": 1.0,
       "source": "pipeline_run_stage",
       "target": "pipeline_time_duration_run_time_duration"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L45",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pipeline_run_stage_main",
-      "target": "pipeline_run_stage_load_status"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/pipeline/run_stage.py",
-      "source_location": "L49",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pipeline_run_stage_main",
-      "target": "pipeline_run_stage_save_status"
     },
     {
       "relation": "calls",
@@ -31933,17 +31638,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_active_queue",
-      "target": "pulse_pulse_core"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_analysis",
       "target": "pulse_pulse_core"
     },
     {
@@ -32295,17 +31989,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_active_queue",
-      "target": "pulse_pulse_core_pbsmanager"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_analysis",
       "target": "pulse_pulse_core_pbsmanager"
     },
     {
@@ -33037,31 +32720,31 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L819",
+      "source_location": "L838",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_819",
-      "target": "pulse_pulse_core_syncmanager_restore_run"
+      "source": "pulse_pulse_core_rationale_838",
+      "target": "pulse_pulse_core_syncmanager_restore_run",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L865",
+      "source_location": "L884",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_865",
-      "target": "pulse_pulse_core_syncmanager_free_restored_space"
+      "source": "pulse_pulse_core_rationale_884",
+      "target": "pulse_pulse_core_syncmanager_free_restored_space",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L882",
+      "source_location": "L901",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_882",
-      "target": "pulse_pulse_core_syncmanager_is_running"
+      "source": "pulse_pulse_core_rationale_901",
+      "target": "pulse_pulse_core_syncmanager_is_running",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -33078,31 +32761,31 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L917",
+      "source_location": "L936",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_917",
-      "target": "pulse_pulse_core_syncmanager_stop_sync"
+      "source": "pulse_pulse_core_rationale_936",
+      "target": "pulse_pulse_core_syncmanager_stop_sync",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L945",
+      "source_location": "L964",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_945",
-      "target": "pulse_pulse_core_syncmanager_get_logs"
+      "source": "pulse_pulse_core_rationale_964",
+      "target": "pulse_pulse_core_syncmanager_get_logs",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L959",
+      "source_location": "L978",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_959",
-      "target": "pulse_pulse_core_syncmanager_get_running_info"
+      "source": "pulse_pulse_core_rationale_978",
+      "target": "pulse_pulse_core_syncmanager_get_running_info",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -33160,11 +32843,21 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/pulse_core.py",
-      "source_location": "L990",
+      "source_location": "L997",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "pulse_pulse_core_rationale_990",
-      "target": "pulse_pulse_core_autopilotmanager_trigger_manual"
+      "source": "pulse_pulse_core_rationale_997",
+      "target": "pulse_pulse_core_autopilotmanager_is_running",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "Pulse/pulse_core.py",
+      "source_location": "L1009",
+      "weight": 1.0,
+      "source": "pulse_pulse_core_rationale_1009",
+      "target": "pulse_pulse_core_autopilotmanager_trigger_manual",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -38303,38 +37996,6 @@
       "target": "views_active_queue_render_active_queue"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_analysis",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_analysis",
-      "target": "views_analysis_render_analysis"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/analysis.py",
-      "source_location": "L89",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_analysis_render_analysis",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Pulse/views/autopilot.py",
@@ -38667,17 +38328,6 @@
       "confidence_score": 1.0,
       "source": "views_visualization",
       "target": "controllers_highlighter_highlightcontroller"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "Pulse/views/visualization.py",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_visualization",
-      "target": "controllers_sim_data_simdatacontroller"
     },
     {
       "relation": "imports",
@@ -39607,28 +39257,6 @@
       "confidence_score": 1.0,
       "source": "controllers_init",
       "target": "controllers_restart_editor_restarteditorcontroller"
-    },
-    {
-      "relation": "re_exports",
-      "context": "export",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/__init__.py",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_init",
-      "target": "controllers_sim_data"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/__init__.py",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_init",
-      "target": "controllers_sim_data_simdatacontroller"
     },
     {
       "relation": "re_exports",
@@ -41664,652 +41292,6 @@
       "confidence_score": 1.0,
       "source": "controllers_restart_editor_restarteditorcontroller_save",
       "target": "controllers_restart_editor_restarteditorcontroller_close"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data",
-      "target": "analysis_data_manager"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data",
-      "target": "analysis_data_manager_load_lammps_geometry"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data",
-      "target": "analysis_data_manager_parse_simple_data_file"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data",
-      "target": "analysis_data_manager_simulationdata"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/ui_viewer.py",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "analysis_ui_viewer",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "analysis/ui_viewer.py",
-      "source_location": "L206",
-      "weight": 1.0,
-      "source": "analysis_ui_viewer_viewerapp_init",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_10",
-      "target": "controllers_sim_data_simdatacontroller"
-    },
-    {
-      "relation": "uses",
-      "confidence": "INFERRED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 0.8,
-      "confidence_score": 0.5,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "analysis_data_manager_simulationdata"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L256",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_cache_all_remaining"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_df"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L54",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_df_angles"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L40",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_df_bonds"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_df_mi"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L361",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_get_angle_data_at_timestep"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L309",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_get_atom_data_at_timestep"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L347",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_get_bond_data_at_timestep"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L344",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_get_frame_data"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L328",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_get_time_at_timestep"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L80",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_init"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L199",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_load_data_file"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L214",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_load_dataframe"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L177",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_load_dump_files"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L122",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_load_folder"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L67",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_metadata"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L375",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_normalize_dropped_path"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L292",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_parse_single_dump"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L249",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_request_batch_for_timestep"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L384",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_resolve_sim_root"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L110",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_stop_caching"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L270",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_worker_loop"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L74",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller",
-      "target": "controllers_sim_data_simdatacontroller_writable_metadata"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_13",
-      "target": "controllers_sim_data_simdatacontroller_df"
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_df",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "uses",
-      "confidence": "INFERRED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L7",
-      "weight": 0.8,
-      "confidence_score": 0.5,
-      "source": "analysis_controllers_sim_data_py_dataframe",
-      "target": "analysis_data_manager_simulationdata"
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L54",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_df_angles",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L40",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_df_bonds",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "references",
-      "context": "generic_arg",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L27",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_df_mi",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L363",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_angle_data_at_timestep",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L322",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_atom_data_at_timestep",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L349",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_bond_data_at_timestep",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L214",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_dataframe",
-      "target": "analysis_controllers_sim_data_py_dataframe"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L28",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_28",
-      "target": "controllers_sim_data_simdatacontroller_df_mi"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_41",
-      "target": "controllers_sim_data_simdatacontroller_df_bonds"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L55",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_55",
-      "target": "controllers_sim_data_simdatacontroller_df_angles"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L68",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_68",
-      "target": "controllers_sim_data_simdatacontroller_metadata"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L75",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_75",
-      "target": "controllers_sim_data_simdatacontroller_writable_metadata"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L111",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_111",
-      "target": "controllers_sim_data_simdatacontroller_stop_caching"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L137",
-      "weight": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_folder",
-      "target": "analysis_data_manager_load_lammps_geometry"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L126",
-      "weight": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_folder",
-      "target": "analysis_data_manager_simulationdata"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L168",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_folder",
-      "target": "controllers_sim_data_simdatacontroller_load_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L196",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_dump_files",
-      "target": "controllers_sim_data_simdatacontroller_load_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L181",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_dump_files",
-      "target": "controllers_sim_data_simdatacontroller_parse_single_dump"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L201",
-      "weight": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_data_file",
-      "target": "analysis_data_manager_parse_simple_data_file"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L209",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_load_data_file",
-      "target": "controllers_sim_data_simdatacontroller_load_dataframe"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L366",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_angle_data_at_timestep",
-      "target": "controllers_sim_data_simdatacontroller_request_batch_for_timestep"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L318",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_atom_data_at_timestep",
-      "target": "controllers_sim_data_simdatacontroller_request_batch_for_timestep"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L352",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_bond_data_at_timestep",
-      "target": "controllers_sim_data_simdatacontroller_request_batch_for_timestep"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L257",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_257",
-      "target": "controllers_sim_data_simdatacontroller_cache_all_remaining"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L345",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_get_frame_data",
-      "target": "controllers_sim_data_simdatacontroller_get_atom_data_at_timestep"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L329",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_rationale_329",
-      "target": "controllers_sim_data_simdatacontroller_get_time_at_timestep"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "analysis/controllers/sim_data.py",
-      "source_location": "L385",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "controllers_sim_data_simdatacontroller_resolve_sim_root",
-      "target": "controllers_sim_data_simdatacontroller_normalize_dropped_path"
     },
     {
       "relation": "contains",
@@ -51851,5 +50833,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4375fec7c5e2ac7fe99731ea7f5b482f30f55855"
+  "built_at_commit": "ab80f48968d4d6d0605fcc2c9a084d1d6d60e7e6"
 }

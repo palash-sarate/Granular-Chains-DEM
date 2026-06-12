@@ -41,8 +41,8 @@ def render_results(user_filter: str):
             # Fetch pipeline status
             status_data = PipelineEngine.get_run_pipeline_status(selected_run_path, active_pbs_ids)
             
-            # Draw pipeline stages dynamically based on RUN_PIPELINE registry
-            stages = list(PipelineEngine.RUN_PIPELINE.keys())
+            # Draw pipeline stages dynamically
+            stages = PipelineEngine.get_applicable_stages(selected_run_path)
             cols = st.columns(len(stages))
             
             for idx, stage in enumerate(stages):
@@ -51,7 +51,11 @@ def render_results(user_filter: str):
                     with st.container(border=True):
                         st.markdown(f"##### Stage: `{stage}`")
                         st.caption(config["description"])
-                        st.write(f"**Output:** `{config['output_file']}`")
+                        if isinstance(config['output_file'], list):
+                            out_str = ", ".join(f"`{f}`" for f in config['output_file'])
+                            st.markdown(f"**Output:** {out_str}")
+                        else:
+                            st.write(f"**Output:** `{config['output_file']}`")
                         
                         stg_status = status_data[stage]["status"]
                         job_id = status_data[stage]["job_id"]
@@ -69,7 +73,12 @@ def render_results(user_filter: str):
                         else:
                             st.markdown("⚪ **Not Started**")
                             
-                        if st.button(f"🔄 Redo {stage}", key=f"redo_{stage}", use_container_width=True):
+                        if isinstance(config["output_file"], list):
+                            exists = all(os.path.exists(os.path.join(selected_run_path, "results_pipeline", f)) for f in config["output_file"])
+                        else:
+                            exists = os.path.exists(os.path.join(selected_run_path, "results_pipeline", config["output_file"]))
+                        btn_label = f"🔄 Redo {stage}" if exists else f"▶️ Run {stage}"
+                        if st.button(btn_label, key=f"redo_{stage}", use_container_width=True):
                             try:
                                 PipelineEngine.trigger_pipeline(selected_run_path, stage)
                                 st.toast(f"Submitted '{stage}' and dependent downstream jobs!")
@@ -132,11 +141,16 @@ def render_results(user_filter: str):
                 dep_output = PipelineEngine.RUN_PIPELINE[dep_stage]["output_file"]
                 
                 for path in all_paths:
-                    dep_path = os.path.join(path, "results_pipeline", dep_output)
-                    if os.path.exists(dep_path):
+                    if isinstance(dep_output, list):
+                        all_exist = all(os.path.exists(os.path.join(path, "results_pipeline", f)) for f in dep_output)
+                    else:
+                        all_exist = os.path.exists(os.path.join(path, "results_pipeline", dep_output))
+                    if all_exist:
                         completed_runs.append(path)
                         
-                if st.button(f"🔄 Redo {stage_g}", key=f"redo_{stage_g}", use_container_width=True, disabled=not completed_runs):
+                out_path_g = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline", config_g["output_file"])
+                btn_label_g = f"🔄 Redo {stage_g}" if os.path.exists(out_path_g) else f"▶️ Run {stage_g}"
+                if st.button(btn_label_g, key=f"redo_{stage_g}", use_container_width=True, disabled=not completed_runs):
                     try:
                         PipelineEngine.submit_global_stage_job(stage_g, completed_runs)
                         st.toast(f"Submitted Global Pooling Job for {stage_g}!")
@@ -144,7 +158,7 @@ def render_results(user_filter: str):
                     except Exception as e:
                         st.error(f"Failed to submit: {e}")
                         
-        global_log_path = os.path.join(ROOT_DIR, "Results_Pipeline", "job_pool_time_durations.log")
+        global_log_path = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline", "job_pool_time_durations.log")
         if os.path.exists(global_log_path):
             with st.expander("View Global Pooling Job Logs"):
                 try:
@@ -153,11 +167,54 @@ def render_results(user_filter: str):
                 except:
                     pass
 
+        st.write("---")
+        st.write("### ⚙️ Batch Pipeline Execution")
+        st.caption("Trigger execution of any pipeline stage across multiple runs sequentially/parallel on the cluster.")
+        
+        c_bstg, c_bscope = st.columns(2)
+        batch_stage = c_bstg.selectbox("Select Stage to Run", ["load_data", "bond_angle_calc", "time_duration", "mass_flow_rate"], key="batch_stage_select")
+        batch_scope = c_bscope.selectbox("Select Runs Scope", ["Selected Runs", "All Runs", "All Flow Runs", "All Fill/Packing Runs"], key="batch_scope_select")
+        
+        batch_target_paths = []
+        if batch_scope == "Selected Runs":
+            selected_runs = st.multiselect("Select Runs", all_paths, format_func=lambda x: names.get(x, x), key="batch_runs_multi")
+            batch_target_paths = selected_runs
+        elif batch_scope == "All Runs":
+            batch_target_paths = all_paths
+        elif batch_scope == "All Flow Runs":
+            batch_target_paths = [p for p in all_paths if "Flow" in lineage.get(p, {}).get("simulation", "")]
+        elif batch_scope == "All Fill/Packing Runs":
+            batch_target_paths = [p for p in all_paths if "Flow" not in lineage.get(p, {}).get("simulation", "")]
+            
+        applicable_targets = [p for p in batch_target_paths if batch_stage in PipelineEngine.get_applicable_stages(p)]
+        
+        if batch_target_paths:
+            st.info(f"Resolved **{len(applicable_targets)}** applicable runs out of **{len(batch_target_paths)}** target runs for stage `{batch_stage}`.")
+            if len(applicable_targets) < len(batch_target_paths):
+                skipped_count = len(batch_target_paths) - len(applicable_targets)
+                st.caption(f"⚠️ Skipped {skipped_count} runs where stage `{batch_stage}` is not applicable.")
+        else:
+            st.warning("No runs selected or resolved for the specified scope.")
+            
+        if st.button("🚀 Launch Batch Jobs", key="btn_launch_batch", use_container_width=True, disabled=not applicable_targets):
+            submitted_count = 0
+            for path in applicable_targets:
+                try:
+                    PipelineEngine.trigger_pipeline(path, batch_stage)
+                    submitted_count += 1
+                except Exception as e:
+                    st.error(f"Failed to submit batch job for {names.get(path, path)}: {e}")
+            if submitted_count > 0:
+                st.success(f"Successfully launched batch jobs for {submitted_count} runs!")
+                st.toast(f"Launched {submitted_count} pipeline batch executions!")
+                st.rerun()
+
+
     with tab_viz:
         st.write("### 📊 Parameter Sweeps & Mass Flow Rates")
         
         st.markdown("#### 1️⃣ Hopper Emptying Time Parameter Sweep")
-        pooled_path = os.path.join(ROOT_DIR, "Results_Pipeline", "time_durations.parquet")
+        pooled_path = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline", "time_durations.parquet")
         
         if os.path.exists(pooled_path):
             try:
@@ -202,8 +259,8 @@ def render_results(user_filter: str):
         st.divider()
         st.markdown("#### 2️⃣ Mass Flow Rate Curve Comparison")
         st.caption("Select multiple runs to compare their mass decay over time.")
-        
-        selected_compare_runs = st.multiselect("Select Runs to Compare", all_paths, format_func=lambda x: names.get(x, x), key="compare_runs_multi")
+        flow_paths = [p for p in all_paths if "Flow" in lineage.get(p, {}).get("simulation", "")]
+        selected_compare_runs = st.multiselect("Select Runs to Compare", flow_paths, format_func=lambda x: names.get(x, x), key="compare_runs_multi")
         
         if selected_compare_runs:
             comparison_records = []
@@ -237,3 +294,96 @@ def render_results(user_filter: str):
                 st.warning("⚠️ None of the selected runs have completed the 'mass_flow_rate' stage yet.")
         else:
             st.info("💡 Select one or more runs from the dropdown above to render mass flow rate comparisons.")
+            
+        st.divider()
+        st.markdown("#### 3️⃣ Bond Lengths & Angles Analysis")
+        st.caption("Select a run to visualize its pre-calculated bond lengths and bond angles trajectories.")
+        
+        anal_run_path = st.selectbox("Select Simulation Run to Analyze", all_paths, format_func=lambda x: names.get(x, x), key="viz_anal_run_path")
+        
+        if anal_run_path:
+            bonds_path = os.path.join(anal_run_path, "results_pipeline", "bonds.parquet")
+            angles_path = os.path.join(anal_run_path, "results_pipeline", "angles.parquet")
+            
+            if os.path.exists(bonds_path) and os.path.exists(angles_path):
+                try:
+                    df_bonds = pd.read_parquet(bonds_path)
+                    df_angles = pd.read_parquet(angles_path)
+                    
+                    # Read dt for time mapping
+                    run_info = lineage.get(anal_run_path, {})
+                    dt = float(run_info.get("params", {}).get("dt", 1e-6))
+                    
+                    # Reset index and map time
+                    df_b = df_bonds.reset_index()
+                    df_b['time'] = df_b['timestep'] * dt
+                    
+                    df_a = df_angles.reset_index()
+                    df_a['time'] = df_a['timestep'] * dt
+                    
+                    v_tab_b, v_tab_a = st.tabs(["🔗 Bond Lengths", "📐 Bond Angles"])
+                    
+                    with v_tab_b:
+                        st.markdown("##### Global Bond Lengths Over Time")
+                        st.caption("Average bond length (with min/max boundaries) across all particle pairs in the system.")
+                        df_b_stats = df_b.groupby('time')['dist'].agg(['mean', 'min', 'max']).reset_index()
+                        st.line_chart(df_b_stats.set_index('time')[['mean', 'min', 'max']])
+                        
+                        st.markdown("##### Individual Bond Analysis")
+                        bond_ids = sorted(df_b['id'].unique())
+                        selected_bonds = st.multiselect("Select Bond IDs to trace", bond_ids, default=bond_ids[:min(5, len(bond_ids))], key="viz_sel_bonds")
+                        
+                        if selected_bonds:
+                            df_b_sel = df_b[df_b['id'].isin(selected_bonds)]
+                            df_b_pivot = df_b_sel.pivot(index='time', columns='id', values='dist')
+                            st.line_chart(df_b_pivot)
+                        else:
+                            st.info("Please select one or more bond IDs above to view their individual trajectories.")
+                            
+                        st.markdown("##### Bond Length Distribution")
+                        times = sorted(df_b['time'].unique())
+                        if len(times) > 0:
+                            selected_time = st.select_slider("Select Time for Distribution Hist", options=times, value=times[-1], key="viz_bond_time_slider")
+                            df_b_t = df_b[df_b['time'] == selected_time]
+                            counts, bin_edges = np.histogram(df_b_t['dist'].dropna(), bins=20)
+                            bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+                            hist_df = pd.DataFrame({'Bond Length': bin_centers, 'Count': counts})
+                            st.bar_chart(hist_df.set_index('Bond Length'))
+                        
+                    with v_tab_a:
+                        use_deg = st.checkbox("Show angles in Degrees (converted from Radians)", value=True, key="viz_anal_use_deg")
+                        angle_col = 'theta_deg' if use_deg else 'theta'
+                        angle_unit = "Degrees" if use_deg else "Radians"
+                        
+                        if use_deg:
+                            df_a['theta_deg'] = df_a['theta'] * 180.0 / np.pi
+                            
+                        st.markdown(f"##### Global Bond Angles Over Time ({angle_unit})")
+                        st.caption("Average bond angle (with min/max boundaries) across all particle triplets in the system.")
+                        df_a_stats = df_a.groupby('time')[angle_col].agg(['mean', 'min', 'max']).reset_index()
+                        st.line_chart(df_a_stats.set_index('time')[['mean', 'min', 'max']])
+                        
+                        st.markdown("##### Individual Angle Analysis")
+                        angle_ids = sorted(df_a['id'].unique())
+                        selected_angles = st.multiselect("Select Angle IDs to trace", angle_ids, default=angle_ids[:min(5, len(angle_ids))], key="viz_sel_angles")
+                        
+                        if selected_angles:
+                            df_a_sel = df_a[df_a['id'].isin(selected_angles)]
+                            df_a_pivot = df_a_sel.pivot(index='time', columns='id', values=angle_col)
+                            st.line_chart(df_a_pivot)
+                        else:
+                            st.info("Please select one or more angle IDs above to view their individual trajectories.")
+                            
+                        st.markdown("##### Bond Angle Distribution")
+                        times_a = sorted(df_a['time'].unique())
+                        if len(times_a) > 0:
+                            selected_time_a = st.select_slider("Select Time for Distribution Hist", options=times_a, value=times_a[-1], key="viz_angle_time_slider")
+                            df_a_t = df_a[df_a['time'] == selected_time_a]
+                            counts, bin_edges = np.histogram(df_a_t[angle_col].dropna(), bins=20)
+                            bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+                            hist_df_a = pd.DataFrame({f'Bond Angle ({angle_unit})': bin_centers, 'Count': counts})
+                            st.bar_chart(hist_df_a.set_index(f'Bond Angle ({angle_unit})'))
+                except Exception as e:
+                    st.error(f"Error loading pre-calculated bonds/angles data: {e}")
+            else:
+                st.info("💡 **Bonds & Angles not calculated yet for this run**: Run the 'bond_angle_calc' pipeline stage in the 'Data Processing Pipelines' tab first.")
