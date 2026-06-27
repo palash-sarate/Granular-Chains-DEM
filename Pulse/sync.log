@@ -1,7 +1,133 @@
-13:05:11 - Starting Sync Cycle...
-13:05:11 - Lineage rescan complete.
-13:05:12 - Active seeds in PBS: ['455062', '722570', '313325', '872001']
-13:05:12 - Found 26 runs to check for sync.
-13:05:12 - Fetching cloud inventory from Google Drive...
-13:05:35 - Found 122 files already on Drive.
-13:05:35 - Starting parallel compression with 8 workers...
+--- HPC Sync Job Started for user: guest ---
+Starting Sync Cycle...
+DEBUG: Parsed Verify_Run with N=0
+DEBUG: Parsed Grid_Flow_1H_S430167 with N=24
+DEBUG: Parsed Grid_Flow_1H_S461938 with N=48
+DEBUG: Parsed Grid_Flow_1H_S103393 with N=24
+DEBUG: Parsed Grid_Flow_1H_S283110 with N=12
+DEBUG: Parsed Grid_Flow_1H_S850217 with N=4
+DEBUG: Parsed Grid_Flow_1H_S794209 with N=24
+DEBUG: Parsed Grid_Flow_1H_S930116_S329384 with N=4
+DEBUG: Parsed Grid_Flow_1H_S815764 with N=12
+DEBUG: Parsed Grid_Flow_1H_S215588 with N=12
+DEBUG: Parsed Grid_Flow_1H_S313325_S869277 with N=4
+DEBUG: Parsed Grid_Flow_1H_S965412 with N=12
+DEBUG: Parsed Grid_Flow_1H_S890335 with N=24
+DEBUG: Parsed Grid_Flow_1H_S247996 with N=24
+DEBUG: Parsed Grid_Flow_1H_S943990 with N=24
+DEBUG: Parsed Grid_Flow_1H_S695096 with N=4
+DEBUG: Parsed Grid_Flow_1H_S546347 with N=12
+DEBUG: Parsed Grid_Flow_1H_S232222 with N=12
+DEBUG: Parsed Grid_Flow_1H_S193408 with N=48
+DEBUG: Parsed Grid_Flow_1H_S676206 with N=48
+DEBUG: Parsed Grid_Flow_1H_S524877 with N=48
+DEBUG: Parsed Grid_Flow_1H_S923472 with N=24
+DEBUG: Parsed Grid_Flow_1H_S278545 with N=4
+DEBUG: Parsed Grid_Flow_1H_S187207 with N=48
+DEBUG: Parsed Grid_Flow_1H_S455062 with N=4
+DEBUG: Parsed Grid_Flow_1H_S475822 with N=4
+DEBUG: Parsed Grid_Flow_1H_S999583 with N=4
+DEBUG: Parsed Grid_Flow_1H_S403836 with N=48
+DEBUG: Parsed Grid_Flow_1H_S872001 with N=4
+DEBUG: Parsed Grid_Flow_1H_S675494 with N=48
+DEBUG: Parsed Grid_Flow_1H_S914799 with N=4
+DEBUG: Parsed Grid_Flow_1H_S952623 with N=24
+DEBUG: Parsed Grid_Flow_1H_S718366 with N=48
+DEBUG: Parsed Grid_Flow_1H_S582215 with N=4
+DEBUG: Parsed Grid_Flow_1H_S170404 with N=12
+DEBUG: Parsed Grid_Flow_1H_S722570 with N=4
+DEBUG: Parsed Grid_Flow_1H_S403643 with N=12
+DEBUG: Parsed Grid_Fill_1H_S762288 with N=48
+DEBUG: Parsed Grid_Fill_1H_S442391 with N=48
+DEBUG: Parsed Grid_Fill_1H_S762224 with N=4
+DEBUG: Parsed Grid_Fill_1H_S762071 with N=48
+DEBUG: Parsed Grid_Fill_1H_S240587 with N=24
+DEBUG: Parsed Grid_Fill_1H_S469898 with N=24
+DEBUG: Parsed Grid_Fill_1H_S437513 with N=48
+DEBUG: Parsed Grid_Fill_1H_S762056 with N=24
+DEBUG: Parsed Grid_Fill_1H_S761743 with N=12
+DEBUG: Parsed Grid_Fill_1H_S762251 with N=12
+DEBUG: Parsed Grid_Fill_1H_S782876 with N=48
+DEBUG: Parsed Grid_Fill_1H_S762269 with N=24
+DEBUG: Parsed Grid_Fill_1H_S358667 with N=48
+DEBUG: Parsed Grid_Fill_1H_S761319 with N=4
+DEBUG: Parsed Grid_Fill_1H_S782733 with N=12
+DEBUG: Parsed Grid_Fill_1H_S631209 with N=48
+DEBUG: Parsed Grid_Fill_1H_S935840 with N=12
+DEBUG: Parsed Grid_Fill_1H_S782860 with N=24
+DEBUG: Parsed Grid_Fill_1H_S374952 with N=4
+DEBUG: Parsed Grid_Fill_1H_S481365 with N=12
+DEBUG: Parsed Grid_Fill_1H_S904266 with N=24
+DEBUG: Parsed Grid_Fill_1H_S782642 with N=4
+DEBUG: Parsed Grid_Fill_1H_S694955 with N=12
+Lineage scan complete. Total runs: 65 (60 active, 5 archived).
+Lineage rescan complete.
+Active seeds in PBS: ['455062', '722570', '313325', '872001']
+Found 26 runs to check for sync.
+Fetching cloud inventory from Google Drive...
+Found 122 files already on Drive.
+Starting parallel compression with 8 workers...
+PROGRESS_COMPRESS: 1 / 26
+Finished compressing Grid_Flow_1H_S313325_S869277.
+PROGRESS_COMPRESS: 2 / 26
+Finished compressing Grid_Flow_1H_S930116_S329384.
+PROGRESS_COMPRESS: 3 / 26
+Finished compressing Grid_Flow_1H_S103393.
+PROGRESS_COMPRESS: 4 / 26
+Finished compressing Grid_Flow_1H_S430167.
+PROGRESS_COMPRESS: 5 / 26
+Finished compressing Grid_Flow_1H_S676206.
+PROGRESS_COMPRESS: 6 / 26
+Finished compressing Grid_Flow_1H_S461938.
+PROGRESS_COMPRESS: 7 / 26
+Finished compressing Grid_Flow_1H_S524877.
+PROGRESS_COMPRESS: 8 / 26
+Finished compressing Grid_Flow_1H_S914799.
+PROGRESS_COMPRESS: 9 / 26
+Finished compressing Grid_Flow_1H_S283110.
+PROGRESS_COMPRESS: 10 / 26
+Finished compressing Grid_Flow_1H_S215588.
+PROGRESS_COMPRESS: 11 / 26
+Finished compressing Grid_Flow_1H_S965412.
+PROGRESS_COMPRESS: 12 / 26
+Finished compressing Grid_Fill_1H_S782733.
+PROGRESS_COMPRESS: 13 / 26
+Finished compressing Grid_Fill_1H_S782860.
+PROGRESS_COMPRESS: 14 / 26
+Finished compressing Grid_Fill_1H_S762071.
+PROGRESS_COMPRESS: 15 / 26
+Finished compressing Grid_Flow_1H_S999583.
+PROGRESS_COMPRESS: 16 / 26
+Finished compressing Grid_Flow_1H_S695096.
+PROGRESS_COMPRESS: 17 / 26
+Finished compressing Grid_Flow_1H_S475822.
+PROGRESS_COMPRESS: 18 / 26
+Finished compressing Grid_Flow_1H_S952623.
+PROGRESS_COMPRESS: 19 / 26
+Finished compressing Grid_Fill_1H_S631209.
+PROGRESS_COMPRESS: 20 / 26
+Finished compressing Grid_Flow_1H_S923472.
+PROGRESS_COMPRESS: 21 / 26
+Finished compressing Grid_Flow_1H_S247996.
+PROGRESS_COMPRESS: 22 / 26
+Finished compressing Grid_Flow_1H_S403643.
+PROGRESS_COMPRESS: 23 / 26
+Finished compressing Grid_Flow_1H_S718366.
+PROGRESS_COMPRESS: 24 / 26
+Finished compressing Grid_Flow_1H_S193408.
+PROGRESS_COMPRESS: 25 / 26
+Finished compressing Grid_Flow_1H_S170404.
+PROGRESS_COMPRESS: 26 / 26
+Finished compressing Grid_Fill_1H_S762288.
+Starting bulk upload to Google Drive...
+Upload successful.
+Starting Smart Cleanup...
+Cleaning up local files for: Grid_Fill_1H_S935840
+Cleaning up local files for: Grid_Fill_1H_S437513
+Cleaning up local files for: Grid_Fill_1H_S481365
+Cleaning up local files for: Grid_Fill_1H_S240587
+Cleaning up local files for: Grid_Fill_1H_S358667
+Cleaning up local files for: Grid_Fill_1H_S469898
+Cleanup complete. Removed 6 parent directories.
+Sync Cycle Finished Successfully.
+--- HPC Sync Job Finished ---

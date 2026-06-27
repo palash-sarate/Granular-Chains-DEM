@@ -137,9 +137,17 @@ def run_manager():
 
     slots_available = max_concurrent - active_guest_jobs
 
-    # 4. Fetch latest lineage
-    with open(LINEAGE_FILE, "r") as f:
-        lineage = json.load(f)
+    # 4. Fetch latest lineage (refresh from dumping yard first)
+    try:
+        import sys
+        if ROOT_DIR not in sys.path:
+            sys.path.append(ROOT_DIR)
+        from Pulse.lineage_tracker import scan_dumping_yard
+        lineage = scan_dumping_yard()
+    except Exception as e:
+        print(f"Warning: Failed to scan lineage: {e}")
+        with open(LINEAGE_FILE, "r") as f:
+            lineage = json.load(f)
 
     # 5. Round Robin Selection
     goals = data.get("goals", {})

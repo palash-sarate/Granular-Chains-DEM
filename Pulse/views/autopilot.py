@@ -143,15 +143,12 @@ def render_autopilot(user_filter: str):
     # --- Fleet Progress ---
     st.subheader("📋 Active Fleet Progress")
     goals = auto_data.get("goals", {})
+    lineage = scan_dumping_yard() or {} # Refresh lineage for accuracy
+    active_jobs = PBSManager.get_jobs(user=user_filter)
+    
     if not goals:
         st.info("Your fleet is currently empty. Add nodes from the '🧬 Lineage' tab to start automated runs.")
     else:
-        # Prepare interactive layout
-        lineage = scan_dumping_yard() or {} # Refresh lineage for accuracy
-        
-        # Fetch active jobs once for real-time status updates
-        active_jobs = PBSManager.get_jobs(user=user_filter)
-        
         # Interactive columns grid
         hdr_cols = st.columns([2.0, 1.5, 0.8, 1.0, 1.0, 1.2, 0.5])
         hdr_cols[0].markdown("**Simulation Run**")
@@ -373,3 +370,75 @@ def render_autopilot(user_filter: str):
             auto_data["goals"] = new_goals
             save_auto_pilot(auto_data)
             st.rerun()
+
+    # --- Identify and display untracked active autopilot jobs ---
+    untracked_ap_jobs = []
+    for j in active_jobs:
+        j_name = j.get("Job_Name", "") or j.get("name", "") or ""
+        if j_name.startswith("AP_"):
+            # Check if it matches any active goal
+            matched = False
+            for run_path, goal in goals.items():
+                name = os.path.basename(run_path)
+                target_seed = str(goal.get("params", {}).get("seed", ""))
+                if not target_seed:
+                    import re
+                    match = re.search(r'S(\d+)', name)
+                    if match:
+                        target_seed = match.group(1)
+                
+                if target_seed:
+                    expected_job_name = f"AP_{target_seed}_{name}"[:15]
+                else:
+                    expected_job_name = f"AP_{name}"[:15]
+                
+                legacy_name = f"AP_{name}"
+                if j_name == expected_job_name or legacy_name == j_name or (len(j_name) == 15 and legacy_name.startswith(j_name)):
+                    matched = True
+                    break
+            if not matched:
+                untracked_ap_jobs.append(j)
+
+    if untracked_ap_jobs:
+        st.write("---")
+        st.warning("⚠️ **Untracked Running Auto-Pilot Jobs**")
+        st.markdown(
+            "The following simulation runs are currently executing under Auto-Pilot names on the cluster, "
+            "but they are not in your active fleet goals list (e.g., they may have been completed and cleared, "
+            "or deleted from the goals list):"
+        )
+        for j in untracked_ap_jobs:
+            resolved = PBSManager.resolve_job_details(j, lineage)
+            j_id = j.get("id")
+            j_name = j.get("Job_Name")
+            j_state = j.get("job_state")
+            cpu = j.get("resources_used.cpupercent", "0")
+            mem = j.get("resources_used.mem", "0kb")
+            
+            with st.container(border=True):
+                col_u1, col_u2, col_u3 = st.columns([2.0, 1.0, 1.0])
+                col_u1.markdown(f"**Job ID:** `{j_id}` | **Name:** `{j_name}`")
+                col_u1.markdown(f"**Resolved Run:** `{resolved['run_name']}`")
+                if resolved['run_path']:
+                    col_u1.markdown(f"<small style='color: grey;'>Path: {resolved['run_path']}</small>", unsafe_allow_html=True)
+                
+                col_u2.markdown(f"**State:** `{j_state}`")
+                col_u2.markdown(f"**CPU Load:** `{cpu}%` | **RAM:** `{mem}`")
+                
+                with col_u3:
+                    if st.button("❌ Terminate Job", key=f"kill_untracked_{j_id}", help="Kill this PBS job"):
+                        try:
+                            PBSManager.delete_job(j_id)
+                            st.success(f"Job {j_id} deleted.")
+                            time.sleep(0.5)
+                            st.rerun()
+                        except Exception as kill_err:
+                            st.error(f"Failed to delete job: {kill_err}")
+                
+                if resolved['log_path'] and os.path.exists(resolved['log_path']):
+                    with st.expander(f"📄 View Logs for Job {j_id}", expanded=False):
+                        try:
+                            with open(resolved['log_path'], 'r', encoding='utf-8', errors='replace') as lf:
+                                st.code(lf.read()[-15000:], language="text")
+                        except Exception as log_err:
+                            st.error(f"Error reading log file: {log_err}")

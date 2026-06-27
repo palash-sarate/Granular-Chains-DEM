@@ -68,6 +68,46 @@ def render_active_queue(refresh_rate: int, user_filter: str):
                         st.error(f"Reason: {reason or 'None'}")
                         st.code(f"Error Path: {hj.get('Error_Path')}")
 
+            # Active Job Inspector (details and live log preview)
+            import os
+            st.write("---")
+            st.subheader("🔍 Active Job Inspector")
+            st.caption("Select a running/queued job to view resolved simulation/pipeline details and live output logs.")
+            
+            job_opts = [f"{j.get('id')} ({j.get('Job_Name')})" for j in jobs]
+            selected_job_opt = st.selectbox("Select Job to Inspect", job_opts, key="active_q_inspect_job")
+            
+            if selected_job_opt:
+                selected_job_id = selected_job_opt.split(" ")[0]
+                sel_job = next((j for j in jobs if j.get("id") == selected_job_id), None)
+                if sel_job:
+                    lineage = PBSManager.load_lineage()
+                    resolved = PBSManager.resolve_job_details(sel_job, lineage)
+                    
+                    st.markdown("##### Resolved Details")
+                    col_j1, col_j2 = st.columns(2)
+                    col_j1.markdown(f"**Run Name:** `{resolved['run_name']}`")
+                    if resolved['run_path']:
+                        col_j1.markdown(f"**Run Path:** `{resolved['run_path']}`")
+                    col_j2.markdown(f"**Resolved Task/Stage:** `{resolved['stage']}`")
+                    if resolved['log_path']:
+                        col_j2.markdown(f"**Log File:** `{os.path.basename(resolved['log_path'])}`")
+                    
+                    if resolved['log_path']:
+                        if os.path.exists(resolved['log_path']):
+                            with st.expander("📄 View Live Output Log", expanded=True):
+                                try:
+                                    with open(resolved['log_path'], 'r', encoding='utf-8', errors='replace') as lf:
+                                        log_content = lf.read()
+                                        if log_content.strip():
+                                            st.code(log_content[-20000:], language="text") # Show last 20k characters
+                                        else:
+                                            st.info("Log file is currently empty.")
+                                except Exception as e:
+                                    st.error(f"Error reading log file: {e}")
+                        else:
+                            st.info(f"Log file not created yet on disk at: `{resolved['log_path']}`")
+
         # Metrics summary
         col1, col2, col3 = st.columns(3)
         col1.metric("Total Jobs", len(jobs))

@@ -382,6 +382,110 @@ class PBSManager:
             
         return temps
 
+    @staticmethod
+    def resolve_job_details(job: Dict, lineage: Dict) -> Dict:
+        """
+        Resolves a PBS job to a specific simulation run, pipeline stage, and log path.
+        """
+        import re
+        job_name = job.get("Job_Name", "") or job.get("name", "") or ""
+        job_id = job.get("id", "")
+        
+        # Default values
+        res = {
+            "run_name": "Unknown",
+            "run_path": None,
+            "stage": "Unknown",
+            "log_path": None
+        }
+        
+        # 1. Check if it is a Global Pool job
+        if job_name == "Global_Pool" or "Global_Pool" in job_name:
+            res["run_name"] = "Global"
+            res["stage"] = "Global Pool: pool_time_durations"
+            res["log_path"] = os.path.join(ROOT_DIR, "dumping_yard", "Results_Pipeline", "job_pool_time_durations.log")
+            return res
+            
+        # 2. Check if it is a Results Pipeline job (starts with P_)
+        if job_name.startswith("P_"):
+            # Format: P_{stage_name[:6]}_{run_name[-5:]}
+            parts = job_name.split("_")
+            if len(parts) >= 3:
+                stage_prefix = "_".join(parts[1:-1])
+                run_suffix = parts[-1]
+                
+                stages_map = {
+                    "load_d": "load_data",
+                    "bond_a": "bond_angle_calc",
+                    "time_d": "time_duration",
+                    "mass_f": "mass_flow_rate"
+                }
+                stage_name = stages_map.get(stage_prefix, stage_prefix)
+                res["stage"] = f"Pipeline: {stage_name}"
+                
+                # Search lineage for matching run suffix
+                for r_path, r_info in lineage.items():
+                    r_name = r_info.get("name", "")
+                    if r_name.endswith(run_suffix) or run_suffix in r_name:
+                        res["run_name"] = r_name
+                        res["run_path"] = r_path
+                        res["log_path"] = os.path.join(r_path, "results_pipeline", f"job_{stage_name}.log")
+                        break
+            return res
+            
+        # 3. Check if it is an Autopilot/Simulation job (starts with AP_)
+        if job_name.startswith("AP_"):
+            # Could be AP_NewRoot_fill_...
+            if "NewRoot" in job_name:
+                res["stage"] = "Simulation: New Fill"
+                match = re.search(r"fill_(\d+)", job_name)
+                if match:
+                    seed = match.group(1)
+                    res["run_name"] = f"New Run (Seed: {seed})"
+                    for r_path, r_info in lineage.items():
+                        if str(r_info.get("params", {}).get("seed", "")) == seed:
+                            res["run_name"] = r_info.get("name", "")
+                            res["run_path"] = r_path
+                            break
+                res["log_path"] = os.path.join(ROOT_DIR, "PBS_Output", f"{job_name}.log")
+                return res
+                
+            # Could be AP_{seed}_{run_name_truncated}
+            seed_match = re.match(r"^AP_(\d{3,6})_", job_name)
+            seed = seed_match.group(1) if seed_match else None
+            
+            if seed:
+                for r_path, r_info in lineage.items():
+                    if str(r_info.get("params", {}).get("seed", "")) == seed:
+                        res["run_name"] = r_info.get("name", "")
+                        res["run_path"] = r_path
+                        
+                        sim_type = r_info.get("simulation", "")
+                        if "Flow" in sim_type or "flow" in r_path.lower():
+                            res["stage"] = "Simulation: Flow"
+                        else:
+                            res["stage"] = "Simulation: Fill"
+                        break
+            else:
+                # Try search by run name in job name
+                clean_name = job_name.replace("AP_", "")
+                for r_path, r_info in lineage.items():
+                    r_name = r_info.get("name", "")
+                    if clean_name in r_name or r_name.startswith(clean_name):
+                        res["run_name"] = r_name
+                        res["run_path"] = r_path
+                        sim_type = r_info.get("simulation", "")
+                        if "Flow" in sim_type or "flow" in r_path.lower():
+                            res["stage"] = "Simulation: Flow"
+                        else:
+                            res["stage"] = "Simulation: Fill"
+                        break
+                        
+            res["log_path"] = os.path.join(ROOT_DIR, "PBS_Output", f"{job_name}.log")
+            return res
+            
+        return res
+
 class SimulationMonitor:
     @staticmethod
     def estimate_eta(directory: str, target_relative_steps: int) -> Dict:

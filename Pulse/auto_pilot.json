@@ -4,285 +4,9 @@
         "polite_mode": true,
         "cron_interval_minutes": 60,
         "enabled": true,
-        "last_heartbeat": "2026-06-12T13:05:01.242171"
+        "last_heartbeat": "2026-06-27T17:10:01.717559"
     },
     "goals": {
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762224": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-11T10:46:42.830468",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 4,
-                "n_fill": 3600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "hopper_ang": 30
-                },
-                "seed": 762224
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761319": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-11T15:00:01.969701",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 4,
-                "n_fill": 3600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 761319
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S761743": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-11T13:23:31.054251",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 12,
-                "n_fill": 1200,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 761743
-            },
-            "polite_mode": true
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762056": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-11T15:40:01.275481",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 24,
-                "n_fill": 600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 762056
-            },
-            "polite_mode": true
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S762071": {
-            "target_steps": 2200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-12T06:59:49.356747",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 48,
-                "n_fill": 300,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025
-                },
-                "seed": 762071
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782642": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-10T20:35:01.038961",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 4,
-                "n_fill": 3600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025,
-                    "hopper_ang": 30
-                },
-                "seed": 782642
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782733": {
-            "target_steps": 2200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-12T07:00:01.455257",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 12,
-                "n_fill": 1200,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025,
-                    "hopper_ang": 30
-                },
-                "seed": 782733
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782860": {
-            "target_steps": 2200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-12T07:10:01.545444",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 24,
-                "n_fill": 600,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025,
-                    "hopper_ang": 30
-                },
-                "seed": 782860
-            }
-        },
-        "/Data/palash_data/dumping_yard/Hopper_Fill/Grid_Fill_1H_S782876": {
-            "target_steps": 2000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-11T10:46:43.893569",
-            "status": "Running",
-            "mode": "fill_resume",
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb",
-                "N": 48,
-                "n_fill": 300,
-                "source_dir": "chain_data/relaxed_2D_x",
-                "spacing": 0.5,
-                "n_hoppers": 1,
-                "mode": "2D_stacked",
-                "dump_file": "simulation_templates/default_dump.inc",
-                "simulation": "Hopper_Fill",
-                "no-vtk": true,
-                "geometry_vars": {
-                    "orifice_half": 0.025,
-                    "hopper_ang": 30
-                },
-                "seed": 782876
-            }
-        },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S943990_S520119": {
             "target_steps": 9200000,
             "increment": 100000,
@@ -304,7 +28,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T12:20:01.904710",
+            "last_submitted": "2026-06-27T15:05:02.135383",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -355,7 +79,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T13:00:01.199913",
+            "last_submitted": "2026-06-27T15:45:01.976170",
             "status": "Running",
             "mode": "flow_resume",
             "params": {
@@ -404,209 +128,11 @@
                 "mem": "16gb"
             }
         },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S103393": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-06T22:55:01.993572",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S890335": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-06T22:55:01.996399",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S247996": {
-            "target_steps": 9400000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-10T11:15:01.563022",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S461938": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T14:20:01.692524",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S718366": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T14:35:01.806216",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S923472": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T04:50:01.625952",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S675494": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T14:45:01.884675",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S187207": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T18:35:01.599622",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S952623": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T12:50:01.166838",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S430167": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T12:50:01.169990",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S193408": {
-            "target_steps": 9200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T18:50:01.716649",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
         "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S872001": {
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T13:05:01.253876",
+            "last_submitted": "2026-06-27T16:15:01.759358",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -624,7 +150,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T12:05:01.786723",
+            "last_submitted": "2026-06-27T14:55:02.497535",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -642,7 +168,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T10:40:01.116742",
+            "last_submitted": "2026-06-27T16:21:15.189070",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -660,25 +186,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T11:15:01.388325",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S582215": {
-            "target_steps": 6000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-05T21:00:01.174844",
+            "last_submitted": "2026-06-27T16:25:02.386713",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -696,25 +204,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T11:24:18.648085",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S278545": {
-            "target_steps": 6000000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-05T22:05:01.678190",
+            "last_submitted": "2026-06-27T17:10:02.277598",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -732,7 +222,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T11:25:01.468631",
+            "last_submitted": "2026-06-27T14:25:02.170697",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
@@ -750,115 +240,7 @@
             "target_steps": 6000000,
             "increment": 100000,
             "in_place": true,
-            "last_submitted": "2026-06-12T11:30:01.512602",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S215588": {
-            "target_steps": 8200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T18:40:01.806643",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S965412": {
-            "target_steps": 8200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T19:55:01.367409",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S283110": {
-            "target_steps": 8200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T20:10:01.493379",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S546347": {
-            "target_steps": 8200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T21:20:02.011382",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S403643": {
-            "target_steps": 8200000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-07T23:15:01.878473",
-            "status": "Running",
-            "mode": "flow_resume",
-            "polite_mode": true,
-            "params": {
-                "dt": 1e-06,
-                "viscosity": 1e-06,
-                "num_procs": 8,
-                "num_threads": 1,
-                "walltime": "24:00:00",
-                "ppn": 16,
-                "mem": "16gb"
-            }
-        },
-        "/Data/palash_data/dumping_yard/Grid_Hopper_Flow/Grid_Flow_1H_S170404": {
-            "target_steps": 8300000,
-            "increment": 100000,
-            "in_place": true,
-            "last_submitted": "2026-06-09T23:45:01.958216",
+            "last_submitted": "2026-06-27T14:50:01.906424",
             "status": "Running",
             "mode": "flow_resume",
             "polite_mode": true,
